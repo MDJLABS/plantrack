@@ -121,7 +121,12 @@ jour : jamais ccr/claude-code-router, jamais de clé API Anthropic.
 Restent honnêtement « à confirmer par un utilisateur réel » (notes dans le
 README et pt.py) : CODEX_THREAD_ID/CODEX_SANDBOX comme détection de rôle.
 
+### Questions §17 TRANCHÉES — 2026-08-29 (PRD amendé)
+- wont_fix : statu quo — proposition en prose + `!note`, pas d'état formel.
+- Mode strict §10-B : pas construit tant que `plantrack stats` ne montre pas
+  de blocages pre-commit fréquents ; jamais par défaut.
+Le PRD n'a plus de question ouverte.
+
 ### Prochaine action
-Gate : trancher §17 (agent proposant wont_fix ; mode strict §10-B par
-défaut), pousser GitHub (`! gh auth login` puis créer `mdjlabs/plantrack`
-privé), ou pause.
+Gate : pousser GitHub (`! gh auth login` puis créer `mdjlabs/plantrack`
+privé et pousser), ou pause / fin de session.

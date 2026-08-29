@@ -273,4 +273,4 @@ Sans ces chiffres, impossible de savoir dans six semaines si l'outil sert, et le
 | Dérive vers un Jira maison | §3 opposable à toute demande d'ajout |
 | IDs séquentiels par rejeu, en multi-branches | À revoir si travail sur worktrees parallèles — préférer alors un suffixe aléatoire |
 
-**À trancher pendant l'implémentation** : faut-il que l'agent puisse *proposer* `wont_fix` (soumis à validation) plutôt que d'en être totalement exclu ; et si le mode `strict` du §10-B doit devenir le défaut une fois éprouvé.
+**Tranché le 2026-08-29 (décisions Mariella)** : l'agent propose `wont_fix` en prose (le message de refus l'y invite, `!note` pour survivre à la compaction) — pas d'état formel « proposé » ; le mode `strict` du §10-B n'est **pas construit** tant que les chiffres de `plantrack stats` ne montrent pas de blocages pre-commit fréquents — jamais par défaut.
