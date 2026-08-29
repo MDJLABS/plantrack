@@ -131,7 +131,8 @@ de le maintenir par principe. C'est aussi le seul argument crédible le jour où
 
 Le PRD fait foi : voir `PRD-PlanTrack-v0.2.md` (jalons §16). Livré : couches 1 à 4
 (capture, plan phases/tâches, bugs/tentatives, pre-commit) + `init`/`doctor`/`stats`
-+ le portage Codex (§13 — reste sa validation sur un projet réel repris depuis Codex).
++ le portage Codex (§13 — testé sur le contrat documenté ; PlanTrack n'installe jamais
+d'agent, la validation en conditions réelles appartient à qui installe Codex).
 Reste : la publication —
 uniquement si les chiffres de `plantrack stats` la justifient. La greffe sur Beads a
 été écartée par décision de conception (PRD §6 : un stockage binaire interdit le diff

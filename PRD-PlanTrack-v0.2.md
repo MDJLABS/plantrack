@@ -260,7 +260,7 @@ Sans ces chiffres, impossible de savoir dans six semaines si l'outil sert, et le
 | **v0** ✅ | Couche capture, 4 hooks, journal, CLI de base | Scénario §5 rejoué et passé |
 | **v0.5** | Couche 4 (pre-commit) — la plus rentable, avant le plan | Test 8 |
 | **v1.0** | Couche 2 (plan) + couche 3 (bugs/tentatives) | Tests 1 à 11 |
-| **v1.1** | `init`, portage Codex, `doctor`, `stats` | Un projet réel repris depuis Codex |
+| **v1.1** | `init`, portage Codex, `doctor`, `stats` | Traduction de config livrée et testée sur le contrat documenté (décision 2026-08-29 : PlanTrack est compatible avec les agents, il ne les installe jamais — la validation sur un agent réel appartient à l'utilisateur qui l'installe) |
 | **Publication** | README, démo, packaging | Uniquement si les chiffres du §15 le justifient |
 
 ## 17. Risques et points à trancher

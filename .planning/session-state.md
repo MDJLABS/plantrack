@@ -109,12 +109,19 @@ depuis Codex » — le binaire `codex` n'est PAS installé sur la machine (seul 
 ~/.codex/config.toml claude-code-router du 11/08 existe) ; installation + auth
 à décider avec Mariella.
 
+### Jalon v1.1 SOLDÉ — décision Mariella 2026-08-29
+« Le but c'est que ce mini projet soit compatible avec n'importe quel agent de
+codage cli, non pas de tous les installer. le user installera ceux qu'il
+voudra. » → PlanTrack est COMPATIBLE avec les agents, il ne les installe
+jamais. Le critère de sortie v1.1 du PRD (§16) a été amendé en conséquence :
+traduction de config livrée et testée sur le contrat documenté suffit.
+Codex (installé un temps pour valider) a été DÉSINSTALLÉ ; le banc de
+validation scratchpad supprimé. Interdictions permanentes actées le même
+jour : jamais ccr/claude-code-router, jamais de clé API Anthropic.
+Restent honnêtement « à confirmer par un utilisateur réel » (notes dans le
+README et pt.py) : CODEX_THREAD_ID/CODEX_SANDBOX comme détection de rôle.
+
 ### Prochaine action
-Binaire `codex` 0.151.0 installé (npm). Interdiction actée par Mariella
-(2026-08-29) : plus jamais ccr/claude-code-router ni de clé API Anthropic —
-la seule voie pour la validation réelle est `! codex login` (compte OpenAI,
-fait par Mariella). Banc de validation prêt dans le scratchpad (projet git
-+ init --agent codex + journal semé t1/d1) mais jetable, à refaire au besoin.
-Gate : `! codex login` puis validation réelle, trancher §17, ou pause.
-GitHub toujours en attente de `! gh auth login` (puis créer
-`mdjlabs/plantrack` privé et pousser).
+Gate : trancher §17 (agent proposant wont_fix ; mode strict §10-B par
+défaut), pousser GitHub (`! gh auth login` puis créer `mdjlabs/plantrack`
+privé), ou pause.
