@@ -68,6 +68,12 @@ du carnet. Au quotidien :
   un motif conservé — l'agent ne retentera pas deux fois la même correction.
 - **Une nouvelle session démarre ?** Rien à faire : l'état complet (fils en
   cours, décisions, bugs ouverts) est réinjecté automatiquement.
+- **L'agent écrit désormais lui-même au carnet.** Une décision prise en
+  conversation, un bug repéré en passant, un piège technique découvert : il les
+  consigne lui-même via la CLI (`./plantrack decide/bug/piege`), marqués
+  `(agent)` pour qu'on distingue toujours ce qu'il a noté de ce que tu as noté.
+  Avant de corriger un bug, il consulte d'abord les tentatives passées — il ne
+  retente jamais une hypothèse déjà rejetée.
 
 Le carnet (`.plantrack/events.jsonl`) ne fait que s'allonger, ligne par ligne :
 rien ne s'y supprime, l'état courant est recalculé en le relisant. Changer
@@ -107,6 +113,9 @@ avant d'atteindre le modèle** : son contexte reste propre.
 | `!decide on abandonne X — motif : Y` | acte une décision, rappelée à chaque session |
 | `!park reste à faire… ne pas toucher à Z` | met le fil en pause **avec note de reprise obligatoire** |
 | `!close` | ferme le fil actif |
+| `!piege le cache invalide la session` | note un piège technique, rappelé à chaque session |
+| `!question faut-il garder l'ancien format ?` | pose une question à l'humain, rappelée tant que sans réponse |
+| `!answer q1 oui, on garde` | toi seule : réponds à une question en attente |
 | `!state` | affiche l'état persistant |
 | `!n'importe quel texte` | capture libre dans l'inbox, à classer plus tard |
 
@@ -126,6 +135,16 @@ Côté humain, hors session :
 ./plantrack reject b1 -m "le cache n'était pas la cause, ne pas retenter"
 ./plantrack file n1 bug         # classe une note d'inbox en bug
 ./plantrack stats               # usage sur 14 jours — la mesure qui justifie l'outil
+```
+
+Côté agent, dans son propre shell (v1.5) :
+
+```bash
+./plantrack decide "texte"      # acte une décision, marquée (agent)
+./plantrack bug "texte"         # crée un bug, marqué (agent) — ./plantrack bug <id> <statut> reste le changement de statut
+./plantrack piege "texte"       # note un piège technique
+./plantrack question "texte"    # pose une question, rappelée jusqu'à réponse
+./plantrack answer q1 "texte"   # toi seule, hors session
 ```
 
 ## Sous le capot
@@ -195,7 +214,7 @@ echo '{"source":"compact"}'            | python3 .claude/hooks/pt.py hook-contex
 
 Le scénario complet — ouvrir un fil, éditer, remonter un bug ailleurs, acter
 une décision, parker, ouvrir un autre fil, revenir — est rejoué par
-`tests/scenario.sh` (165 vérifications).
+`tests/scenario.sh` (203 vérifications).
 
 ## Limites assumées
 

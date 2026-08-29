@@ -444,5 +444,102 @@ out=$(env -u CLAUDECODE -u CLAUDE_CODE_ENTRYPOINT CODEX_THREAD_ID=th1 python3 "$
 check "l agent Codex est detecte (CODEX_THREAD_ID)" "reserve a l'humain" "$out"
 check_exit "wont_fix refuse cote agent Codex" 1 "$rc"
 
+# 25. v1.5 — provenance (agent)/(humain) sur decisions et bugs, CLI decide/bug (creation),
+# desambiguation avec le changement de statut existant
+TMP10=$(mktemp -d)
+out=$(CLAUDE_PROJECT_DIR="$TMP10" python3 "$PT" decide "on utilise redis pour le cache" 2>&1)
+check "plantrack decide cree une decision" "decision d1 actee" "$out"
+out=$(CLAUDE_PROJECT_DIR="$TMP10" python3 "$PT" status 2>&1)
+check "decision creee par la CLI est marquee (agent)" "(agent)" "$out"
+out=$(printf '{"prompt":"!decide on garde postgres"}' | CLAUDE_PROJECT_DIR="$TMP10" python3 "$PT" hook-prompt 2>&1)
+check "!decide via hook enregistre d2" "decision d2 actee" "$out"
+out=$(CLAUDE_PROJECT_DIR="$TMP10" python3 "$PT" status 2>&1)
+d2line=$(printf '%s\n' "$out" | grep "^  d2 ")
+check_not "!decide via hook ne porte pas de marqueur (agent)" "(agent)" "$d2line"
+
+out=$(CLAUDE_PROJECT_DIR="$TMP10" python3 "$PT" bug "le paiement echoue" --high 2>&1)
+check "plantrack bug <texte> cree un bug" "bug b1" "$out"
+check "plantrack bug <texte> porte la severite" "[high]" "$out"
+out=$(CLAUDE_PROJECT_DIR="$TMP10" python3 "$PT" bugs 2>&1)
+check "bug cree par la CLI est marque (agent)" "(agent)" "$out"
+out=$(CLAUDE_PROJECT_DIR="$TMP10" python3 "$PT" bug b1 to_verify 2>&1)
+check "bug <id> <statut> reste le changement de statut (desambiguation)" "to_verify" "$out"
+out=$(CLAUDE_PROJECT_DIR="$TMP10" python3 "$PT" bugs 2>&1)
+check "le statut de b1 a bien change" "to_verify" "$out"
+rm -rf "$TMP10"
+
+# 26. v1.5 — bloc-notes des pieges : hook + CLI, reinjection, ids sequentiels
+TMP11=$(mktemp -d)
+out=$(printf '{"prompt":"!piege le cache invalide la session au deploy"}' \
+  | CLAUDE_PROJECT_DIR="$TMP11" python3 "$PT" hook-prompt 2>&1); rc=$?
+check_exit "!piege rejette le prompt (exit 2)" 2 "$rc"
+check "!piege note p1" "piege p1 note" "$out"
+out=$(CLAUDE_PROJECT_DIR="$TMP11" python3 "$PT" piege "ne jamais committer .env" 2>&1)
+check "plantrack piege cree p2" "piege p2 note" "$out"
+out=$(printf '{"source":"startup"}' | CLAUDE_PROJECT_DIR="$TMP11" python3 "$PT" hook-context 2>&1)
+check "les pieges sont reinjectes" "Pieges connus" "$out"
+check "p1 apparait dans le bloc" "p1 :" "$out"
+check "p2 apparait dans le bloc" "p2 :" "$out"
+rm -rf "$TMP11"
+
+# 27. v1.5 — questions en attente de verdict : hook + CLI, reponse fait disparaitre du bloc
+TMP12=$(mktemp -d)
+out=$(printf '{"prompt":"!question faut-il garder l ancien format d export ?"}' \
+  | CLAUDE_PROJECT_DIR="$TMP12" python3 "$PT" hook-prompt 2>&1); rc=$?
+check_exit "!question rejette le prompt (exit 2)" 2 "$rc"
+check "!question enregistre q1" "question q1 enregistree" "$out"
+out=$(printf '{"source":"startup"}' | CLAUDE_PROJECT_DIR="$TMP12" python3 "$PT" hook-context 2>&1)
+check "la question en attente ressort dans le bloc" "Questions en attente" "$out"
+check "q1 apparait dans le bloc" "q1 :" "$out"
+
+out=$(CLAUDE_PROJECT_DIR="$TMP12" python3 "$PT" question "prochaine version : 2.0 ou 1.6 ?" 2>&1)
+check "plantrack question cree q2" "question q2 enregistree" "$out"
+
+out=$(env -u CLAUDECODE -u CLAUDE_CODE_ENTRYPOINT CLAUDE_PROJECT_DIR="$TMP12" python3 "$PT" answer q1 "oui, on garde l ancien format" 2>&1)
+check "plantrack answer repond a q1" "q1 repondue" "$out"
+out=$(printf '{"source":"startup"}' | CLAUDE_PROJECT_DIR="$TMP12" python3 "$PT" hook-context 2>&1)
+check_not "q1 repondue disparait du bloc" "q1 :" "$out"
+check "q2 encore sans reponse reste dans le bloc" "q2 :" "$out"
+
+out=$(env -u CLAUDECODE -u CLAUDE_CODE_ENTRYPOINT CLAUDE_PROJECT_DIR="$TMP12" python3 "$PT" answer qX "texte" 2>&1); rc=$?
+check "answer sur id inconnu : erreur claire" "introuvable" "$out"
+check_exit "answer id inconnu sort en erreur" 1 "$rc"
+
+out=$(env -u CLAUDECODE -u CLAUDE_CODE_ENTRYPOINT CLAUDE_PROJECT_DIR="$TMP12" python3 "$PT" answer q1 "autre reponse" 2>&1); rc=$?
+check "answer sur question deja repondue : erreur claire" "deja une reponse" "$out"
+check_exit "answer deja repondue sort en erreur" 1 "$rc"
+
+out=$(env -u CLAUDECODE -u CLAUDE_CODE_ENTRYPOINT CLAUDE_PROJECT_DIR="$TMP12" python3 "$PT" answer q2 2>&1); rc=$?
+check "answer sans texte : erreur claire" "usage" "$out"
+check_exit "answer sans texte sort en erreur" 1 "$rc"
+
+out=$(CLAUDE_PROJECT_DIR="$TMP12" python3 "$PT" answer q2 "texte" 2>&1); rc=$?
+check "answer refuse cote agent (O6, comme verify/wont_fix)" "reserve a l'humain" "$out"
+check_exit "answer refuse cote agent sort en erreur" 1 "$rc"
+rm -rf "$TMP12"
+
+# 28. v1.5 — tentatives cablees dans le bloc reinjecte (compteur + derniere hypothese)
+TMP13=$(mktemp -d)
+printf '{"prompt":"!bug le paiement echoue"}' | CLAUDE_PROJECT_DIR="$TMP13" python3 "$PT" hook-prompt >/dev/null 2>&1
+CLAUDE_PROJECT_DIR="$TMP13" python3 "$PT" attempt b1 le cache invalide la session >/dev/null 2>&1
+CLAUDE_PROJECT_DIR="$TMP13" python3 "$PT" attempt b1 la variable d environnement manque en prod >/dev/null 2>&1
+out=$(printf '{"source":"startup"}' | CLAUDE_PROJECT_DIR="$TMP13" python3 "$PT" hook-context 2>&1)
+check "le bloc affiche le compteur de tentatives" "2 tentatives" "$out"
+check "le bloc affiche la derniere hypothese" "derniere: la variable d environnement" "$out"
+rm -rf "$TMP13"
+
+# 29. v1.5 — init rejoue sur une installation existante : MD_BLOCK mis a niveau, idempotent
+TMP14=$(mktemp -d)
+printf '<!-- plantrack:start -->\nancien bloc PlanTrack (pre-v1.5)\n<!-- plantrack:end -->\n' > "$TMP14/AGENTS.md"
+out=$(CLAUDE_PROJECT_DIR="$TMP14" python3 "$PT" init 2>&1)
+check "init met a niveau le bloc AGENTS.md existant" "mis a jour dans AGENTS.md" "$out"
+check "le nouveau bloc mentionne l ecriture agent" "plantrack piege" "$(cat "$TMP14/AGENTS.md")"
+check "le nouveau bloc mentionne les questions" "plantrack question" "$(cat "$TMP14/AGENTS.md")"
+out=$(CLAUDE_PROJECT_DIR="$TMP14" python3 "$PT" init 2>&1)
+check "second init : bloc AGENTS.md idempotent" "a jour dans AGENTS.md" "$out"
+n=$(grep -c "plantrack:start" "$TMP14/AGENTS.md")
+check_exit "un seul jeu de marqueurs apres mise a niveau" 1 "$n"
+rm -rf "$TMP14"
+
 echo
 [ "$fail" = 0 ] && echo "TOUS LES TESTS PASSENT" || { echo "DES TESTS ECHOUENT"; exit 1; }

@@ -30,6 +30,8 @@ CTX_MAX_CHARS = 3000          # budget dur du bloc reinjecte
 CTX_MAX_BUGS = 8
 CTX_MAX_DECISIONS = 6
 CTX_MAX_FILES = 6
+CTX_MAX_PIEGES = 6
+CTX_MAX_QUESTIONS = 6
 LINE_TRUNC = 140
 
 ROOT = (os.environ.get("CLAUDE_PROJECT_DIR") or os.environ.get("PLANTRACK_ROOT")
@@ -75,7 +77,7 @@ def read_events():
 def project():
     """Rejoue le journal et renvoie l'etat courant."""
     st = {"threads": {}, "bugs": {}, "decisions": [], "inbox": [], "active": None,
-          "phases": {}, "tasks": {}}
+          "phases": {}, "tasks": {}, "pieges": {}, "questions": {}}
     for ev in read_events():
         k = ev.get("kind") if isinstance(ev, dict) else None
         if k is None:
@@ -121,6 +123,7 @@ def project():
                 "thread": ev.get("thread"), "notes": [], "ts": ev["ts"],
                 "severity": ev.get("severity", "normal"),
                 "blocking": bool(ev.get("blocking")), "attempts": [],
+                "par": ev.get("par"),
             }
         elif k == "bug_status":
             b = st["bugs"].get(ev["id"])
@@ -140,11 +143,21 @@ def project():
                     "ts": ev["ts"], "rejected": None,
                 })
         elif k == "decision":
-            st["decisions"].append({"id": ev["id"], "text": ev.get("text", ""), "ts": ev["ts"]})
+            st["decisions"].append({"id": ev["id"], "text": ev.get("text", ""), "ts": ev["ts"],
+                                    "par": ev.get("par")})
         elif k == "note":
             st["inbox"].append({"id": ev["id"], "text": ev.get("text", ""), "ts": ev["ts"]})
         elif k == "note_filed":
             st["inbox"] = [n for n in st["inbox"] if n["id"] != ev["id"]]
+        elif k == "piege":
+            st["pieges"][ev["id"]] = {"id": ev["id"], "text": ev.get("text", ""), "ts": ev["ts"]}
+        elif k == "question":
+            st["questions"][ev["id"]] = {"id": ev["id"], "text": ev.get("text", ""),
+                                         "ts": ev["ts"], "answer": None}
+        elif k == "answer":
+            q = st["questions"].get(ev["id"])
+            if q:
+                q["answer"] = ev.get("text", "")
         elif k == "phase_open":
             st["phases"][ev["id"]] = {
                 "id": ev["id"], "title": ev.get("text", ""), "goal": ev.get("goal", ""),
@@ -225,7 +238,12 @@ def context_block(st, header=True):
         L.append("\nBUGS OUVERTS (ne pas traiter maintenant, sauf demande explicite) :")
         for b in bugs[-CTX_MAX_BUGS:]:
             th = f"[{b['thread']}] " if b.get("thread") else ""
-            L.append(f"  {b['id']} ({b['status']}) {th}{trunc(b['text'])}")
+            tag = " (agent)" if b.get("par") == "agent" else ""
+            att = ""
+            if b["attempts"]:  # tentatives cablees en session (v1.5)
+                att = (f" [{len(b['attempts'])} tentatives, derniere: "
+                       f"{trunc(b['attempts'][-1]['hypothesis'], 60)}]")
+            L.append(f"  {b['id']} ({b['status']}) {th}{trunc(b['text'])}{tag}{att}")
             rej = [a for a in b["attempts"] if a.get("rejected")]
             if rej:  # §5 : ce qui a deja ete tente doit survivre a la compaction
                 plus = f" (+{len(rej) - 1}, voir plantrack attempts {b['id']})" if len(rej) > 1 else ""
@@ -235,7 +253,19 @@ def context_block(st, header=True):
     if st["decisions"]:
         L.append("\nDECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :")
         for d in st["decisions"][-CTX_MAX_DECISIONS:]:
-            L.append(f"  {d['id']} : {trunc(d['text'])}")
+            tag = " (agent)" if d.get("par") == "agent" else ""
+            L.append(f"  {d['id']} : {trunc(d['text'])}{tag}")
+
+    if st["pieges"]:
+        L.append("\nPieges connus :")
+        for p in list(st["pieges"].values())[-CTX_MAX_PIEGES:]:
+            L.append(f"  {p['id']} : {trunc(p['text'], 80)}")
+
+    pending_q = [q for q in st["questions"].values() if not q.get("answer")]
+    if pending_q:
+        L.append("\nQuestions en attente (reponds via !answer qN ...) :")
+        for q in pending_q[-CTX_MAX_QUESTIONS:]:
+            L.append(f"  {q['id']} : {trunc(q['text'], 80)}")
 
     if st["inbox"]:
         L.append(f"\nINBOX NON CLASSEE : {len(st['inbox'])} element(s), voir `plantrack inbox`.")
@@ -254,7 +284,7 @@ def context_block(st, header=True):
 
 # ---------------------------------------------------------------------- commandes
 
-def cmd_bug(text, st):
+def cmd_bug(text, st, par="humain"):
     if not text:
         return "usage : !bug <description> [--low|--high|--blocker]"
     severity = "normal"
@@ -268,17 +298,51 @@ def cmd_bug(text, st):
     active = st["threads"].get(st["active"]) if st["active"] else None
     append("bug", id=bid, text=text, thread=st["active"],
            task=active.get("task") if active else None, severity=severity,
-           blocking=True if severity == "blocker" else None)
+           blocking=True if severity == "blocker" else None,
+           par=par if par == "agent" else None)
     sev = f" [{severity}]" if severity != "normal" else ""
     return f"[PlanTrack] bug {bid}{sev} enregistre : {trunc(text, 80)}\n(non traite pour l'instant — il sera rappele a chaque session)"
 
 
-def cmd_decide(text):
+def cmd_decide(text, par="humain"):
     if not text:
         return "usage : !decide <ce qui est decide> — <motif>"
     did = next_id("d")
-    append("decision", id=did, text=text)
+    append("decision", id=did, text=text, par=par if par == "agent" else None)
     return f"[PlanTrack] decision {did} actee : {trunc(text, 80)}"
+
+
+def cmd_piege(text):
+    if not text:
+        return "usage : !piege <ce qu'il ne faut pas refaire>"
+    pid = next_id("p")
+    append("piege", id=pid, text=text)
+    return f"[PlanTrack] piege {pid} note : {trunc(text, 80)}"
+
+
+def cmd_question(text):
+    if not text:
+        return "usage : !question <texte>"
+    qid = next_id("q")
+    append("question", id=qid, text=text)
+    return (f"[PlanTrack] question {qid} enregistree : {trunc(text, 80)}\n"
+            "(sans reponse, elle sera rappelee a chaque session)")
+
+
+def cmd_answer(rest, st):
+    """!answer (hook, humain) : ne fait jamais sys.exit — le hook doit rester
+    silencieux en erreur et afficher un message au lieu de planter la session."""
+    parts = rest.split(None, 1)
+    if len(parts) < 2 or not parts[1].strip():
+        return "usage : !answer <id> <texte>"
+    qid, text = parts[0], parts[1].strip()
+    q = st["questions"].get(qid)
+    if not q:
+        return f"[PlanTrack] question introuvable : {qid} — `plantrack status` pour la liste."
+    if q.get("answer"):
+        return f"[PlanTrack] {qid} a deja une reponse."
+    append("answer", id=qid, text=text)
+    return f"[PlanTrack] {qid} repondue : {trunc(text, 80)}"
 
 
 def cmd_focus(arg, st):
@@ -370,6 +434,12 @@ def handle_command(raw):
         return cmd_park(rest, st)
     if verb == "close":
         return cmd_close(st)
+    if verb == "piege":
+        return cmd_piege(rest)
+    if verb == "question":
+        return cmd_question(rest)
+    if verb == "answer":
+        return cmd_answer(rest, st)
     if verb == "state":
         return context_block(st)
     if verb == "help":
@@ -384,6 +454,9 @@ HELP = """[PlanTrack] commandes (dans le prompt de l'agent, jamais transmises au
   !focus <sujet|id>   ouvre ou reprend un fil de travail
   !park <note>        met le fil actif en pause avec une note de reprise (obligatoire)
   !close              ferme le fil actif
+  !piege <texte>      note un piege technique (rappele a chaque session)
+  !question <texte>   pose une question a l'humain (rappelee tant que sans reponse)
+  !answer <id> <texte>   toi seule : reponds a une question en attente
   !state              affiche l'etat persistant courant
   !<texte libre>      capture dans l'inbox, a classer plus tard
 CLI humaine : plantrack status | bugs | inbox | verify <id> | reject <id> -m ... | close <id>
@@ -392,6 +465,9 @@ CLI humaine : plantrack status | bugs | inbox | verify <id> | reject <id> -m ...
               plantrack plan [import <f.md>] | decisions
               plantrack phase add|start|done|cancel   (done/cancel : humain seul)
               plantrack task add|start|verify|done|cancel|replace   (done/cancel/replace : humain seul)
+              plantrack decide <texte> | bug <texte> [--low|--high|--blocker]   ecriture agent (marquee (agent))
+              plantrack piege <texte> | question <texte>   utilisables par l'agent
+              plantrack answer <question_id> <texte>   toi seule, hors session
               plantrack init [--git-hook]   installation vendoree (tous agents)
               uvx plantrack@latest update   mise a jour d'une installation existante
               plantrack doctor   verifie l'installation | plantrack stats   usage sur 14 jours"""
@@ -452,7 +528,7 @@ def hook_context():
     src = data.get("source", "startup")
     st = project()
     if not any([st["threads"], st["bugs"], st["decisions"], st["inbox"],
-                st["phases"], st["tasks"]]):
+                st["phases"], st["tasks"], st["pieges"], st["questions"]]):
         sys.exit(0)
     if src == "compact":
         print("(contexte compacte — etat du projet reinjecte depuis PlanTrack)")
@@ -520,6 +596,9 @@ MD_BLOCK = """<!-- plantrack:start -->
 - Ne réimplémente jamais ce qui figure sous DECISIONS ACTEES.
 - Ne modifie pas les fichiers d'un fil en pause.
 - Après correction d'un bug : consigne la tentative, puis passe-le en "to_verify". Tu ne valides jamais un bug toi-même.
+- Quand une décision se prend en conversation, enregistre-la toi-même : `./plantrack decide "..."` (marquée agent). Un bug repéré en passant : `./plantrack bug "..."`. Un piège technique découvert : `./plantrack piege "..."`.
+- Avant de corriger un bug : lis `./plantrack attempts <id>`, puis dépose ton hypothèse `./plantrack attempt <id> "..."` avant de coder ; une hypothèse refusée a déjà été tentée, change d'approche.
+- Une question posée à l'humain restée sans réponse : `./plantrack question "..."` — elle ressortira à chaque session jusqu'à la réponse.
 <!-- plantrack:end -->
 """
 
@@ -1114,8 +1193,9 @@ def cli(argv):
             print("aucun bug ouvert.")
         for b in rows:
             sev = f" [{b['severity']}]" if b.get("severity", "normal") != "normal" else ""
+            tag = " (agent)" if b.get("par") == "agent" else ""
             na = f" ({len(b['attempts'])} tentative(s))" if b["attempts"] else ""
-            print(f"{b['id']:>4}  {b['status']:<11}{sev} {trunc(b['text'], 90)}{na}")
+            print(f"{b['id']:>4}  {b['status']:<11}{sev} {trunc(b['text'], 90)}{tag}{na}")
             for n in b["notes"]:
                 print(f"        \u21b3 {trunc(n, 90)}")
     elif cmd == "inbox":
@@ -1149,7 +1229,36 @@ def cli(argv):
         extra = " (motif attache a la derniere tentative)" if b["attempts"] else ""
         print(f"{b['id']} rouvert avec motif{extra}.")
     elif cmd == "bug":
-        cmd_bug_status(args, st)
+        # desambiguation : "bug b1 wont_fix" (changement de statut) vs
+        # "bug <texte>" (creation par l'agent, v1.5)
+        if args and re.match(r"^b[0-9]+$", args[0]):
+            cmd_bug_status(args, st)
+        else:
+            print(cmd_bug(" ".join(args), st, par="agent"))
+    elif cmd == "decide":
+        if not args:
+            sys.exit("usage : plantrack decide <texte>")
+        print(cmd_decide(" ".join(args), par="agent"))
+    elif cmd == "piege":
+        if not args:
+            sys.exit("usage : plantrack piege <texte>")
+        print(cmd_piege(" ".join(args)))
+    elif cmd == "question":
+        if not args:
+            sys.exit("usage : plantrack question <texte>")
+        print(cmd_question(" ".join(args)))
+    elif cmd == "answer":
+        require_human("answer")
+        if len(args) < 2:
+            sys.exit("usage : plantrack answer <question_id> <texte>")
+        qid, text = args[0], " ".join(args[1:])
+        q = st["questions"].get(qid)
+        if not q:
+            sys.exit(f"question introuvable : {qid} — `plantrack status` pour la liste.")
+        if q.get("answer"):
+            sys.exit(f"{qid} a deja une reponse.")
+        append("answer", id=qid, text=text)
+        print(f"{qid} repondue.")
     elif cmd == "attempt":
         cmd_attempt(args, st)
     elif cmd == "attempts":
