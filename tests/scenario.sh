@@ -230,7 +230,7 @@ out=$(cd "$TMP2" && ./plantrack help 2>&1)
 check "le wrapper ./plantrack fonctionne" "commandes" "$out"
 out=$(CLAUDE_PROJECT_DIR="$TMP2" python3 "$PT" init 2>&1)
 check "init idempotent : coeur identique reconnu" "deja en place" "$out"
-check "init idempotent : bloc non duplique" "deja present" "$out"
+check "init idempotent : bloc non duplique" "a jour dans" "$out"
 n=$(grep -c "plantrack:start" "$TMP2/CLAUDE.md")
 check_exit "un seul jeu de marqueurs dans CLAUDE.md" 1 "$n"
 printf '{"hooks":{}}' > "$TMP2/.claude/settings.json"
@@ -284,20 +284,24 @@ check_exit "file destination inconnue sort en erreur" 1 "$rc"
 out=$(H file n1 decision)
 check "file vers decision classe la note" "decision" "$out"
 
-# 19. revue v1.1 — reinjection d une inbox seule, init sur AGENTS.md, --agent codex
+# 19. revue v1.1 — reinjection d une inbox seule, blocs d instructions multi-agents
 TMP3=$(mktemp -d)
 printf '{"prompt":"!verifier les quotas API"}' | CLAUDE_PROJECT_DIR="$TMP3" python3 "$PT" hook-prompt >/dev/null 2>&1
 out=$(printf '{"source":"startup"}' | CLAUDE_PROJECT_DIR="$TMP3" python3 "$PT" hook-context 2>&1)
 check "une inbox seule est reinjectee" "INBOX" "$out"
 printf '# Notes utilisateur\n' > "$TMP3/AGENTS.md"
 out=$(CLAUDE_PROJECT_DIR="$TMP3" python3 "$PT" init 2>&1)
-check "init prefere un AGENTS.md existant" "insere dans AGENTS.md" "$out"
+check "init insere le bloc complet dans AGENTS.md" "insere dans AGENTS.md" "$out"
 check "init preserve le contenu utilisateur" "Notes utilisateur" "$(cat "$TMP3/AGENTS.md")"
+check "CLAUDE.md recoit la ligne d import" "@AGENTS.md" "$(cat "$TMP3/CLAUDE.md")"
+check "GEMINI.md recoit la ligne d import" "@AGENTS.md" "$(cat "$TMP3/GEMINI.md")"
 rm -rf "$TMP3"
 TMP4=$(mktemp -d)
+printf '<!-- plantrack:start -->\nancien bloc complet v1.1\n<!-- plantrack:end -->\n' > "$TMP4/CLAUDE.md"
 out=$(CLAUDE_PROJECT_DIR="$TMP4" python3 "$PT" init --agent gemini 2>&1)
-check "--agent gemini annonce le mode degrade" "mode degrade" "$out"
-check "--agent gemini ecrit AGENTS.md" "insere dans AGENTS.md" "$out"
+check "--agent est annonce obsolete" "obsolete" "$out"
+check "un ancien bloc CLAUDE.md est mis a niveau" "mis a jour dans CLAUDE.md" "$out"
+check "le bloc CLAUDE.md devient la ligne d import" "@AGENTS.md" "$(cat "$TMP4/CLAUDE.md")"
 rm -rf "$TMP4"
 
 # 20. revue lots B+C — pre-commit fiable, restitution des tentatives (§5), schema §9
@@ -344,12 +348,12 @@ check_exit "precommit voit un fil parque sous une racine git plus haute" 1 "$rc"
 check "et nomme le fil fautif" "appartient au fil t1" "$out"
 rm -rf "$TMP5"
 
-# 21. portage Codex (§13) — init --agent codex, apply_patch, detection de role
+# 21. portage Codex (§13) — hooks codex par defaut, apply_patch, detection de role
 TMP6=$(mktemp -d)
-out=$(CLAUDE_PROJECT_DIR="$TMP6" python3 "$PT" init --agent codex 2>&1)
-check "--agent codex ecrit .codex/hooks.json" ".codex/hooks.json ecrit (4 hooks)" "$out"
-check "--agent codex pointe vers l approbation /hooks" "/hooks pour approuver" "$out"
-check "--agent codex ecrit AGENTS.md" "insere dans AGENTS.md" "$out"
+out=$(CLAUDE_PROJECT_DIR="$TMP6" python3 "$PT" init 2>&1)
+check "init ecrit .codex/hooks.json par defaut" ".codex/hooks.json ecrit (4 hooks)" "$out"
+check "init pointe vers l approbation /hooks" "/hooks pour approuver" "$out"
+check "init ecrit AGENTS.md" "insere dans AGENTS.md" "$out"
 hj=$(cat "$TMP6/.codex/hooks.json")
 for h in hook-prompt hook-filelog hook-context hook-precompact; do
   check "hooks.json declare $h" "$h" "$hj"
@@ -358,8 +362,9 @@ check "hooks.json resout la racine git (cwd de session variable)" "git rev-parse
 check "hooks.json couvre apply_patch" "apply_patch" "$hj"
 python3 -c "import json,sys; json.load(open(sys.argv[1]))" "$TMP6/.codex/hooks.json" \
   && check "hooks.json est du JSON valide" ok ok || check "hooks.json est du JSON valide" ok invalide
-out=$(CLAUDE_PROJECT_DIR="$TMP6" python3 "$PT" init --agent codex 2>&1)
-check "init --agent codex idempotent" ".codex/hooks.json deja en place" "$out"
+out=$(CLAUDE_PROJECT_DIR="$TMP6" python3 "$PT" init 2>&1)
+check "init idempotent sur les hooks codex" ".codex/hooks.json deja en place" "$out"
+check "init idempotent sur les blocs md" "a jour dans AGENTS.md" "$out"
 out=$(CLAUDE_PROJECT_DIR="$TMP6" python3 "$PT" doctor 2>&1 || true)
 check "doctor verifie les hooks codex" "declare dans .codex/hooks.json" "$out"
 rm -rf "$TMP6"

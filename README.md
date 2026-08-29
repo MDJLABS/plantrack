@@ -17,10 +17,14 @@ uvx plantrack init               # ou : pipx run plantrack init
 `uvx --from git+https://github.com/mdjlabs/plantrack plantrack init` marche aussi.)
 
 `init` copie le cœur dans `.claude/hooks/pt.py` (auto-copie vendorée : le projet reste
-autonome, les hooks marchent sur un simple clone), écrit `.claude/settings.json`
-(4 hooks — jamais écrasé s'il existe : fusion à la main), le wrapper `./plantrack`, un
-bloc d'instructions entre marqueurs `<!-- plantrack:start/end -->` dans `CLAUDE.md` ou
-`AGENTS.md`, et exclut `.plantrack/transcripts/` du versionnage. Il est idempotent.
+autonome, les hooks marchent sur un simple clone), écrit les hooks de **tous** les
+agents supportés — `.claude/settings.json` (Claude Code) et `.codex/hooks.json`
+(Codex), jamais écrasés s'ils existent —, le wrapper `./plantrack`, le bloc
+d'instructions complet dans `AGENTS.md` (le standard lu par la plupart des agents)
+plus une ligne d'import `@AGENTS.md` entre marqueurs dans `CLAUDE.md` et `GEMINI.md`,
+et exclut `.plantrack/transcripts/` du versionnage. Il est idempotent — un fichier de
+config est inerte tant que l'agent n'est pas là : celui que tu installeras **après**
+trouvera PlanTrack déjà en place, sans option à connaître, même s'ils sont plusieurs.
 
 Le journal `.plantrack/events.jsonl` **se versionne** : une ligne par événement, diff
 lisible en revue, merge trivial.
@@ -108,14 +112,14 @@ parker, ouvrir un autre fil, revenir — a été rejoué et passe.
 - **Ce qui n'est jamais capturé reste perdu.** La nuance expliquée en prose et jamais
   transformée en `!decide` disparaît à la compaction. Seul l'archivage du transcript
   permet de la retrouver, à la main.
-- Hooks Claude Code **et Codex CLI**. `plantrack init --agent codex` écrit
-  `.codex/hooks.json` (même protocole : `UserPromptSubmit` bloquant, `SessionStart`
-  — y compris `source: "compact"` —, `PostToolUse`, `PreCompact`) ; dans Codex,
-  lancer `/hooks` une fois pour approuver les hooks du projet. Le chemin des fichiers
-  édités est extrait du patch `apply_patch` ; la détection de rôle s'appuie sur
-  `CODEX_THREAD_ID`/`CODEX_SANDBOX` (posées par le shell de l'agent Codex — non
-  documentées, à confirmer sur un projet réel). Les autres agents retombent sur
-  la CLI + une consigne dans `AGENTS.md`, sans garantie.
+- Hooks Claude Code **et Codex CLI**, écrits d'office par `init` (même protocole :
+  `UserPromptSubmit` bloquant, `SessionStart` — y compris `source: "compact"` —,
+  `PostToolUse`, `PreCompact`) ; dans Codex, lancer `/hooks` une fois pour approuver
+  les hooks du projet. Le chemin des fichiers édités est extrait du patch
+  `apply_patch` ; la détection de rôle s'appuie sur `CODEX_THREAD_ID`/`CODEX_SANDBOX`
+  (posées par le shell de l'agent Codex — non documentées, à confirmer sur un projet
+  réel). Les autres agents n'ont pas de hooks : ils lisent `AGENTS.md` (ou la ligne
+  d'import dans `GEMINI.md`) et utilisent la CLI, sans réinjection automatique.
 - IDs séquentiels calculés par rejeu : à revoir en cas de travail multi-branches
   simultané.
 

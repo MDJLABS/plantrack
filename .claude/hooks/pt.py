@@ -392,7 +392,7 @@ CLI humaine : plantrack status | bugs | inbox | verify <id> | reject <id> -m ...
               plantrack plan [import <f.md>] | decisions
               plantrack phase add|start|done|cancel   (done/cancel : humain seul)
               plantrack task add|start|verify|done|cancel|replace   (done/cancel/replace : humain seul)
-              plantrack init [--git-hook] [--agent claude|codex|gemini]   installation vendoree
+              plantrack init [--git-hook]   installation vendoree (tous agents)
               plantrack doctor   verifie l'installation | plantrack stats   usage sur 14 jours"""
 
 
@@ -522,6 +522,38 @@ MD_BLOCK = """<!-- plantrack:start -->
 <!-- plantrack:end -->
 """
 
+# CLAUDE.md et GEMINI.md n'ont qu'une ligne d'import : le bloc complet vit dans
+# AGENTS.md (standard cross-agents), source unique — Claude Code et Gemini CLI
+# savent tous deux importer un fichier via `@chemin`.
+REF_BLOCK = """<!-- plantrack:start -->
+@AGENTS.md
+<!-- plantrack:end -->
+"""
+
+
+def write_md_block(name, block):
+    """Insere le bloc entre marqueurs dans ROOT/name (cree le fichier au besoin) ;
+    si les marqueurs existent deja, remplace leur contenu (mise a niveau)."""
+    path = os.path.join(ROOT, name)
+    existing = ""
+    if os.path.exists(path):
+        with open(path, encoding="utf-8") as f:
+            existing = f.read()
+    start, end = "<!-- plantrack:start -->", "<!-- plantrack:end -->"
+    if start in existing and end in existing.split(start, 1)[1]:
+        pre, rest = existing.split(start, 1)
+        updated = pre + block.strip("\n") + rest.split(end, 1)[1]
+        if updated == existing:
+            print(f"bloc d'instructions a jour dans {name}.")
+            return
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(updated)
+        print(f"bloc d'instructions mis a jour dans {name}.")
+    else:
+        with open(path, "a", encoding="utf-8") as f:
+            f.write(("\n" if existing and not existing.endswith("\n") else "") + block)
+        print(f"bloc d'instructions insere dans {name}.")
+
 
 def install_git_hook():
     if not os.path.isdir(os.path.join(ROOT, ".git")):
@@ -561,13 +593,10 @@ def cmd_init(args):
     `--git-hook` seul n'installe que le garde-fou git (comportement v0.5)."""
     known = {"--git-hook", "--agent"}
     if any(a.startswith("--") and a not in known for a in args):
-        sys.exit("usage : plantrack init [--git-hook] [--agent claude|codex|gemini]")
-    agent = "claude"
+        sys.exit("usage : plantrack init [--git-hook]")
     if "--agent" in args:
-        i = args.index("--agent")
-        agent = args[i + 1] if len(args) > i + 1 else ""
-        if agent not in ("claude", "codex", "gemini"):
-            sys.exit("usage : plantrack init [--git-hook] [--agent claude|codex|gemini]")
+        print("[PlanTrack] note : --agent est obsolete — init couvre desormais "
+              "tous les agents d'un coup.")
     if args == ["--git-hook"]:
         install_git_hook()
         return
@@ -589,16 +618,14 @@ def cmd_init(args):
             os.chmod(dst, 0o755)
             print(f"pt.py copie dans {os.path.relpath(dst, ROOT)}.")
 
-    # 2. les 4 hooks Claude Code (et leur traduction Codex le cas echeant)
+    # 2. les hooks de tous les agents supportes, systematiquement : un fichier
+    # de config est inerte tant que l'agent n'est pas installe, et il attend
+    # deja celui qu'on installera apres coup — aucune option a connaitre
     write_hooks_file(os.path.join(ROOT, ".claude", "settings.json"), SETTINGS,
                      ".claude/settings.json")
-    if agent == "codex":
-        write_hooks_file(os.path.join(ROOT, ".codex", "hooks.json"), CODEX_HOOKS,
-                         ".codex/hooks.json",
-                         " Dans Codex, lance /hooks pour approuver les hooks du projet.")
-    elif agent != "claude":
-        print(f"[PlanTrack] agent {agent} : hooks non traduits automatiquement pour l'instant — "
-              "la CLI, le bloc d'instructions et le pre-commit git tiennent (mode degrade, §13).")
+    write_hooks_file(os.path.join(ROOT, ".codex", "hooks.json"), CODEX_HOOKS,
+                     ".codex/hooks.json",
+                     " Dans Codex, lance /hooks pour approuver les hooks du projet.")
 
     # 3. wrapper CLI humaine
     wrapper = os.path.join(ROOT, "plantrack")
@@ -608,22 +635,12 @@ def cmd_init(args):
         os.chmod(wrapper, 0o755)
         print("wrapper ./plantrack ecrit.")
 
-    # 4. bloc d'instructions entre marqueurs, sans ecraser l'existant
-    md = os.path.join(ROOT, "CLAUDE.md" if agent == "claude" else "AGENTS.md")
-    for candidate in ("CLAUDE.md", "AGENTS.md"):
-        if os.path.exists(os.path.join(ROOT, candidate)):
-            md = os.path.join(ROOT, candidate)
-            break
-    existing = ""
-    if os.path.exists(md):
-        with open(md, encoding="utf-8") as f:
-            existing = f.read()
-    if "<!-- plantrack:start -->" in existing:
-        print(f"bloc d'instructions deja present dans {os.path.basename(md)}.")
-    else:
-        with open(md, "a", encoding="utf-8") as f:
-            f.write(("\n" if existing and not existing.endswith("\n") else "") + MD_BLOCK)
-        print(f"bloc d'instructions insere dans {os.path.basename(md)}.")
+    # 4. blocs d'instructions : le bloc complet dans AGENTS.md (standard
+    # cross-agents, source unique), une ligne d'import @AGENTS.md dans
+    # CLAUDE.md et GEMINI.md — chaque agent, present ou futur, le trouve
+    write_md_block("AGENTS.md", MD_BLOCK)
+    for name in ("CLAUDE.md", "GEMINI.md"):
+        write_md_block(name, REF_BLOCK)
 
     # 5. transcripts gitignores
     gi = os.path.join(ROOT, ".gitignore")
@@ -712,12 +729,20 @@ def cmd_doctor(st):
     for h in ("hook-prompt", "hook-filelog", "hook-context", "hook-precompact"):
         chk(h in txt, f"hook {h} declare dans settings.json", "lance `plantrack init`")
     codexh = os.path.join(ROOT, ".codex", "hooks.json")
-    if os.path.exists(codexh):  # installation Codex : meme exigence de completude
+    ctxt = ""
+    if os.path.exists(codexh):
         with open(codexh, encoding="utf-8") as f:
             ctxt = f.read()
-        for h in ("hook-prompt", "hook-filelog", "hook-context", "hook-precompact"):
-            chk(h in ctxt, f"hook {h} declare dans .codex/hooks.json",
-                "lance `plantrack init --agent codex`")
+    for h in ("hook-prompt", "hook-filelog", "hook-context", "hook-precompact"):
+        chk(h in ctxt, f"hook {h} declare dans .codex/hooks.json",
+            "lance `plantrack init`")
+    atxt = ""
+    agents_md = os.path.join(ROOT, "AGENTS.md")
+    if os.path.exists(agents_md):
+        with open(agents_md, encoding="utf-8") as f:
+            atxt = f.read()
+    chk("<!-- plantrack:start -->" in atxt, "bloc d'instructions dans AGENTS.md",
+        "lance `plantrack init`")
     if os.path.isdir(os.path.join(ROOT, ".git")):
         hook = os.path.join(ROOT, ".git", "hooks", "pre-commit")
         htxt = ""
