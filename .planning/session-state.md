@@ -138,6 +138,14 @@ vérifié : **MDJLABS/plantrack**, privé, branche main, remote local mis à jou
 (`https://github.com/mdjlabs/plantrack.git`). L'URL d'installation du README
 (`uvx --from git+https://github.com/mdjlabs/plantrack …`) est désormais réelle.
 
+### Installation uvx VALIDÉE en réel — 2026-08-29
+Sur un projet git vierge : `uvx --from git+https://github.com/mdjlabs/plantrack
+plantrack init` passe du premier coup (repo privé cloné via le credential
+helper gh ; un utilisateur externe devra avoir accès au repo tant qu'il est
+privé). Vérifié fonctionnel : hook-prompt (exit 2, fil créé), hook-context
+(bloc réinjecté 325/3000), doctor tout vert, `init --git-hook` + commit réel,
+`init --agent codex` (hooks.json JSON valide), idempotence (« deja en place »).
+
 ### Session CLOSE — 2026-08-29
 Prompt de reprise : `.planning/2026-08-29-reprise-apres-v1.1.md` (autonome).
 Rien en suspens. Prochain jalon (§16 Publication) conditionné aux chiffres
