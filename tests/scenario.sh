@@ -300,5 +300,49 @@ check "--agent codex annonce le mode degrade" "mode degrade" "$out"
 check "--agent codex ecrit AGENTS.md" "insere dans AGENTS.md" "$out"
 rm -rf "$TMP4"
 
+# 20. revue lots B+C — pre-commit fiable, restitution des tentatives (§5), schema §9
+H task add p1 Retouche du header >/dev/null
+out=$(prompt '!focus k7')
+check "focus k7 ouvre un fil rattache" "tache k7" "$out"
+printf '{"tool_input":{"file_path":"%s/src/a.txt"}}' "$TMP" | python3 "$PT" hook-filelog
+echo v3 > "$TMP/src/a.txt"
+git -C "$TMP" add src/a.txt
+out=$(cd "$TMP" && git -c user.name=t -c user.email=t@t commit -q -m l3 2>&1); rc=$?
+check_exit "fichier repris par le fil actif : commit passe" 0 "$rc"
+
+prompt '!bug le header masque le menu --high' >/dev/null
+out=$(grep '"kind": "bug"' "$TMP/.plantrack/events.jsonl" | tail -1)
+check "l evenement bug porte la tache (§9)" '"task": "k7"' "$out"
+python3 "$PT" attempt b5 le z-index du header ecrase le menu >/dev/null 2>&1
+out=$(grep '"hypothesis"' "$TMP/.plantrack/events.jsonl" | tail -1)
+check "attempt consigne l hypothese (§9)" "z-index du header" "$out"
+check "attempt consigne l acteur (§9)" '"actor": "claude-code"' "$out"
+python3 "$PT" bug b5 to_verify >/dev/null 2>&1
+H reject b5 -m "le z-index etait correct" >/dev/null
+out=$(ctx compact)
+check "le bloc restitue la tentative rejetee (§5)" "deja rejete" "$out"
+check "la tentative rejetee porte son motif" "le z-index etait correct" "$out"
+python3 "$PT" bug b5 to_verify >/dev/null 2>&1
+out=$(python3 "$PT" bug b5 open 2>&1); rc=$?
+check "retrograder to_verify->open sans motif refuse" "motif obligatoire" "$out"
+check_exit "la retrogradation sans motif sort en erreur" 1 "$rc"
+out=$(python3 "$PT" bug b5 open -m "la correction ne tient pas en prod" 2>&1)
+check "retrograder avec motif passe" "motif conserve" "$out"
+out=$(H attempts b5)
+check "le motif de retrogradation s attache a la tentative" "la correction ne tient pas en prod" "$out"
+
+TMP5=$(mktemp -d)
+mkdir -p "$TMP5/proj"
+git -C "$TMP5" init -q
+printf '{"prompt":"!focus module imbrique"}' | CLAUDE_PROJECT_DIR="$TMP5/proj" python3 "$PT" hook-prompt >/dev/null 2>&1
+printf '{"tool_input":{"file_path":"%s/proj/x.txt"}}' "$TMP5" | CLAUDE_PROJECT_DIR="$TMP5/proj" python3 "$PT" hook-filelog
+printf '{"prompt":"!park en attente"}' | CLAUDE_PROJECT_DIR="$TMP5/proj" python3 "$PT" hook-prompt >/dev/null 2>&1
+echo x > "$TMP5/proj/x.txt"
+git -C "$TMP5" add -A
+out=$(CLAUDE_PROJECT_DIR="$TMP5/proj" python3 "$PT" precommit 2>&1); rc=$?
+check_exit "precommit voit un fil parque sous une racine git plus haute" 1 "$rc"
+check "et nomme le fil fautif" "appartient au fil t1" "$out"
+rm -rf "$TMP5"
+
 echo
 [ "$fail" = 0 ] && echo "TOUS LES TESTS PASSENT" || { echo "DES TESTS ECHOUENT"; exit 1; }

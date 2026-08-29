@@ -134,7 +134,8 @@ def project():
             b = st["bugs"].get(ev.get("bug"))
             if b:
                 b["attempts"].append({
-                    "id": ev["id"], "hypothesis": ev.get("text", ""),
+                    # "text" : nom du champ avant la mise en conformite §9
+                    "id": ev["id"], "hypothesis": ev.get("hypothesis") or ev.get("text", ""),
                     "ts": ev["ts"], "rejected": None,
                 })
         elif k == "decision":
@@ -224,6 +225,11 @@ def context_block(st, header=True):
         for b in bugs[-CTX_MAX_BUGS:]:
             th = f"[{b['thread']}] " if b.get("thread") else ""
             L.append(f"  {b['id']} ({b['status']}) {th}{trunc(b['text'])}")
+            rej = [a for a in b["attempts"] if a.get("rejected")]
+            if rej:  # §5 : ce qui a deja ete tente doit survivre a la compaction
+                plus = f" (+{len(rej) - 1}, voir plantrack attempts {b['id']})" if len(rej) > 1 else ""
+                L.append(f"    deja rejete : {trunc(rej[-1]['hypothesis'], 60)}"
+                         f" — {trunc(rej[-1]['rejected'], 60)}{plus}")
 
     if st["decisions"]:
         L.append("\nDECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :")
@@ -258,7 +264,9 @@ def cmd_bug(text, st):
     if not text:
         return "usage : !bug <description> [--low|--high|--blocker]"
     bid = next_id("b")
-    append("bug", id=bid, text=text, thread=st["active"], severity=severity,
+    active = st["threads"].get(st["active"]) if st["active"] else None
+    append("bug", id=bid, text=text, thread=st["active"],
+           task=active.get("task") if active else None, severity=severity,
            blocking=True if severity == "blocker" else None)
     sev = f" [{severity}]" if severity != "normal" else ""
     return f"[PlanTrack] bug {bid}{sev} enregistre : {trunc(text, 80)}\n(non traite pour l'instant — il sera rappele a chaque session)"
@@ -601,21 +609,33 @@ def cmd_precommit():
     """Garde-fou §10-A : le commit echoue si un fichier stage appartient a un fil
     parque. S'etendra aux taches cancelled/replaced avec la couche 2."""
     try:
+        git_root = subprocess.run(
+            ["git", "rev-parse", "--show-toplevel"],
+            capture_output=True, text=True, cwd=ROOT, check=True,
+        ).stdout.strip()
         out = subprocess.run(
             ["git", "diff", "--cached", "--name-only"],
             capture_output=True, text=True, cwd=ROOT, check=True,
         ).stdout
     except (OSError, subprocess.CalledProcessError):
         sys.exit(0)  # pas de git exploitable : ne jamais bloquer un commit legitime
-    staged = {l.strip() for l in out.splitlines() if l.strip()}
+    # git rend des chemins relatifs a SA racine ; le journal les stocke relatifs
+    # a ROOT — sans conversion, un projet en sous-repertoire ne matchait jamais
+    staged = {os.path.relpath(os.path.join(git_root, l.strip()), ROOT)
+              for l in out.splitlines() if l.strip()}
     st = project()
+    # un fichier repris par le fil actif (sain) se commite : le fil actif a priorite
+    a = st["threads"].get(st["active"]) if st["active"] else None
+    a_task = st["tasks"].get(a.get("task")) if a and a.get("task") else None
+    a_frozen = a_task and a_task["status"] in ("cancelled", "replaced")
+    active_files = set(a["files"]) if a and not a_frozen else set()
     blocked = False
     for t in st["threads"].values():
         task = st["tasks"].get(t.get("task")) if t.get("task") else None
         frozen = task and task["status"] in ("cancelled", "replaced")
         if t["status"] != "parked" and not frozen:
             continue
-        for f in sorted(staged & set(t["files"])):
+        for f in sorted(staged & set(t["files"]) - active_files):
             blocked = True
             if frozen:
                 date = (task.get("status_ts") or "")[:10]
@@ -860,7 +880,8 @@ def cmd_attempt(args, st):
                      f"({a['id']}, similarite {ratio:.2f}) : {trunc(a['hypothesis'], 80)}{rej}\n"
                      "Change d'angle au lieu de retenter la meme piste.")
     aid = next_id("a")
-    append("attempt", id=aid, bug=b["id"], text=hyp)
+    append("attempt", id=aid, bug=b["id"], hypothesis=hyp,
+           actor="claude-code" if any(os.environ.get(v) for v in AGENT_ENV) else "human")
     print(f"tentative {aid} consignee sur {b['id']} : {trunc(hyp, 80)}")
 
 
@@ -891,8 +912,13 @@ def cmd_bug_status(args, st):
         append("bug_status", id=b["id"], status="wont_fix", text="wont_fix : " + motif)
         print(f"{b['id']} classe wont_fix (motif conserve).")
     elif target in ("open", "in_progress", "to_verify"):
-        append("bug_status", id=b["id"], status=target)
-        print(f"{b['id']} -> {target}.")
+        motif = None
+        if target == "open" and b["status"] == "to_verify":
+            # retrograder un bug annonce comme corrige se motive (revue : L6) —
+            # le motif s'attache a la derniere tentative, sans compter comme reject humain
+            motif = arg_motif(args, 2)
+        append("bug_status", id=b["id"], status=target, text=motif)
+        print(f"{b['id']} -> {target}." + (" (motif conserve)" if motif else ""))
     else:
         sys.exit("statuts : open | in_progress | to_verify | wont_fix (validated : via `plantrack verify`)")
 
