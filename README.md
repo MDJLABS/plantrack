@@ -13,6 +13,17 @@ uvx plantrack init               # ou : pipx run plantrack init
 ./plantrack init --git-hook      # optionnel : le garde-fou git pre-commit
 ```
 
+Pour mettre à jour une installation existante :
+
+```bash
+uvx plantrack@latest update
+```
+
+`update` remplace la copie vendorée par la dernière version puis rejoue `init` :
+toutes les étapes savent se mettre à niveau (fusion des hooks, blocs entre
+marqueurs, skill), et rien de ce que tu as écrit n'est touché — le journal
+`.plantrack/` encore moins.
+
 (Paquet publié sur PyPI — licence MIT. Depuis un clone du repo :
 `uvx --from git+https://github.com/mdjlabs/plantrack plantrack init` marche aussi.)
 

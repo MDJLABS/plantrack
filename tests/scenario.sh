@@ -400,6 +400,29 @@ check "JSON invalide : le bloc a coller est imprime" '"hooks"' "$out"
 check "JSON invalide : l installation s annonce INCOMPLETE" "INCOMPLETE" "$out"
 rm -rf "$TMP7"
 
+# 23. commande update — remplace la copie vendoree puis rejoue init
+TMP8=$(mktemp -d)
+out=$(CLAUDE_PROJECT_DIR="$TMP8" python3 "$PT" update 2>&1); rc=$?
+check_exit "update sans installation refuse" 1 "$rc"
+check "et renvoie vers init" "lance \`plantrack init\`" "$out"
+CLAUDE_PROJECT_DIR="$TMP8" python3 "$PT" init >/dev/null 2>&1
+printf '\n# vieille version simulee\n' >> "$TMP8/.claude/hooks/pt.py"
+out=$(CLAUDE_PROJECT_DIR="$TMP8" python3 "$PT" init 2>&1); rc=$?
+check_exit "init refuse toujours d ecraser une copie differente" 1 "$rc"
+check "et renvoie vers update" "plantrack@latest update" "$out"
+out=$(CLAUDE_PROJECT_DIR="$TMP8" python3 "$PT" update 2>&1)
+check "update remplace la copie vendoree" "pt.py mis a jour" "$out"
+check "update rejoue init derriere" "deja en place" "$out"
+cmp -s "$PT" "$TMP8/.claude/hooks/pt.py" \
+  && check "la copie vendoree est identique a la source" ok ok \
+  || check "la copie vendoree est identique a la source" ok differente
+out=$(CLAUDE_PROJECT_DIR="$TMP8" python3 "$PT" update 2>&1)
+check "update idempotent" "pt.py deja a jour" "$out"
+out=$(CLAUDE_PROJECT_DIR="$TMP8" python3 "$TMP8/.claude/hooks/pt.py" update 2>&1); rc=$?
+check_exit "la copie installee ne se met pas a jour seule" 1 "$rc"
+check "et renvoie vers uvx" "uvx plantrack@latest update" "$out"
+rm -rf "$TMP8"
+
 printf '{"tool_name":"apply_patch","tool_input":{"command":"*** Begin Patch\\n*** Add File: src/patch1.txt\\n+hello\\n*** Update File: docs/patch2.md\\n*** End Patch"},"cwd":"%s"}' "$TMP" | python3 "$PT" hook-filelog
 check "apply_patch : premier fichier du patch journalise" '"text": "src/patch1.txt"' "$(cat "$TMP/.plantrack/events.jsonl")"
 check "apply_patch : second fichier du patch journalise" '"text": "docs/patch2.md"' "$(cat "$TMP/.plantrack/events.jsonl")"

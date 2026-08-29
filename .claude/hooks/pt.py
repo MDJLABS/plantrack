@@ -393,6 +393,7 @@ CLI humaine : plantrack status | bugs | inbox | verify <id> | reject <id> -m ...
               plantrack phase add|start|done|cancel   (done/cancel : humain seul)
               plantrack task add|start|verify|done|cancel|replace   (done/cancel/replace : humain seul)
               plantrack init [--git-hook]   installation vendoree (tous agents)
+              uvx plantrack@latest update   mise a jour d'une installation existante
               plantrack doctor   verifie l'installation | plantrack stats   usage sur 14 jours"""
 
 
@@ -530,9 +531,8 @@ REF_BLOCK = """<!-- plantrack:start -->
 <!-- plantrack:end -->
 """
 
-# Deep Code (CLI tiers DeepSeek) ne lit pas AGENTS.md mais decouvre des skills
-# au format Claude Code dans ./.deepcode/skills/<nom>/SKILL.md — la skill est
-# une simple reference vers AGENTS.md, la source unique des regles.
+# Deep Code (CLI tiers DeepSeek) ne lit pas AGENTS.md mais des skills format
+# Claude Code (./.deepcode/skills/<nom>/SKILL.md) — simple renvoi vers AGENTS.md.
 DEEPCODE_SKILL = """---
 name: plantrack
 description: État persistant du projet (fils de travail, décisions actées, bugs) — consignes à lire avant toute tâche.
@@ -656,11 +656,9 @@ def cmd_init(args):
     dst = os.path.join(ROOT, ".claude", "hooks", "pt.py")
     if os.path.abspath(dst) != src:
         if os.path.exists(dst):
-            with open(dst, encoding="utf-8") as f:
-                same = f.read() == open(src, encoding="utf-8").read()
-            if not same:
+            if open(dst, encoding="utf-8").read() != open(src, encoding="utf-8").read():
                 sys.exit(f"[PlanTrack] {dst} existe avec un contenu different — rien n'a ete "
-                         "ecrit. Supprime-le pour reinstaller (ton journal .plantrack/ est intact).")
+                         "ecrit. Pour changer de version : `uvx plantrack@latest update`.")
             print("pt.py deja en place (identique).")
         else:
             os.makedirs(os.path.dirname(dst), exist_ok=True)
@@ -668,9 +666,8 @@ def cmd_init(args):
             os.chmod(dst, 0o755)
             print(f"pt.py copie dans {os.path.relpath(dst, ROOT)}.")
 
-    # 2. les hooks de tous les agents supportes, systematiquement : un fichier
-    # de config est inerte tant que l'agent n'est pas installe, et il attend
-    # deja celui qu'on installera apres coup — aucune option a connaitre
+    # 2. les hooks de tous les agents supportes, systematiquement : un fichier de
+    # config est inerte sans son agent, et il attend deja celui installe apres coup
     complete = write_hooks_file(os.path.join(ROOT, ".claude", "settings.json"), SETTINGS,
                                 ".claude/settings.json")
     complete &= write_hooks_file(os.path.join(ROOT, ".codex", "hooks.json"), CODEX_HOOKS,
@@ -712,6 +709,24 @@ def cmd_init(args):
           if complete else
           "[PlanTrack] installation INCOMPLETE — fusionne le bloc ci-dessus a la main, "
           "puis verifie avec `plantrack doctor`.")
+
+
+def cmd_update(args):
+    """Remplace la copie vendoree par la version (plus recente) qui execute la
+    commande, puis rejoue init — toutes les etapes savent se mettre a niveau."""
+    src, dst = os.path.abspath(__file__), os.path.abspath(os.path.join(ROOT, ".claude", "hooks", "pt.py"))
+    if dst == src:
+        sys.exit("[PlanTrack] la copie installee ne peut pas se mettre a jour seule — "
+                 "lance `uvx plantrack@latest update`.")
+    if not os.path.exists(dst):
+        sys.exit("[PlanTrack] aucune installation ici — lance `plantrack init`.")
+    if open(dst, encoding="utf-8").read() == open(src, encoding="utf-8").read():
+        print("pt.py deja a jour.")
+    else:
+        shutil.copy(src, dst)
+        os.chmod(dst, 0o755)
+        print("pt.py mis a jour (nouvelle version vendoree).")
+    cmd_init(args)
 
 
 def cmd_precommit():
@@ -1069,6 +1084,8 @@ def cli(argv):
         print(context_block(st))
     elif cmd == "init":
         cmd_init(args)
+    elif cmd == "update":
+        cmd_update(args)
     elif cmd == "plan":
         if args and args[0] == "import":
             cmd_plan_import(args[1:], st)
