@@ -263,6 +263,12 @@ Sans ces chiffres, impossible de savoir dans six semaines si l'outil sert, et le
 | **v1.1** | `init`, portage Codex, `doctor`, `stats` | Traduction de config livrée et testée sur le contrat documenté (décision 2026-08-29 : PlanTrack est compatible avec les agents, il ne les installe jamais — la validation sur un agent réel appartient à l'utilisateur qui l'installe) |
 | **Publication** | README, démo, packaging | Uniquement si les chiffres du §15 le justifient |
 
+Décision 2026-08-29 : la commande d'installation grand public promise au jalon
+Publication est **`uvx plantrack init`** (publication PyPI, `pipx run plantrack init`
+en équivalent) — la commande longue `uvx --from git+…` reste la voie tant que le
+repo est privé. Écartés : paquet npm (2e écosystème de packaging à maintenir pour
+un outil Python pur) et script `curl | sh` (emballage d'emballage).
+
 ## 17. Risques et points à trancher
 
 | Risque | Parade |

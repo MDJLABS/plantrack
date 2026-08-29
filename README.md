@@ -13,6 +13,9 @@ uvx --from git+https://github.com/mdjlabs/plantrack plantrack init
 ./plantrack init --git-hook      # optionnel : le garde-fou git pre-commit
 ```
 
+(Au jalon Publication, la commande deviendra simplement `uvx plantrack init`
+via PyPI — décision 2026-08-29, PRD §16.)
+
 `init` copie le cœur dans `.claude/hooks/pt.py` (auto-copie vendorée : le projet reste
 autonome, les hooks marchent sur un simple clone), écrit `.claude/settings.json`
 (4 hooks — jamais écrasé s'il existe : fusion à la main), le wrapper `./plantrack`, un
