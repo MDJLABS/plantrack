@@ -269,6 +269,12 @@ en équivalent) — la commande longue `uvx --from git+…` reste la voie tant q
 repo est privé. Écartés : paquet npm (2e écosystème de packaging à maintenir pour
 un outil Python pur) et script `curl | sh` (emballage d'emballage).
 
+Amendement 2026-08-29 (décision Mariella, en connaissance de cause) : la
+**publication PyPI est faite immédiatement** — sans attendre les chiffres du §15 —
+pour que `uvx plantrack init` marche tout de suite. Le code du paquet devient
+public (licence MIT) ; le repo GitHub reste privé. Le reste du jalon Publication
+(repo public, démo) demeure conditionné aux chiffres du §15.
+
 ## 17. Risques et points à trancher
 
 | Risque | Parade |
