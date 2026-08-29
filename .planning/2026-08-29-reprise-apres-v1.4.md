@@ -6,7 +6,8 @@ Prompt autonome : la session qui lit ceci ne sait rien des précédentes.
 PlanTrack : contexte, plan et bugs persistants pour longues sessions d'agent,
 installable partout (`uvx plantrack init`). Le PRD fait foi :
 `PRD-PlanTrack-v0.2.md` (jalons §16). Repo GitHub : `mdjlabs/plantrack`
-(privé), paquet PyPI `plantrack` (public, MIT).
+(rendu PUBLIC le 2026-08-29, décision Mariella), paquet PyPI `plantrack`
+(public, MIT).
 
 ## Où on en est
 TOUT le périmètre décidé est livré, commité, poussé, publié :
@@ -34,8 +35,9 @@ Derniers commits : `527689d` (v1.4.0), `3af8d04` (v1.4.1), `351c634` (v1.4.2).
 
 ## Décisions tranchées par Mariella (immuables)
 - Commande publique : `uvx plantrack init` (npm/curl écartés, PRD §16).
-- Publication PyPI immédiate, MIT ; repo GitHub reste privé — le reste du
-  jalon Publication (repo public, démo) attend les chiffres du §15.
+- Publication PyPI immédiate, MIT ; repo GitHub rendu public le 2026-08-29
+  (Mariella voulait un lien partageable — le code était déjà public via la
+  sdist PyPI). Le reste du jalon Publication (démo) attend les chiffres du §15.
 - Supporter Deep Code (tiers) — contre la reco « rien pour l'instant ».
 - JAMAIS installer un agent de codage pour valider (tester sur le contrat
   documenté) ; jamais ccr ni clé API Anthropic.
