@@ -146,6 +146,21 @@ privé). Vérifié fonctionnel : hook-prompt (exit 2, fil créé), hook-context
 (bloc réinjecté 325/3000), doctor tout vert, `init --git-hook` + commit réel,
 `init --agent codex` (hooks.json JSON valide), idempotence (« deja en place »).
 
+### PUBLIÉ sur PyPI — 2026-08-29 (décision Mariella, PRD §16 amendé)
+`plantrack 1.1.0` sur PyPI (licence MIT, page = README) → **`uvx plantrack init`
+marche**, testé en réel sur un projet vierge (doctor 6 ok, hook-prompt ok).
+Voie : **trusted publishing** GitHub Actions (`.github/workflows/publish.yml`,
+tag `v*`, environnement `pypi`, AUCUN token stocké) — publier une version =
+bump `version` dans pyproject.toml + `git tag vX.Y.Z && git push origin vX.Y.Z`.
+Pièges payés : (1) un bloc `permissions:` dans un workflow met à **none** tout
+droit non listé → `contents: read` explicite obligatoire pour checkout ;
+(2) pousser `.github/workflows/` exige le scope gh `workflow` (ajouté par
+device flow) — avant ça le push échouait, silencieusement avec `-q 2>/dev/null` ;
+(3) la saisie masquée `read -s` via `!` ne capture rien (fichier vide → 403
+PyPI) — le trusted publishing évite tout secret. Le code du paquet est public ;
+le repo GitHub reste privé (le reste du jalon Publication — repo public, démo —
+demeure conditionné aux chiffres du §15).
+
 ### Session CLOSE — 2026-08-29
 Prompt de reprise : `.planning/2026-08-29-reprise-apres-v1.1.md` (autonome).
 Rien en suspens. Prochain jalon (§16 Publication) conditionné aux chiffres

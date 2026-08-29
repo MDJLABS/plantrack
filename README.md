@@ -9,12 +9,12 @@ malgré la compaction du contexte.
 Depuis la racine du projet cible :
 
 ```bash
-uvx --from git+https://github.com/mdjlabs/plantrack plantrack init
+uvx plantrack init               # ou : pipx run plantrack init
 ./plantrack init --git-hook      # optionnel : le garde-fou git pre-commit
 ```
 
-(Au jalon Publication, la commande deviendra simplement `uvx plantrack init`
-via PyPI — décision 2026-08-29, PRD §16.)
+(Paquet publié sur PyPI — licence MIT. Depuis un clone du repo :
+`uvx --from git+https://github.com/mdjlabs/plantrack plantrack init` marche aussi.)
 
 `init` copie le cœur dans `.claude/hooks/pt.py` (auto-copie vendorée : le projet reste
 autonome, les hooks marchent sur un simple clone), écrit `.claude/settings.json`
