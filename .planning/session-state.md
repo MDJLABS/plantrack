@@ -110,6 +110,11 @@ depuis Codex » — le binaire `codex` n'est PAS installé sur la machine (seul 
 à décider avec Mariella.
 
 ### Prochaine action
-Gate : valider le portage Codex en réel (installer codex + auth — décision
-Mariella), trancher §17, ou pause. GitHub toujours en attente de
-`! gh auth login` (puis créer `mdjlabs/plantrack` privé et pousser).
+Binaire `codex` 0.151.0 installé (npm). Interdiction actée par Mariella
+(2026-08-29) : plus jamais ccr/claude-code-router ni de clé API Anthropic —
+la seule voie pour la validation réelle est `! codex login` (compte OpenAI,
+fait par Mariella). Banc de validation prêt dans le scratchpad (projet git
++ init --agent codex + journal semé t1/d1) mais jetable, à refaire au besoin.
+Gate : `! codex login` puis validation réelle, trancher §17, ou pause.
+GitHub toujours en attente de `! gh auth login` (puis créer
+`mdjlabs/plantrack` privé et pousser).
