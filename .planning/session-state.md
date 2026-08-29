@@ -49,7 +49,20 @@ triviale) ; seuil d'éclatement du PRD §0 relevé de 700 à 1200 lignes.
 - Écart §11 assumé (hérité v0) : la troncature du bloc coupe par la fin, elle
   n'applique pas l'ordre de priorité décisions > note de reprise > bugs bloquants.
 
+### v1.1 LIVRÉE (hors portage Codex) — commits `95d02ef` + `8ea8214`
+- `plantrack init` vendorisé complet (§13) : copie de pt.py, settings.json 4 hooks
+  (jamais écrasé), wrapper ./plantrack, bloc CLAUDE.md/AGENTS.md entre marqueurs,
+  .gitignore ; idempotent. `--agent codex|gemini` = mode dégradé annoncé.
+- `plantrack doctor` (installation, journal, budget) et `plantrack stats` (§15,
+  blocages pre-commit désormais journalisés : événement `precommit_block`).
+- `pyproject.toml` : installable via uvx/pip depuis GitHub (entry point pt:main
+  mappé sur .claude/hooks) — vérifié dans un venv + projet vierge.
+- 81 checks verts. pt.py : 1021 lignes (plafond dérogé : 1200 — marge faible).
+- Reste du jalon v1.1 : portage Codex (traduction config hooks, critère de sortie :
+  un projet réel repris depuis Codex) ; questions §17 non tranchées (agent proposant
+  wont_fix ; mode strict §10-B par défaut).
+
 ### Prochaine action
-Gate PRD §0 post-v1.0 : Mariella décide — v1.1 (`init` complet vendorisé, doctor,
-stats) ou trancher d'abord les questions ouvertes §17. GitHub toujours en attente de
-`! gh auth login` (puis créer `mdjlabs/plantrack` privé et pousser).
+Gate : Mariella décide — portage Codex, revue de code, trancher §17, ou pause.
+GitHub toujours en attente de `! gh auth login` (puis créer `mdjlabs/plantrack`
+privé et pousser).
