@@ -197,6 +197,21 @@ Livré (tag v1.3.0, publié PyPI via Actions, testé en réel depuis PyPI) :
 - Sources : github.com/lessweb/deepcode-cli,
   api-docs.deepseek.com/quick_start/agent_integrations/deepcode/.
 
+### v1.3.1 — correctifs du rapport de terrain miamboost (2026-08-29)
+Rapport : `.planning/2026-08-29-rapport-install-claude-code.md` (3 défauts
+constatés en installant sur miamboost). Livré (tag v1.3.1, publié, rejoué
+en réel depuis PyPI sur le scénario exact du rapport) :
+- `write_hooks_file` FUSIONNE dans un settings.json existant (additive,
+  comparaison sur la commande → idempotente, écriture atomique os.replace,
+  JSON invalide → bloc à coller imprimé + retour False) ;
+- retour anticipé `--git-hook` supprimé : le drapeau AJOUTE le garde-fou à
+  l'installation complète (le chemin mort de fin de cmd_init le gérait déjà) ;
+- init termine sur « installation INCOMPLETE » si une étape a échoué.
+- 150 checks verts (dont section 22 = rejeu miamboost). pt.py : 1183 lignes
+  (plafond 1200 — marge très faible, prochain ajout devra dégraisser).
+- Piège : l'API JSON PyPI est indexée AVANT l'index simple qu'utilise uv —
+  attendre `curl https://pypi.org/simple/plantrack/ | grep X.Y.Z`.
+
 ### Session CLOSE — 2026-08-29
 Prompt de reprise : `.planning/2026-08-29-reprise-apres-v1.3.md` (autonome,
 l'ancien apres-v1.1 est purgé). Rien en suspens. Prochain jalon (§16
