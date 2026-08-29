@@ -1,4 +1,4 @@
-# Reprise — PlanTrack après v1.3.1 (2026-08-29)
+# Reprise — PlanTrack après v1.4.2 (2026-08-29)
 
 Prompt autonome : la session qui lit ceci ne sait rien des précédentes.
 
@@ -21,9 +21,16 @@ TOUT le périmètre décidé est livré, commité, poussé, publié :
 - v1.3.1 : correctifs du rapport de terrain miamboost
   (`.planning/2026-08-29-rapport-install-claude-code.md`) — `init` FUSIONNE
   les hooks dans un `settings.json` existant (idempotent, atomique),
-  `--git-hook` n'ampute plus l'installation, échec → « INCOMPLETE ».
-Derniers commits : `941806c` (v1.3.1), `e0a62b3` (session-state).
-150 checks verts (`bash tests/scenario.sh`), aussi en environnement nu.
+  `--git-hook` n'ampute plus l'installation, échec → « INCOMPLETE » ;
+- v1.4.0 : commande `update` (`uvx plantrack@latest update`) — remplace la
+  copie vendorée puis rejoue init ;
+- v1.4.1 : garde-fou surcouches — doctor vérifie la ligne `@AGENTS.md` dans
+  CLAUDE.md/GEMINI.md (GSD génère/écrase CLAUDE.md ; BMAD, task-master,
+  claude-flow, spec-kit déjà couverts : les sous-agents Claude Code
+  reçoivent le CLAUDE.md du projet — sources au README) ;
+- v1.4.2 : README section grand public « Comment ça marche, tout simplement ».
+Derniers commits : `527689d` (v1.4.0), `3af8d04` (v1.4.1), `351c634` (v1.4.2).
+165 checks verts (`bash tests/scenario.sh`), aussi en environnement nu.
 
 ## Décisions tranchées par Mariella (immuables)
 - Commande publique : `uvx plantrack init` (npm/curl écartés, PRD §16).
@@ -41,14 +48,17 @@ Derniers commits : `941806c` (v1.3.1), `e0a62b3` (session-state).
 - Juste après un tag, l'index PyPI sert l'ancienne version à uvx → tester
   avec `uvx --refresh --from 'plantrack==X.Y.Z' plantrack init`. L'API JSON
   est indexée AVANT l'index simple qu'utilise uv : attendre que
-  `curl https://pypi.org/simple/plantrack/` contienne X.Y.Z.
+  `curl https://pypi.org/simple/plantrack/` contienne X.Y.Z. Même
+  `plantrack@latest --refresh` peut résoudre l'ancienne pendant quelques
+  minutes.
 - `git push -q 2>/dev/null` masque les échecs — jamais sur un push critique.
 - Compatibilité vérifiée (web, 2026-08, sources au README) : ZCode, Grok
   Build, Kimi Code CLI, Mistral Vibe lisent AGENTS.md nativement ; aucun
   agent tiers ne supporte l'import `@fichier` ; DeepSeek n'a pas de CLI
   officiel (d'où Deep Code, format SKILL.md compatible Claude Code).
-- `pt.py` : 1183 lignes, plafond dérogé 1200 — marge presque nulle, tout
-  prochain ajout devra d'abord dégraisser.
+- `pt.py` : 1195 lignes, plafond dérogé 1200 — marge presque nulle, tout
+  prochain ajout devra d'abord dégraisser (doctor a déjà été compacté avec
+  un helper `slurp()`, les commentaires aussi).
 
 ## Prochaine action exacte
 Aucune tâche en attente. Le prochain jalon (§16 Publication complète) est
