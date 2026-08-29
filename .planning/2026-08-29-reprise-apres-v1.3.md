@@ -1,4 +1,4 @@
-# Reprise — PlanTrack après v1.3.0 (2026-08-29)
+# Reprise — PlanTrack après v1.3.1 (2026-08-29)
 
 Prompt autonome : la session qui lit ceci ne sait rien des précédentes.
 
@@ -17,9 +17,13 @@ TOUT le périmètre décidé est livré, commité, poussé, publié :
   hooks `.claude/settings.json` + `.codex/hooks.json` écrits d'office ;
 - v1.3.0 : skill Deep Code `.deepcode/skills/plantrack/SKILL.md` — une
   **référence** vers AGENTS.md, jamais une duplication (principe posé par
-  Mariella : UN fichier source + des références partout ailleurs).
-Derniers commits : `b2f0b3f` (v1.3.0), `1360b13` (session-state).
-137 checks verts (`bash tests/scenario.sh`), aussi en environnement nu.
+  Mariella : UN fichier source + des références partout ailleurs) ;
+- v1.3.1 : correctifs du rapport de terrain miamboost
+  (`.planning/2026-08-29-rapport-install-claude-code.md`) — `init` FUSIONNE
+  les hooks dans un `settings.json` existant (idempotent, atomique),
+  `--git-hook` n'ampute plus l'installation, échec → « INCOMPLETE ».
+Derniers commits : `941806c` (v1.3.1), `e0a62b3` (session-state).
+150 checks verts (`bash tests/scenario.sh`), aussi en environnement nu.
 
 ## Décisions tranchées par Mariella (immuables)
 - Commande publique : `uvx plantrack init` (npm/curl écartés, PRD §16).
@@ -35,13 +39,16 @@ Derniers commits : `b2f0b3f` (v1.3.0), `1360b13` (session-state).
   publishing, AUCUN token). Un bloc `permissions:` doit garder
   `contents: read` sinon le checkout échoue.
 - Juste après un tag, l'index PyPI sert l'ancienne version à uvx → tester
-  avec `uvx --refresh --from 'plantrack==X.Y.Z' plantrack init`.
+  avec `uvx --refresh --from 'plantrack==X.Y.Z' plantrack init`. L'API JSON
+  est indexée AVANT l'index simple qu'utilise uv : attendre que
+  `curl https://pypi.org/simple/plantrack/` contienne X.Y.Z.
 - `git push -q 2>/dev/null` masque les échecs — jamais sur un push critique.
 - Compatibilité vérifiée (web, 2026-08, sources au README) : ZCode, Grok
   Build, Kimi Code CLI, Mistral Vibe lisent AGENTS.md nativement ; aucun
   agent tiers ne supporte l'import `@fichier` ; DeepSeek n'a pas de CLI
   officiel (d'où Deep Code, format SKILL.md compatible Claude Code).
-- `pt.py` : 1160 lignes environ, plafond dérogé 1200 — marge faible.
+- `pt.py` : 1183 lignes, plafond dérogé 1200 — marge presque nulle, tout
+  prochain ajout devra d'abord dégraisser.
 
 ## Prochaine action exacte
 Aucune tâche en attente. Le prochain jalon (§16 Publication complète) est
