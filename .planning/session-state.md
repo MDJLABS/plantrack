@@ -17,7 +17,12 @@
 
 ### État
 - Commit initial `6209f57` : layout installable (.claude/, plantrack, README, PRD).
-- Remote GitHub PAS créé : `gh` non authentifié → Mariella doit lancer `! gh auth login`.
+- Commit `21fed8c` : les 4 correctifs d'audit livrés — O6 verrouillé (verify/reject
+  refusés si env CLAUDECODE/CLAUDE_CODE_ENTRYPOINT), verrue `--force` supprimée,
+  README aligné PRD, `tests/scenario.sh` (19 checks, tous verts).
+- Remote GitHub PAS créé : `gh` non authentifié → Mariella doit lancer `! gh auth login`,
+  puis créer `mdjlabs/plantrack` en privé et pousser.
 
 ### Prochaine action
-Question posée à Mariella : correctifs d'audit d'abord (reco) vs v0.5 pre-commit direct vs couche 2.
+Choix posé à Mariella : enchaîner v0.5 (couche 4, hook pre-commit — garde partielle
+« fils parqués » assumée tant que la couche 2 n'existe pas) ou s'arrêter là.
