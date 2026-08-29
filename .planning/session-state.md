@@ -62,7 +62,27 @@ triviale) ; seuil d'éclatement du PRD §0 relevé de 700 à 1200 lignes.
   un projet réel repris depuis Codex) ; questions §17 non tranchées (agent proposant
   wont_fix ; mode strict §10-B par défaut).
 
+### Revue de code FAITE — lots A+D livrés, commit `60c26fa`
+Revue skill code-review (4 passes de collecte + 4 vérificateurs, scoring 0-100).
+Faux positifs démontés : B1 (pre-commit fils closed = conforme PRD), P5 (rôles
+par env = décision actée), P6 (statuts anglais = choix v0). Mariella a retenu
+les lots A (bugs sûrs) et D (tests fiables) :
+- plafond dur 3000 respecté (le bloc faisait 3042) ; project() tolère un
+  événement incomplet (KeyError cassait hooks/CLI/doctor) ; init détecte une
+  installation partielle et liste les hooks manquants ; hook-context réinjecte
+  une inbox/un plan seuls ; `file` refuse une destination ≠ bug|decision.
+- scenario.sh hermétique (export CLAUDECODE=1 — avant : 4 FAIL + EOFError en
+  env nu) + 20 nouveaux checks. 101 checks verts, vérifiés aussi en env nu.
+  pt.py : 1031 lignes (< 1200).
+
+### Lots B et C NON retenus (choix Mariella, restent ouverts)
+- Lot B pre-commit : faux négatif si CLAUDE_PROJECT_DIR ≠ racine git ; faux
+  positif sur fichier partagé fil parqué / fil actif (L3, réaliste en multi-fils).
+- Lot C schéma/traçabilité : tentatives rejetées jamais réinjectées (§5, score
+  75) ; champs §9 manquants (bug.task ; attempt hypothesis/changes/actor) ;
+  `bug <id> open` contourne reject sans motif ni humain (L6).
+
 ### Prochaine action
-Gate : Mariella décide — portage Codex, revue de code, trancher §17, ou pause.
-GitHub toujours en attente de `! gh auth login` (puis créer `mdjlabs/plantrack`
-privé et pousser).
+Gate : Mariella décide — lots B/C de la revue, portage Codex, trancher §17,
+ou pause. GitHub toujours en attente de `! gh auth login` (puis créer
+`mdjlabs/plantrack` privé et pousser).
