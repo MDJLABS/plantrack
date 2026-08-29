@@ -212,6 +212,24 @@ en réel depuis PyPI sur le scénario exact du rapport) :
 - Piège : l'API JSON PyPI est indexée AVANT l'index simple qu'utilise uv —
   attendre `curl https://pypi.org/simple/plantrack/ | grep X.Y.Z`.
 
+### v1.4.0 → v1.4.2 — update, garde-fou surcouches, README grand public (2026-08-29)
+- v1.4.0 : commande `update` (demande Mariella) — remplace la copie vendoree
+  par la version qui execute la commande puis rejoue init (idempotent).
+  Usage : `uvx plantrack@latest update`. Piege : @latest peut resoudre
+  l'ancienne version quelques minutes apres publication.
+- v1.4.1 : surcouches (demande Mariella : BMAD, GSD…). Recherche sous-agent
+  (sources au README) : les sous-agents Claude Code RECOIVENT le CLAUDE.md
+  du projet → BMAD, task-master, claude-flow, spec-kit deja couverts ; BMAD
+  et task-master ecrivent eux-memes dans AGENTS.md entre leurs marqueurs
+  (cohabitation ok). Seul point dur : GSD genere/ecrase CLAUDE.md. Choix
+  Mariella : garde-fou doctor (verifie @AGENTS.md dans CLAUDE.md/GEMINI.md),
+  rien d'intrusif chez les autres outils.
+- v1.4.2 : section README « Comment ca marche, tout simplement » (langage
+  courant, demande Mariella) — publiee sur PyPI via bump.
+- 165 checks verts ; pt.py 1195 lignes (doctor degraisse via slurp()).
+- Scenarios rejoues en reel depuis PyPI : update 1.3.1→1.4.0, CLAUDE.md
+  ecrase facon GSD → doctor detecte, init repose la ligne.
+
 ### Session CLOSE — 2026-08-29
 Prompt de reprise : `.planning/2026-08-29-reprise-apres-v1.3.md` (autonome,
 l'ancien apres-v1.1 est purgé). Rien en suspens. Prochain jalon (§16

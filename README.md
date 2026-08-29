@@ -50,6 +50,40 @@ Redémarre Claude Code. Vérifie avec `/hooks` que les quatre hooks sont chargé
 ./plantrack doctor               # hooks, journal, budget de contexte
 ```
 
+## Comment ça marche, tout simplement
+
+Un agent de codage oublie : quand la conversation devient trop longue, elle est
+compressée et des détails disparaissent — un bug signalé au passage, une décision
+prise il y a deux heures. PlanTrack tient un **carnet de bord** dans le projet, et
+tout ce qui y est noté est **définitif** : à chaque nouvelle session, et après
+chaque compression, l'agent reçoit automatiquement le résumé de ce carnet. Il
+repart toujours de ce qui a été décidé, pas de ce dont il « se souvient ».
+
+Au quotidien :
+
+- **Tu vois un bug en plein milieu d'une tâche ?** Tape `!bug l'avatar ne se
+  rafraîchit pas`. Le bug est noté et l'agent ne voit même pas passer le message :
+  il n'est pas déconcentré de sa tâche. Le bug ressortira à chaque session tant
+  qu'il n'est pas réglé — impossible de l'oublier.
+- **Vous prenez une décision ?** `!decide on abandonne X — motif : Y`. Elle est
+  rappelée à l'agent à chaque session, avec interdiction de la réimplémenter.
+- **Tu changes d'avis plus tard ?** Tu actes une nouvelle décision. Rien ne
+  s'efface jamais : l'ancienne reste dans l'historique — on sait *pourquoi* on
+  avait choisi autrement — et la nouvelle fait foi.
+- **Tu pars sur un autre sujet ?** `!park reste à faire : Z`. La note de reprise
+  est obligatoire — c'est elle qui permet de reprendre le fil dans trois jours
+  sans rien reperdre.
+- **L'agent dit qu'un bug est corrigé ?** Il n'a pas le droit de le déclarer
+  réglé : le bug passe « à vérifier » et c'est toi qui valides ou rejettes, avec
+  un motif conservé — l'agent ne retentera pas deux fois la même correction.
+- **Une nouvelle session démarre ?** Rien à faire : l'état complet (fils en
+  cours, décisions, bugs ouverts) est réinjecté automatiquement.
+
+Le carnet (`.plantrack/events.jsonl`) ne fait que s'allonger, ligne par ligne :
+rien ne s'y supprime, l'état courant est recalculé en le relisant. Changer d'avis,
+revenir en arrière, reprendre après une pause : tout reste cohérent parce que
+tout est écrit.
+
 ## Utilisation
 
 Tout se tape dans le prompt de l'agent. Les commandes commençant par `!` sont
