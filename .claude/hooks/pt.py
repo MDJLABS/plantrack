@@ -18,6 +18,7 @@ import json
 import os
 import re
 import shutil
+import subprocess
 import sys
 from datetime import datetime, timezone
 
@@ -89,6 +90,7 @@ def project():
             if t:
                 t["status"] = "parked"
                 t["note"] = ev.get("text", "")
+                t["parked_ts"] = ev.get("ts", "")
             if st["active"] == ev["id"]:
                 st["active"] = None
         elif k == "close":
@@ -290,7 +292,8 @@ HELP = """[PlanTrack] commandes (dans le prompt de l'agent, jamais transmises au
   !close              ferme le fil actif
   !state              affiche l'etat persistant courant
   !<texte libre>      capture dans l'inbox, a classer plus tard
-CLI humaine : plantrack status | bugs | inbox | verify <id> | reject <id> -m ... | close <id>"""
+CLI humaine : plantrack status | bugs | inbox | verify <id> | reject <id> -m ... | close <id>
+              plantrack init --git-hook   installe le pre-commit qui protege les fils parques"""
 
 
 # -------------------------------------------------------------------------- hooks
@@ -368,6 +371,53 @@ def hook_precompact():
 AGENT_ENV = ("CLAUDECODE", "CLAUDE_CODE_ENTRYPOINT")
 
 
+GIT_HOOK = "#!/bin/sh\n# installe par plantrack init --git-hook\nexec python3 .claude/hooks/pt.py precommit\n"
+
+
+def cmd_init(args):
+    """v0.5 : n'installe que le garde-fou git. L'installation complete (agent,
+    AGENTS.md) arrive en v1.1."""
+    if "--git-hook" not in args:
+        sys.exit("usage : plantrack init --git-hook")
+    if not os.path.isdir(os.path.join(ROOT, ".git")):
+        sys.exit("[PlanTrack] pas de depot git ici — lance `git init` d'abord.")
+    hook = os.path.join(ROOT, ".git", "hooks", "pre-commit")
+    if os.path.exists(hook):
+        sys.exit(f"[PlanTrack] {hook} existe deja — fusionne a la main, rien n'a ete ecrit.")
+    os.makedirs(os.path.dirname(hook), exist_ok=True)
+    with open(hook, "w", encoding="utf-8") as f:
+        f.write(GIT_HOOK)
+    os.chmod(hook, 0o755)
+    print("[PlanTrack] hook pre-commit installe (contournement : git commit --no-verify).")
+
+
+def cmd_precommit():
+    """Garde-fou §10-A : le commit echoue si un fichier stage appartient a un fil
+    parque. S'etendra aux taches cancelled/replaced avec la couche 2."""
+    try:
+        out = subprocess.run(
+            ["git", "diff", "--cached", "--name-only"],
+            capture_output=True, text=True, cwd=ROOT, check=True,
+        ).stdout
+    except (OSError, subprocess.CalledProcessError):
+        sys.exit(0)  # pas de git exploitable : ne jamais bloquer un commit legitime
+    staged = {l.strip() for l in out.splitlines() if l.strip()}
+    st = project()
+    blocked = False
+    for t in st["threads"].values():
+        if t["status"] != "parked":
+            continue
+        for f in sorted(staged & set(t["files"])):
+            blocked = True
+            date = (t.get("parked_ts") or "")[:10]
+            print(f"PlanTrack : {f} appartient au fil {t['id']} ({trunc(t['label'], 50)}), parque le {date}")
+            print(f"  note de reprise : {trunc(t['note'] or 'aucune', 100)}")
+    if blocked:
+        print("Contournement : git commit --no-verify")
+        sys.exit(1)
+    sys.exit(0)
+
+
 def require_human(cmd):
     """O6 : ecrire un verdict est reserve a l'humain. Refus deterministe quand
     la CLI est invoquee depuis un shell pilote par l'agent (env Claude Code)."""
@@ -386,6 +436,10 @@ def cli(argv):
 
     if cmd == "status":
         print(context_block(st))
+    elif cmd == "init":
+        cmd_init(args)
+    elif cmd == "precommit":
+        cmd_precommit()
     elif cmd == "bugs":
         rows = [b for b in st["bugs"].values() if b["status"] != "validated"] or []
         if not rows:

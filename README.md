@@ -78,6 +78,9 @@ Le bloc réinjecté fait environ 250 tokens sur un projet à deux fils. Plafond 
 - **Trois fils ouverts maximum.** Au-delà, le bloc réinjecté devient trop gros pour
   survivre à une compaction.
 - **Rien ne se supprime.** Journal append-only : l'état est reconstruit par rejeu.
+- **Un commit ne touche pas un fil en pause.** `plantrack init --git-hook` installe un
+  `pre-commit` qui bloque tout commit d'un fichier appartenant à un fil parqué — le seul
+  garde-fou qui ne dépende d'aucun modèle. Contournement assumé : `git commit --no-verify`.
 
 ## Vérifier que ça marche
 

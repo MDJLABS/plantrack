@@ -81,5 +81,29 @@ n=$(ctx compact | wc -c)
 if [ "$n" -le 3100 ]; then echo "ok   - bloc reinjecte sous le plafond ($n chars)"
 else echo "FAIL - bloc reinjecte a $n chars (> 3000 + marge troncature)"; fail=1; fi
 
+# 10. v0.5 — le hook pre-commit bloque un commit touchant un fichier d'un fil parque
+printf '{"tool_input":{"file_path":"%s/src/a.txt"}}' "$TMP" | python3 "$PT" hook-filelog
+prompt '!park en attente de la maquette' >/dev/null
+mkdir -p "$TMP/.claude/hooks" "$TMP/src"
+cp "$PT" "$TMP/.claude/hooks/pt.py"
+echo contenu > "$TMP/src/a.txt"
+echo libre > "$TMP/libre.txt"
+git -C "$TMP" init -q
+git -C "$TMP" add -A
+out=$(cd "$TMP" && python3 "$PT" init --git-hook 2>&1)
+check "init --git-hook installe le hook" "pre-commit installe" "$out"
+out=$(cd "$TMP" && git -c user.name=t -c user.email=t@t commit -m x 2>&1); rc=$?
+check_exit "commit d un fichier parque bloque (exit 1)" 1 "$rc"
+check "le message nomme le fil fautif" "appartient au fil t1" "$out"
+check "le contournement est documente" "no-verify" "$out"
+out=$(cd "$TMP" && git -c user.name=t -c user.email=t@t commit -q --no-verify -m x 2>&1); rc=$?
+check_exit "contournement --no-verify passe" 0 "$rc"
+echo v2 > "$TMP/libre.txt"
+git -C "$TMP" add libre.txt
+out=$(cd "$TMP" && git -c user.name=t -c user.email=t@t commit -q -m y 2>&1); rc=$?
+check_exit "commit d un fichier libre passe" 0 "$rc"
+out=$(cd "$TMP" && python3 "$PT" init --git-hook 2>&1); rc=$?
+check "init refuse d ecraser un pre-commit existant" "existe deja" "$out"
+
 echo
 [ "$fail" = 0 ] && echo "TOUS LES TESTS PASSENT" || { echo "DES TESTS ECHOUENT"; exit 1; }
