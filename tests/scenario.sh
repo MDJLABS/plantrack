@@ -473,13 +473,13 @@ TMP11=$(mktemp -d)
 out=$(printf '{"prompt":"!piege le cache invalide la session au deploy"}' \
   | CLAUDE_PROJECT_DIR="$TMP11" python3 "$PT" hook-prompt 2>&1); rc=$?
 check_exit "!piege rejette le prompt (exit 2)" 2 "$rc"
-check "!piege note p1" "piege p1 note" "$out"
+check "!piege note pg1 (prefixe dedie, pas de collision avec les phases)" "piege pg1 note" "$out"
 out=$(CLAUDE_PROJECT_DIR="$TMP11" python3 "$PT" piege "ne jamais committer .env" 2>&1)
-check "plantrack piege cree p2" "piege p2 note" "$out"
+check "plantrack piege cree pg2" "piege pg2 note" "$out"
 out=$(printf '{"source":"startup"}' | CLAUDE_PROJECT_DIR="$TMP11" python3 "$PT" hook-context 2>&1)
 check "les pieges sont reinjectes" "Pieges connus" "$out"
-check "p1 apparait dans le bloc" "p1 :" "$out"
-check "p2 apparait dans le bloc" "p2 :" "$out"
+check "pg1 apparait dans le bloc" "pg1 :" "$out"
+check "pg2 apparait dans le bloc" "pg2 :" "$out"
 rm -rf "$TMP11"
 
 # 27. v1.5 — questions en attente de verdict : hook + CLI, reponse fait disparaitre du bloc

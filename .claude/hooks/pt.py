@@ -315,7 +315,7 @@ def cmd_decide(text, par="humain"):
 def cmd_piege(text):
     if not text:
         return "usage : !piege <ce qu'il ne faut pas refaire>"
-    pid = next_id("p")
+    pid = next_id("pg")
     append("piege", id=pid, text=text)
     return f"[PlanTrack] piege {pid} note : {trunc(text, 80)}"
 
