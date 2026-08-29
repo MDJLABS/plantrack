@@ -23,6 +23,12 @@
 - Remote GitHub PAS créé : `gh` non authentifié → Mariella doit lancer `! gh auth login`,
   puis créer `mdjlabs/plantrack` en privé et pousser.
 
+### Jalon v0.5 ATTEINT — commit `6d922c6`
+- `plantrack init --git-hook` + `plantrack precommit` : commit bloqué si un fichier
+  stagé appartient à un fil parqué (portée v0.5 ; les tâches cancelled/replaced
+  viendront avec la couche 2). 26 checks verts dans tests/scenario.sh.
+
 ### Prochaine action
-Choix posé à Mariella : enchaîner v0.5 (couche 4, hook pre-commit — garde partielle
-« fils parqués » assumée tant que la couche 2 n'existe pas) ou s'arrêter là.
+Gate de validation humaine du PRD §0 (jamais deux couches sans retour) : Mariella
+décide — enchaîner couche 2 (plan phases/tâches, v1.0) ou s'arrêter. GitHub toujours
+en attente de `! gh auth login`.
