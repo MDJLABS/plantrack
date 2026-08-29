@@ -161,6 +161,24 @@ PyPI) — le trusted publishing évite tout secret. Le code du paquet est public
 le repo GitHub reste privé (le reste du jalon Publication — repo public, démo —
 demeure conditionné aux chiffres du §15).
 
+### v1.2.0 — découverte multi-agents (décision Mariella 2026-08-29)
+Demande : « comment l'agent installé en prend connaissance, ou s'il y en a
+plusieurs, ou installé après ? … une ligne réf dans claude.md, et les autres
+pareil. » Livré (tag v1.2.0, publié PyPI, testé en réel depuis PyPI) :
+- `init` sans option couvre TOUT : `.claude/settings.json` + `.codex/hooks.json`
+  systématiques (un fichier de config est inerte sans l'agent ; celui installé
+  après trouve tout en place) ; bloc complet dans **AGENTS.md** (source unique,
+  standard cross-agents) ; ligne d'import `@AGENTS.md` entre marqueurs dans
+  **CLAUDE.md** et **GEMINI.md** (les deux savent importer via `@`).
+- Fait vérifié (web) : Gemini CLI lit GEMINI.md par défaut, AGENTS.md
+  seulement via config → d'où le fichier GEMINI.md.
+- `--agent` obsolète (accepté, annoncé) ; `write_md_block` remplace le contenu
+  entre marqueurs (mise à niveau des anciens blocs CLAUDE.md v1.1) ; doctor
+  vérifie codex + AGENTS.md inconditionnellement.
+- 134 checks verts (aussi env nu). pt.py : 1126 lignes (< 1200).
+- Piège : juste après un tag, l'index PyPI peut servir l'ancienne version à
+  uvx — forcer `--from 'plantrack==X.Y.Z'` pour tester la fraîche.
+
 ### Session CLOSE — 2026-08-29
 Prompt de reprise : `.planning/2026-08-29-reprise-apres-v1.1.md` (autonome).
 Rien en suspens. Prochain jalon (§16 Publication) conditionné aux chiffres
