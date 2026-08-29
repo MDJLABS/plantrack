@@ -541,5 +541,96 @@ n=$(grep -c "plantrack:start" "$TMP14/AGENTS.md")
 check_exit "un seul jeu de marqueurs apres mise a niveau" 1 "$n"
 rm -rf "$TMP14"
 
+# 30. v1.6.0 — post-commit journalisant installe d'office (pre-commit reste opt-in)
+TMP15=$(mktemp -d)
+git -C "$TMP15" init -q
+out=$(CLAUDE_PROJECT_DIR="$TMP15" python3 "$PT" init 2>&1)
+check "init installe le post-commit d'office (sans --git-hook)" "hook post-commit installe" "$out"
+check_not "et n'installe PAS le pre-commit garde-fou (reste opt-in)" "pre-commit installe" "$out"
+out=$(CLAUDE_PROJECT_DIR="$TMP15" python3 "$PT" init 2>&1)
+check "second init : post-commit deja en place (idempotent)" "hook post-commit deja en place" "$out"
+
+printf '{"prompt":"!focus travail post-commit"}' | CLAUDE_PROJECT_DIR="$TMP15" python3 "$PT" hook-prompt >/dev/null 2>&1
+echo x > "$TMP15/f.txt"
+git -C "$TMP15" add f.txt
+out=$(cd "$TMP15" && env -u CLAUDE_PROJECT_DIR git -c user.name=t -c user.email=t@t commit -q -m "feat: premier commit" 2>&1); rc=$?
+check_exit "commit avec fil actif passe (post-commit jamais bloquant)" 0 "$rc"
+out=$(CLAUDE_PROJECT_DIR="$TMP15" python3 "$PT" threads 2>&1)
+check "le commit est attache au fil actif" "commits : 1" "$out"
+check "avec le sha du dernier commit" "(dernier" "$out"
+out=$(printf '{"source":"startup"}' | CLAUDE_PROJECT_DIR="$TMP15" python3 "$PT" hook-context 2>&1)
+check "le bloc reinjecte porte le compteur de commits" "[1 commits]" "$out"
+
+printf '{"prompt":"!close"}' | CLAUDE_PROJECT_DIR="$TMP15" python3 "$PT" hook-prompt >/dev/null 2>&1
+echo y > "$TMP15/g.txt"
+git -C "$TMP15" add g.txt
+out=$(cd "$TMP15" && env -u CLAUDE_PROJECT_DIR git -c user.name=t -c user.email=t@t commit -q -m "second commit sans fil" 2>&1); rc=$?
+check_exit "commit sans fil actif passe silencieusement" 0 "$rc"
+out=$(CLAUDE_PROJECT_DIR="$TMP15" python3 "$PT" threads 2>&1)
+check "aucun commit ajoute sans fil actif" "commits : 1" "$out"
+rm -rf "$TMP15"
+
+# 31. v1.6.0 — un post-commit etranger n'est jamais ecrase, le reste de l'install continue
+TMP16=$(mktemp -d)
+git -C "$TMP16" init -q
+printf '#!/bin/sh\necho foreign-hook\n' > "$TMP16/.git/hooks/post-commit"
+chmod +x "$TMP16/.git/hooks/post-commit"
+out=$(CLAUDE_PROJECT_DIR="$TMP16" python3 "$PT" init 2>&1)
+check "un post-commit etranger n'est pas ecrase" "rien n'a ete ecrase" "$out"
+check "le bloc a fusionner a la main est imprime" "hook-commit" "$out"
+check "le contenu etranger est preserve" "foreign-hook" "$(cat "$TMP16/.git/hooks/post-commit")"
+check "le reste de l'installation continue malgre tout" "insere dans AGENTS.md" "$out"
+rm -rf "$TMP16"
+
+# 32. v1.6.0 — guides de test coches, caches derriere !testcheck (off par defaut)
+TMP17=$(mktemp -d)
+out=$(printf '{"prompt":"!guide un titre"}' | CLAUDE_PROJECT_DIR="$TMP17" python3 "$PT" hook-prompt 2>&1); rc=$?
+check_exit "!guide rejette le prompt (exit 2)" 2 "$rc"
+check "!guide refuse tant que testcheck est off" "testcheck desactivee" "$out"
+out=$(CLAUDE_PROJECT_DIR="$TMP17" python3 "$PT" guide "un titre" 2>&1)
+check "plantrack guide refuse aussi tant que testcheck est off" "testcheck desactivee" "$out"
+out=$(printf '{"source":"startup"}' | CLAUDE_PROJECT_DIR="$TMP17" python3 "$PT" hook-context 2>&1)
+check_not "rien dans le bloc reinjecte tant que testcheck est off" "Guide" "$out"
+
+out=$(printf '{"prompt":"!testcheck on"}' | CLAUDE_PROJECT_DIR="$TMP17" python3 "$PT" hook-prompt 2>&1); rc=$?
+check_exit "!testcheck rejette le prompt (exit 2)" 2 "$rc"
+check "!testcheck on active l'option" "testcheck active" "$out"
+
+out=$(printf '{"prompt":"!guide parcours inscription"}' | CLAUDE_PROJECT_DIR="$TMP17" python3 "$PT" hook-prompt 2>&1)
+check "!guide cree g1 une fois testcheck actif" "guide g1 cree" "$out"
+out=$(printf '{"prompt":"!step g1 cliquer sur inscription"}' | CLAUDE_PROJECT_DIR="$TMP17" python3 "$PT" hook-prompt 2>&1)
+check "!step ajoute s1 au guide" "etape s1 ajoutee" "$out"
+CLAUDE_PROJECT_DIR="$TMP17" python3 "$PT" step g1 "verifier le mail de confirmation" >/dev/null 2>&1
+
+out=$(printf '{"source":"startup"}' | CLAUDE_PROJECT_DIR="$TMP17" python3 "$PT" hook-context 2>&1)
+check "les etapes sans verdict ressortent dans le bloc" "etapes sans verdict" "$out"
+check "s1 est nomme dans le bloc" "s1" "$out"
+
+out=$(CLAUDE_PROJECT_DIR="$TMP17" python3 "$PT" check s1 ok 2>&1); rc=$?
+check "check refuse cote agent (verdict reserve a l'humain)" "reserve a l'humain" "$out"
+check_exit "check refuse cote agent sort en erreur" 1 "$rc"
+out=$(env -u CLAUDECODE -u CLAUDE_CODE_ENTRYPOINT CLAUDE_PROJECT_DIR="$TMP17" python3 "$PT" check s1 ko 2>&1)
+check "check ko sans motif refuse" "motif obligatoire" "$out"
+out=$(env -u CLAUDECODE -u CLAUDE_CODE_ENTRYPOINT CLAUDE_PROJECT_DIR="$TMP17" python3 "$PT" check s1 ko -m "bouton introuvable" 2>&1)
+check "check ko avec motif passe (humain)" "s1 : ko" "$out"
+
+out=$(printf '{"prompt":"!check s2 ok"}' | CLAUDE_PROJECT_DIR="$TMP17" python3 "$PT" hook-prompt 2>&1); rc=$?
+check_exit "!check rejette le prompt (exit 2)" 2 "$rc"
+check "!check ok verdict s2 cote hook" "s2 : ok" "$out"
+
+out=$(printf '{"source":"startup"}' | CLAUDE_PROJECT_DIR="$TMP17" python3 "$PT" hook-context 2>&1)
+check_not "toutes les etapes verdictees : plus rien dans le bloc" "etapes sans verdict" "$out"
+out=$(CLAUDE_PROJECT_DIR="$TMP17" python3 "$PT" guide g1 2>&1)
+check "plantrack guide <id> affiche le verdict negatif" "✗ s1" "$out"
+check "et le verdict positif" "✓ s2" "$out"
+
+out=$(printf '{"prompt":"!testcheck off"}' | CLAUDE_PROJECT_DIR="$TMP17" python3 "$PT" hook-prompt 2>&1)
+check "!testcheck off desactive l'option" "testcheck desactive" "$out"
+out=$(CLAUDE_PROJECT_DIR="$TMP17" python3 "$PT" guide g1 2>&1)
+check "testcheck off : les donnees restent consultables (rien n'est efface)" "s1" "$out"
+out=$(CLAUDE_PROJECT_DIR="$TMP17" python3 "$PT" step g1 "nouvelle etape" 2>&1)
+check "testcheck off : creer une nouvelle etape est de nouveau refuse" "testcheck desactivee" "$out"
+rm -rf "$TMP17"
+
 echo
 [ "$fail" = 0 ] && echo "TOUS LES TESTS PASSENT" || { echo "DES TESTS ECHOUENT"; exit 1; }

@@ -117,6 +117,8 @@ avant d'atteindre le modèle** : son contexte reste propre.
 | `!question faut-il garder l'ancien format ?` | pose une question à l'humain, rappelée tant que sans réponse |
 | `!answer q1 oui, on garde` | toi seule : réponds à une question en attente |
 | `!state` | affiche l'état persistant |
+| `!testcheck on\|off` | active/désactive les guides de test cochables (off par défaut) |
+| `!check s1 ok` / `!check s1 ko -m "motif"` | toi seule : verdict sur une étape de guide (motif obligatoire pour ko) |
 | `!n'importe quel texte` | capture libre dans l'inbox, à classer plus tard |
 
 Un bug accepte une sévérité : `!bug le paiement échoue --blocker` (ou
@@ -145,7 +147,22 @@ Côté agent, dans son propre shell (v1.5) :
 ./plantrack piege "texte"       # note un piège technique
 ./plantrack question "texte"    # pose une question, rappelée jusqu'à réponse
 ./plantrack answer q1 "texte"   # toi seule, hors session
+./plantrack testcheck on|off    # active/désactive les guides de test (off par défaut)
+./plantrack guide "titre"       # crée un guide de test ; ./plantrack guide g1 l'affiche
+./plantrack step g1 "texte"     # ajoute une étape au guide
+./plantrack check s1 ok|ko [-m motif]   # toi seule : verdict sur une étape
 ```
+
+### Une recette de test qui se coche
+
+`!testcheck on` transforme une recette de test en checklist persistante :
+l'agent structure les étapes (`./plantrack guide`, `./plantrack step`), mais ne
+pose jamais le verdict lui-même — c'est le même principe que pour un bug,
+réservé à l'humain (`./plantrack check s1 ok` ou `ko -m "motif"`, motif
+obligatoire pour un échec). Tant qu'une étape n'a pas de verdict, elle
+ressort dans le bloc réinjecté à chaque session — impossible d'oublier une
+recette à moitié testée. Option coupée par défaut : `!testcheck off` ne
+supprime rien, elle cache juste le bloc.
 
 ## Sous le capot
 
@@ -167,8 +184,10 @@ agent ◀───── bloc d'état (~250 tokens) ◀──── hook Session
 reste autonome, les hooks marchent sur un simple clone), écrit les hooks de
 tous les agents supportés, le wrapper `./plantrack`, le bloc d'instructions
 complet dans `AGENTS.md` (la source unique) plus une ligne d'import
-`@AGENTS.md` entre marqueurs dans `CLAUDE.md` et `GEMINI.md`, et une skill
-Deep Code qui renvoie vers `AGENTS.md`.
+`@AGENTS.md` entre marqueurs dans `CLAUDE.md` et `GEMINI.md`, une skill
+Deep Code qui renvoie vers `AGENTS.md`, et installe d'office un hook git
+`post-commit` qui journalise chaque commit sur le fil actif (pur logging,
+jamais bloquant — sans rapport avec le `pre-commit` garde-fou, resté opt-in).
 
 ## Quels agents sont couverts ?
 
@@ -214,7 +233,7 @@ echo '{"source":"compact"}'            | python3 .claude/hooks/pt.py hook-contex
 
 Le scénario complet — ouvrir un fil, éditer, remonter un bug ailleurs, acter
 une décision, parker, ouvrir un autre fil, revenir — est rejoué par
-`tests/scenario.sh` (203 vérifications).
+`tests/scenario.sh` (238 vérifications).
 
 ## Limites assumées
 

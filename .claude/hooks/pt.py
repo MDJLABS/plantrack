@@ -77,19 +77,20 @@ def read_events():
 def project():
     """Rejoue le journal et renvoie l'etat courant."""
     st = {"threads": {}, "bugs": {}, "decisions": [], "inbox": [], "active": None,
-          "phases": {}, "tasks": {}, "pieges": {}, "questions": {}}
+          "phases": {}, "tasks": {}, "pieges": {}, "questions": {}, "testcheck": False,
+          "guides": {}, "steps": {}}
     for ev in read_events():
         k = ev.get("kind") if isinstance(ev, dict) else None
         if k is None:
             continue
         # un evenement incomplet (JSON valide mais champs manquants) ne doit
         # jamais casser le rejeu — meme regle qu'une ligne corrompue
-        if k not in ("file_touched", "precommit_block") and not ("id" in ev and "ts" in ev):
+        if k not in ("file_touched", "precommit_block", "commit", "testcheck") and not ("id" in ev and "ts" in ev):
             continue
         if k == "thread_open":
             st["threads"][ev["id"]] = {
                 "id": ev["id"], "label": ev.get("text", ""), "status": "active",
-                "note": "", "files": [], "ts": ev["ts"], "task": ev.get("task"),
+                "note": "", "files": [], "ts": ev["ts"], "task": ev.get("task"), "commits": [],
             }
             st["active"] = ev["id"]
         elif k == "focus":
@@ -158,6 +159,21 @@ def project():
             q = st["questions"].get(ev["id"])
             if q:
                 q["answer"] = ev.get("text", "")
+        elif k == "commit":
+            if (t := st["threads"].get(ev.get("thread"))):
+                t["commits"].append({"sha": ev.get("sha", ""), "ctype": ev.get("ctype", "")})
+        elif k == "testcheck":
+            st["testcheck"] = bool(ev.get("enabled"))
+        elif k == "guide":
+            st["guides"][ev["id"]] = {"id": ev["id"], "title": ev.get("text", ""), "steps": [], "ts": ev["ts"]}
+        elif k == "step":
+            st["steps"][ev["id"]] = {"id": ev["id"], "guide": ev.get("guide"), "text": ev.get("text", ""),
+                                     "verdict": None, "motif": None, "ts": ev["ts"]}
+            if (g := st["guides"].get(ev.get("guide"))):
+                g["steps"].append(ev["id"])
+        elif k == "check":
+            if (s := st["steps"].get(ev["id"])):
+                s["verdict"], s["motif"] = ev.get("verdict"), ev.get("text")
         elif k == "phase_open":
             st["phases"][ev["id"]] = {
                 "id": ev["id"], "title": ev.get("text", ""), "goal": ev.get("goal", ""),
@@ -221,7 +237,8 @@ def context_block(st, header=True):
     a = st["threads"].get(st["active"]) if st["active"] else None
     if a:
         tag = f" [{a['task']}]" if a.get("task") else ""
-        L.append(f"\nFIL ACTIF — {a['id']}{tag} : {trunc(a['label'])}")
+        ctag = f" [{len(a['commits'])} commits]" if a.get("commits") else ""
+        L.append(f"\nFIL ACTIF — {a['id']}{tag} : {trunc(a['label'])}{ctag}")
         if a["files"]:
             L.append("  fichiers recemment ecrits : " + ", ".join(a["files"][-CTX_MAX_FILES:]))
     else:
@@ -266,6 +283,11 @@ def context_block(st, header=True):
         L.append("\nQuestions en attente (reponds via !answer qN ...) :")
         for q in pending_q[-CTX_MAX_QUESTIONS:]:
             L.append(f"  {q['id']} : {trunc(q['text'], 80)}")
+
+    if st.get("testcheck"):
+        for g in list(st["guides"].values())[:6]:
+            if (pend := [s for s in g["steps"] if st["steps"][s]["verdict"] is None]):
+                L.append(f"\nGuide {trunc(g['title'], 50)}: {len(pend)} etapes sans verdict ({', '.join(pend)})")
 
     if st["inbox"]:
         L.append(f"\nINBOX NON CLASSEE : {len(st['inbox'])} element(s), voir `plantrack inbox`.")
@@ -343,6 +365,43 @@ def cmd_answer(rest, st):
         return f"[PlanTrack] {qid} a deja une reponse."
     append("answer", id=qid, text=text)
     return f"[PlanTrack] {qid} repondue : {trunc(text, 80)}"
+
+
+def cmd_testcheck(arg):
+    if arg not in ("on", "off"):
+        return "usage : !testcheck on|off"
+    append("testcheck", enabled=(arg == "on"))
+    return f"[PlanTrack] testcheck {'active' if arg == 'on' else 'desactive'}."
+
+def cmd_guide(text, st):
+    if not st.get("testcheck"):
+        return "[PlanTrack] option testcheck desactivee — active avec !testcheck on"
+    if not text:
+        return "usage : !guide <titre>"
+    gid = next_id("g")
+    append("guide", id=gid, text=text)
+    return f"[PlanTrack] guide {gid} cree : {trunc(text, 80)}"
+
+def cmd_step(rest, st):
+    if not st.get("testcheck"):
+        return "[PlanTrack] option testcheck desactivee — active avec !testcheck on"
+    parts = rest.split(None, 1)
+    if len(parts) < 2 or parts[0] not in st["guides"]:
+        return "usage : !step <guide_id> <texte>"
+    sid = next_id("s")
+    append("step", id=sid, guide=parts[0], text=parts[1])
+    return f"[PlanTrack] etape {sid} ajoutee a {parts[0]} : {trunc(parts[1], 80)}"
+
+def cmd_check(sid, verdict, motif, st):
+    """Verdict humain, partage entre !check (hook) et `plantrack check` (CLI)."""
+    if not st.get("testcheck"):
+        return "[PlanTrack] option testcheck desactivee — active avec !testcheck on"
+    if sid not in st["steps"] or verdict not in ("ok", "ko"):
+        return "usage : check <step_id> ok|ko [motif]"
+    if verdict == "ko" and not motif:
+        return "refuse : motif obligatoire pour un ko."
+    append("check", id=sid, verdict=verdict, text=motif)
+    return f"[PlanTrack] {sid} : {verdict}" + (f" — {trunc(motif, 80)}" if motif else "")
 
 
 def cmd_focus(arg, st):
@@ -440,6 +499,17 @@ def handle_command(raw):
         return cmd_question(rest)
     if verb == "answer":
         return cmd_answer(rest, st)
+    if verb == "testcheck":
+        return cmd_testcheck(rest)
+    if verb == "guide":
+        return cmd_guide(rest, st)
+    if verb == "step":
+        return cmd_step(rest, st)
+    if verb == "check":
+        parts = rest.split(None, 2)
+        if len(parts) < 2:
+            return "usage : !check <step_id> ok|ko [motif]"
+        return cmd_check(parts[0], parts[1], parts[2] if len(parts) > 2 else None, st)
     if verb == "state":
         return context_block(st)
     if verb == "help":
@@ -457,6 +527,7 @@ HELP = """[PlanTrack] commandes (dans le prompt de l'agent, jamais transmises au
   !piege <texte>      note un piege technique (rappele a chaque session)
   !question <texte>   pose une question a l'humain (rappelee tant que sans reponse)
   !answer <id> <texte>   toi seule : reponds a une question en attente
+  !testcheck on|off / !guide <titre> / !step <id> <texte> / !check <id> ok|ko [motif]   guides de test, off par defaut (ko exige un motif)
   !state              affiche l'etat persistant courant
   !<texte libre>      capture dans l'inbox, a classer plus tard
 CLI humaine : plantrack status | bugs | inbox | verify <id> | reject <id> -m ... | close <id>
@@ -468,7 +539,8 @@ CLI humaine : plantrack status | bugs | inbox | verify <id> | reject <id> -m ...
               plantrack decide <texte> | bug <texte> [--low|--high|--blocker]   ecriture agent (marquee (agent))
               plantrack piege <texte> | question <texte>   utilisables par l'agent
               plantrack answer <question_id> <texte>   toi seule, hors session
-              plantrack init [--git-hook]   installation vendoree (tous agents)
+              plantrack testcheck on|off | guide <titre>|<id> | step <id> <texte> | check <id> ok|ko [-m motif]
+              plantrack init [--git-hook]   installation vendoree (tous agents, + hook post-commit d'office)
               uvx plantrack@latest update   mise a jour d'une installation existante
               plantrack doctor   verifie l'installation | plantrack stats   usage sur 14 jours"""
 
@@ -528,11 +600,23 @@ def hook_context():
     src = data.get("source", "startup")
     st = project()
     if not any([st["threads"], st["bugs"], st["decisions"], st["inbox"],
-                st["phases"], st["tasks"], st["pieges"], st["questions"]]):
+                st["phases"], st["tasks"], st["pieges"], st["questions"], st["guides"]]):
         sys.exit(0)
     if src == "compact":
         print("(contexte compacte — etat du projet reinjecte depuis PlanTrack)")
     print(context_block(st))
+    sys.exit(0)
+
+
+def hook_commit():
+    """post-commit git (sha/sujet passes en argv par le hook shell) : journalise
+    {type, sha, fil actif} ; silencieux sans fil actif, jamais bloquant."""
+    st = project()
+    if not st["active"] or len(sys.argv) < 4:
+        sys.exit(0)
+    sha, subject = sys.argv[2], sys.argv[3]
+    m = re.match(r"^([a-zA-Z]+)(\(.+\))?!?:", subject)
+    append("commit", sha=sha, ctype=m.group(1).lower() if m else "commit", thread=st["active"])
     sys.exit(0)
 
 
@@ -560,6 +644,10 @@ AGENT_ENV = ("CLAUDECODE", "CLAUDE_CODE_ENTRYPOINT", "CODEX_THREAD_ID", "CODEX_S
 
 
 GIT_HOOK = "#!/bin/sh\n# installe par plantrack init --git-hook\nexec python3 .claude/hooks/pt.py precommit\n"
+
+GIT_HOOK_POST = ("#!/bin/sh\n# installe d'office par plantrack init (journalisation, jamais bloquant)\n"
+                  '[ -f .claude/hooks/pt.py ] && python3 .claude/hooks/pt.py hook-commit '
+                  '"$(git rev-parse --short HEAD)" "$(git log -1 --pretty=%s)"\nexit 0\n')
 
 WRAPPER = '#!/bin/sh\nexec python3 "$(dirname "$0")/.claude/hooks/pt.py" "$@"\n'
 
@@ -599,6 +687,8 @@ MD_BLOCK = """<!-- plantrack:start -->
 - Quand une décision se prend en conversation, enregistre-la toi-même : `./plantrack decide "..."` (marquée agent). Un bug repéré en passant : `./plantrack bug "..."`. Un piège technique découvert : `./plantrack piege "..."`.
 - Avant de corriger un bug : lis `./plantrack attempts <id>`, puis dépose ton hypothèse `./plantrack attempt <id> "..."` avant de coder ; une hypothèse refusée a déjà été tentée, change d'approche.
 - Une question posée à l'humain restée sans réponse : `./plantrack question "..."` — elle ressortira à chaque session jusqu'à la réponse.
+- Chaque commit est journalisé automatiquement sur le fil actif (hook post-commit).
+- Si `!testcheck on` est actif, structure les recettes de test en guide/étapes (`./plantrack guide`, `./plantrack step`) ; tu ne poses JAMAIS le verdict toi-même, il est réservé à l'humain (`./plantrack check`).
 <!-- plantrack:end -->
 """
 
@@ -673,6 +763,25 @@ def install_git_hook():
         f.write(GIT_HOOK)
     os.chmod(hook, 0o755)
     print("[PlanTrack] hook pre-commit installe (contournement : git commit --no-verify).")
+
+
+def install_post_commit_hook():
+    """Post-commit journalisant, installe d'office (pre-commit reste opt-in, jamais destructif)."""
+    if not os.path.isdir(os.path.join(ROOT, ".git")):
+        return
+    hook = os.path.join(ROOT, ".git", "hooks", "post-commit")
+    cur = open(hook, encoding="utf-8").read() if os.path.exists(hook) else None
+    if cur == GIT_HOOK_POST:
+        print("hook post-commit deja en place.")
+    elif cur is None:
+        os.makedirs(os.path.dirname(hook), exist_ok=True)
+        with open(hook, "w", encoding="utf-8") as f:
+            f.write(GIT_HOOK_POST)
+        os.chmod(hook, 0o755)
+        print("hook post-commit installe (journalisation, jamais bloquant).")
+    else:
+        print("[PlanTrack] .git/hooks/post-commit existe deja — rien n'a ete ecrase. "
+              "Bloc a fusionner a la main :\n" + GIT_HOOK_POST)
 
 
 def write_hooks_file(path, obj, label, hint=""):
@@ -782,6 +891,7 @@ def cmd_init(args):
             f.write(("\n" if content and not content.endswith("\n") else "") + line + "\n")
         print(".gitignore : transcripts exclus.")
 
+    install_post_commit_hook()
     if "--git-hook" in args:
         install_git_hook()
     print("[PlanTrack] installation terminee. Redemarre l'agent puis verifie avec /hooks."
@@ -1209,6 +1319,8 @@ def cli(argv):
             print(f"{mark} {t['id']:>4}  {t['status']:<8} {trunc(t['label'], 50)}")
             if t["note"]:
                 print(f"        reprise : {trunc(t['note'], 90)}")
+            if t["commits"]:
+                print(f"        commits : {len(t['commits'])} (dernier {t['commits'][-1]['sha']})")
     elif cmd == "verify":
         require_human("verify")
         b = get_bug(st, args[0] if args else "")
@@ -1259,6 +1371,28 @@ def cli(argv):
             sys.exit(f"{qid} a deja une reponse.")
         append("answer", id=qid, text=text)
         print(f"{qid} repondue.")
+    elif cmd == "testcheck":
+        if not args:
+            sys.exit("usage : plantrack testcheck on|off")
+        print(cmd_testcheck(args[0]))
+    elif cmd == "guide":
+        if args and re.match(r"^g[0-9]+$", args[0]) and args[0] in st["guides"]:
+            g = st["guides"][args[0]]
+            print(f"{g['id']}  {trunc(g['title'], 80)}")
+            for sid in g["steps"]:
+                s = st["steps"][sid]
+                mark = "✓" if s["verdict"] == "ok" else "✗" if s["verdict"] == "ko" else "·"
+                print(f"  {mark} {s['id']}  {trunc(s['text'], 80)}")
+        else:
+            print(cmd_guide(" ".join(args), st))
+    elif cmd == "step":
+        print(cmd_step(" ".join(args), st))
+    elif cmd == "check":
+        require_human("check")
+        if len(args) < 2:
+            sys.exit("usage : plantrack check <step_id> ok|ko [-m motif]")
+        motif = arg_motif(args, 2) if len(args) > 2 else None
+        print(cmd_check(args[0], args[1], motif, st))
     elif cmd == "attempt":
         cmd_attempt(args, st)
     elif cmd == "attempts":
@@ -1296,6 +1430,8 @@ def main():
         hook_context()
     elif entry == "hook-precompact":
         hook_precompact()
+    elif entry == "hook-commit":
+        hook_commit()
     else:
         cli(sys.argv[1:])
 
