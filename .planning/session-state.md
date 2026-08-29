@@ -230,7 +230,19 @@ en réel depuis PyPI sur le scénario exact du rapport) :
 - Scenarios rejoues en reel depuis PyPI : update 1.3.1→1.4.0, CLAUDE.md
   ecrase facon GSD → doctor detecte, init repose la ligne.
 
+### v1.4.3 — repo public + README vitrine (2026-08-29)
+- Repo GitHub rendu PUBLIC (décision Mariella — elle voulait un lien
+  partageable ; le code était déjà public via la sdist PyPI) :
+  https://github.com/MDJLABS/plantrack
+- README refondu en présentation publique pédagogique (demande Mariella,
+  français seul — choix AskUserQuestion) : badges, problème/réponse,
+  « Une session type, pas à pas », schéma des hooks, tableau de
+  compatibilité agents. Sections internes (« Mesure à tenir », « La
+  suite ») déplacées dans `.planning/notes-internes-mesure-et-suite.md`.
+- pyproject : `[project.urls]` (Homepage/Source/Issues) → lien GitHub
+  visible sur PyPI. Tag v1.4.3 poussé.
+
 ### Session CLOSE — 2026-08-29
-Prompt de reprise : `.planning/2026-08-29-reprise-apres-v1.3.md` (autonome,
-l'ancien apres-v1.1 est purgé). Rien en suspens. Prochain jalon (§16
-Publication) conditionné aux chiffres de `plantrack stats` après usage réel.
+Prompt de reprise : `.planning/2026-08-29-reprise-apres-v1.4.md` (autonome,
+les anciens sont purgés). Rien en suspens. Prochain jalon (§16 Publication)
+réduit à la démo, conditionné aux chiffres de `plantrack stats`.

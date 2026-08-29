@@ -29,9 +29,14 @@ TOUT le périmètre décidé est livré, commité, poussé, publié :
   CLAUDE.md/GEMINI.md (GSD génère/écrase CLAUDE.md ; BMAD, task-master,
   claude-flow, spec-kit déjà couverts : les sous-agents Claude Code
   reçoivent le CLAUDE.md du projet — sources au README) ;
-- v1.4.2 : README section grand public « Comment ça marche, tout simplement ».
-Derniers commits : `527689d` (v1.4.0), `3af8d04` (v1.4.1), `351c634` (v1.4.2).
-165 checks verts (`bash tests/scenario.sh`), aussi en environnement nu.
+- v1.4.2 : README section grand public « Comment ça marche, tout simplement » ;
+- v1.4.3 : repo GitHub rendu public + README refondu en vitrine pédagogique
+  (badges, session type pas à pas, schéma hooks, tableau compatibilité —
+  français seul, choix Mariella) + `[project.urls]` dans pyproject (lien
+  GitHub sur PyPI). Notes internes du README déplacées dans
+  `.planning/notes-internes-mesure-et-suite.md`.
+Derniers commits : `527689d` (v1.4.0), `3af8d04` (v1.4.1), `351c634` (v1.4.2),
+`0db9c8d` (v1.4.3). 165 checks verts (`bash tests/scenario.sh`).
 
 ## Décisions tranchées par Mariella (immuables)
 - Commande publique : `uvx plantrack init` (npm/curl écartés, PRD §16).
