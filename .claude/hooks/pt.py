@@ -14,6 +14,7 @@ Points d'entree :
   <commande>       CLI humaine       -> status, bugs, inbox, verify, reject, ...
 """
 
+import difflib
 import json
 import os
 import re
@@ -111,6 +112,8 @@ def project():
             st["bugs"][ev["id"]] = {
                 "id": ev["id"], "text": ev.get("text", ""), "status": "open",
                 "thread": ev.get("thread"), "notes": [], "ts": ev["ts"],
+                "severity": ev.get("severity", "normal"),
+                "blocking": bool(ev.get("blocking")), "attempts": [],
             }
         elif k == "bug_status":
             b = st["bugs"].get(ev["id"])
@@ -118,6 +121,16 @@ def project():
                 b["status"] = ev.get("status", b["status"])
                 if ev.get("text"):
                     b["notes"].append(ev["text"])
+                    # un rejet motive s'attache a la derniere tentative (§9)
+                    if ev.get("status") == "open" and b["attempts"]:
+                        b["attempts"][-1]["rejected"] = re.sub(r"^rejete : ", "", ev["text"])
+        elif k == "attempt":
+            b = st["bugs"].get(ev.get("bug"))
+            if b:
+                b["attempts"].append({
+                    "id": ev["id"], "hypothesis": ev.get("text", ""),
+                    "ts": ev["ts"], "rejected": None,
+                })
         elif k == "decision":
             st["decisions"].append({"id": ev["id"], "text": ev.get("text", ""), "ts": ev["ts"]})
         elif k == "note":
@@ -178,6 +191,12 @@ def context_block(st, header=True):
         L.append("== PlanTrack — etat persistant du projet ==")
         L.append("(reinjecte automatiquement, y compris apres compaction du contexte)")
 
+    blockers = [b for b in st["bugs"].values()
+                if b.get("blocking") and b["status"] not in ("validated", "wont_fix")]
+    if blockers:
+        ids = " ; ".join(f"{b['id']} {trunc(b['text'], 50)}" for b in blockers[:2])
+        L.append(f"\n!! BUG BLOQUANT — a traiter avant toute autre chose : {ids}")
+
     a = st["threads"].get(st["active"]) if st["active"] else None
     if a:
         tag = f" [{a['task']}]" if a.get("task") else ""
@@ -193,7 +212,7 @@ def context_block(st, header=True):
         for t in parked:
             L.append(f"  {t['id']} : {trunc(t['label'], 60)} — reprise : {trunc(t['note'] or 'aucune note', 110)}")
 
-    bugs = [b for b in st["bugs"].values() if b["status"] in ("open", "to_verify")]
+    bugs = [b for b in st["bugs"].values() if b["status"] in ("open", "in_progress", "to_verify")]
     if bugs:
         L.append("\nBUGS OUVERTS (ne pas traiter maintenant, sauf demande explicite) :")
         for b in bugs[-CTX_MAX_BUGS:]:
@@ -223,10 +242,19 @@ def context_block(st, header=True):
 
 def cmd_bug(text, st):
     if not text:
-        return "usage : !bug <description>"
+        return "usage : !bug <description> [--low|--high|--blocker]"
+    severity = "normal"
+    m = re.search(r"\s*--(low|high|blocker)\b", text)
+    if m:
+        severity = m.group(1)
+        text = (text[:m.start()] + text[m.end():]).strip()
+    if not text:
+        return "usage : !bug <description> [--low|--high|--blocker]"
     bid = next_id("b")
-    append("bug", id=bid, text=text, thread=st["active"])
-    return f"[PlanTrack] bug {bid} enregistre : {trunc(text, 80)}\n(non traite pour l'instant — il sera rappele a chaque session)"
+    append("bug", id=bid, text=text, thread=st["active"], severity=severity,
+           blocking=True if severity == "blocker" else None)
+    sev = f" [{severity}]" if severity != "normal" else ""
+    return f"[PlanTrack] bug {bid}{sev} enregistre : {trunc(text, 80)}\n(non traite pour l'instant — il sera rappele a chaque session)"
 
 
 def cmd_decide(text):
@@ -335,7 +363,7 @@ def handle_command(raw):
 
 
 HELP = """[PlanTrack] commandes (dans le prompt de l'agent, jamais transmises au modele) :
-  !bug <texte>        enregistre un bug, sans interrompre le fil en cours
+  !bug <texte> [--low|--high|--blocker]   enregistre un bug, sans interrompre le fil
   !decide <texte>     acte une decision (elle sera rappelee a chaque session)
   !focus <sujet|id>   ouvre ou reprend un fil de travail
   !park <note>        met le fil actif en pause avec une note de reprise (obligatoire)
@@ -343,6 +371,8 @@ HELP = """[PlanTrack] commandes (dans le prompt de l'agent, jamais transmises au
   !state              affiche l'etat persistant courant
   !<texte libre>      capture dans l'inbox, a classer plus tard
 CLI humaine : plantrack status | bugs | inbox | verify <id> | reject <id> -m ... | close <id>
+              plantrack attempt <bug_id> <hypothese> | attempts <bug_id>
+              plantrack bug <id> open|in_progress|to_verify|wont_fix   (wont_fix : humain seul)
               plantrack plan [import <f.md>] | decisions
               plantrack phase add|start|done|cancel   (done/cancel : humain seul)
               plantrack task add|start|verify|done|cancel|replace   (done/cancel/replace : humain seul)
@@ -606,6 +636,78 @@ def cmd_task(args, st):
         sys.exit("usage : plantrack task add|start|verify|done|cancel|replace <id> ...")
 
 
+SIMILAR = 0.85  # §9 : au-dela, deux hypotheses sont considerees identiques
+
+BUG_TERMINAL = ("validated", "wont_fix")
+
+
+def _norm(s):
+    """Normalise une hypothese pour la comparaison : casse, ponctuation, espaces."""
+    return " ".join(re.sub(r"[^a-z0-9]+", " ", s.lower()).split())
+
+
+def get_bug(st, bid):
+    b = st["bugs"].get(bid or "")
+    if not b:
+        sys.exit(f"bug introuvable : {bid or '(manquant)'} — `plantrack bugs` pour la liste.")
+    return b
+
+
+def cmd_attempt(args, st):
+    """§9 : consigne une hypothese testee sur un bug. Refuse une hypothese trop
+    proche d'une tentative existante — avec le motif de rejet si elle en a un."""
+    if len(args) < 2:
+        sys.exit("usage : plantrack attempt <bug_id> <hypothese testee>")
+    b = get_bug(st, args[0])
+    if b["status"] in BUG_TERMINAL:
+        sys.exit(f"refuse : {b['id']} est {b['status']} — plus rien a tenter dessus.")
+    hyp = " ".join(args[1:])
+    for a in b["attempts"]:
+        ratio = difflib.SequenceMatcher(None, _norm(hyp), _norm(a["hypothesis"])).ratio()
+        if ratio > SIMILAR:
+            rej = (f"\n  motif du rejet : {trunc(a['rejected'], 100)}"
+                   if a.get("rejected") else "")
+            sys.exit(f"[PlanTrack] refuse : hypothese deja tentee sur {b['id']} "
+                     f"({a['id']}, similarite {ratio:.2f}) : {trunc(a['hypothesis'], 80)}{rej}\n"
+                     "Change d'angle au lieu de retenter la meme piste.")
+    aid = next_id("a")
+    append("attempt", id=aid, bug=b["id"], text=hyp)
+    print(f"tentative {aid} consignee sur {b['id']} : {trunc(hyp, 80)}")
+
+
+def cmd_attempts(args, st):
+    b = get_bug(st, args[0] if args else "")
+    if not b["attempts"]:
+        print(f"aucune tentative sur {b['id']}.")
+    for a in b["attempts"]:
+        print(f"{a['id']:>4}  {a['ts'][:16]}  {trunc(a['hypothesis'], 80)}")
+        if a.get("rejected"):
+            print(f"        rejetee : {trunc(a['rejected'], 90)}")
+
+
+def cmd_bug_status(args, st):
+    """§9 : machine a etats. L'agent ecrit open/in_progress/to_verify ;
+    validated passe par `verify` (humain), wont_fix est humain seul."""
+    if len(args) < 2:
+        sys.exit("usage : plantrack bug <id> open|in_progress|to_verify|wont_fix [-m motif]")
+    b, target = get_bug(st, args[0]), args[1]
+    if b["status"] in BUG_TERMINAL:
+        sys.exit(f"refuse : {b['id']} est {b['status']} (etat terminal, le journal ne s'efface pas).")
+    if target == "validated":
+        sys.exit("[PlanTrack] \"validated\" est reserve a l'humain, via `plantrack verify`. "
+                 "Passe le bug en \"to_verify\" et signale-le dans ta reponse.")
+    if target == "wont_fix":
+        require_human("bug wont_fix")
+        motif = arg_motif(args, 2)
+        append("bug_status", id=b["id"], status="wont_fix", text="wont_fix : " + motif)
+        print(f"{b['id']} classe wont_fix (motif conserve).")
+    elif target in ("open", "in_progress", "to_verify"):
+        append("bug_status", id=b["id"], status=target)
+        print(f"{b['id']} -> {target}.")
+    else:
+        sys.exit("statuts : open | in_progress | to_verify | wont_fix (validated : via `plantrack verify`)")
+
+
 def require_human(cmd):
     """O6 : ecrire un verdict est reserve a l'humain. Refus deterministe quand
     la CLI est invoquee depuis un shell pilote par l'agent (env Claude Code)."""
@@ -650,11 +752,13 @@ def cli(argv):
     elif cmd == "precommit":
         cmd_precommit()
     elif cmd == "bugs":
-        rows = [b for b in st["bugs"].values() if b["status"] != "validated"] or []
+        rows = [b for b in st["bugs"].values() if b["status"] not in BUG_TERMINAL]
         if not rows:
             print("aucun bug ouvert.")
         for b in rows:
-            print(f"{b['id']:>4}  {b['status']:<10} {trunc(b['text'], 90)}")
+            sev = f" [{b['severity']}]" if b.get("severity", "normal") != "normal" else ""
+            na = f" ({len(b['attempts'])} tentative(s))" if b["attempts"] else ""
+            print(f"{b['id']:>4}  {b['status']:<11}{sev} {trunc(b['text'], 90)}{na}")
             for n in b["notes"]:
                 print(f"        \u21b3 {trunc(n, 90)}")
     elif cmd == "inbox":
@@ -670,16 +774,29 @@ def cli(argv):
                 print(f"        reprise : {trunc(t['note'], 90)}")
     elif cmd == "verify":
         require_human("verify")
-        if not args or args[0] not in st["bugs"]:
-            sys.exit("usage : plantrack verify <bug_id>")
-        append("bug_status", id=args[0], status="validated")
-        print(f"{args[0]} valide.")
+        b = get_bug(st, args[0] if args else "")
+        if b["status"] != "to_verify":
+            sys.exit(f"refuse : {b['id']} est \"{b['status']}\" — seul un bug \"to_verify\" "
+                     "se valide (machine a etats §9).")
+        append("bug_status", id=b["id"], status="validated")
+        print(f"{b['id']} valide.")
     elif cmd == "reject":
         require_human("reject")
         if len(args) < 3 or args[1] != "-m":
             sys.exit("usage : plantrack reject <bug_id> -m \"pourquoi ca ne marche pas\"")
-        append("bug_status", id=args[0], status="open", text="rejete : " + " ".join(args[2:]))
-        print(f"{args[0]} rouvert avec motif.")
+        b = get_bug(st, args[0])
+        if b["status"] != "to_verify":
+            sys.exit(f"refuse : {b['id']} est \"{b['status']}\" — on ne rejette qu'un bug "
+                     "\"to_verify\" (machine a etats §9).")
+        append("bug_status", id=b["id"], status="open", text="rejete : " + " ".join(args[2:]))
+        extra = " (motif attache a la derniere tentative)" if b["attempts"] else ""
+        print(f"{b['id']} rouvert avec motif{extra}.")
+    elif cmd == "bug":
+        cmd_bug_status(args, st)
+    elif cmd == "attempt":
+        cmd_attempt(args, st)
+    elif cmd == "attempts":
+        cmd_attempts(args, st)
     elif cmd == "file":
         if len(args) < 2:
             sys.exit("usage : plantrack file <note_id> bug|decision")
