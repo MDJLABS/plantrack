@@ -212,5 +212,36 @@ check "wont_fix humain avec motif passe" "wont_fix" "$out"
 out=$(H bugs)
 check_not "un bug wont_fix sort de la liste des bugs ouverts" "b3" "$out"
 
+# 15. v1.1 — init vendorise complet dans un projet vierge
+TMP2=$(mktemp -d)
+out=$(CLAUDE_PROJECT_DIR="$TMP2" python3 "$PT" init 2>&1)
+check "init copie le coeur" "pt.py copie" "$out"
+check "init ecrit les 4 hooks" "settings.json ecrit" "$out"
+check "init insere le bloc d instructions" "insere dans CLAUDE.md" "$out"
+check "init exclut les transcripts" ".plantrack/transcripts/" "$(cat "$TMP2/.gitignore")"
+out=$(cd "$TMP2" && ./plantrack help 2>&1)
+check "le wrapper ./plantrack fonctionne" "commandes" "$out"
+out=$(CLAUDE_PROJECT_DIR="$TMP2" python3 "$PT" init 2>&1)
+check "init idempotent : coeur identique reconnu" "deja en place" "$out"
+check "init idempotent : bloc non duplique" "deja present" "$out"
+n=$(grep -c "plantrack:start" "$TMP2/CLAUDE.md")
+check_exit "un seul jeu de marqueurs dans CLAUDE.md" 1 "$n"
+printf '{"hooks":{}}' > "$TMP2/.claude/settings.json"
+out=$(CLAUDE_PROJECT_DIR="$TMP2" python3 "$PT" init 2>&1)
+check "settings etranger jamais ecrase" "fusionne le bloc" "$out"
+check "contenu du settings preserve" '{"hooks":{}}' "$(cat "$TMP2/.claude/settings.json")"
+
+# 16. v1.1 — doctor et stats
+out=$(cd "$TMP2" && rm .claude/settings.json && CLAUDE_PROJECT_DIR="$TMP2" python3 "$PT" init >/dev/null 2>&1; CLAUDE_PROJECT_DIR="$TMP2" ./plantrack doctor 2>&1); rc=$?
+check_exit "doctor tout vert apres init" 0 "$rc"
+check "doctor valide le coeur vendorise" "ok  coeur vendorise" "$out"
+rm -rf "$TMP2"
+out=$(python3 "$PT" doctor 2>&1); rc=$?
+check "doctor detecte la ligne corrompue du journal" "corrompue" "$out"
+check_exit "doctor sort en erreur si probleme" 1 "$rc"
+out=$(python3 "$PT" stats 2>&1)
+check "stats compte les reprises de fil" "reprises de fil :" "$out"
+check "stats compte les blocages pre-commit" "blocages pre-commit : 2" "$out"
+
 echo
 [ "$fail" = 0 ] && echo "TOUS LES TESTS PASSENT" || { echo "DES TESTS ECHOUENT"; exit 1; }

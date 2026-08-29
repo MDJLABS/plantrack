@@ -21,7 +21,7 @@ import re
 import shutil
 import subprocess
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 # ---------------------------------------------------------------- configuration
 
@@ -376,7 +376,8 @@ CLI humaine : plantrack status | bugs | inbox | verify <id> | reject <id> -m ...
               plantrack plan [import <f.md>] | decisions
               plantrack phase add|start|done|cancel   (done/cancel : humain seul)
               plantrack task add|start|verify|done|cancel|replace   (done/cancel/replace : humain seul)
-              plantrack init --git-hook   installe le pre-commit (fils parques, taches annulees)"""
+              plantrack init [--git-hook] [--agent claude|codex|gemini]   installation vendoree
+              plantrack doctor   verifie l'installation | plantrack stats   usage sur 14 jours"""
 
 
 # -------------------------------------------------------------------------- hooks
@@ -456,12 +457,30 @@ AGENT_ENV = ("CLAUDECODE", "CLAUDE_CODE_ENTRYPOINT")
 
 GIT_HOOK = "#!/bin/sh\n# installe par plantrack init --git-hook\nexec python3 .claude/hooks/pt.py precommit\n"
 
+WRAPPER = '#!/bin/sh\nexec python3 "$(dirname "$0")/.claude/hooks/pt.py" "$@"\n'
 
-def cmd_init(args):
-    """v0.5 : n'installe que le garde-fou git. L'installation complete (agent,
-    AGENTS.md) arrive en v1.1."""
-    if "--git-hook" not in args:
-        sys.exit("usage : plantrack init --git-hook")
+SETTINGS = {"hooks": {
+    "UserPromptSubmit": [{"hooks": [
+        {"type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/pt.py\" hook-prompt"}]}],
+    "PostToolUse": [{"matcher": "Edit|Write|MultiEdit|NotebookEdit", "hooks": [
+        {"type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/pt.py\" hook-filelog"}]}],
+    "SessionStart": [{"hooks": [
+        {"type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/pt.py\" hook-context"}]}],
+    "PreCompact": [{"hooks": [
+        {"type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/pt.py\" hook-precompact"}]}],
+}}
+
+MD_BLOCK = """<!-- plantrack:start -->
+## PlanTrack
+- L'état du projet t'est injecté automatiquement en début de session et après chaque compaction. Fie-toi à ce bloc, pas à ta mémoire de la conversation.
+- Ne réimplémente jamais ce qui figure sous DECISIONS ACTEES.
+- Ne modifie pas les fichiers d'un fil en pause.
+- Après correction d'un bug : consigne la tentative, puis passe-le en "to_verify". Tu ne valides jamais un bug toi-même.
+<!-- plantrack:end -->
+"""
+
+
+def install_git_hook():
     if not os.path.isdir(os.path.join(ROOT, ".git")):
         sys.exit("[PlanTrack] pas de depot git ici — lance `git init` d'abord.")
     hook = os.path.join(ROOT, ".git", "hooks", "pre-commit")
@@ -472,6 +491,100 @@ def cmd_init(args):
         f.write(GIT_HOOK)
     os.chmod(hook, 0o755)
     print("[PlanTrack] hook pre-commit installe (contournement : git commit --no-verify).")
+
+
+def cmd_init(args):
+    """§13 : installation vendoree dans le projet courant (CLAUDE_PROJECT_DIR ou cwd).
+    Copie pt.py, ecrit settings.json + wrapper, insere le bloc d'instructions.
+    `--git-hook` seul n'installe que le garde-fou git (comportement v0.5)."""
+    known = {"--git-hook", "--agent"}
+    if any(a.startswith("--") and a not in known for a in args):
+        sys.exit("usage : plantrack init [--git-hook] [--agent claude|codex|gemini]")
+    agent = "claude"
+    if "--agent" in args:
+        i = args.index("--agent")
+        agent = args[i + 1] if len(args) > i + 1 else ""
+        if agent not in ("claude", "codex", "gemini"):
+            sys.exit("usage : plantrack init [--git-hook] [--agent claude|codex|gemini]")
+    if args == ["--git-hook"]:
+        install_git_hook()
+        return
+
+    # 1. copie vendoree du coeur
+    src = os.path.abspath(__file__)
+    dst = os.path.join(ROOT, ".claude", "hooks", "pt.py")
+    if os.path.abspath(dst) != src:
+        if os.path.exists(dst):
+            with open(dst, encoding="utf-8") as f:
+                same = f.read() == open(src, encoding="utf-8").read()
+            if not same:
+                sys.exit(f"[PlanTrack] {dst} existe avec un contenu different — rien n'a ete "
+                         "ecrit. Supprime-le pour reinstaller (ton journal .plantrack/ est intact).")
+            print("pt.py deja en place (identique).")
+        else:
+            os.makedirs(os.path.dirname(dst), exist_ok=True)
+            shutil.copy(src, dst)
+            os.chmod(dst, 0o755)
+            print(f"pt.py copie dans {os.path.relpath(dst, ROOT)}.")
+
+    # 2. les 4 hooks Claude Code
+    settings = os.path.join(ROOT, ".claude", "settings.json")
+    if os.path.exists(settings):
+        with open(settings, encoding="utf-8") as f:
+            has_pt = "pt.py" in f.read()
+        print("settings.json deja en place." if has_pt else
+              "[PlanTrack] .claude/settings.json existe sans les hooks pt.py — fusionne le "
+              "bloc `hooks` a la main (voir README), rien n'a ete ecrase.")
+    else:
+        os.makedirs(os.path.dirname(settings), exist_ok=True)
+        with open(settings, "w", encoding="utf-8") as f:
+            json.dump(SETTINGS, f, ensure_ascii=False, indent=2)
+            f.write("\n")
+        print("settings.json ecrit (4 hooks).")
+    if agent != "claude":
+        print(f"[PlanTrack] agent {agent} : hooks non traduits automatiquement pour l'instant — "
+              "la CLI, le bloc d'instructions et le pre-commit git tiennent (mode degrade, §13).")
+
+    # 3. wrapper CLI humaine
+    wrapper = os.path.join(ROOT, "plantrack")
+    if not os.path.exists(wrapper):
+        with open(wrapper, "w", encoding="utf-8") as f:
+            f.write(WRAPPER)
+        os.chmod(wrapper, 0o755)
+        print("wrapper ./plantrack ecrit.")
+
+    # 4. bloc d'instructions entre marqueurs, sans ecraser l'existant
+    md = os.path.join(ROOT, "CLAUDE.md" if agent == "claude" else "AGENTS.md")
+    for candidate in ("CLAUDE.md", "AGENTS.md"):
+        if os.path.exists(os.path.join(ROOT, candidate)):
+            md = os.path.join(ROOT, candidate)
+            break
+    existing = ""
+    if os.path.exists(md):
+        with open(md, encoding="utf-8") as f:
+            existing = f.read()
+    if "<!-- plantrack:start -->" in existing:
+        print(f"bloc d'instructions deja present dans {os.path.basename(md)}.")
+    else:
+        with open(md, "a", encoding="utf-8") as f:
+            f.write(("\n" if existing and not existing.endswith("\n") else "") + MD_BLOCK)
+        print(f"bloc d'instructions insere dans {os.path.basename(md)}.")
+
+    # 5. transcripts gitignores
+    gi = os.path.join(ROOT, ".gitignore")
+    line = ".plantrack/transcripts/"
+    content = ""
+    if os.path.exists(gi):
+        with open(gi, encoding="utf-8") as f:
+            content = f.read()
+    if line not in content:
+        with open(gi, "a", encoding="utf-8") as f:
+            f.write(("\n" if content and not content.endswith("\n") else "") + line + "\n")
+        print(".gitignore : transcripts exclus.")
+
+    if "--git-hook" in args:
+        install_git_hook()
+    print("[PlanTrack] installation terminee. Redemarre l'agent puis verifie avec /hooks.")
 
 
 def cmd_precommit():
@@ -504,9 +617,75 @@ def cmd_precommit():
                 print(f"PlanTrack : {f} appartient au fil {t['id']} ({trunc(t['label'], 50)}), parque le {date}")
                 print(f"  note de reprise : {trunc(t['note'] or 'aucune', 100)}")
     if blocked:
+        append("precommit_block")  # journalise pour `plantrack stats` (§15)
         print("Contournement : git commit --no-verify")
         sys.exit(1)
     sys.exit(0)
+
+
+def cmd_doctor(st):
+    """§12 : hooks installes, journal lisible, budget de contexte."""
+    probs = 0
+
+    def chk(good, label, fix=""):
+        nonlocal probs
+        if good:
+            print(f"  ok  {label}")
+        else:
+            probs += 1
+            print(f"  !!  {label}" + (f" — {fix}" if fix else ""))
+
+    chk(os.path.exists(os.path.join(ROOT, ".claude", "hooks", "pt.py")),
+        "coeur vendorise (.claude/hooks/pt.py)", "lance `plantrack init`")
+    settings = os.path.join(ROOT, ".claude", "settings.json")
+    txt = ""
+    if os.path.exists(settings):
+        with open(settings, encoding="utf-8") as f:
+            txt = f.read()
+    for h in ("hook-prompt", "hook-filelog", "hook-context", "hook-precompact"):
+        chk(h in txt, f"hook {h} declare dans settings.json", "lance `plantrack init`")
+    if os.path.isdir(os.path.join(ROOT, ".git")):
+        hook = os.path.join(ROOT, ".git", "hooks", "pre-commit")
+        htxt = ""
+        if os.path.exists(hook):
+            with open(hook, encoding="utf-8") as f:
+                htxt = f.read()
+        chk("pt.py precommit" in htxt, "garde-fou git pre-commit",
+            "lance `plantrack init --git-hook`")
+    if os.path.exists(LOG):
+        with open(LOG, encoding="utf-8") as f:
+            raw = sum(1 for l in f if l.strip())
+        parsed = len(read_events())
+        chk(raw == parsed, f"journal lisible ({parsed}/{raw} lignes)",
+            f"{raw - parsed} ligne(s) corrompue(s) ignoree(s) au rejeu")
+    else:
+        print("  --  aucun journal encore (.plantrack/events.jsonl)")
+    n = len(context_block(st))
+    chk(n <= CTX_MAX_CHARS, f"bloc reinjecte sous le budget ({n}/{CTX_MAX_CHARS} chars)",
+        "le bloc sera tronque — ferme des fils ou valide des bugs")
+    sys.exit(1 if probs else 0)
+
+
+def cmd_stats():
+    """§15 : mesure d'usage sur 14 jours — le seul argument credible pour publier."""
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=14)).isoformat(timespec="seconds")
+    evs = [e for e in read_events() if e.get("ts", "") >= cutoff]
+    if not evs:
+        print("aucun evenement sur les 14 derniers jours.")
+        return
+    kinds, rejets = {}, {}
+    for e in evs:
+        kinds[e["kind"]] = kinds.get(e["kind"], 0) + 1
+        if e["kind"] == "bug_status" and str(e.get("text", "")).startswith("rejete"):
+            rejets[e["id"]] = rejets.get(e["id"], 0) + 1
+    print(f"14 derniers jours — {len(evs)} evenement(s) :")
+    for k in sorted(kinds):
+        print(f"  {kinds[k]:>4}  {k}")
+    print(f"reprises de fil : {kinds.get('focus', 0)}")
+    print(f"blocages pre-commit : {kinds.get('precommit_block', 0)}")
+    loops = sorted(b for b, n in rejets.items() if n >= 2)
+    if loops:
+        print(f"!! bugs rejetes plusieurs fois (signal de boucle) : {', '.join(loops)}")
 
 
 def arg_motif(args, pos):
@@ -751,6 +930,10 @@ def cli(argv):
             print(f"{d['id']:>4}  {d['ts'][:16]}  {trunc(d['text'], 100)}")
     elif cmd == "precommit":
         cmd_precommit()
+    elif cmd == "doctor":
+        cmd_doctor(st)
+    elif cmd == "stats":
+        cmd_stats()
     elif cmd == "bugs":
         rows = [b for b in st["bugs"].values() if b["status"] not in BUG_TERMINAL]
         if not rows:
