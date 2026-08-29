@@ -142,6 +142,12 @@ parker, ouvrir un autre fil, revenir — a été rejoué et passe.
   écrit une skill pour **Deep Code** (outil tiers `lessweb/deepcode-cli`, listé par
   la doc DeepSeek ; format SKILL.md compatible Claude Code) qui renvoie vers
   `AGENTS.md` et rappelle `./plantrack status` faute de hooks.
+- Surcouches d'orchestration (BMAD, task-master, claude-flow, spec-kit…) : déjà
+  couvertes — leurs sous-agents reçoivent le `CLAUDE.md` du projet, donc la ligne
+  `@AGENTS.md` ; BMAD et task-master écrivent d'ailleurs eux-mêmes dans `AGENTS.md`,
+  chacun entre ses propres marqueurs, sans conflit. Exception : **GSD génère son
+  propre `CLAUDE.md`** et peut écraser la ligne d'import — `plantrack doctor` le
+  détecte, `plantrack init` la repose.
 - IDs séquentiels calculés par rejeu : à revoir en cas de travail multi-branches
   simultané.
 

@@ -423,6 +423,19 @@ check_exit "la copie installee ne se met pas a jour seule" 1 "$rc"
 check "et renvoie vers uvx" "uvx plantrack@latest update" "$out"
 rm -rf "$TMP8"
 
+# 24. garde-fou surcouches — un outil (GSD...) regenere CLAUDE.md sans la reference
+TMP9=$(mktemp -d)
+CLAUDE_PROJECT_DIR="$TMP9" python3 "$PT" init >/dev/null 2>&1
+printf '# CLAUDE.md regenere par un autre outil\n' > "$TMP9/CLAUDE.md"
+out=$(CLAUDE_PROJECT_DIR="$TMP9" python3 "$PT" doctor 2>&1 || true)
+check "doctor detecte la reference perdue dans CLAUDE.md" "!!  ligne d'import @AGENTS.md dans CLAUDE.md" "$out"
+check "doctor voit GEMINI.md intact" "ok  ligne d'import @AGENTS.md dans GEMINI.md" "$out"
+check "et designe la regeneration comme cause" "regenere le fichier ? relance" "$out"
+CLAUDE_PROJECT_DIR="$TMP9" python3 "$PT" init >/dev/null 2>&1
+check "init repose la reference" "@AGENTS.md" "$(cat "$TMP9/CLAUDE.md")"
+check "sans toucher au contenu regenere" "regenere par un autre outil" "$(cat "$TMP9/CLAUDE.md")"
+rm -rf "$TMP9"
+
 printf '{"tool_name":"apply_patch","tool_input":{"command":"*** Begin Patch\\n*** Add File: src/patch1.txt\\n+hello\\n*** Update File: docs/patch2.md\\n*** End Patch"},"cwd":"%s"}' "$TMP" | python3 "$PT" hook-filelog
 check "apply_patch : premier fichier du patch journalise" '"text": "src/patch1.txt"' "$(cat "$TMP/.plantrack/events.jsonl")"
 check "apply_patch : second fichier du patch journalise" '"text": "docs/patch2.md"' "$(cat "$TMP/.plantrack/events.jsonl")"

@@ -789,30 +789,25 @@ def cmd_doctor(st):
             probs += 1
             print(f"  !!  {label}" + (f" — {fix}" if fix else ""))
 
+    def slurp(*parts):
+        p = os.path.join(ROOT, *parts)
+        return open(p, encoding="utf-8").read() if os.path.exists(p) else ""
+
     chk(os.path.exists(os.path.join(ROOT, ".claude", "hooks", "pt.py")),
         "coeur vendorise (.claude/hooks/pt.py)", "lance `plantrack init`")
-    settings = os.path.join(ROOT, ".claude", "settings.json")
-    txt = ""
-    if os.path.exists(settings):
-        with open(settings, encoding="utf-8") as f:
-            txt = f.read()
+    txt = slurp(".claude", "settings.json")
     for h in ("hook-prompt", "hook-filelog", "hook-context", "hook-precompact"):
         chk(h in txt, f"hook {h} declare dans settings.json", "lance `plantrack init`")
-    codexh = os.path.join(ROOT, ".codex", "hooks.json")
-    ctxt = ""
-    if os.path.exists(codexh):
-        with open(codexh, encoding="utf-8") as f:
-            ctxt = f.read()
+    ctxt = slurp(".codex", "hooks.json")
     for h in ("hook-prompt", "hook-filelog", "hook-context", "hook-precompact"):
         chk(h in ctxt, f"hook {h} declare dans .codex/hooks.json",
             "lance `plantrack init`")
-    atxt = ""
-    agents_md = os.path.join(ROOT, "AGENTS.md")
-    if os.path.exists(agents_md):
-        with open(agents_md, encoding="utf-8") as f:
-            atxt = f.read()
-    chk("<!-- plantrack:start -->" in atxt, "bloc d'instructions dans AGENTS.md",
+    chk("<!-- plantrack:start -->" in slurp("AGENTS.md"), "bloc d'instructions dans AGENTS.md",
         "lance `plantrack init`")
+    for name in ("CLAUDE.md", "GEMINI.md"):
+        # un outil qui regenere ces fichiers (GSD...) peut faire sauter la reference
+        chk("@AGENTS.md" in slurp(name), f"ligne d'import @AGENTS.md dans {name}",
+            "un outil a regenere le fichier ? relance `plantrack init`")
     chk(os.path.exists(os.path.join(ROOT, ".deepcode", "skills", "plantrack", "SKILL.md")),
         "skill Deep Code presente", "lance `plantrack init`")
     if os.path.isdir(os.path.join(ROOT, ".git")):
