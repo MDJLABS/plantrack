@@ -32,9 +32,24 @@
 - Plan phases/tâches complet (§8) : CLI plan/phase/task/decisions, plan import avec
   validation humaine, statuts réservés à l'humain, décisions d'abandon automatiques,
   `!focus <task_id>`, pre-commit étendu aux tâches cancelled/replaced.
-- 45 checks verts dans tests/scenario.sh.
-- ⚠️ pt.py fait 721 lignes — le PRD §0 prescrit l'éclatement en modules au-delà de 700.
+
+### Dérogation fichier unique ACTÉE — commit `a2b614a`
+Décision Mariella 2026-08-29 : pt.py reste un seul fichier (auto-copie vendorée
+triviale) ; seuil d'éclatement du PRD §0 relevé de 700 à 1200 lignes.
+
+### Couche 3 LIVRÉE — commit `1fdb7a7` → v1.0 COMPLÈTE (couches 1+2+3+4)
+- Bugs enrichis (`!bug … --low|--high|--blocker`), bug blocker = avertissement en tête
+  du bloc réinjecté ; tentatives (`plantrack attempt`) avec refus de doublon
+  difflib > 0.85 rendant l'hypothèse précédente + son motif de rejet (test 6 §14) ;
+  machine à états (`plantrack bug <id> <statut>`) : validated refusé à l'agent avec
+  message pédagogique (test 7 §14), wont_fix humain seul avec motif, verify/reject
+  exigent to_verify, motif de rejet attaché à la dernière tentative, états terminaux
+  figés ; `plantrack attempts <bug_id>`.
+- 65 checks verts dans tests/scenario.sh. pt.py : 838 lignes (< 1200).
+- Écart §11 assumé (hérité v0) : la troncature du bloc coupe par la fin, elle
+  n'applique pas l'ordre de priorité décisions > note de reprise > bugs bloquants.
 
 ### Prochaine action
-Gate PRD §0 : Mariella décide — couche 3 (bugs/tentatives, complète v1.0) avec ou sans
-éclatement de pt.py en modules, ou arrêt. GitHub toujours en attente de `! gh auth login`.
+Gate PRD §0 post-v1.0 : Mariella décide — v1.1 (`init` complet vendorisé, doctor,
+stats) ou trancher d'abord les questions ouvertes §17. GitHub toujours en attente de
+`! gh auth login` (puis créer `mdjlabs/plantrack` privé et pousser).
