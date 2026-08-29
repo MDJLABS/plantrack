@@ -72,13 +72,14 @@ def read_events():
 
 def project():
     """Rejoue le journal et renvoie l'etat courant."""
-    st = {"threads": {}, "bugs": {}, "decisions": [], "inbox": [], "active": None}
+    st = {"threads": {}, "bugs": {}, "decisions": [], "inbox": [], "active": None,
+          "phases": {}, "tasks": {}}
     for ev in read_events():
         k = ev.get("kind")
         if k == "thread_open":
             st["threads"][ev["id"]] = {
                 "id": ev["id"], "label": ev.get("text", ""), "status": "active",
-                "note": "", "files": [], "ts": ev["ts"],
+                "note": "", "files": [], "ts": ev["ts"], "task": ev.get("task"),
             }
             st["active"] = ev["id"]
         elif k == "focus":
@@ -123,6 +124,31 @@ def project():
             st["inbox"].append({"id": ev["id"], "text": ev.get("text", ""), "ts": ev["ts"]})
         elif k == "note_filed":
             st["inbox"] = [n for n in st["inbox"] if n["id"] != ev["id"]]
+        elif k == "phase_open":
+            st["phases"][ev["id"]] = {
+                "id": ev["id"], "title": ev.get("text", ""), "goal": ev.get("goal", ""),
+                "status": "open", "ts": ev["ts"],
+            }
+        elif k == "phase_status":
+            p = st["phases"].get(ev["id"])
+            if p:
+                p["status"] = ev.get("status", p["status"])
+                if ev.get("text"):
+                    p["motif"] = ev["text"]
+        elif k == "task_open":
+            st["tasks"][ev["id"]] = {
+                "id": ev["id"], "phase": ev.get("phase"), "text": ev.get("text", ""),
+                "status": "todo", "ts": ev["ts"],
+            }
+        elif k == "task_status":
+            t = st["tasks"].get(ev["id"])
+            if t:
+                t["status"] = ev.get("status", t["status"])
+                t["status_ts"] = ev["ts"]
+                if ev.get("text"):
+                    t["motif"] = ev["text"]
+                if ev.get("replaced_by"):
+                    t["replaced_by"] = ev["replaced_by"]
     return st
 
 
@@ -154,7 +180,8 @@ def context_block(st, header=True):
 
     a = st["threads"].get(st["active"]) if st["active"] else None
     if a:
-        L.append(f"\nFIL ACTIF — {a['id']} : {trunc(a['label'])}")
+        tag = f" [{a['task']}]" if a.get("task") else ""
+        L.append(f"\nFIL ACTIF — {a['id']}{tag} : {trunc(a['label'])}")
         if a["files"]:
             L.append("  fichiers recemment ecrits : " + ", ".join(a["files"][-CTX_MAX_FILES:]))
     else:
@@ -217,6 +244,29 @@ def cmd_focus(arg, st):
         a = st["threads"][st["active"]]
         return (f"[PlanTrack] refuse : le fil {a['id']} ({trunc(a['label'], 40)}) est encore actif.\n"
                 f"Fais `!park <ou tu en es>` avant de changer de sujet, ou `!close` s'il est termine.")
+    if arg in st["tasks"]:
+        k = st["tasks"][arg]
+        if k["status"] in ("done", "cancelled", "replaced"):
+            extra = f" — motif : {trunc(k.get('motif', ''), 80)}" if k.get("motif") else ""
+            return f"[PlanTrack] refuse : la tache {arg} est {k['status']}{extra}"
+        th = next((t for t in st["threads"].values()
+                   if t.get("task") == arg and t["status"] != "closed"), None)
+        if th:
+            append("focus", id=th["id"])
+            append("task_status", id=arg, status="in_progress")
+            msg = f"[PlanTrack] reprise du fil {th['id']} [tache {arg}] : {trunc(th['label'], 60)}"
+            if th["note"]:
+                msg += f"\n  note de reprise : {th['note']}"
+            if th["files"]:
+                msg += "\n  fichiers : " + ", ".join(th["files"][-CTX_MAX_FILES:])
+            return msg
+        if len(open_threads(st)) >= MAX_OPEN_THREADS:
+            ids = ", ".join(t["id"] for t in open_threads(st))
+            return f"[PlanTrack] refuse : {MAX_OPEN_THREADS} fils deja ouverts ({ids})."
+        tid = next_id("t")
+        append("thread_open", id=tid, text=k["text"], task=arg)
+        append("task_status", id=arg, status="in_progress")
+        return f"[PlanTrack] nouveau fil {tid} sur la tache {arg} : {trunc(k['text'], 60)} (passee in_progress)"
     if arg in st["threads"]:
         append("focus", id=arg)
         t = st["threads"][arg]
@@ -293,7 +343,10 @@ HELP = """[PlanTrack] commandes (dans le prompt de l'agent, jamais transmises au
   !state              affiche l'etat persistant courant
   !<texte libre>      capture dans l'inbox, a classer plus tard
 CLI humaine : plantrack status | bugs | inbox | verify <id> | reject <id> -m ... | close <id>
-              plantrack init --git-hook   installe le pre-commit qui protege les fils parques"""
+              plantrack plan [import <f.md>] | decisions
+              plantrack phase add|start|done|cancel   (done/cancel : humain seul)
+              plantrack task add|start|verify|done|cancel|replace   (done/cancel/replace : humain seul)
+              plantrack init --git-hook   installe le pre-commit (fils parques, taches annulees)"""
 
 
 # -------------------------------------------------------------------------- hooks
@@ -405,17 +458,152 @@ def cmd_precommit():
     st = project()
     blocked = False
     for t in st["threads"].values():
-        if t["status"] != "parked":
+        task = st["tasks"].get(t.get("task")) if t.get("task") else None
+        frozen = task and task["status"] in ("cancelled", "replaced")
+        if t["status"] != "parked" and not frozen:
             continue
         for f in sorted(staged & set(t["files"])):
             blocked = True
-            date = (t.get("parked_ts") or "")[:10]
-            print(f"PlanTrack : {f} appartient au fil {t['id']} ({trunc(t['label'], 50)}), parque le {date}")
-            print(f"  note de reprise : {trunc(t['note'] or 'aucune', 100)}")
+            if frozen:
+                date = (task.get("status_ts") or "")[:10]
+                rb = f" (remplacee par {task['replaced_by']})" if task.get("replaced_by") else ""
+                print(f"PlanTrack : {f} appartient a la tache {task['id']}, {task['status']} le {date}{rb}")
+                print(f"  motif : {trunc(task.get('motif') or 'aucun', 100)}")
+            else:
+                date = (t.get("parked_ts") or "")[:10]
+                print(f"PlanTrack : {f} appartient au fil {t['id']} ({trunc(t['label'], 50)}), parque le {date}")
+                print(f"  note de reprise : {trunc(t['note'] or 'aucune', 100)}")
     if blocked:
         print("Contournement : git commit --no-verify")
         sys.exit(1)
     sys.exit(0)
+
+
+def arg_motif(args, pos):
+    """Extrait le motif obligatoire `-m <texte>` a partir de args[pos]."""
+    if len(args) <= pos + 1 or args[pos] != "-m":
+        sys.exit("motif obligatoire : ajoute -m \"pourquoi\" — un abandon sans motif "
+                 "recree exactement le probleme que l'outil combat.")
+    return " ".join(args[pos + 1:])
+
+
+def cmd_plan_import(args, st):
+    """§8 : l'agent propose un decoupage (fichier markdown), l'humain valide
+    avant ecriture. `## titre` = phase, `- texte` = tache de la phase courante."""
+    require_human("plan import")
+    if not args:
+        sys.exit("usage : plantrack plan import <fichier.md>")
+    try:
+        with open(args[0], encoding="utf-8") as f:
+            lines = f.readlines()
+    except OSError as e:
+        sys.exit(f"[PlanTrack] illisible : {e}")
+    phases = []  # [(titre, [taches])]
+    for line in lines:
+        if line.startswith("## "):
+            phases.append((line[3:].strip(), []))
+        elif re.match(r"^\s*[-*] ", line) and phases:
+            phases[-1][1].append(re.sub(r"^\s*[-*] ", "", line).strip())
+    if not phases:
+        sys.exit("[PlanTrack] aucune phase (`## titre`) trouvee — rien a importer.")
+    print("Plan propose :")
+    for title, tasks in phases:
+        print(f"  {title}")
+        for t in tasks:
+            print(f"    - {trunc(t, 70)}")
+    resp = input("Ecrire ce plan dans le journal ? [y/N] ").strip().lower()
+    if resp not in ("y", "yes", "o", "oui"):
+        sys.exit("abandon — rien n'a ete ecrit.")
+    for title, tasks in phases:
+        pid = next_id("p")
+        append("phase_open", id=pid, text=title)
+        for t in tasks:
+            append("task_open", id=next_id("k"), phase=pid, text=t)
+    print(f"{len(phases)} phase(s) importee(s). `plantrack plan` pour l'arbre.")
+
+
+def cmd_phase(args, st):
+    sub = args[0] if args else ""
+    if sub == "add":
+        if len(args) < 2:
+            sys.exit("usage : plantrack phase add <titre> [--goal <objectif>]")
+        rest = args[1:]
+        goal = ""
+        if "--goal" in rest:
+            i = rest.index("--goal")
+            goal = " ".join(rest[i + 1:])
+            rest = rest[:i]
+        pid = next_id("p")
+        append("phase_open", id=pid, text=" ".join(rest), goal=goal or None)
+        print(f"phase {pid} creee.")
+        return
+    if len(args) < 2 or args[1] not in st["phases"]:
+        sys.exit("usage : plantrack phase add|start|done|cancel <id> [-m motif]")
+    pid = args[1]
+    if sub == "start":
+        append("phase_status", id=pid, status="active")
+        print(f"phase {pid} active.")
+    elif sub == "done":
+        require_human("phase done")
+        append("phase_status", id=pid, status="done")
+        print(f"phase {pid} terminee.")
+    elif sub == "cancel":
+        require_human("phase cancel")
+        motif = arg_motif(args, 2)
+        append("phase_status", id=pid, status="cancelled", text=motif)
+        append("decision", id=next_id("d"), text=f"phase {pid} annulee : {motif}")
+        print(f"phase {pid} annulee (decision actee).")
+    else:
+        sys.exit("usage : plantrack phase add|start|done|cancel <id> [-m motif]")
+
+
+def cmd_task(args, st):
+    sub = args[0] if args else ""
+    if sub == "add":
+        if len(args) < 3:
+            sys.exit("usage : plantrack task add <phase_id> <texte>")
+        pid = args[1]
+        p = st["phases"].get(pid)
+        if not p:
+            sys.exit(f"phase {pid} introuvable — `plantrack plan` pour l'arbre.")
+        if p["status"] in ("done", "cancelled"):
+            sys.exit(f"refuse : la phase {pid} est {p['status']}.")
+        kid = next_id("k")
+        append("task_open", id=kid, phase=pid, text=" ".join(args[2:]))
+        print(f"tache {kid} creee dans {pid}.")
+        return
+    if len(args) < 2 or args[1] not in st["tasks"]:
+        sys.exit("usage : plantrack task add|start|verify|done|cancel|replace <id> ...")
+    kid = args[1]
+    if sub == "start":
+        append("task_status", id=kid, status="in_progress")
+        print(f"tache {kid} in_progress.")
+    elif sub == "verify":
+        append("task_status", id=kid, status="to_verify")
+        print(f"tache {kid} a verifier.")
+    elif sub == "done":
+        require_human("task done")
+        append("task_status", id=kid, status="done")
+        print(f"tache {kid} terminee.")
+    elif sub == "cancel":
+        require_human("task cancel")
+        motif = arg_motif(args, 2)
+        append("task_status", id=kid, status="cancelled", text=motif)
+        append("decision", id=next_id("d"),
+               text=f"tache {kid} annulee ({trunc(st['tasks'][kid]['text'], 50)}) : {motif}")
+        print(f"tache {kid} annulee (decision actee : ne jamais reimplementer).")
+    elif sub == "replace":
+        require_human("task replace")
+        if len(args) < 3 or args[2] not in st["tasks"]:
+            sys.exit("usage : plantrack task replace <ancien_id> <nouveau_id> -m <motif>\n"
+                     "(le nouveau doit exister : `plantrack task add` d'abord)")
+        motif = arg_motif(args, 3)
+        append("task_status", id=kid, status="replaced", text=motif, replaced_by=args[2])
+        append("decision", id=next_id("d"),
+               text=f"tache {kid} remplacee par {args[2]} : {motif}")
+        print(f"tache {kid} remplacee par {args[2]} (decision actee).")
+    else:
+        sys.exit("usage : plantrack task add|start|verify|done|cancel|replace <id> ...")
 
 
 def require_human(cmd):
@@ -424,8 +612,8 @@ def require_human(cmd):
     if any(os.environ.get(v) for v in AGENT_ENV):
         sys.exit(
             f"[PlanTrack] refuse : `{cmd}` est reserve a l'humain (environnement agent detecte).\n"
-            "Signale dans ta reponse que le correctif est pret a verifier ; "
-            "l'humain tranchera avec `plantrack verify` ou `plantrack reject -m ...`."
+            "Propose l'action dans ta reponse (statut maximum pour toi : to_verify / in_progress) ; "
+            "l'humain tranchera via la CLI `plantrack`."
         )
 
 
@@ -438,6 +626,27 @@ def cli(argv):
         print(context_block(st))
     elif cmd == "init":
         cmd_init(args)
+    elif cmd == "plan":
+        if args and args[0] == "import":
+            cmd_plan_import(args[1:], st)
+        elif not st["phases"]:
+            print("aucun plan. `plantrack phase add <titre>` ou `plantrack plan import <fichier.md>`.")
+        else:
+            for p in st["phases"].values():
+                extra = f" — {trunc(p['goal'], 60)}" if p["goal"] else ""
+                print(f"{p['id']:>4}  {p['status']:<10} {trunc(p['title'], 50)}{extra}")
+                for t in (t for t in st["tasks"].values() if t["phase"] == p["id"]):
+                    rb = f" -> {t['replaced_by']}" if t.get("replaced_by") else ""
+                    print(f"   {t['id']:>4}  {t['status']:<12} {trunc(t['text'], 60)}{rb}")
+    elif cmd == "phase":
+        cmd_phase(args, st)
+    elif cmd == "task":
+        cmd_task(args, st)
+    elif cmd == "decisions":
+        if not st["decisions"]:
+            print("aucune decision actee.")
+        for d in st["decisions"]:
+            print(f"{d['id']:>4}  {d['ts'][:16]}  {trunc(d['text'], 100)}")
     elif cmd == "precommit":
         cmd_precommit()
     elif cmd == "bugs":

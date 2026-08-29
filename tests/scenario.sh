@@ -105,5 +105,58 @@ check_exit "commit d un fichier libre passe" 0 "$rc"
 out=$(cd "$TMP" && python3 "$PT" init --git-hook 2>&1); rc=$?
 check "init refuse d ecraser un pre-commit existant" "existe deja" "$out"
 
+# 11. couche 2 — plan phases/taches
+H() { env -u CLAUDECODE -u CLAUDE_CODE_ENTRYPOINT python3 "$PT" "$@" 2>&1; }
+
+out=$(H phase add Authentification --goal parcours complet)
+check "phase add cree p1" "phase p1 creee" "$out"
+out=$(H task add p1 Formulaire d inscription)
+check "task add cree k1" "tache k1 creee" "$out"
+out=$(python3 "$PT" task start k1 2>&1)
+check "task start autorise a l agent" "in_progress" "$out"
+out=$(python3 "$PT" task done k1 2>&1)
+check "task done refuse a l agent" "reserve a l'humain" "$out"
+out=$(H task cancel k1)
+check "task cancel sans motif refuse" "motif obligatoire" "$out"
+out=$(H task cancel k1 -m "parcours simplifie retenu")
+check "task cancel avec motif passe" "decision actee" "$out"
+out=$(ctx compact)
+check "l annulation alimente les decisions reinjectees" "k1 annulee" "$out"
+H task add p1 Upload v1 >/dev/null
+H task add p1 Upload unifie >/dev/null
+out=$(H task replace k2 k9 -m x)
+check "replace vers une tache inexistante refuse" "doit exister" "$out"
+out=$(H task replace k2 k3 -m "composant unifie")
+check "replace passe avec cible et motif" "remplacee par k3" "$out"
+out=$(H plan)
+check "l arbre montre le remplacement" "-> k3" "$out"
+out=$(prompt '!focus k2')
+check "!focus sur une tache remplacee refuse" "replaced" "$out"
+out=$(prompt '!focus k3')
+check "!focus <tache> ouvre un fil rattache" "tache k3" "$out"
+out=$(ctx startup)
+check "le bloc reinjecte porte la tache du fil actif" "[k3]" "$out"
+
+# 12. le pre-commit s'etend aux taches annulees
+printf '{"tool_input":{"file_path":"%s/src/b.txt"}}' "$TMP" | python3 "$PT" hook-filelog
+H task cancel k3 -m "finalement inutile" >/dev/null
+echo b > "$TMP/src/b.txt"
+git -C "$TMP" add src/b.txt
+out=$(cd "$TMP" && git -c user.name=t -c user.email=t@t commit -m z 2>&1); rc=$?
+check_exit "commit d une tache annulee bloque (exit 1)" 1 "$rc"
+check "le message nomme la tache annulee" "appartient a la tache k3" "$out"
+git -C "$TMP" reset -q
+
+# 13. plan import : proposition, validation humaine obligatoire
+printf '## Paiement\n- integrer stripe\n- page facturation\n' > "$TMP/plan.md"
+out=$(python3 "$PT" plan import "$TMP/plan.md" < /dev/null 2>&1)
+check "plan import refuse en env agent" "reserve a l'humain" "$out"
+out=$(printf 'y\n' | H plan import "$TMP/plan.md")
+check "plan import ecrit apres confirmation" "importee" "$out"
+out=$(H plan)
+check "les taches importees sont dans l arbre" "integrer stripe" "$out"
+out=$(printf 'n\n' | H plan import "$TMP/plan.md")
+check "plan import sans confirmation n ecrit rien" "abandon" "$out"
+
 echo
 [ "$fail" = 0 ] && echo "TOUS LES TESTS PASSENT" || { echo "DES TESTS ECHOUENT"; exit 1; }
