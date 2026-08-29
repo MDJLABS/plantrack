@@ -75,14 +75,20 @@ les lots A (bugs sûrs) et D (tests fiables) :
   env nu) + 20 nouveaux checks. 101 checks verts, vérifiés aussi en env nu.
   pt.py : 1031 lignes (< 1200).
 
-### Lots B et C NON retenus (choix Mariella, restent ouverts)
-- Lot B pre-commit : faux négatif si CLAUDE_PROJECT_DIR ≠ racine git ; faux
-  positif sur fichier partagé fil parqué / fil actif (L3, réaliste en multi-fils).
-- Lot C schéma/traçabilité : tentatives rejetées jamais réinjectées (§5, score
-  75) ; champs §9 manquants (bug.task ; attempt hypothesis/changes/actor) ;
-  `bug <id> open` contourne reject sans motif ni humain (L6).
+### Lots B et C LIVRÉS — commit `9cd51ba` → revue de code SOLDÉE
+Trois arbitrages actés par Mariella (reco retenue à chaque fois) :
+- pre-commit : fil actif (sain) prioritaire sur un fichier partagé avec un fil
+  parqué ; chemins git convertis en ROOT-relatifs (projet en sous-répertoire) ;
+- §5 : le bloc réinjecté restitue la dernière hypothèse rejetée + motif
+  (+compteur) par bug affiché ;
+- L6 : rétrograder to_verify→open exige un motif (agent autorisé, tracé,
+  pas compté comme reject humain dans stats).
+Schéma §9 complété : bug.task, attempt.hypothesis + attempt.actor (projection
+rétro-compatible avec l'ancien champ text ; champ changes non implémenté —
+aucune donnée disponible à la CLI).
+114 checks verts (aussi en env nu). pt.py : 1057 lignes (< 1200).
 
 ### Prochaine action
-Gate : Mariella décide — lots B/C de la revue, portage Codex, trancher §17,
-ou pause. GitHub toujours en attente de `! gh auth login` (puis créer
-`mdjlabs/plantrack` privé et pousser).
+Gate : Mariella décide — portage Codex (dernier morceau du jalon v1.1),
+trancher §17, ou pause. GitHub toujours en attente de `! gh auth login`
+(puis créer `mdjlabs/plantrack` privé et pousser).
