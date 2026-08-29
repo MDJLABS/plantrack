@@ -28,7 +28,13 @@
   stagé appartient à un fil parqué (portée v0.5 ; les tâches cancelled/replaced
   viendront avec la couche 2). 26 checks verts dans tests/scenario.sh.
 
+### Couche 2 LIVRÉE — commit `9f45006`
+- Plan phases/tâches complet (§8) : CLI plan/phase/task/decisions, plan import avec
+  validation humaine, statuts réservés à l'humain, décisions d'abandon automatiques,
+  `!focus <task_id>`, pre-commit étendu aux tâches cancelled/replaced.
+- 45 checks verts dans tests/scenario.sh.
+- ⚠️ pt.py fait 721 lignes — le PRD §0 prescrit l'éclatement en modules au-delà de 700.
+
 ### Prochaine action
-Gate de validation humaine du PRD §0 (jamais deux couches sans retour) : Mariella
-décide — enchaîner couche 2 (plan phases/tâches, v1.0) ou s'arrêter. GitHub toujours
-en attente de `! gh auth login`.
+Gate PRD §0 : Mariella décide — couche 3 (bugs/tentatives, complète v1.0) avec ou sans
+éclatement de pt.py en modules, ou arrêt. GitHub toujours en attente de `! gh auth login`.
