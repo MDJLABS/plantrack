@@ -118,8 +118,12 @@ parker, ouvrir un autre fil, revenir — a été rejoué et passe.
   les hooks du projet. Le chemin des fichiers édités est extrait du patch
   `apply_patch` ; la détection de rôle s'appuie sur `CODEX_THREAD_ID`/`CODEX_SANDBOX`
   (posées par le shell de l'agent Codex — non documentées, à confirmer sur un projet
-  réel). Les autres agents n'ont pas de hooks : ils lisent `AGENTS.md` (ou la ligne
-  d'import dans `GEMINI.md`) et utilisent la CLI, sans réinjection automatique.
+  réel). Les autres agents n'ont pas de hooks : ils lisent `AGENTS.md` et utilisent
+  la CLI, sans réinjection automatique. Lisent `AGENTS.md` nativement (vérifié sur
+  leur doc, 2026-08) : ZCode (Z.ai/GLM), Grok Build (xAI), Kimi Code CLI (Moonshot),
+  Mistral Vibe ; Gemini CLI passe par la ligne d'import de `GEMINI.md`. Aucun de
+  ces agents ne supporte l'import `@fichier` — d'où le bloc complet dans `AGENTS.md`,
+  jamais une simple référence. DeepSeek n'a pas de CLI officiel à ce jour.
 - IDs séquentiels calculés par rejeu : à revoir en cas de travail multi-branches
   simultané.
 
