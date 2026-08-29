@@ -10,7 +10,7 @@
 
 ## 0. Instructions à l'agent qui implémente
 
-- Le fichier `.claude/hooks/pt.py` existe déjà et fonctionne. **Ne le réécris pas depuis zéro.** Étends-le, ou éclate-le en modules si le fichier dépasse 700 lignes.
+- Le fichier `.claude/hooks/pt.py` existe déjà et fonctionne. **Ne le réécris pas depuis zéro.** Étends-le, ou éclate-le en modules si le fichier dépasse 1200 lignes. *(Décision Mariella, 2026-08-29 : seuil relevé de 700 à 1200 — le fichier unique est assumé parce qu'il rend l'auto-copie vendorée de `plantrack init` triviale : une seule copie, un seul diff.)*
 - Implémente dans l'ordre des couches (§7 → §8 → §9 → §10). Chaque couche doit être fonctionnelle et testée avant de passer à la suivante.
 - **Aucune dépendance externe.** Pas de pip install, pas de framework. Si tu penses en avoir besoin, c'est que le périmètre a dérivé.
 - Le §5 (scénario de référence) est la spécification qui fait foi. En cas d'ambiguïté ailleurs dans ce document, c'est lui qui tranche.
