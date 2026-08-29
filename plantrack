@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# CLI humaine PlanTrack. A placer a la racine du projet.
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CLAUDE_PROJECT_DIR="$DIR" python3 "$DIR/.claude/hooks/pt.py" "$@"
