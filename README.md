@@ -115,14 +115,13 @@ Une seule ligne dans un fichier à part, à chaque fois que ça arrive :
 Sans ces trois chiffres, tu ne sauras pas dans six semaines si l'outil sert, et tu risques
 de le maintenir par principe. C'est aussi le seul argument crédible le jour où tu publies.
 
-## Ensuite, seulement si les chiffres le justifient
+## La suite
 
-1. Greffer le plan (phases/tâches) sur [Beads](https://github.com/gastownhall/beads)
-   plutôt que de le réécrire.
-2. Ajouter le registre de tentatives par bug (refus d'une hypothèse déjà testée).
-3. Ajouter le hook `pre-commit` qui échoue si un commit touche un fichier rattaché à un
-   fil parqué ou à une décision d'abandon — le seul garde-fou qui ne dépende d'aucun
-   modèle.
-4. Emballer en serveur MCP, en option, par-dessus la même CLI.
+Le PRD fait foi : voir `PRD-PlanTrack-v0.2.md` (jalons §16). Dans l'ordre : le hook
+`pre-commit` (couche 4 — le seul garde-fou qui ne dépende d'aucun modèle), puis le plan
+phases/tâches (couche 2) et le registre de tentatives par bug (couche 3), sur le même
+journal JSONL. La greffe sur Beads a été écartée par décision de conception (PRD §6 :
+un stockage binaire interdit le diff et le merge git) — au mieux un pont d'export en
+extension. MCP en option, jamais en socle.
 
 Référence hooks : https://code.claude.com/docs/en/hooks

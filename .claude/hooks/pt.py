@@ -211,7 +211,7 @@ def cmd_decide(text):
 def cmd_focus(arg, st):
     if not arg:
         return "usage : !focus <sujet ou identifiant de fil>"
-    if st["active"] and arg not in ("--force",):
+    if st["active"]:
         a = st["threads"][st["active"]]
         return (f"[PlanTrack] refuse : le fil {a['id']} ({trunc(a['label'], 40)}) est encore actif.\n"
                 f"Fais `!park <ou tu en es>` avant de changer de sujet, ou `!close` s'il est termine.")
@@ -365,6 +365,20 @@ def hook_precompact():
 
 # ---------------------------------------------------------------------- CLI
 
+AGENT_ENV = ("CLAUDECODE", "CLAUDE_CODE_ENTRYPOINT")
+
+
+def require_human(cmd):
+    """O6 : ecrire un verdict est reserve a l'humain. Refus deterministe quand
+    la CLI est invoquee depuis un shell pilote par l'agent (env Claude Code)."""
+    if any(os.environ.get(v) for v in AGENT_ENV):
+        sys.exit(
+            f"[PlanTrack] refuse : `{cmd}` est reserve a l'humain (environnement agent detecte).\n"
+            "Signale dans ta reponse que le correctif est pret a verifier ; "
+            "l'humain tranchera avec `plantrack verify` ou `plantrack reject -m ...`."
+        )
+
+
 def cli(argv):
     st = project()
     cmd = argv[0] if argv else "status"
@@ -392,11 +406,13 @@ def cli(argv):
             if t["note"]:
                 print(f"        reprise : {trunc(t['note'], 90)}")
     elif cmd == "verify":
+        require_human("verify")
         if not args or args[0] not in st["bugs"]:
             sys.exit("usage : plantrack verify <bug_id>")
         append("bug_status", id=args[0], status="validated")
         print(f"{args[0]} valide.")
     elif cmd == "reject":
+        require_human("reject")
         if len(args) < 3 or args[1] != "-m":
             sys.exit("usage : plantrack reject <bug_id> -m \"pourquoi ca ne marche pas\"")
         append("bug_status", id=args[0], status="open", text="rejete : " + " ".join(args[2:]))
