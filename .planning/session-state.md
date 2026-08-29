@@ -88,7 +88,28 @@ rétro-compatible avec l'ancien champ text ; champ changes non implémenté —
 aucune donnée disponible à la CLI).
 114 checks verts (aussi en env nu). pt.py : 1057 lignes (< 1200).
 
+### Portage Codex LIVRÉ (code) — commit `2a62dcd`
+Recherche documentaire (learn.chatgpt.com/docs/hooks + code source openai/codex) :
+Codex CLI a un vrai système de hooks calqué sur Claude Code. Faits mesurés :
+- réinjection post-compaction = `SessionStart` avec `source: "compact"` (PostCompact
+  n'injecte PAS de contexte) → hook-context marche tel quel ;
+- `UserPromptSubmit` : exit 2 + stderr bloque, comme Claude Code ;
+- `apply_patch` : pas de champ file_path, le chemin est dans le texte du patch
+  (`*** Update File: …`) → hook-filelog parse le patch, chemins résolus via cwd ;
+- hooks lancés dans le cwd de session (parfois un sous-répertoire), aucune variable
+  projet → la commande résout `git rev-parse --show-toplevel` et pose PLANTRACK_ROOT ;
+- détection de rôle : `CODEX_THREAD_ID`/`CODEX_SANDBOX` posées par le shell tool de
+  Codex (source code, NON documenté — à confirmer) → ajoutées à AGENT_ENV ;
+- hooks projet à truster une fois via `/hooks` dans Codex.
+Livré : CODEX_HOOKS + write_hooks_file (factorisation avec settings.json), init
+--agent codex écrit .codex/hooks.json, doctor étendu, gemini reste mode dégradé.
+130 checks verts (aussi en env nu). pt.py : 1101 lignes (< 1200).
+**Reste pour solder le jalon v1.1** : critère de sortie « un projet réel repris
+depuis Codex » — le binaire `codex` n'est PAS installé sur la machine (seul un
+~/.codex/config.toml claude-code-router du 11/08 existe) ; installation + auth
+à décider avec Mariella.
+
 ### Prochaine action
-Gate : Mariella décide — portage Codex (dernier morceau du jalon v1.1),
-trancher §17, ou pause. GitHub toujours en attente de `! gh auth login`
-(puis créer `mdjlabs/plantrack` privé et pousser).
+Gate : valider le portage Codex en réel (installer codex + auth — décision
+Mariella), trancher §17, ou pause. GitHub toujours en attente de
+`! gh auth login` (puis créer `mdjlabs/plantrack` privé et pousser).
