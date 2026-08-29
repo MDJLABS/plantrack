@@ -295,9 +295,9 @@ check "init prefere un AGENTS.md existant" "insere dans AGENTS.md" "$out"
 check "init preserve le contenu utilisateur" "Notes utilisateur" "$(cat "$TMP3/AGENTS.md")"
 rm -rf "$TMP3"
 TMP4=$(mktemp -d)
-out=$(CLAUDE_PROJECT_DIR="$TMP4" python3 "$PT" init --agent codex 2>&1)
-check "--agent codex annonce le mode degrade" "mode degrade" "$out"
-check "--agent codex ecrit AGENTS.md" "insere dans AGENTS.md" "$out"
+out=$(CLAUDE_PROJECT_DIR="$TMP4" python3 "$PT" init --agent gemini 2>&1)
+check "--agent gemini annonce le mode degrade" "mode degrade" "$out"
+check "--agent gemini ecrit AGENTS.md" "insere dans AGENTS.md" "$out"
 rm -rf "$TMP4"
 
 # 20. revue lots B+C — pre-commit fiable, restitution des tentatives (§5), schema §9
@@ -343,6 +343,34 @@ out=$(CLAUDE_PROJECT_DIR="$TMP5/proj" python3 "$PT" precommit 2>&1); rc=$?
 check_exit "precommit voit un fil parque sous une racine git plus haute" 1 "$rc"
 check "et nomme le fil fautif" "appartient au fil t1" "$out"
 rm -rf "$TMP5"
+
+# 21. portage Codex (§13) — init --agent codex, apply_patch, detection de role
+TMP6=$(mktemp -d)
+out=$(CLAUDE_PROJECT_DIR="$TMP6" python3 "$PT" init --agent codex 2>&1)
+check "--agent codex ecrit .codex/hooks.json" ".codex/hooks.json ecrit (4 hooks)" "$out"
+check "--agent codex pointe vers l approbation /hooks" "/hooks pour approuver" "$out"
+check "--agent codex ecrit AGENTS.md" "insere dans AGENTS.md" "$out"
+hj=$(cat "$TMP6/.codex/hooks.json")
+for h in hook-prompt hook-filelog hook-context hook-precompact; do
+  check "hooks.json declare $h" "$h" "$hj"
+done
+check "hooks.json resout la racine git (cwd de session variable)" "git rev-parse --show-toplevel" "$hj"
+check "hooks.json couvre apply_patch" "apply_patch" "$hj"
+python3 -c "import json,sys; json.load(open(sys.argv[1]))" "$TMP6/.codex/hooks.json" \
+  && check "hooks.json est du JSON valide" ok ok || check "hooks.json est du JSON valide" ok invalide
+out=$(CLAUDE_PROJECT_DIR="$TMP6" python3 "$PT" init --agent codex 2>&1)
+check "init --agent codex idempotent" ".codex/hooks.json deja en place" "$out"
+out=$(CLAUDE_PROJECT_DIR="$TMP6" python3 "$PT" doctor 2>&1 || true)
+check "doctor verifie les hooks codex" "declare dans .codex/hooks.json" "$out"
+rm -rf "$TMP6"
+
+printf '{"tool_name":"apply_patch","tool_input":{"command":"*** Begin Patch\\n*** Add File: src/patch1.txt\\n+hello\\n*** Update File: docs/patch2.md\\n*** End Patch"},"cwd":"%s"}' "$TMP" | python3 "$PT" hook-filelog
+check "apply_patch : premier fichier du patch journalise" '"text": "src/patch1.txt"' "$(cat "$TMP/.plantrack/events.jsonl")"
+check "apply_patch : second fichier du patch journalise" '"text": "docs/patch2.md"' "$(cat "$TMP/.plantrack/events.jsonl")"
+
+out=$(env -u CLAUDECODE -u CLAUDE_CODE_ENTRYPOINT CODEX_THREAD_ID=th1 python3 "$PT" bug b5 wont_fix -m test 2>&1); rc=$?
+check "l agent Codex est detecte (CODEX_THREAD_ID)" "reserve a l'humain" "$out"
+check_exit "wont_fix refuse cote agent Codex" 1 "$rc"
 
 echo
 [ "$fail" = 0 ] && echo "TOUS LES TESTS PASSENT" || { echo "DES TESTS ECHOUENT"; exit 1; }

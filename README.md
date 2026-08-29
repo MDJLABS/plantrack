@@ -105,9 +105,13 @@ parker, ouvrir un autre fil, revenir — a été rejoué et passe.
 - **Ce qui n'est jamais capturé reste perdu.** La nuance expliquée en prose et jamais
   transformée en `!decide` disparaît à la compaction. Seul l'archivage du transcript
   permet de la retrouver, à la main.
-- Hooks Claude Code. Codex CLI expose le même protocole sur six événements
-  (`SessionStart`, `UserPromptSubmit`, `PreToolUse`, `PermissionRequest`, `PostToolUse`,
-  `Stop`) : le portage se fait par traduction de config. Les autres agents retombent sur
+- Hooks Claude Code **et Codex CLI**. `plantrack init --agent codex` écrit
+  `.codex/hooks.json` (même protocole : `UserPromptSubmit` bloquant, `SessionStart`
+  — y compris `source: "compact"` —, `PostToolUse`, `PreCompact`) ; dans Codex,
+  lancer `/hooks` une fois pour approuver les hooks du projet. Le chemin des fichiers
+  édités est extrait du patch `apply_patch` ; la détection de rôle s'appuie sur
+  `CODEX_THREAD_ID`/`CODEX_SANDBOX` (posées par le shell de l'agent Codex — non
+  documentées, à confirmer sur un projet réel). Les autres agents retombent sur
   la CLI + une consigne dans `AGENTS.md`, sans garantie.
 - IDs séquentiels calculés par rejeu : à revoir en cas de travail multi-branches
   simultané.
@@ -126,8 +130,9 @@ de le maintenir par principe. C'est aussi le seul argument crédible le jour où
 ## La suite
 
 Le PRD fait foi : voir `PRD-PlanTrack-v0.2.md` (jalons §16). Livré : couches 1 à 4
-(capture, plan phases/tâches, bugs/tentatives, pre-commit) + `init`/`doctor`/`stats`.
-Reste : le portage Codex (traduction de la config hooks, §13) et la publication —
+(capture, plan phases/tâches, bugs/tentatives, pre-commit) + `init`/`doctor`/`stats`
++ le portage Codex (§13 — reste sa validation sur un projet réel repris depuis Codex).
+Reste : la publication —
 uniquement si les chiffres de `plantrack stats` la justifient. La greffe sur Beads a
 été écartée par décision de conception (PRD §6 : un stockage binaire interdit le diff
 et le merge git) — au mieux un pont d'export en extension. MCP en option, jamais en

@@ -32,7 +32,8 @@ CTX_MAX_DECISIONS = 6
 CTX_MAX_FILES = 6
 LINE_TRUNC = 140
 
-ROOT = os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()
+ROOT = (os.environ.get("CLAUDE_PROJECT_DIR") or os.environ.get("PLANTRACK_ROOT")
+        or os.getcwd())
 PT_DIR = os.path.join(ROOT, ".plantrack")
 LOG = os.path.join(PT_DIR, "events.jsonl")
 ARCHIVE = os.path.join(PT_DIR, "transcripts")
@@ -420,20 +421,27 @@ def hook_prompt():
 
 
 def hook_filelog():
-    """PostToolUse sur les outils d'ecriture : journalise le fichier touche."""
+    """PostToolUse sur les outils d'ecriture : journalise le(s) fichier(s) touches.
+    Codex n'a pas de champ file_path : apply_patch livre le patch entier dans
+    tool_input.command, les chemins sont sur les lignes '*** Update File: ...'."""
     data = read_hook_input()
     ti = data.get("tool_input") or {}
-    path = ti.get("file_path") or ti.get("path") or ti.get("notebook_path")
-    if not path:
+    p = ti.get("file_path") or ti.get("path") or ti.get("notebook_path")
+    paths = [p] if p else re.findall(r"^\*\*\* (?:Add|Update|Delete) File: (.+)$",
+                                     ti.get("command") or "", re.M)
+    if not paths:
         sys.exit(0)
     st = project()
     if not st["active"]:
         sys.exit(0)
-    try:
-        path = os.path.relpath(path, ROOT)
-    except ValueError:
-        pass
-    append("file_touched", text=path, thread=st["active"])
+    for path in paths:
+        if not os.path.isabs(path):  # apply_patch : chemins relatifs au cwd de session
+            path = os.path.join(data.get("cwd") or ROOT, path)
+        try:
+            path = os.path.relpath(path, ROOT)
+        except ValueError:
+            pass
+        append("file_touched", text=path, thread=st["active"])
     sys.exit(0)
 
 
@@ -468,7 +476,10 @@ def hook_precompact():
 
 # ---------------------------------------------------------------------- CLI
 
-AGENT_ENV = ("CLAUDECODE", "CLAUDE_CODE_ENTRYPOINT")
+# CODEX_THREAD_ID/CODEX_SANDBOX : poses par le shell tool de Codex (source :
+# codex-rs/protocol/src/shell_environment.rs), non documentes — a re-verifier
+# lors de la validation sur un projet reel repris depuis Codex.
+AGENT_ENV = ("CLAUDECODE", "CLAUDE_CODE_ENTRYPOINT", "CODEX_THREAD_ID", "CODEX_SANDBOX")
 
 
 GIT_HOOK = "#!/bin/sh\n# installe par plantrack init --git-hook\nexec python3 .claude/hooks/pt.py precommit\n"
@@ -484,6 +495,22 @@ SETTINGS = {"hooks": {
         {"type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/pt.py\" hook-context"}]}],
     "PreCompact": [{"hooks": [
         {"type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/pt.py\" hook-precompact"}]}],
+}}
+
+
+def _codex_cmd(entry):
+    # les hooks Codex tournent dans le cwd de session (parfois un sous-repertoire)
+    # sans variable d'environnement projet : la racine se resout dans la commande.
+    return ('r="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"; '
+            f'PLANTRACK_ROOT="$r" exec python3 "$r/.claude/hooks/pt.py" {entry}')
+
+
+CODEX_HOOKS = {"description": "PlanTrack — traduction Codex des 4 hooks (§13).", "hooks": {
+    "UserPromptSubmit": [{"hooks": [{"type": "command", "command": _codex_cmd("hook-prompt")}]}],
+    "PostToolUse": [{"matcher": "apply_patch|Edit|Write", "hooks": [
+        {"type": "command", "command": _codex_cmd("hook-filelog")}]}],
+    "SessionStart": [{"hooks": [{"type": "command", "command": _codex_cmd("hook-context")}]}],
+    "PreCompact": [{"hooks": [{"type": "command", "command": _codex_cmd("hook-precompact")}]}],
 }}
 
 MD_BLOCK = """<!-- plantrack:start -->
@@ -507,6 +534,25 @@ def install_git_hook():
         f.write(GIT_HOOK)
     os.chmod(hook, 0o755)
     print("[PlanTrack] hook pre-commit installe (contournement : git commit --no-verify).")
+
+
+def write_hooks_file(path, obj, label, hint=""):
+    """Ecrit un fichier de hooks JSON sans jamais ecraser un existant ; s'il
+    existe, signale les hooks PlanTrack manquants (installation partielle)."""
+    if os.path.exists(path):
+        with open(path, encoding="utf-8") as f:
+            content = f.read()
+        missing = [h for h in ("hook-prompt", "hook-filelog", "hook-context", "hook-precompact")
+                   if h not in content]
+        print(f"{label} deja en place." if not missing else
+              f"[PlanTrack] {label} existe sans les hooks " + ", ".join(missing) +
+              " — fusionne le bloc `hooks` a la main (voir README), rien n'a ete ecrase.")
+    else:
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(obj, f, ensure_ascii=False, indent=2)
+            f.write("\n")
+        print(f"{label} ecrit (4 hooks).{hint}")
 
 
 def cmd_init(args):
@@ -543,23 +589,14 @@ def cmd_init(args):
             os.chmod(dst, 0o755)
             print(f"pt.py copie dans {os.path.relpath(dst, ROOT)}.")
 
-    # 2. les 4 hooks Claude Code
-    settings = os.path.join(ROOT, ".claude", "settings.json")
-    if os.path.exists(settings):
-        with open(settings, encoding="utf-8") as f:
-            content = f.read()
-        missing = [h for h in ("hook-prompt", "hook-filelog", "hook-context", "hook-precompact")
-                   if h not in content]
-        print("settings.json deja en place." if not missing else
-              "[PlanTrack] .claude/settings.json existe sans les hooks " + ", ".join(missing) +
-              " — fusionne le bloc `hooks` a la main (voir README), rien n'a ete ecrase.")
-    else:
-        os.makedirs(os.path.dirname(settings), exist_ok=True)
-        with open(settings, "w", encoding="utf-8") as f:
-            json.dump(SETTINGS, f, ensure_ascii=False, indent=2)
-            f.write("\n")
-        print("settings.json ecrit (4 hooks).")
-    if agent != "claude":
+    # 2. les 4 hooks Claude Code (et leur traduction Codex le cas echeant)
+    write_hooks_file(os.path.join(ROOT, ".claude", "settings.json"), SETTINGS,
+                     ".claude/settings.json")
+    if agent == "codex":
+        write_hooks_file(os.path.join(ROOT, ".codex", "hooks.json"), CODEX_HOOKS,
+                         ".codex/hooks.json",
+                         " Dans Codex, lance /hooks pour approuver les hooks du projet.")
+    elif agent != "claude":
         print(f"[PlanTrack] agent {agent} : hooks non traduits automatiquement pour l'instant — "
               "la CLI, le bloc d'instructions et le pre-commit git tiennent (mode degrade, §13).")
 
@@ -674,6 +711,13 @@ def cmd_doctor(st):
             txt = f.read()
     for h in ("hook-prompt", "hook-filelog", "hook-context", "hook-precompact"):
         chk(h in txt, f"hook {h} declare dans settings.json", "lance `plantrack init`")
+    codexh = os.path.join(ROOT, ".codex", "hooks.json")
+    if os.path.exists(codexh):  # installation Codex : meme exigence de completude
+        with open(codexh, encoding="utf-8") as f:
+            ctxt = f.read()
+        for h in ("hook-prompt", "hook-filelog", "hook-context", "hook-precompact"):
+            chk(h in ctxt, f"hook {h} declare dans .codex/hooks.json",
+                "lance `plantrack init --agent codex`")
     if os.path.isdir(os.path.join(ROOT, ".git")):
         hook = os.path.join(ROOT, ".git", "hooks", "pre-commit")
         htxt = ""
