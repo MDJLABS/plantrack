@@ -76,7 +76,13 @@ def project():
     st = {"threads": {}, "bugs": {}, "decisions": [], "inbox": [], "active": None,
           "phases": {}, "tasks": {}}
     for ev in read_events():
-        k = ev.get("kind")
+        k = ev.get("kind") if isinstance(ev, dict) else None
+        if k is None:
+            continue
+        # un evenement incomplet (JSON valide mais champs manquants) ne doit
+        # jamais casser le rejeu — meme regle qu'une ligne corrompue
+        if k not in ("file_touched", "precommit_block") and not ("id" in ev and "ts" in ev):
+            continue
         if k == "thread_open":
             st["threads"][ev["id"]] = {
                 "id": ev["id"], "label": ev.get("text", ""), "status": "active",
@@ -234,7 +240,8 @@ def context_block(st, header=True):
     )
     out = "\n".join(L)
     if len(out) > CTX_MAX_CHARS:
-        out = out[:CTX_MAX_CHARS] + "\n[...tronque — budget de contexte atteint]"
+        suffix = "\n[...tronque — budget de contexte atteint]"
+        out = out[:CTX_MAX_CHARS - len(suffix)] + suffix
     return out
 
 
@@ -427,7 +434,8 @@ def hook_context():
     data = read_hook_input()
     src = data.get("source", "startup")
     st = project()
-    if not any([st["threads"], st["bugs"], st["decisions"]]):
+    if not any([st["threads"], st["bugs"], st["decisions"], st["inbox"],
+                st["phases"], st["tasks"]]):
         sys.exit(0)
     if src == "compact":
         print("(contexte compacte — etat du projet reinjecte depuis PlanTrack)")
@@ -531,10 +539,12 @@ def cmd_init(args):
     settings = os.path.join(ROOT, ".claude", "settings.json")
     if os.path.exists(settings):
         with open(settings, encoding="utf-8") as f:
-            has_pt = "pt.py" in f.read()
-        print("settings.json deja en place." if has_pt else
-              "[PlanTrack] .claude/settings.json existe sans les hooks pt.py — fusionne le "
-              "bloc `hooks` a la main (voir README), rien n'a ete ecrase.")
+            content = f.read()
+        missing = [h for h in ("hook-prompt", "hook-filelog", "hook-context", "hook-precompact")
+                   if h not in content]
+        print("settings.json deja en place." if not missing else
+              "[PlanTrack] .claude/settings.json existe sans les hooks " + ", ".join(missing) +
+              " — fusionne le bloc `hooks` a la main (voir README), rien n'a ete ecrase.")
     else:
         os.makedirs(os.path.dirname(settings), exist_ok=True)
         with open(settings, "w", encoding="utf-8") as f:
@@ -981,7 +991,7 @@ def cli(argv):
     elif cmd == "attempts":
         cmd_attempts(args, st)
     elif cmd == "file":
-        if len(args) < 2:
+        if len(args) < 2 or args[1] not in ("bug", "decision"):
             sys.exit("usage : plantrack file <note_id> bug|decision")
         nid, dest = args[0], args[1]
         note = next((n for n in st["inbox"] if n["id"] == nid), None)

@@ -7,6 +7,9 @@ PT="$(cd "$(dirname "$0")/.." && pwd)/.claude/hooks/pt.py"
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 export CLAUDE_PROJECT_DIR="$TMP"
+# Le scenario doit rendre le meme verdict partout (CI, cron, poste nu) :
+# l'environnement agent est pose explicitement, jamais herite de la session.
+export CLAUDECODE=1
 fail=0
 
 check() { # check <description> <sous-chaine attendue> <sortie>
@@ -84,6 +87,10 @@ echo '{"kind": PAS DU JSON' >> "$TMP/.plantrack/events.jsonl"
 out=$(ctx startup); rc=$?
 check_exit "ligne corrompue : hook-context sort en 0" 0 "$rc"
 check "ligne corrompue : l etat survit" "t1" "$out"
+echo '{"kind":"decision"}' >> "$TMP/.plantrack/events.jsonl"
+out=$(ctx startup); rc=$?
+check_exit "evenement incomplet : hook-context sort en 0" 0 "$rc"
+check "evenement incomplet : l etat survit" "t1" "$out"
 
 # 9. le bloc reinjecte reste sous le plafond de 3000 caracteres
 for i in $(seq 1 30); do
@@ -91,8 +98,8 @@ for i in $(seq 1 30); do
     "$(printf 'x%.0s' $(seq 1 120))" | python3 "$PT" hook-prompt >/dev/null 2>&1
 done
 n=$(ctx compact | wc -c)
-if [ "$n" -le 3100 ]; then echo "ok   - bloc reinjecte sous le plafond ($n chars)"
-else echo "FAIL - bloc reinjecte a $n chars (> 3000 + marge troncature)"; fail=1; fi
+if [ "$n" -le 3000 ]; then echo "ok   - bloc reinjecte sous le plafond dur ($n chars)"
+else echo "FAIL - bloc reinjecte a $n chars (> 3000)"; fail=1; fi
 
 # 10. v0.5 — le hook pre-commit bloque un commit touchant un fichier d'un fil parque
 printf '{"tool_input":{"file_path":"%s/src/a.txt"}}' "$TMP" | python3 "$PT" hook-filelog
@@ -229,6 +236,7 @@ check_exit "un seul jeu de marqueurs dans CLAUDE.md" 1 "$n"
 printf '{"hooks":{}}' > "$TMP2/.claude/settings.json"
 out=$(CLAUDE_PROJECT_DIR="$TMP2" python3 "$PT" init 2>&1)
 check "settings etranger jamais ecrase" "fusionne le bloc" "$out"
+check "init liste les hooks manquants" "hook-precompact" "$out"
 check "contenu du settings preserve" '{"hooks":{}}' "$(cat "$TMP2/.claude/settings.json")"
 
 # 16. v1.1 — doctor et stats
@@ -242,6 +250,55 @@ check_exit "doctor sort en erreur si probleme" 1 "$rc"
 out=$(python3 "$PT" stats 2>&1)
 check "stats compte les reprises de fil" "reprises de fil :" "$out"
 check "stats compte les blocages pre-commit" "blocages pre-commit : 2" "$out"
+
+# 17. revue v1.1 — reject exige to_verify, signal de boucle dans stats
+prompt '!bug le bouton contraste trop faible' >/dev/null
+out=$(H reject b4 -m "pas encore corrige")
+check "reject refuse un bug encore open" 'est "open"' "$out"
+python3 "$PT" bug b4 to_verify >/dev/null 2>&1
+H reject b4 -m "premier faux espoir" >/dev/null
+python3 "$PT" bug b4 to_verify >/dev/null 2>&1
+H reject b4 -m "second faux espoir" >/dev/null
+out=$(python3 "$PT" stats 2>&1)
+check "stats signale la boucle apres 2 rejets" "signal de boucle" "$out"
+check "le signal de boucle nomme le bug" "b4" "$out"
+
+# 18. revue v1.1 — close, chemin positif des taches, classement d inbox
+out=$(prompt '!close')
+check "!close ferme le fil actif" "ferme" "$out"
+out=$(prompt '!focus nettoyage css')
+check "!close libere l ouverture d un nouveau fil" "nouveau fil t3" "$out"
+out=$(H close t3)
+check "plantrack close ferme un fil par id" "ferme" "$out"
+H task add p1 Page profil >/dev/null
+python3 "$PT" task start k6 >/dev/null 2>&1
+out=$(python3 "$PT" task verify k6 2>&1)
+check "task verify autorise a l agent" "a verifier" "$out"
+out=$(H task done k6)
+check "task done humain termine la tache" "terminee" "$out"
+out=$(prompt '!penser au favicon manquant')
+check "capture libre en inbox" "n1" "$out"
+out=$(python3 "$PT" file n1 tache 2>&1); rc=$?
+check "file refuse une destination inconnue" "usage" "$out"
+check_exit "file destination inconnue sort en erreur" 1 "$rc"
+out=$(H file n1 decision)
+check "file vers decision classe la note" "decision" "$out"
+
+# 19. revue v1.1 — reinjection d une inbox seule, init sur AGENTS.md, --agent codex
+TMP3=$(mktemp -d)
+printf '{"prompt":"!verifier les quotas API"}' | CLAUDE_PROJECT_DIR="$TMP3" python3 "$PT" hook-prompt >/dev/null 2>&1
+out=$(printf '{"source":"startup"}' | CLAUDE_PROJECT_DIR="$TMP3" python3 "$PT" hook-context 2>&1)
+check "une inbox seule est reinjectee" "INBOX" "$out"
+printf '# Notes utilisateur\n' > "$TMP3/AGENTS.md"
+out=$(CLAUDE_PROJECT_DIR="$TMP3" python3 "$PT" init 2>&1)
+check "init prefere un AGENTS.md existant" "insere dans AGENTS.md" "$out"
+check "init preserve le contenu utilisateur" "Notes utilisateur" "$(cat "$TMP3/AGENTS.md")"
+rm -rf "$TMP3"
+TMP4=$(mktemp -d)
+out=$(CLAUDE_PROJECT_DIR="$TMP4" python3 "$PT" init --agent codex 2>&1)
+check "--agent codex annonce le mode degrade" "mode degrade" "$out"
+check "--agent codex ecrit AGENTS.md" "insere dans AGENTS.md" "$out"
+rm -rf "$TMP4"
 
 echo
 [ "$fail" = 0 ] && echo "TOUS LES TESTS PASSENT" || { echo "DES TESTS ECHOUENT"; exit 1; }
