@@ -127,6 +127,17 @@ README et pt.py) : CODEX_THREAD_ID/CODEX_SANDBOX comme détection de rôle.
   de blocages pre-commit fréquents ; jamais par défaut.
 Le PRD n'a plus de question ouverte.
 
+### GitHub POUSSÉ — 2026-08-29
+`gh` authentifié (compte Slimariella). L'organisation mdjlabs n'existe pas
+encore sur GitHub (HTTP 404 ; sa création est réservée au navigateur, aucune
+API/CLI ne le permet) → repo créé en PRIVÉ sous **Slimariella/plantrack**
+(`https://github.com/Slimariella/plantrack`), remote origin posé, main poussé
+(tête `ece297f`). Dès que l'org mdjlabs existe : transférer le repo
+(`gh api repos/Slimariella/plantrack/transfer -f new_owner=mdjlabs`) —
+l'historique, les URL redirigées et le remote suivent ; puis mettre à jour
+le remote local (`git remote set-url origin https://github.com/mdjlabs/plantrack.git`).
+Une surveillance en arrière-plan guette l'apparition de l'org.
+
 ### Prochaine action
-Gate : pousser GitHub (`! gh auth login` puis créer `mdjlabs/plantrack`
-privé et pousser), ou pause / fin de session.
+Transférer le repo vers mdjlabs quand l'org existe, puis pause / fin de
+session (protocole mdj-session-protocol : prompt de reprise + purge).
