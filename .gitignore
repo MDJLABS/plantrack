@@ -1,3 +1,5 @@
 .plantrack/transcripts/
 documents/
 backup/
+build/
+*.egg-info/
