@@ -132,12 +132,13 @@ Le PRD n'a plus de question ouverte.
 encore sur GitHub (HTTP 404 ; sa création est réservée au navigateur, aucune
 API/CLI ne le permet) → repo créé en PRIVÉ sous **Slimariella/plantrack**
 (`https://github.com/Slimariella/plantrack`), remote origin posé, main poussé
-(tête `ece297f`). Dès que l'org mdjlabs existe : transférer le repo
-(`gh api repos/Slimariella/plantrack/transfer -f new_owner=mdjlabs`) —
-l'historique, les URL redirigées et le remote suivent ; puis mettre à jour
-le remote local (`git remote set-url origin https://github.com/mdjlabs/plantrack.git`).
-Une surveillance en arrière-plan guette l'apparition de l'org.
+(tête `ece297f`). Mariella a ensuite créé l'org mdjlabs dans le navigateur →
+repo TRANSFÉRÉ (`gh api repos/Slimariella/plantrack/transfer -f new_owner=mdjlabs`),
+vérifié : **MDJLABS/plantrack**, privé, branche main, remote local mis à jour
+(`https://github.com/mdjlabs/plantrack.git`). L'URL d'installation du README
+(`uvx --from git+https://github.com/mdjlabs/plantrack …`) est désormais réelle.
 
 ### Prochaine action
-Transférer le repo vers mdjlabs quand l'org existe, puis pause / fin de
-session (protocole mdj-session-protocol : prompt de reprise + purge).
+Pause / fin de session (protocole mdj-session-protocol : prompt de reprise
++ purge), ou prochain chantier : jalon Publication (§16) seulement si les
+chiffres de `plantrack stats` le justifient.
