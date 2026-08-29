@@ -198,7 +198,6 @@ Livré (tag v1.3.0, publié PyPI via Actions, testé en réel depuis PyPI) :
   api-docs.deepseek.com/quick_start/agent_integrations/deepcode/.
 
 ### Session CLOSE — 2026-08-29
-Prompt de reprise : `.planning/2026-08-29-reprise-apres-v1.1.md` (autonome,
-partiellement périmé — v1.2.0 et v1.3.0 livrées depuis ; à rafraîchir à la
-prochaine fin de session). Rien en suspens. Prochain jalon (§16 Publication)
-conditionné aux chiffres de `plantrack stats` après usage réel.
+Prompt de reprise : `.planning/2026-08-29-reprise-apres-v1.3.md` (autonome,
+l'ancien apres-v1.1 est purgé). Rien en suspens. Prochain jalon (§16
+Publication) conditionné aux chiffres de `plantrack stats` après usage réel.
