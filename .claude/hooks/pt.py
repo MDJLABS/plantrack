@@ -597,37 +597,59 @@ def install_git_hook():
 
 
 def write_hooks_file(path, obj, label, hint=""):
-    """Ecrit un fichier de hooks JSON sans jamais ecraser un existant ; s'il
-    existe, signale les hooks PlanTrack manquants (installation partielle)."""
-    if os.path.exists(path):
-        with open(path, encoding="utf-8") as f:
-            content = f.read()
-        missing = [h for h in ("hook-prompt", "hook-filelog", "hook-context", "hook-precompact")
-                   if h not in content]
-        print(f"{label} deja en place." if not missing else
-              f"[PlanTrack] {label} existe sans les hooks " + ", ".join(missing) +
-              " — fusionne le bloc `hooks` a la main (voir README), rien n'a ete ecrase.")
-    else:
+    """Ecrit ou FUSIONNE un fichier de hooks JSON : cree s'il manque, sinon
+    ajoute les entrees PlanTrack absentes (comparees sur la commande) en
+    preservant tout l'existant — settings.json existe dans quasiment tout
+    projet Claude Code reel. Ecriture atomique (l'utilisateur edite aussi ce
+    fichier). Rend False si rien n'a pu etre ecrit."""
+    if not os.path.exists(path):
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, "w", encoding="utf-8") as f:
             json.dump(obj, f, ensure_ascii=False, indent=2)
             f.write("\n")
         print(f"{label} ecrit (4 hooks).{hint}")
+        return True
+    with open(path, encoding="utf-8") as f:
+        content = f.read()
+    try:
+        data = json.loads(content)
+        assert isinstance(data, dict) and isinstance(data.get("hooks", {}), dict)
+    except (ValueError, AssertionError):
+        print(f"[PlanTrack] {label} existe mais n'est pas un objet JSON exploitable — rien "
+              "n'a ete ecrase. Bloc a fusionner a la main :\n"
+              + json.dumps({"hooks": obj["hooks"]}, ensure_ascii=False, indent=2))
+        return False
+    hooks = data.setdefault("hooks", {})
+    added = 0
+    for evt, entries in obj["hooks"].items():
+        cur = hooks.setdefault(evt, [])
+        have = {h.get("command") for e in cur for h in e.get("hooks", [])}
+        for e in entries:
+            if any(h.get("command") not in have for h in e["hooks"]):
+                cur.append(e)
+                added += 1
+    if not added:
+        print(f"{label} deja en place.")
+        return True
+    tmp = path + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+        f.write("\n")
+    os.replace(tmp, path)
+    print(f"{label} : {added} hooks PlanTrack fusionnes, l'existant est preserve.{hint}")
+    return True
 
 
 def cmd_init(args):
     """§13 : installation vendoree dans le projet courant (CLAUDE_PROJECT_DIR ou cwd).
-    Copie pt.py, ecrit settings.json + wrapper, insere le bloc d'instructions.
-    `--git-hook` seul n'installe que le garde-fou git (comportement v0.5)."""
+    Copie pt.py, ecrit/fusionne les hooks + wrapper, insere le bloc d'instructions.
+    `--git-hook` ajoute le garde-fou git a l'installation complete."""
     known = {"--git-hook", "--agent"}
     if any(a.startswith("--") and a not in known for a in args):
         sys.exit("usage : plantrack init [--git-hook]")
     if "--agent" in args:
         print("[PlanTrack] note : --agent est obsolete — init couvre desormais "
               "tous les agents d'un coup.")
-    if args == ["--git-hook"]:
-        install_git_hook()
-        return
 
     # 1. copie vendoree du coeur
     src = os.path.abspath(__file__)
@@ -649,11 +671,11 @@ def cmd_init(args):
     # 2. les hooks de tous les agents supportes, systematiquement : un fichier
     # de config est inerte tant que l'agent n'est pas installe, et il attend
     # deja celui qu'on installera apres coup — aucune option a connaitre
-    write_hooks_file(os.path.join(ROOT, ".claude", "settings.json"), SETTINGS,
-                     ".claude/settings.json")
-    write_hooks_file(os.path.join(ROOT, ".codex", "hooks.json"), CODEX_HOOKS,
-                     ".codex/hooks.json",
-                     " Dans Codex, lance /hooks pour approuver les hooks du projet.")
+    complete = write_hooks_file(os.path.join(ROOT, ".claude", "settings.json"), SETTINGS,
+                                ".claude/settings.json")
+    complete &= write_hooks_file(os.path.join(ROOT, ".codex", "hooks.json"), CODEX_HOOKS,
+                                 ".codex/hooks.json",
+                                 " Dans Codex, lance /hooks pour approuver les hooks du projet.")
 
     # 3. wrapper CLI humaine
     wrapper = os.path.join(ROOT, "plantrack")
@@ -686,7 +708,10 @@ def cmd_init(args):
 
     if "--git-hook" in args:
         install_git_hook()
-    print("[PlanTrack] installation terminee. Redemarre l'agent puis verifie avec /hooks.")
+    print("[PlanTrack] installation terminee. Redemarre l'agent puis verifie avec /hooks."
+          if complete else
+          "[PlanTrack] installation INCOMPLETE — fusionne le bloc ci-dessus a la main, "
+          "puis verifie avec `plantrack doctor`.")
 
 
 def cmd_precommit():

@@ -235,9 +235,8 @@ n=$(grep -c "plantrack:start" "$TMP2/CLAUDE.md")
 check_exit "un seul jeu de marqueurs dans CLAUDE.md" 1 "$n"
 printf '{"hooks":{}}' > "$TMP2/.claude/settings.json"
 out=$(CLAUDE_PROJECT_DIR="$TMP2" python3 "$PT" init 2>&1)
-check "settings etranger jamais ecrase" "fusionne le bloc" "$out"
-check "init liste les hooks manquants" "hook-precompact" "$out"
-check "contenu du settings preserve" '{"hooks":{}}' "$(cat "$TMP2/.claude/settings.json")"
+check "settings existant : les hooks sont fusionnes" "4 hooks PlanTrack fusionnes" "$out"
+check "settings fusionne : les 4 hooks presents" "hook-precompact" "$(cat "$TMP2/.claude/settings.json")"
 
 # 16. v1.1 — doctor et stats
 out=$(cd "$TMP2" && rm .claude/settings.json && CLAUDE_PROJECT_DIR="$TMP2" python3 "$PT" init >/dev/null 2>&1; CLAUDE_PROJECT_DIR="$TMP2" ./plantrack doctor 2>&1); rc=$?
@@ -372,6 +371,34 @@ check "init idempotent sur les blocs md" "a jour dans AGENTS.md" "$out"
 out=$(CLAUDE_PROJECT_DIR="$TMP6" python3 "$PT" doctor 2>&1 || true)
 check "doctor verifie les hooks codex" "declare dans .codex/hooks.json" "$out"
 rm -rf "$TMP6"
+
+# 22. rapport miamboost 2026-08-29 — fusion dans un settings.json existant,
+# --git-hook n'ampute plus l'installation, JSON invalide = INCOMPLETE
+TMP7=$(mktemp -d)
+mkdir -p "$TMP7/.claude"
+printf '{ "enabledPlugins": { "cloudflare@claude-plugins-official": true } }\n' > "$TMP7/.claude/settings.json"
+git -C "$TMP7" init -q
+out=$(CLAUDE_PROJECT_DIR="$TMP7" python3 "$PT" init --git-hook 2>&1)
+check "init fusionne dans un settings.json existant" "4 hooks PlanTrack fusionnes" "$out"
+check "init --git-hook fait AUSSI l installation complete" "insere dans AGENTS.md" "$out"
+check "init --git-hook pose le garde-fou git" "hook pre-commit installe" "$out"
+check "et annonce une installation terminee" "installation terminee" "$out"
+sj=$(cat "$TMP7/.claude/settings.json")
+check "la fusion preserve l existant (enabledPlugins)" "enabledPlugins" "$sj"
+for h in hook-prompt hook-filelog hook-context hook-precompact; do
+  check "settings.json fusionne declare $h" "$h" "$sj"
+done
+python3 -c "import json,sys; json.load(open(sys.argv[1]))" "$TMP7/.claude/settings.json" \
+  && check "settings.json fusionne est du JSON valide" ok ok || check "settings.json fusionne est du JSON valide" ok invalide
+out=$(CLAUDE_PROJECT_DIR="$TMP7" python3 "$PT" init 2>&1)
+check "fusion idempotente au second init" ".claude/settings.json deja en place" "$out"
+n=$(grep -c "hook-prompt" "$TMP7/.claude/settings.json")
+check "aucun hook duplique au second init" 1 "$n"
+printf 'pas du json' > "$TMP7/.claude/settings.json"
+out=$(CLAUDE_PROJECT_DIR="$TMP7" python3 "$PT" init 2>&1)
+check "JSON invalide : le bloc a coller est imprime" '"hooks"' "$out"
+check "JSON invalide : l installation s annonce INCOMPLETE" "INCOMPLETE" "$out"
+rm -rf "$TMP7"
 
 printf '{"tool_name":"apply_patch","tool_input":{"command":"*** Begin Patch\\n*** Add File: src/patch1.txt\\n+hello\\n*** Update File: docs/patch2.md\\n*** End Patch"},"cwd":"%s"}' "$TMP" | python3 "$PT" hook-filelog
 check "apply_patch : premier fichier du patch journalise" '"text": "src/patch1.txt"' "$(cat "$TMP/.plantrack/events.jsonl")"

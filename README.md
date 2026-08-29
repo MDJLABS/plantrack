@@ -19,7 +19,9 @@ uvx plantrack init               # ou : pipx run plantrack init
 `init` copie le cœur dans `.claude/hooks/pt.py` (auto-copie vendorée : le projet reste
 autonome, les hooks marchent sur un simple clone), écrit les hooks de **tous** les
 agents supportés — `.claude/settings.json` (Claude Code) et `.codex/hooks.json`
-(Codex), jamais écrasés s'ils existent —, le wrapper `./plantrack`, le bloc
+(Codex) ; si le fichier existe déjà (un `settings.json` existe dans presque tout
+projet réel), les hooks PlanTrack y sont **fusionnés** sans toucher au reste —,
+le wrapper `./plantrack`, le bloc
 d'instructions complet dans `AGENTS.md` (la source unique, le standard lu par la
 plupart des agents) plus une ligne d'import `@AGENTS.md` entre marqueurs dans
 `CLAUDE.md` et `GEMINI.md`, une skill `.deepcode/skills/plantrack/SKILL.md` qui
