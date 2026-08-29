@@ -179,7 +179,26 @@ pareil. » Livré (tag v1.2.0, publié PyPI, testé en réel depuis PyPI) :
 - Piège : juste après un tag, l'index PyPI peut servir l'ancienne version à
   uvx — forcer `--from 'plantrack==X.Y.Z'` pour tester la fraîche.
 
+### v1.3.0 — skill Deep Code (décision Mariella 2026-08-29)
+Demande : couvrir aussi zcode, xcode, kimi code, deepseek, mistral. Vérifié
+(web, sources au README) : ZCode, Grok Build, Kimi Code CLI, Mistral Vibe
+lisent AGENTS.md nativement — déjà couverts, zéro code ; « xcode » n'existe
+pas comme agent CLI ; DeepSeek n'a pas de CLI officiel. Mariella a choisi
+« Supporter Deep Code (tiers) » (contre la reco « rien pour l'instant »).
+Livré (tag v1.3.0, publié PyPI via Actions, testé en réel depuis PyPI) :
+- Principe reconfirmé par Mariella en séance : UN fichier source
+  (`AGENTS.md`) + une **référence** dans chaque fichier propre à un agent —
+  la skill Deep Code ne duplique donc RIEN, elle renvoie vers AGENTS.md.
+- `init` écrit `.deepcode/skills/plantrack/SKILL.md` (format Claude Code :
+  frontmatter YAML name/description + corps) via `write_owned_file`
+  (fichier 100 % généré → remplaçable sans risque, « deja en place » si
+  identique) ; rappelle `./plantrack status` faute de hooks.
+- doctor vérifie la présence de la skill. 137 checks verts.
+- Sources : github.com/lessweb/deepcode-cli,
+  api-docs.deepseek.com/quick_start/agent_integrations/deepcode/.
+
 ### Session CLOSE — 2026-08-29
-Prompt de reprise : `.planning/2026-08-29-reprise-apres-v1.1.md` (autonome).
-Rien en suspens. Prochain jalon (§16 Publication) conditionné aux chiffres
-de `plantrack stats` après usage réel.
+Prompt de reprise : `.planning/2026-08-29-reprise-apres-v1.1.md` (autonome,
+partiellement périmé — v1.2.0 et v1.3.0 livrées depuis ; à rafraîchir à la
+prochaine fin de session). Rien en suspens. Prochain jalon (§16 Publication)
+conditionné aux chiffres de `plantrack stats` après usage réel.
