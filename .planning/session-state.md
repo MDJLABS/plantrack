@@ -138,7 +138,7 @@ vérifié : **MDJLABS/plantrack**, privé, branche main, remote local mis à jou
 (`https://github.com/mdjlabs/plantrack.git`). L'URL d'installation du README
 (`uvx --from git+https://github.com/mdjlabs/plantrack …`) est désormais réelle.
 
-### Prochaine action
-Pause / fin de session (protocole mdj-session-protocol : prompt de reprise
-+ purge), ou prochain chantier : jalon Publication (§16) seulement si les
-chiffres de `plantrack stats` le justifient.
+### Session CLOSE — 2026-08-29
+Prompt de reprise : `.planning/2026-08-29-reprise-apres-v1.1.md` (autonome).
+Rien en suspens. Prochain jalon (§16 Publication) conditionné aux chiffres
+de `plantrack stats` après usage réel.
