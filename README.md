@@ -1,32 +1,32 @@
-# PlanTrack v0 — couche de capture
+# PlanTrack — contexte, plan et bugs pour les longues sessions agent
 
-Squelette fonctionnel, testé. ~380 lignes, Python stdlib uniquement, aucune dépendance,
-aucune base de données. Objectif unique : ne perdre ni décision, ni bug, ni état de fil
-pendant une session longue, malgré la compaction du contexte.
+Un seul fichier Python, stdlib uniquement, aucune dépendance, aucune base de données.
+Objectif : ne perdre ni décision, ni bug, ni état de fil pendant une session longue,
+malgré la compaction du contexte.
 
 ## Installation (2 minutes)
 
-Depuis la racine du projet cible (CodeRing en premier) :
+Depuis la racine du projet cible :
 
 ```bash
-tar xzf plantrack-v0.tar.gz -C .        # dépose .claude/hooks/pt.py, .claude/settings.json, plantrack
-chmod +x plantrack .claude/hooks/pt.py
-./plantrack help
+uvx --from git+https://github.com/mdjlabs/plantrack plantrack init
+./plantrack init --git-hook      # optionnel : le garde-fou git pre-commit
 ```
 
-Si un `.claude/settings.json` existe déjà, fusionne le bloc `hooks` à la main plutôt que
-d'écraser le fichier.
-
-Ajoute à ton `.gitignore` :
-
-```
-.plantrack/transcripts/
-```
+`init` copie le cœur dans `.claude/hooks/pt.py` (auto-copie vendorée : le projet reste
+autonome, les hooks marchent sur un simple clone), écrit `.claude/settings.json`
+(4 hooks — jamais écrasé s'il existe : fusion à la main), le wrapper `./plantrack`, un
+bloc d'instructions entre marqueurs `<!-- plantrack:start/end -->` dans `CLAUDE.md` ou
+`AGENTS.md`, et exclut `.plantrack/transcripts/` du versionnage. Il est idempotent.
 
 Le journal `.plantrack/events.jsonl` **se versionne** : une ligne par événement, diff
 lisible en revue, merge trivial.
 
-Redémarre Claude Code. Vérifie avec `/hooks` que les quatre hooks sont chargés.
+Redémarre Claude Code. Vérifie avec `/hooks` que les quatre hooks sont chargés, ou :
+
+```bash
+./plantrack doctor               # hooks, journal, budget de contexte
+```
 
 ## Utilisation
 
@@ -44,16 +44,22 @@ son contexte reste propre, et tu ne le déconcentres pas de sa tâche.
 | `!state` | affiche l'état persistant |
 | `!n'importe quel texte` | capture libre dans l'inbox, à classer plus tard |
 
+Un bug accepte une sévérité : `!bug le paiement échoue --blocker` (ou `--low`/`--high`).
+Un bug `blocker` s'affiche en tête du bloc réinjecté à chaque session.
+
 Côté humain, hors session :
 
 ```bash
 ./plantrack status              # le bloc d'état, tel que l'agent le voit
-./plantrack bugs                # bugs ouverts + motifs de rejet
-./plantrack inbox               # captures non classées
-./plantrack threads             # fils actifs / en pause / fermés
-./plantrack verify b1           # toi seul valides
+./plantrack bugs                # bugs ouverts + tentatives + motifs de rejet
+./plantrack plan                # arbre phases/tâches ; plan import <f.md> pour proposer
+./plantrack attempt b1 "hypothèse testée"   # refusé si déjà tentée (similarité > 0.85)
+./plantrack attempts b1         # journal des tentatives et motifs de rejet
+./plantrack bug b1 wont_fix -m "cosmétique"  # toi seule (motif obligatoire)
+./plantrack verify b1           # toi seule valides (bug en to_verify uniquement)
 ./plantrack reject b1 -m "le cache n'était pas la cause, ne pas retenter"
 ./plantrack file n1 bug         # classe une note d'inbox en bug
+./plantrack stats               # usage sur 14 jours — la mesure qui justifie l'outil
 ```
 
 ## Ce que font les quatre hooks
@@ -93,10 +99,9 @@ echo '{"source":"compact"}'            | python3 .claude/hooks/pt.py hook-contex
 Le scénario complet — ouvrir un fil, éditer, remonter un bug ailleurs, acter une décision,
 parker, ouvrir un autre fil, revenir — a été rejoué et passe.
 
-## Limites assumées de la v0
+## Limites assumées
 
-- Pas de MCP, pas de SQLite, pas de plan structuré en phases/tâches. Volontaire :
-  on mesure d'abord si la capture suffit.
+- Pas de MCP, pas de SQLite. Volontaire : un journal JSONL rejoué suffit à cette échelle.
 - **Ce qui n'est jamais capturé reste perdu.** La nuance expliquée en prose et jamais
   transformée en `!decide` disparaît à la compaction. Seul l'archivage du transcript
   permet de la retrouver, à la main.
@@ -120,11 +125,12 @@ de le maintenir par principe. C'est aussi le seul argument crédible le jour où
 
 ## La suite
 
-Le PRD fait foi : voir `PRD-PlanTrack-v0.2.md` (jalons §16). Dans l'ordre : le hook
-`pre-commit` (couche 4 — le seul garde-fou qui ne dépende d'aucun modèle), puis le plan
-phases/tâches (couche 2) et le registre de tentatives par bug (couche 3), sur le même
-journal JSONL. La greffe sur Beads a été écartée par décision de conception (PRD §6 :
-un stockage binaire interdit le diff et le merge git) — au mieux un pont d'export en
-extension. MCP en option, jamais en socle.
+Le PRD fait foi : voir `PRD-PlanTrack-v0.2.md` (jalons §16). Livré : couches 1 à 4
+(capture, plan phases/tâches, bugs/tentatives, pre-commit) + `init`/`doctor`/`stats`.
+Reste : le portage Codex (traduction de la config hooks, §13) et la publication —
+uniquement si les chiffres de `plantrack stats` la justifient. La greffe sur Beads a
+été écartée par décision de conception (PRD §6 : un stockage binaire interdit le diff
+et le merge git) — au mieux un pont d'export en extension. MCP en option, jamais en
+socle.
 
 Référence hooks : https://code.claude.com/docs/en/hooks
