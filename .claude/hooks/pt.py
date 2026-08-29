@@ -530,6 +530,34 @@ REF_BLOCK = """<!-- plantrack:start -->
 <!-- plantrack:end -->
 """
 
+# Deep Code (CLI tiers DeepSeek) ne lit pas AGENTS.md mais decouvre des skills
+# au format Claude Code dans ./.deepcode/skills/<nom>/SKILL.md — la skill est
+# une simple reference vers AGENTS.md, la source unique des regles.
+DEEPCODE_SKILL = """---
+name: plantrack
+description: État persistant du projet (fils de travail, décisions actées, bugs) — consignes à lire avant toute tâche.
+---
+
+**Important : lis le bloc « PlanTrack » du fichier `AGENTS.md` à la racine du projet et applique ses consignes.** C'est la source unique des règles PlanTrack.
+
+Particularité ici (pas de hooks, donc pas d'injection automatique) : lance `./plantrack status` en début de tâche pour lire l'état persistant, et refais-le après toute compaction du contexte.
+"""
+
+
+def write_owned_file(path, content, label):
+    """Ecrit un fichier entierement genere par PlanTrack (remplacable sans risque)."""
+    existing = None
+    if os.path.exists(path):
+        with open(path, encoding="utf-8") as f:
+            existing = f.read()
+    if existing == content:
+        print(f"{label} deja en place.")
+        return
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(content)
+    print(f"{label} {'mis a jour' if existing is not None else 'ecrit'}.")
+
 
 def write_md_block(name, block):
     """Insere le bloc entre marqueurs dans ROOT/name (cree le fichier au besoin) ;
@@ -641,6 +669,8 @@ def cmd_init(args):
     write_md_block("AGENTS.md", MD_BLOCK)
     for name in ("CLAUDE.md", "GEMINI.md"):
         write_md_block(name, REF_BLOCK)
+    write_owned_file(os.path.join(ROOT, ".deepcode", "skills", "plantrack", "SKILL.md"),
+                     DEEPCODE_SKILL, "skill Deep Code (.deepcode/skills/plantrack/SKILL.md)")
 
     # 5. transcripts gitignores
     gi = os.path.join(ROOT, ".gitignore")
@@ -743,6 +773,8 @@ def cmd_doctor(st):
             atxt = f.read()
     chk("<!-- plantrack:start -->" in atxt, "bloc d'instructions dans AGENTS.md",
         "lance `plantrack init`")
+    chk(os.path.exists(os.path.join(ROOT, ".deepcode", "skills", "plantrack", "SKILL.md")),
+        "skill Deep Code presente", "lance `plantrack init`")
     if os.path.isdir(os.path.join(ROOT, ".git")):
         hook = os.path.join(ROOT, ".git", "hooks", "pre-commit")
         htxt = ""

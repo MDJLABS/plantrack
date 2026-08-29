@@ -295,6 +295,10 @@ check "init insere le bloc complet dans AGENTS.md" "insere dans AGENTS.md" "$out
 check "init preserve le contenu utilisateur" "Notes utilisateur" "$(cat "$TMP3/AGENTS.md")"
 check "CLAUDE.md recoit la ligne d import" "@AGENTS.md" "$(cat "$TMP3/CLAUDE.md")"
 check "GEMINI.md recoit la ligne d import" "@AGENTS.md" "$(cat "$TMP3/GEMINI.md")"
+check "la skill Deep Code est ecrite" "name: plantrack" "$(cat "$TMP3/.deepcode/skills/plantrack/SKILL.md")"
+check "la skill Deep Code renvoie vers AGENTS.md" "AGENTS.md" "$(cat "$TMP3/.deepcode/skills/plantrack/SKILL.md")"
+out=$(CLAUDE_PROJECT_DIR="$TMP3" python3 "$PT" init 2>&1)
+check "init idempotent sur la skill Deep Code" "skill Deep Code (.deepcode/skills/plantrack/SKILL.md) deja en place" "$out"
 rm -rf "$TMP3"
 TMP4=$(mktemp -d)
 printf '<!-- plantrack:start -->\nancien bloc complet v1.1\n<!-- plantrack:end -->\n' > "$TMP4/CLAUDE.md"

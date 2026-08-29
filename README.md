@@ -20,9 +20,11 @@ uvx plantrack init               # ou : pipx run plantrack init
 autonome, les hooks marchent sur un simple clone), écrit les hooks de **tous** les
 agents supportés — `.claude/settings.json` (Claude Code) et `.codex/hooks.json`
 (Codex), jamais écrasés s'ils existent —, le wrapper `./plantrack`, le bloc
-d'instructions complet dans `AGENTS.md` (le standard lu par la plupart des agents)
-plus une ligne d'import `@AGENTS.md` entre marqueurs dans `CLAUDE.md` et `GEMINI.md`,
-et exclut `.plantrack/transcripts/` du versionnage. Il est idempotent — un fichier de
+d'instructions complet dans `AGENTS.md` (la source unique, le standard lu par la
+plupart des agents) plus une ligne d'import `@AGENTS.md` entre marqueurs dans
+`CLAUDE.md` et `GEMINI.md`, une skill `.deepcode/skills/plantrack/SKILL.md` qui
+renvoie vers `AGENTS.md` (Deep Code), et exclut `.plantrack/transcripts/` du
+versionnage. Il est idempotent — un fichier de
 config est inerte tant que l'agent n'est pas là : celui que tu installeras **après**
 trouvera PlanTrack déjà en place, sans option à connaître, même s'ils sont plusieurs.
 
@@ -123,7 +125,10 @@ parker, ouvrir un autre fil, revenir — a été rejoué et passe.
   leur doc, 2026-08) : ZCode (Z.ai/GLM), Grok Build (xAI), Kimi Code CLI (Moonshot),
   Mistral Vibe ; Gemini CLI passe par la ligne d'import de `GEMINI.md`. Aucun de
   ces agents ne supporte l'import `@fichier` — d'où le bloc complet dans `AGENTS.md`,
-  jamais une simple référence. DeepSeek n'a pas de CLI officiel à ce jour.
+  jamais une simple référence. DeepSeek n'a pas de CLI officiel à ce jour : `init`
+  écrit une skill pour **Deep Code** (outil tiers `lessweb/deepcode-cli`, listé par
+  la doc DeepSeek ; format SKILL.md compatible Claude Code) qui renvoie vers
+  `AGENTS.md` et rappelle `./plantrack status` faute de hooks.
 - IDs séquentiels calculés par rejeu : à revoir en cas de travail multi-branches
   simultané.
 
