@@ -242,7 +242,48 @@ en réel depuis PyPI sur le scénario exact du rapport) :
 - pyproject : `[project.urls]` (Homepage/Source/Issues) → lien GitHub
   visible sur PyPI. Tag v1.4.3 poussé.
 
-### Session CLOSE — 2026-08-29
-Prompt de reprise : `.planning/2026-08-29-reprise-apres-v1.4.md` (autonome,
-les anciens sont purgés). Rien en suspens. Prochain jalon (§16 Publication)
+### v1.5.0 — l'agent écrit lui-même au carnet (2026-08-29)
+Issue du brainstorming BMAD sur les galères réelles de prolearn, miamboost
+et bcc (3 sous-agents d'enquête ; constat majeur : la sous-capture — carnet
+miamboost à 1 ligne vs session-state manuel de 1155 lignes). Livré (tag
+v1.5.0, commits `6ba24fe` + fix `57e634c`) :
+- provenance `par` agent/humain sur décisions/bugs, affichage ` (agent)` ;
+- CLI agent : `decide` / `bug` (création si l'argument n'est pas un id) /
+  `piege` / `question` / `answer` ; côté hook `!piege` `!question` `!answer` ;
+- tentatives des bugs ouverts réinjectées `[N tentatives, derniere: …]` ;
+- pièges préfixe **pg** (collision évitée avec les phases `p`) ;
+- questions en attente réinjectées jusqu'à réponse (`answer` = humain,
+  require_human).
+- Enquête MCP (décision Mariella après rapport) : PAS de MCP — les 8 agents
+  visés ont tous un shell, `./plantrack` équivaut à un tools/call.
+- Audit sécurité repo public (demande Mariella) : gitleaks 50 commits +
+  passe manuelle = rien ; secret scanning + push protection GitHub activés.
+- 203 checks verts.
+
+### v1.6.0 — commits rattachés au fil, guides de test cochés (2026-08-30)
+Emprunts choisis après comparaison avec les trackers SQLite maison
+(prolearn-knowledge.db reste un outil séparé ; s69 track.py et miamboost
+log.py sont des sous-ensembles de PlanTrack). Livré (tag v1.6.0, commits
+`b26abf3` + `01e5a30`) :
+- hook git **post-commit** installé D'OFFICE par init (le pre-commit
+  garde-fou reste opt-in `--git-hook`) : sous-commande `hook-commit`,
+  événement {type, sha, fil actif}, silencieux sans fil actif, jamais
+  bloquant, hook étranger préservé (bloc à coller imprimé) ; ` [N commits]`
+  sur la ligne du fil réinjectée ; `threads` montre le dernier sha ;
+- guides de test cochés derrière `!testcheck on|off` (OFF par défaut,
+  commandes refusées quand off, données conservées) : `guide` (g1),
+  `step` (s1), verdict HUMAIN `check <sid> ok|ko -m` (ko : motif
+  obligatoire, require_human côté CLI), étapes sans verdict réinjectées ;
+- **plafond pt.py relevé à 1450** (décision Mariella — 1442 lignes,
+  compression réelle faite, lisibilité préservée) ; voyant doctor du
+  post-commit rétabli.
+- Piège de test : `CLAUDE_PROJECT_DIR` exporté globalement par scenario.sh
+  pollue les commits git des tests → `env -u CLAUDE_PROJECT_DIR`.
+- 238 checks verts (203 + 35). Publiée, indexée PyPI, run Actions vert.
+
+### Session CLOSE — 2026-08-30
+Prompt de reprise : `.planning/2026-08-30-reprise-apres-v1.6.md` (autonome,
+les anciens sont purgés). En suspens éventuel : Mariella n'a pas dit si elle
+veut retirer la signature Co-Authored-By de Claude (`includeCoAuthoredBy:
+false`) — ne rien faire sans sa demande. Prochain jalon (§16 Publication)
 réduit à la démo, conditionné aux chiffres de `plantrack stats`.
