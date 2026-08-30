@@ -1007,6 +1007,8 @@ def cmd_doctor(st):
                 htxt = f.read()
         chk("pt.py precommit" in htxt, "garde-fou git pre-commit",
             "lance `plantrack init --git-hook`")
+        chk("hook-commit" in slurp(".git", "hooks", "post-commit"),
+            "hook git post-commit (journal des commits)", "lance `plantrack init`")
     if os.path.exists(LOG):
         with open(LOG, encoding="utf-8") as f:
             raw = sum(1 for l in f if l.strip())
