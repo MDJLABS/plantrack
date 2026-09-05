@@ -243,7 +243,7 @@ def context_block(st, header=True):
         if a["files"]:
             L.append("  fichiers recemment ecrits : " + ", ".join(a["files"][-CTX_MAX_FILES:]))
     else:
-        L.append("\nFIL ACTIF : aucun. Demande a l'utilisateur de faire `!focus <sujet>` avant de coder.")
+        L.append("\nFIL ACTIF : aucun. Ouvre un fil avec `!focus <sujet>` avant de coder — sans fil, aucun de tes commits n'est rattache.")
 
     parked = [t for t in st["threads"].values() if t["status"] == "parked"]
     if parked:
@@ -690,7 +690,7 @@ MD_BLOCK = """<!-- plantrack:start -->
 - Quand une décision se prend en conversation, enregistre-la toi-même : `./plantrack decide "..."` (marquée agent). Un bug repéré en passant : `./plantrack bug "..."`. Un piège technique découvert : `./plantrack piege "..."`.
 - Avant de corriger un bug : lis `./plantrack attempts <id>`, puis dépose ton hypothèse `./plantrack attempt <id> "..."` avant de coder ; une hypothèse refusée a déjà été tentée, change d'approche.
 - Une question posée à l'humain restée sans réponse : `./plantrack question "..."` — elle ressortira à chaque session jusqu'à la réponse.
-- Chaque commit est journalisé automatiquement sur le fil actif (hook post-commit).
+- Ouvre un fil AVANT de coder : `!focus <sujet>` (`!park <note>` pour changer de sujet, `!close` quand c'est fini). Chaque commit est alors journalisé automatiquement sur le fil actif (hook post-commit) ; sans fil actif, aucun commit n'est rattaché au carnet.
 - Si `!testcheck on` est actif, structure les recettes de test en guide/étapes (`./plantrack guide`, `./plantrack step`) ; tu ne poses JAMAIS le verdict toi-même, il est réservé à l'humain (`./plantrack check`).
 <!-- plantrack:end -->
 """
