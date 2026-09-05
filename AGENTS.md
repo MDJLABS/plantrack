@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t1 : surveillance des repos plantrack [8 commits]
+FIL ACTIF — t1 : surveillance des repos plantrack [9 commits]
   fichiers recemment ecrits : ../../../tmp/claude-0/-home-mariella-plantrack/25db747d-ebf4-407e-b1fe-4b9b89070138/scratchpad/carnet-deux-depots.html, ../../../tmp/claude-0/-home-mariella-plantrack/25db747d-ebf4-407e-b1fe-4b9b89070138/scratchpad/regle-manquante.html, .claude/hooks/pt.py
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
