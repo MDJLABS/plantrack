@@ -1025,8 +1025,8 @@ def cmd_doctor(st):
     else:
         print("  --  aucun journal encore (.plantrack/events.jsonl)")
     n = len(context_block(st))
-    chk(n <= CTX_MAX_CHARS, f"bloc reinjecte sous le budget ({n}/{CTX_MAX_CHARS} chars)",
-        "le bloc sera tronque — ferme des fils ou valide des bugs")
+    chk(n < CTX_MAX_CHARS, f"bloc reinjecte sous le budget ({n}/{CTX_MAX_CHARS} chars)",
+        "le bloc EST tronque, la fin ne parvient plus a l'agent — ferme des fils ou valide des bugs")
     sys.exit(1 if probs else 0)
 
 
