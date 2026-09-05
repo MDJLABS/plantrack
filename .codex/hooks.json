@@ -1,0 +1,46 @@
+{
+  "description": "PlanTrack — traduction Codex des 4 hooks (§13).",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "r=\"$(git rev-parse --show-toplevel 2>/dev/null || pwd)\"; PLANTRACK_ROOT=\"$r\" exec python3 \"$r/.claude/hooks/pt.py\" hook-prompt"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "apply_patch|Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "r=\"$(git rev-parse --show-toplevel 2>/dev/null || pwd)\"; PLANTRACK_ROOT=\"$r\" exec python3 \"$r/.claude/hooks/pt.py\" hook-filelog"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "r=\"$(git rev-parse --show-toplevel 2>/dev/null || pwd)\"; PLANTRACK_ROOT=\"$r\" exec python3 \"$r/.claude/hooks/pt.py\" hook-context"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "r=\"$(git rev-parse --show-toplevel 2>/dev/null || pwd)\"; PLANTRACK_ROOT=\"$r\" exec python3 \"$r/.claude/hooks/pt.py\" hook-precompact"
+          }
+        ]
+      }
+    ]
+  }
+}

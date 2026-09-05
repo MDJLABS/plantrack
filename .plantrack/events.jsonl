@@ -1,0 +1,2 @@
+{"ts": "2026-09-05T08:37:47+00:00", "kind": "decision", "id": "d1", "text": "Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, chacune recopiant la session entiere. Decision Mariella.", "par": "agent"}
+{"ts": "2026-09-05T08:38:14+00:00", "kind": "thread_open", "id": "t1", "text": "surveillance des repos plantrack"}

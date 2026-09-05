@@ -1015,7 +1015,7 @@ def cmd_doctor(st):
         chk(post, "hook git post-commit (journal des commits)", "lance `plantrack init`")
         if post:
             chk(bool(st["active"]), "fil actif (sinon aucun commit n'est journalise)",
-                "lance `plantrack focus <sujet>`")
+                "ouvre un fil avec `!focus <sujet>`")
     if os.path.exists(LOG):
         with open(LOG, encoding="utf-8") as f:
             raw = sum(1 for l in f if l.strip())
