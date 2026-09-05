@@ -958,6 +958,10 @@ def cmd_init(args):
         print(f".gitignore : {len(missing)} entree(s) PlanTrack ajoutee(s).")
 
     register_root()
+    if not os.path.exists(INJECTIONS):
+        os.makedirs(PT_DIR, exist_ok=True)
+        with open(INJECTIONS, "w", encoding="utf-8") as f:
+            json.dump({"_depuis": now()}, f, indent=1, sort_keys=True)
     install_post_commit_hook()
     if "--git-hook" in args:
         install_git_hook()
@@ -1089,10 +1093,12 @@ def cmd_doctor(st):
             inj = json.load(open(INJECTIONS, encoding="utf-8"))
         except ValueError:
             pass
-    detail = ", ".join(f"{k} le {v[:10]}" for k, v in sorted(inj.items())) or "jamais"
-    # une installation plus jeune que la fenetre ne prouve rien : ne pas crier au loup
-    if min((e["ts"] for e in read_events() if e.get("ts")), default="9") < old:
-        chk(max(inj.values(), default="") >= old, f"etat reellement injecte ({detail})",
+    seen = {k: v for k, v in inj.items() if not k.startswith("_")}
+    detail = ", ".join(f"{k} le {v[:10]}" for k, v in sorted(seen.items())) or "jamais"
+    # la fenetre part de la pose de la trace : un depot mis a niveau hier n'a pas
+    # encore eu l'occasion de prouver quoi que ce soit
+    if inj.get("_depuis", "9") < old:
+        chk(max(seen.values(), default="") >= old, f"etat reellement injecte ({detail})",
             f"aucun agent n'a recu l'etat depuis {STALE_DAYS} jours — hooks declares mais "
             "jamais approuves ? (Codex : lance `/hooks`)")
     else:
@@ -1161,12 +1167,15 @@ def cmd_doctor_all():
     roots = registered_roots()
     if not roots:
         sys.exit("[PlanTrack] aucun depot enregistre — lance `plantrack init` dans chacun.")
-    bad = 0
+    bad, gone = 0, []
     for r in roots:
         core = os.path.join(r, ".claude", "hooks", "pt.py")
+        if not os.path.isdir(r):
+            gone.append(r)  # depot efface : l'entree n'a plus de sens, on la retire
+            continue
         if not os.path.exists(core):
             bad += 1
-            print(f"!!  {r} — installation absente (depot deplace ou supprime ?)")
+            print(f"!!  {r} — installation absente — relance `plantrack init` ici")
             continue
         env = dict(os.environ, PLANTRACK_ROOT=r, CLAUDE_PROJECT_DIR=r)
         p = subprocess.run([sys.executable, core, "doctor"], capture_output=True, text=True, env=env)
@@ -1175,7 +1184,11 @@ def cmd_doctor_all():
         print(f"{'!!' if ko else 'ok'}  {r}" + (f" — {len(ko)} probleme(s)" if ko else ""))
         for l in ko:
             print("      " + l)
-    print(f"\n{len(roots)} depot(s), {bad} en defaut.")
+    if gone:
+        with open(REGISTRY, "w", encoding="utf-8") as f:
+            f.write("".join(x + "\n" for x in roots if x not in gone))
+        print(f"\n{len(gone)} depot(s) efface(s) retire(s) du registre.")
+    print(f"\n{len(roots) - len(gone)} depot(s), {bad} en defaut.")
     sys.exit(1 if bad else 0)
 
 

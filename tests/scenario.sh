@@ -600,7 +600,12 @@ check "doctor --all compte les depots en defaut" "en defaut" "$out"
 check_exit "doctor --all sort en erreur si un depot deraille" 1 "$rc"
 echo "/tmp/depot-plantrack-inexistant" >> "$PLANTRACK_REGISTRY"
 out=$(python3 "$PT" doctor --all 2>&1 || true)
-check "doctor --all signale un depot disparu" "installation absente" "$out"
+check "doctor --all retire du registre un depot efface" "1 depot(s) efface(s) retire(s)" "$out"
+check_not "et l entree ne revient pas" "depot-plantrack-inexistant" "$(cat "$PLANTRACK_REGISTRY")"
+TMP20=$(mktemp -d); echo "$TMP20" >> "$PLANTRACK_REGISTRY"
+out=$(python3 "$PT" doctor --all 2>&1 || true)
+check "un depot present mais desinstalle est signale, pas efface" "installation absente" "$out"
+rm -rf "$TMP20"
 rm -rf "$TMP18"
 
 # 30d. v1.7.1 — instantane de l'etat dans AGENTS.md, pour les agents sans hooks
