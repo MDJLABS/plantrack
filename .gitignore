@@ -4,3 +4,4 @@ backup/
 build/
 *.egg-info/
 __pycache__/
+.plantrack/injections.json

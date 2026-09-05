@@ -603,7 +603,28 @@ out=$(python3 "$PT" doctor --all 2>&1 || true)
 check "doctor --all signale un depot disparu" "installation absente" "$out"
 rm -rf "$TMP18"
 
-# 30d. v1.7 — les regles sont injectees hors budget, jamais tronquees
+# 30d. v1.7.1 — instantane de l'etat dans AGENTS.md, pour les agents sans hooks
+TMP19=$(mktemp -d)
+git -C "$TMP19" init -q
+CLAUDE_PROJECT_DIR="$TMP19" python3 "$PT" init >/dev/null 2>&1
+check "init pose les marqueurs d etat dans AGENTS.md" "<!-- plantrack:state -->" "$(cat "$TMP19/AGENTS.md")"
+CLAUDE_PROJECT_DIR="$TMP19" python3 "$PT" decide "le carnet fait foi" >/dev/null 2>&1
+echo x > "$TMP19/f.txt"; git -C "$TMP19" add f.txt
+(cd "$TMP19" && env -u CLAUDE_PROJECT_DIR git -c user.name=t -c user.email=t@t commit -q -m "feat: x")
+out=$(cat "$TMP19/AGENTS.md")
+check "le post-commit rafraichit l instantane, quel que soit l agent" "le carnet fait foi" "$out"
+check "l instantane porte le fil ouvert d office" "travaux sur" "$out"
+check_not "l instantane ne duplique pas les regles deja presentes au-dessus" "REGLES PLANTRACK" "$out"
+n=$(grep -c "plantrack:state" "$TMP19/AGENTS.md")
+check "un seul jeu de marqueurs d etat apres rafraichissement" "2" "$n"
+check "injections.json est gitignore (propre a la machine)" "injections.json" "$(cat "$TMP19/.gitignore")"
+out=$(printf '{"source":"startup"}' | CLAUDE_PROJECT_DIR="$TMP19" python3 "$PT" hook-context >/dev/null 2>&1; cat "$TMP19/.plantrack/injections.json")
+check "hook-context laisse une trace horodatee de l injection" "claude" "$out"
+out=$(CLAUDE_PROJECT_DIR="$TMP19" python3 "$PT" doctor 2>&1 || true)
+check "doctor rend compte de l injection reelle" "etat injecte (claude le" "$out"
+rm -rf "$TMP19"
+
+# 30e. v1.7 — les regles sont injectees hors budget, jamais tronquees
 out=$(ctx compact)
 check "les regles sont reinjectees avec l etat" "REGLES PLANTRACK" "$out"
 check "et portent la regle du verdict humain" "Tu ne valides jamais un bug toi-même" "$out"

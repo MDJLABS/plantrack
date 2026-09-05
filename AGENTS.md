@@ -10,3 +10,14 @@
 - Ouvre un fil AVANT de coder : `!focus <sujet>` (`!park <note>` pour changer de sujet, `!close` quand c'est fini). Chaque commit est journalisé sur le fil actif ; à défaut de fil, PlanTrack en ouvre un d'office au nom de la branche — nomme-le toi-même, c'est plus utile.
 - Si `!testcheck on` est actif, structure les recettes de test en guide/étapes (`./plantrack guide`, `./plantrack step`) ; tu ne poses JAMAIS le verdict toi-même, il est réservé à l'humain (`./plantrack check`).
 <!-- plantrack:end -->
+<!-- plantrack:state -->
+<!-- genere par plantrack a chaque commit — ne pas editer a la main -->
+```
+
+FIL ACTIF — t1 : surveillance des repos plantrack [6 commits]
+  fichiers recemment ecrits : ../../../tmp/claude-0/-home-mariella-plantrack/25db747d-ebf4-407e-b1fe-4b9b89070138/scratchpad/carnet-deux-depots.html, ../../../tmp/claude-0/-home-mariella-plantrack/25db747d-ebf4-407e-b1fe-4b9b89070138/scratchpad/regle-manquante.html, .claude/hooks/pt.py
+
+DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
+  d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
+```
+<!-- plantrack:state-end -->

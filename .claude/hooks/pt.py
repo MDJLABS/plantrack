@@ -58,6 +58,7 @@ LOG = os.path.join(PT_DIR, "events.jsonl")
 ARCHIVE = os.path.join(PT_DIR, "transcripts")
 # registre des depots installes : personne n'ira lancer doctor dans vingt repos
 REGISTRY = os.environ.get("PLANTRACK_REGISTRY") or os.path.expanduser("~/.plantrack-repos")
+INJECTIONS = os.path.join(PT_DIR, "injections.json")
 
 
 # ---------------------------------------------------------------------- journal
@@ -251,7 +252,7 @@ def trunc(s, n=LINE_TRUNC):
 
 # ------------------------------------------------------------- bloc de contexte
 
-def context_block(st, header=True):
+def context_block(st, header=True, rules=True):
     L = []
     if header:
         L.append("== PlanTrack — etat persistant du projet ==")
@@ -329,6 +330,8 @@ def context_block(st, header=True):
         out = out[:CTX_MAX_CHARS - len(suffix)] + suffix
     # les regles sont ajoutees APRES la troncature : l'etat peut deborder, les
     # regles jamais — c'est le seul canal qu'aucun outil tiers ne peut ecraser
+    if not rules:
+        return out
     return out + "\n\nREGLES PLANTRACK (elles priment sur ta memoire de la conversation) :\n" + RULES.rstrip()
 
 
@@ -622,9 +625,25 @@ def hook_filelog():
     sys.exit(0)
 
 
+def note_injection():
+    """Un hook declare mais jamais approuve (Codex : /hooks) est indiscernable
+    d'un hook qui tourne. Cette trace, par agent, rend la difference visible."""
+    who = next(("codex" if e.startswith("CODEX") else "claude"
+                for e in AGENT_ENV if os.environ.get(e)), "autre")
+    try:
+        d = json.load(open(INJECTIONS, encoding="utf-8")) if os.path.exists(INJECTIONS) else {}
+        d[who] = now()
+        os.makedirs(PT_DIR, exist_ok=True)
+        with open(INJECTIONS, "w", encoding="utf-8") as f:
+            json.dump(d, f, indent=1, sort_keys=True)
+    except (OSError, ValueError):
+        pass
+
+
 def hook_context():
     """SessionStart. stdout est injecte comme contexte visible par l'agent."""
     data = read_hook_input()
+    note_injection()
     src = data.get("source", "startup")
     st = project()
     if not any([st["threads"], st["bugs"], st["decisions"], st["inbox"],
@@ -653,6 +672,7 @@ def hook_commit():
         append("thread_open", id=tid, text=f"travaux sur {branch()}", auto=1)
     m = re.match(r"^([a-zA-Z]+)(\(.+\))?!?:", subject)
     append("commit", sha=sha, ctype=m.group(1).lower() if m else "commit", thread=tid)
+    write_state_block(project())
     sys.exit(0)
 
 
@@ -716,7 +736,9 @@ CODEX_HOOKS = {"description": "PlanTrack — traduction Codex des 4 hooks (§13)
     "PreCompact": [{"hooks": [{"type": "command", "command": _codex_cmd("hook-precompact")}]}],
 }}
 
-MD_BLOCK = ("<!-- plantrack:start -->\n## PlanTrack\n" + RULES + "<!-- plantrack:end -->\n")
+MD_START, MD_END = "<!-- plantrack:start -->", "<!-- plantrack:end -->"
+STATE_START, STATE_END = "<!-- plantrack:state -->", "<!-- plantrack:state-end -->"
+MD_BLOCK = MD_START + "\n## PlanTrack\n" + RULES + MD_END + "\n"
 
 # CLAUDE.md et GEMINI.md n'ont qu'une ligne d'import : le bloc complet vit dans
 # AGENTS.md (standard cross-agents), source unique — Claude Code et Gemini CLI
@@ -735,7 +757,7 @@ description: État persistant du projet (fils de travail, décisions actées, bu
 
 **Important : lis le bloc « PlanTrack » du fichier `AGENTS.md` à la racine du projet et applique ses consignes.** C'est la source unique des règles PlanTrack.
 
-Particularité ici (pas de hooks, donc pas d'injection automatique) : lance `./plantrack status` en début de tâche pour lire l'état persistant, et refais-le après toute compaction du contexte.
+Particularité ici (pas de hooks, donc pas d'injection automatique) : l'état persistant du projet est écrit **dans `AGENTS.md` même**, entre les marqueurs `plantrack:state` — il est rafraîchi à chaque commit, quel que soit l'agent. Lis-le. Pour la version à la seconde près (ou après une compaction du contexte), lance `./plantrack status`.
 """
 
 
@@ -754,7 +776,8 @@ def write_owned_file(path, content, label):
     print(f"{label} {'mis a jour' if existing is not None else 'ecrit'}.")
 
 
-def write_md_block(name, block):
+def write_md_block(name, block, start=MD_START, end=MD_END,
+                   label="bloc d'instructions", quiet=False):
     """Insere le bloc entre marqueurs dans ROOT/name (cree le fichier au besoin) ;
     si les marqueurs existent deja, remplace leur contenu (mise a niveau)."""
     path = os.path.join(ROOT, name)
@@ -762,20 +785,33 @@ def write_md_block(name, block):
     if os.path.exists(path):
         with open(path, encoding="utf-8") as f:
             existing = f.read()
-    start, end = "<!-- plantrack:start -->", "<!-- plantrack:end -->"
     if start in existing and end in existing.split(start, 1)[1]:
         pre, rest = existing.split(start, 1)
         updated = pre + block.strip("\n") + rest.split(end, 1)[1]
         if updated == existing:
-            print(f"bloc d'instructions a jour dans {name}.")
+            if not quiet:
+                print(f"{label} a jour dans {name}.")
             return
         with open(path, "w", encoding="utf-8") as f:
             f.write(updated)
-        print(f"bloc d'instructions mis a jour dans {name}.")
+        if not quiet:
+            print(f"{label} mis a jour dans {name}.")
     else:
         with open(path, "a", encoding="utf-8") as f:
             f.write(("\n" if existing and not existing.endswith("\n") else "") + block)
-        print(f"bloc d'instructions insere dans {name}.")
+        if not quiet:
+            print(f"{label} insere dans {name}.")
+
+
+def write_state_block(st, quiet=True):
+    """Instantane de l'etat dans AGENTS.md. C'est le seul canal qu'un agent sans
+    hooks (Deep Code) lit de toute facon, et il est regenere par le post-commit
+    git : peu importe quel agent a commite, l'etat suit."""
+    if not os.path.exists(os.path.join(ROOT, "AGENTS.md")):
+        return
+    body = (f"{STATE_START}\n<!-- genere par plantrack a chaque commit — ne pas editer a la main -->\n"
+            f"```\n{context_block(st, header=False, rules=False)}\n```\n{STATE_END}\n")
+    write_md_block("AGENTS.md", body, STATE_START, STATE_END, "instantane de l'etat", quiet)
 
 
 def install_git_hook():
@@ -900,6 +936,7 @@ def cmd_init(args):
     # cross-agents, source unique), une ligne d'import @AGENTS.md dans
     # CLAUDE.md et GEMINI.md — chaque agent, present ou futur, le trouve
     write_md_block("AGENTS.md", MD_BLOCK)
+    write_state_block(project(), quiet=False)
     for name in ("CLAUDE.md", "GEMINI.md"):
         write_md_block(name, REF_BLOCK)
     write_owned_file(os.path.join(ROOT, ".deepcode", "skills", "plantrack", "SKILL.md"),
@@ -907,15 +944,18 @@ def cmd_init(args):
 
     # 5. transcripts gitignores
     gi = os.path.join(ROOT, ".gitignore")
-    line = ".plantrack/transcripts/"
     content = ""
     if os.path.exists(gi):
         with open(gi, encoding="utf-8") as f:
             content = f.read()
-    if line not in content:
+    # transcripts : trop lourds ; injections : propres a la machine
+    missing = [l for l in (".plantrack/transcripts/", ".plantrack/injections.json")
+               if l not in content]
+    if missing:
         with open(gi, "a", encoding="utf-8") as f:
-            f.write(("\n" if content and not content.endswith("\n") else "") + line + "\n")
-        print(".gitignore : transcripts exclus.")
+            f.write(("\n" if content and not content.endswith("\n") else "")
+                    + "\n".join(missing) + "\n")
+        print(f".gitignore : {len(missing)} entree(s) PlanTrack ajoutee(s).")
 
     register_root()
     install_post_commit_hook()
@@ -1038,8 +1078,25 @@ def cmd_doctor(st):
     for h in ("hook-prompt", "hook-filelog", "hook-context", "hook-precompact"):
         chk(h in ctxt, f"hook {h} declare dans .codex/hooks.json",
             "lance `plantrack init`")
-    chk("<!-- plantrack:start -->" in slurp("AGENTS.md"), "bloc d'instructions dans AGENTS.md",
+    chk(MD_START in slurp("AGENTS.md"), "bloc d'instructions dans AGENTS.md",
         "lance `plantrack init`")
+    chk(STATE_START in slurp("AGENTS.md"), "instantane de l'etat dans AGENTS.md",
+        "sans lui, un agent sans hooks (Deep Code) ne voit rien — lance `plantrack init`")
+    old = (datetime.now(timezone.utc) - timedelta(days=STALE_DAYS)).isoformat(timespec="seconds")
+    inj = {}
+    if os.path.exists(INJECTIONS):
+        try:
+            inj = json.load(open(INJECTIONS, encoding="utf-8"))
+        except ValueError:
+            pass
+    detail = ", ".join(f"{k} le {v[:10]}" for k, v in sorted(inj.items())) or "jamais"
+    # une installation plus jeune que la fenetre ne prouve rien : ne pas crier au loup
+    if min((e["ts"] for e in read_events() if e.get("ts")), default="9") < old:
+        chk(max(inj.values(), default="") >= old, f"etat reellement injecte ({detail})",
+            f"aucun agent n'a recu l'etat depuis {STALE_DAYS} jours — hooks declares mais "
+            "jamais approuves ? (Codex : lance `/hooks`)")
+    else:
+        print(f"  --  etat injecte ({detail}) — installation trop recente pour juger")
     for name in ("CLAUDE.md", "GEMINI.md"):
         # un outil qui regenere ces fichiers (GSD...) peut faire sauter la reference
         chk("@AGENTS.md" in slurp(name), f"ligne d'import @AGENTS.md dans {name}",
@@ -1069,7 +1126,6 @@ def cmd_doctor(st):
             f"{raw - parsed} ligne(s) corrompue(s) ignoree(s) au rejeu")
     else:
         print("  --  aucun journal encore (.plantrack/events.jsonl)")
-    old = (datetime.now(timezone.utc) - timedelta(days=STALE_DAYS)).isoformat(timespec="seconds")
     stale = [b for b in st["bugs"].values()
              if b["status"] == "to_verify" and b.get("status_ts", b["ts"]) < old]
     chk(not stale, f"bugs en attente de verdict humain ({len(stale)} depuis plus de {STALE_DAYS} jours)",
