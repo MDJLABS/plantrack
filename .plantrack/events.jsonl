@@ -15,3 +15,5 @@
 {"ts": "2026-09-05T09:20:15+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t1"}
 {"ts": "2026-09-05T09:20:27+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t1"}
 {"ts": "2026-09-05T09:25:09+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t1"}
+{"ts": "2026-09-05T09:25:56+00:00", "kind": "commit", "sha": "2671941", "ctype": "feat", "thread": "t1"}
+{"ts": "2026-09-05T09:29:00+00:00", "kind": "commit", "sha": "b30c6e2", "ctype": "chore", "thread": "t1"}
