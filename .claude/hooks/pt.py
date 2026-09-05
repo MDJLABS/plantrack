@@ -34,12 +34,30 @@ CTX_MAX_PIEGES = 6
 CTX_MAX_QUESTIONS = 6
 LINE_TRUNC = 140
 MAX_ARCHIVES = 5              # transcripts gardes : chacun pese la session entiere
+STALE_DAYS = 7                # au-dela, un bug sans verdict humain est un oubli
+USAGE_DAYS = 30               # fenetre du controle d'usage (commits vs journal)
+
+# Source unique des regles : elles vivent ici, sont ecrites dans AGENTS.md (agents
+# sans hooks) ET reinjectees hors budget a chaque session — un outil tiers peut
+# regenerer un fichier de consignes, il ne peut pas toucher au bloc injecte.
+RULES = """- L'état du projet t'est injecté automatiquement en début de session et après chaque compaction. Fie-toi à ce bloc, pas à ta mémoire de la conversation.
+- Ne réimplémente jamais ce qui figure sous DECISIONS ACTEES.
+- Ne modifie pas les fichiers d'un fil en pause.
+- Après correction d'un bug : consigne la tentative, puis passe-le en "to_verify". Tu ne valides jamais un bug toi-même.
+- Quand une décision se prend en conversation, enregistre-la toi-même : `./plantrack decide "..."` (marquée agent). Un bug repéré en passant : `./plantrack bug "..."`. Un piège technique découvert : `./plantrack piege "..."`.
+- Avant de corriger un bug : lis `./plantrack attempts <id>`, puis dépose ton hypothèse `./plantrack attempt <id> "..."` avant de coder ; une hypothèse refusée a déjà été tentée, change d'approche.
+- Une question posée à l'humain restée sans réponse : `./plantrack question "..."` — elle ressortira à chaque session jusqu'à la réponse.
+- Ouvre un fil AVANT de coder : `!focus <sujet>` (`!park <note>` pour changer de sujet, `!close` quand c'est fini). Chaque commit est journalisé sur le fil actif ; à défaut de fil, PlanTrack en ouvre un d'office au nom de la branche — nomme-le toi-même, c'est plus utile.
+- Si `!testcheck on` est actif, structure les recettes de test en guide/étapes (`./plantrack guide`, `./plantrack step`) ; tu ne poses JAMAIS le verdict toi-même, il est réservé à l'humain (`./plantrack check`).
+"""
 
 ROOT = (os.environ.get("CLAUDE_PROJECT_DIR") or os.environ.get("PLANTRACK_ROOT")
         or os.getcwd())
 PT_DIR = os.path.join(ROOT, ".plantrack")
 LOG = os.path.join(PT_DIR, "events.jsonl")
 ARCHIVE = os.path.join(PT_DIR, "transcripts")
+# registre des depots installes : personne n'ira lancer doctor dans vingt repos
+REGISTRY = os.environ.get("PLANTRACK_REGISTRY") or os.path.expanduser("~/.plantrack-repos")
 
 
 # ---------------------------------------------------------------------- journal
@@ -92,6 +110,7 @@ def project():
             st["threads"][ev["id"]] = {
                 "id": ev["id"], "label": ev.get("text", ""), "status": "active",
                 "note": "", "files": [], "ts": ev["ts"], "task": ev.get("task"), "commits": [],
+                "auto": bool(ev.get("auto")),
             }
             st["active"] = ev["id"]
         elif k == "focus":
@@ -130,7 +149,7 @@ def project():
         elif k == "bug_status":
             b = st["bugs"].get(ev["id"])
             if b:
-                b["status"] = ev.get("status", b["status"])
+                b["status"], b["status_ts"] = ev.get("status", b["status"]), ev["ts"]
                 if ev.get("text"):
                     b["notes"].append(ev["text"])
                     # un rejet motive s'attache a la derniere tentative (§9)
@@ -216,6 +235,15 @@ def open_threads(st):
     return [t for t in st["threads"].values() if t["status"] in ("active", "parked")]
 
 
+def branch():
+    """Nom de la branche courante, lu sans git (le hook doit rester instantane)."""
+    try:
+        head = open(os.path.join(ROOT, ".git", "HEAD"), encoding="utf-8").read().strip()
+    except OSError:
+        return "le depot"
+    return head.rsplit("/", 1)[-1] if head.startswith("ref:") else "un commit detache"
+
+
 def trunc(s, n=LINE_TRUNC):
     s = " ".join(str(s).split())
     return s if len(s) <= n else s[: n - 1] + "\u2026"
@@ -240,6 +268,8 @@ def context_block(st, header=True):
         tag = f" [{a['task']}]" if a.get("task") else ""
         ctag = f" [{len(a['commits'])} commits]" if a.get("commits") else ""
         L.append(f"\nFIL ACTIF — {a['id']}{tag} : {trunc(a['label'])}{ctag}")
+        if a.get("auto"):
+            L.append("  (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)")
         if a["files"]:
             L.append("  fichiers recemment ecrits : " + ", ".join(a["files"][-CTX_MAX_FILES:]))
     else:
@@ -293,16 +323,13 @@ def context_block(st, header=True):
     if st["inbox"]:
         L.append(f"\nINBOX NON CLASSEE : {len(st['inbox'])} element(s), voir `plantrack inbox`.")
 
-    L.append(
-        "\nREGLES : tu ne valides jamais un bug toi-meme (statut maximum : to_verify). "
-        "Tu ne reimplementes rien qui figure sous DECISIONS ACTEES. "
-        "Tu ne modifies pas les fichiers d'un fil en pause."
-    )
     out = "\n".join(L)
     if len(out) > CTX_MAX_CHARS:
         suffix = "\n[...tronque — budget de contexte atteint]"
         out = out[:CTX_MAX_CHARS - len(suffix)] + suffix
-    return out
+    # les regles sont ajoutees APRES la troncature : l'etat peut deborder, les
+    # regles jamais — c'est le seul canal qu'aucun outil tiers ne peut ecraser
+    return out + "\n\nREGLES PLANTRACK (elles priment sur ta memoire de la conversation) :\n" + RULES.rstrip()
 
 
 # ---------------------------------------------------------------------- commandes
@@ -543,7 +570,7 @@ CLI humaine : plantrack status | bugs | inbox | verify <id> | reject <id> -m ...
               plantrack testcheck on|off | guide <titre>|<id> | step <id> <texte> | check <id> ok|ko [-m motif]
               plantrack init [--git-hook]   installation vendoree (tous agents, + hook post-commit d'office)
               uvx plantrack@latest update   mise a jour d'une installation existante
-              plantrack doctor   verifie l'installation | plantrack stats   usage sur 14 jours"""
+              plantrack doctor [--all]   verifie l'installation et l'usage reel | plantrack stats   usage sur 14 jours"""
 
 
 # -------------------------------------------------------------------------- hooks
@@ -611,13 +638,21 @@ def hook_context():
 
 def hook_commit():
     """post-commit git (sha/sujet passes en argv par le hook shell) : journalise
-    {type, sha, fil actif} ; silencieux sans fil actif, jamais bloquant."""
+    {type, sha, fil actif}. Sans fil actif, il en ouvre un d'office au nom de la
+    branche : un commit perdu ne se rattrape pas, un fil mal nomme se renomme.
+    Jamais bloquant."""
     st = project()
-    if not st["active"] or len(sys.argv) < 4:
+    if len(sys.argv) < 4:
         sys.exit(0)
     sha, subject = sys.argv[2], sys.argv[3]
+    tid = st["active"]
+    if not tid:
+        if len(open_threads(st)) >= MAX_OPEN_THREADS:
+            sys.exit(0)  # le garde-fou des fils ouverts prime : rien d'automatique
+        tid = next_id("t")
+        append("thread_open", id=tid, text=f"travaux sur {branch()}", auto=1)
     m = re.match(r"^([a-zA-Z]+)(\(.+\))?!?:", subject)
-    append("commit", sha=sha, ctype=m.group(1).lower() if m else "commit", thread=st["active"])
+    append("commit", sha=sha, ctype=m.group(1).lower() if m else "commit", thread=tid)
     sys.exit(0)
 
 
@@ -681,19 +716,7 @@ CODEX_HOOKS = {"description": "PlanTrack — traduction Codex des 4 hooks (§13)
     "PreCompact": [{"hooks": [{"type": "command", "command": _codex_cmd("hook-precompact")}]}],
 }}
 
-MD_BLOCK = """<!-- plantrack:start -->
-## PlanTrack
-- L'état du projet t'est injecté automatiquement en début de session et après chaque compaction. Fie-toi à ce bloc, pas à ta mémoire de la conversation.
-- Ne réimplémente jamais ce qui figure sous DECISIONS ACTEES.
-- Ne modifie pas les fichiers d'un fil en pause.
-- Après correction d'un bug : consigne la tentative, puis passe-le en "to_verify". Tu ne valides jamais un bug toi-même.
-- Quand une décision se prend en conversation, enregistre-la toi-même : `./plantrack decide "..."` (marquée agent). Un bug repéré en passant : `./plantrack bug "..."`. Un piège technique découvert : `./plantrack piege "..."`.
-- Avant de corriger un bug : lis `./plantrack attempts <id>`, puis dépose ton hypothèse `./plantrack attempt <id> "..."` avant de coder ; une hypothèse refusée a déjà été tentée, change d'approche.
-- Une question posée à l'humain restée sans réponse : `./plantrack question "..."` — elle ressortira à chaque session jusqu'à la réponse.
-- Ouvre un fil AVANT de coder : `!focus <sujet>` (`!park <note>` pour changer de sujet, `!close` quand c'est fini). Chaque commit est alors journalisé automatiquement sur le fil actif (hook post-commit) ; sans fil actif, aucun commit n'est rattaché au carnet.
-- Si `!testcheck on` est actif, structure les recettes de test en guide/étapes (`./plantrack guide`, `./plantrack step`) ; tu ne poses JAMAIS le verdict toi-même, il est réservé à l'humain (`./plantrack check`).
-<!-- plantrack:end -->
-"""
+MD_BLOCK = ("<!-- plantrack:start -->\n## PlanTrack\n" + RULES + "<!-- plantrack:end -->\n")
 
 # CLAUDE.md et GEMINI.md n'ont qu'une ligne d'import : le bloc complet vit dans
 # AGENTS.md (standard cross-agents), source unique — Claude Code et Gemini CLI
@@ -894,6 +917,7 @@ def cmd_init(args):
             f.write(("\n" if content and not content.endswith("\n") else "") + line + "\n")
         print(".gitignore : transcripts exclus.")
 
+    register_root()
     install_post_commit_hook()
     if "--git-hook" in args:
         install_git_hook()
@@ -969,8 +993,28 @@ def cmd_precommit():
     sys.exit(0)
 
 
+def usage_gap(days=USAGE_DAYS):
+    """Commits reellement faits vs commits arrives au carnet. Le controle
+    d'installation ne voit pas un depot vert et muet ; celui-la si."""
+    evs = read_events()
+    stamps = [e["ts"] for e in evs if e.get("ts")]
+    if not stamps:
+        return None
+    # la fenetre ne remonte jamais avant l'installation : les commits d'avant ne
+    # pouvaient pas etre journalises, les compter serait un faux positif garanti
+    since = max((datetime.now(timezone.utc) - timedelta(days=days)).isoformat(timespec="seconds"),
+                min(stamps))
+    jc = sum(1 for e in evs if e.get("kind") == "commit" and e["ts"] >= since)
+    try:
+        r = subprocess.run(["git", "-C", ROOT, "log", f"--since={since}", "--pretty=%h"],
+                           capture_output=True, text=True, timeout=10)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    return jc, len(r.stdout.split()), since[:10]
+
+
 def cmd_doctor(st):
-    """§12 : hooks installes, journal lisible, budget de contexte."""
+    """§12 : hooks installes, journal lisible, budget de contexte, usage reel."""
     probs = 0
 
     def chk(good, label, fix=""):
@@ -1013,9 +1057,10 @@ def cmd_doctor(st):
             if htxt else "lance `plantrack init --git-hook`")
         post = "hook-commit" in slurp(".git", "hooks", "post-commit")
         chk(post, "hook git post-commit (journal des commits)", "lance `plantrack init`")
-        if post:
-            chk(bool(st["active"]), "fil actif (sinon aucun commit n'est journalise)",
-                "ouvre un fil avec `!focus <sujet>`")
+        if post and (u := usage_gap()):
+            chk(u[0] >= u[1], f"commits arrives au carnet ({u[0]}/{u[1]} depuis le {u[2]})",
+                f"{u[1] - u[0]} commit(s) hors du carnet — hook post-commit muet, "
+                "ou depassement du plafond de fils ouverts")
     if os.path.exists(LOG):
         with open(LOG, encoding="utf-8") as f:
             raw = sum(1 for l in f if l.strip())
@@ -1024,10 +1069,58 @@ def cmd_doctor(st):
             f"{raw - parsed} ligne(s) corrompue(s) ignoree(s) au rejeu")
     else:
         print("  --  aucun journal encore (.plantrack/events.jsonl)")
-    n = len(context_block(st))
-    chk(n < CTX_MAX_CHARS, f"bloc reinjecte sous le budget ({n}/{CTX_MAX_CHARS} chars)",
+    old = (datetime.now(timezone.utc) - timedelta(days=STALE_DAYS)).isoformat(timespec="seconds")
+    stale = [b for b in st["bugs"].values()
+             if b["status"] == "to_verify" and b.get("status_ts", b["ts"]) < old]
+    chk(not stale, f"bugs en attente de verdict humain ({len(stale)} depuis plus de {STALE_DAYS} jours)",
+        "l'agent a fini, personne n'a tranche : `plantrack verify <id>` ou `plantrack reject <id> \"motif\"` — "
+        + ", ".join(b["id"] for b in stale[:6]))
+    n = len(context_block(st)) - len(RULES)
+    chk(n < CTX_MAX_CHARS, f"etat reinjecte sous le budget ({n}/{CTX_MAX_CHARS} chars)",
         "le bloc EST tronque, la fin ne parvient plus a l'agent — ferme des fils ou valide des bugs")
     sys.exit(1 if probs else 0)
+
+
+def registered_roots():
+    if not os.path.exists(REGISTRY):
+        return []
+    with open(REGISTRY, encoding="utf-8") as f:
+        return [r for r in dict.fromkeys(l.strip() for l in f) if r]
+
+
+def register_root():
+    """Inscrit le depot au registre a l'installation — sans lui, `doctor --all`
+    n'aurait rien a parcourir et chaque depot resterait a verifier a la main."""
+    try:
+        if ROOT not in registered_roots():
+            with open(REGISTRY, "a", encoding="utf-8") as f:
+                f.write(ROOT + "\n")
+            print(f"depot inscrit au registre ({REGISTRY}) — visible dans `plantrack doctor --all`.")
+    except OSError:
+        pass
+
+
+def cmd_doctor_all():
+    """Un ecran pour toute la flotte : ou ca deraille, sans entrer dans les depots."""
+    roots = registered_roots()
+    if not roots:
+        sys.exit("[PlanTrack] aucun depot enregistre — lance `plantrack init` dans chacun.")
+    bad = 0
+    for r in roots:
+        core = os.path.join(r, ".claude", "hooks", "pt.py")
+        if not os.path.exists(core):
+            bad += 1
+            print(f"!!  {r} — installation absente (depot deplace ou supprime ?)")
+            continue
+        env = dict(os.environ, PLANTRACK_ROOT=r, CLAUDE_PROJECT_DIR=r)
+        p = subprocess.run([sys.executable, core, "doctor"], capture_output=True, text=True, env=env)
+        ko = [l.strip() for l in p.stdout.splitlines() if l.startswith("  !!")]
+        bad += bool(ko)
+        print(f"{'!!' if ko else 'ok'}  {r}" + (f" — {len(ko)} probleme(s)" if ko else ""))
+        for l in ko:
+            print("      " + l)
+    print(f"\n{len(roots)} depot(s), {bad} en defaut.")
+    sys.exit(1 if bad else 0)
 
 
 def cmd_stats():
@@ -1303,7 +1396,7 @@ def cli(argv):
     elif cmd == "precommit":
         cmd_precommit()
     elif cmd == "doctor":
-        cmd_doctor(st)
+        cmd_doctor_all() if "--all" in args else cmd_doctor(st)
     elif cmd == "stats":
         cmd_stats()
     elif cmd == "bugs":

@@ -10,6 +10,7 @@ export CLAUDE_PROJECT_DIR="$TMP"
 # Le scenario doit rendre le meme verdict partout (CI, cron, poste nu) :
 # l'environnement agent est pose explicitement, jamais herite de la session.
 export CLAUDECODE=1
+export PLANTRACK_REGISTRY="$TMP/registry"
 fail=0
 
 check() { # check <description> <sous-chaine attendue> <sortie>
@@ -122,6 +123,13 @@ echo v2 > "$TMP/libre.txt"
 git -C "$TMP" add libre.txt
 out=$(cd "$TMP" && git -c user.name=t -c user.email=t@t commit -q -m y 2>&1); rc=$?
 check_exit "commit d un fichier libre passe" 0 "$rc"
+
+# 10b. v1.7 — sans fil actif, le commit ouvre un fil d'office au lieu d'etre perdu
+out=$(H threads)
+check "un commit sans fil ouvre un fil d office" "travaux sur" "$out"
+out=$(ctx startup)
+check "le bloc signale que ce fil attend son vrai nom" "ouvert d'office" "$out"
+prompt '!close' >/dev/null
 out=$(cd "$TMP" && python3 "$PT" init --git-hook 2>&1); rc=$?
 check "init refuse d ecraser un pre-commit existant" "existe deja" "$out"
 
@@ -266,8 +274,8 @@ check "le signal de boucle nomme le bug" "b4" "$out"
 out=$(prompt '!close')
 check "!close ferme le fil actif" "ferme" "$out"
 out=$(prompt '!focus nettoyage css')
-check "!close libere l ouverture d un nouveau fil" "nouveau fil t3" "$out"
-out=$(H close t3)
+check "!close libere l ouverture d un nouveau fil" "nouveau fil t4" "$out"
+out=$(H close t4)
 check "plantrack close ferme un fil par id" "ferme" "$out"
 H task add p1 Page profil >/dev/null
 python3 "$PT" task start k6 >/dev/null 2>&1
@@ -565,10 +573,40 @@ printf '{"prompt":"!close"}' | CLAUDE_PROJECT_DIR="$TMP15" python3 "$PT" hook-pr
 echo y > "$TMP15/g.txt"
 git -C "$TMP15" add g.txt
 out=$(cd "$TMP15" && env -u CLAUDE_PROJECT_DIR git -c user.name=t -c user.email=t@t commit -q -m "second commit sans fil" 2>&1); rc=$?
-check_exit "commit sans fil actif passe silencieusement" 0 "$rc"
+check_exit "commit sans fil actif passe (jamais bloquant)" 0 "$rc"
 out=$(CLAUDE_PROJECT_DIR="$TMP15" python3 "$PT" threads 2>&1)
-check "aucun commit ajoute sans fil actif" "commits : 1" "$out"
+check "le fil ferme ne recupere pas le commit" "commits : 1" "$out"
+check "un fil d office prend le relais, nomme d apres la branche" "travaux sur" "$out"
+out=$(CLAUDE_PROJECT_DIR="$TMP15" python3 "$PT" doctor 2>&1 || true)
+check "doctor mesure l usage : tous les commits sont arrives au carnet" "ok  commits arrives au carnet (2/2 depuis" "$out"
 rm -rf "$TMP15"
+
+# 30b. v1.7 — doctor voit un depot vert en configuration mais muet a l'usage
+TMP18=$(mktemp -d)
+git -C "$TMP18" init -q
+CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" init >/dev/null 2>&1
+rm -f "$TMP18/.git/hooks/post-commit"          # le hook saute : plus rien n'est journalise
+echo x > "$TMP18/f.txt"; git -C "$TMP18" add f.txt
+(cd "$TMP18" && env -u CLAUDE_PROJECT_DIR git -c user.name=t -c user.email=t@t commit -q -m "un commit hors carnet")
+CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" decide "pour que le journal existe" >/dev/null 2>&1
+out=$(CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" doctor 2>&1 || true)
+check "doctor signale le hook post-commit disparu" "!!  hook git post-commit" "$out"
+
+# 30c. v1.7 — registre et vue d'ensemble de la flotte
+check "init inscrit le depot au registre" "$TMP18" "$(cat "$PLANTRACK_REGISTRY")"
+out=$(python3 "$PT" doctor --all 2>&1); rc=$?
+check "doctor --all parcourt les depots enregistres" "$TMP18" "$out"
+check "doctor --all compte les depots en defaut" "en defaut" "$out"
+check_exit "doctor --all sort en erreur si un depot deraille" 1 "$rc"
+echo "/tmp/depot-plantrack-inexistant" >> "$PLANTRACK_REGISTRY"
+out=$(python3 "$PT" doctor --all 2>&1 || true)
+check "doctor --all signale un depot disparu" "installation absente" "$out"
+rm -rf "$TMP18"
+
+# 30d. v1.7 — les regles sont injectees hors budget, jamais tronquees
+out=$(ctx compact)
+check "les regles sont reinjectees avec l etat" "REGLES PLANTRACK" "$out"
+check "et portent la regle du verdict humain" "Tu ne valides jamais un bug toi-même" "$out"
 
 # 31. v1.6.0 — un post-commit etranger n'est jamais ecrase, le reste de l'install continue
 TMP16=$(mktemp -d)

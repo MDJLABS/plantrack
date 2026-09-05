@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "plantrack"
-version = "1.6.1"
+version = "1.7.0"
 description = "Contexte, plan et bugs persistants pour les longues sessions d'agent de code — journal JSONL append-only + hooks Claude Code"
 readme = "README.md"
 license = "MIT"
