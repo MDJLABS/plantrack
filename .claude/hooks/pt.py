@@ -33,6 +33,7 @@ CTX_MAX_FILES = 6
 CTX_MAX_PIEGES = 6
 CTX_MAX_QUESTIONS = 6
 LINE_TRUNC = 140
+MAX_ARCHIVES = 5              # transcripts gardes : chacun pese la session entiere
 
 ROOT = (os.environ.get("CLAUDE_PROJECT_DIR") or os.environ.get("PLANTRACK_ROOT")
         or os.getcwd())
@@ -630,6 +631,8 @@ def hook_precompact():
         stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
         try:
             shutil.copy(tp, os.path.join(ARCHIVE, f"{stamp}-{os.path.basename(tp)}"))
+            for old in sorted(os.listdir(ARCHIVE))[:-MAX_ARCHIVES]:
+                os.unlink(os.path.join(ARCHIVE, old))
         except OSError:
             pass
     sys.exit(0)
@@ -1006,9 +1009,13 @@ def cmd_doctor(st):
             with open(hook, encoding="utf-8") as f:
                 htxt = f.read()
         chk("pt.py precommit" in htxt, "garde-fou git pre-commit",
-            "lance `plantrack init --git-hook`")
-        chk("hook-commit" in slurp(".git", "hooks", "post-commit"),
-            "hook git post-commit (journal des commits)", "lance `plantrack init`")
+            "un autre outil occupe .git/hooks/pre-commit — fusionne a la main"
+            if htxt else "lance `plantrack init --git-hook`")
+        post = "hook-commit" in slurp(".git", "hooks", "post-commit")
+        chk(post, "hook git post-commit (journal des commits)", "lance `plantrack init`")
+        if post:
+            chk(bool(st["active"]), "fil actif (sinon aucun commit n'est journalise)",
+                "lance `plantrack focus <sujet>`")
     if os.path.exists(LOG):
         with open(LOG, encoding="utf-8") as f:
             raw = sum(1 for l in f if l.strip())
