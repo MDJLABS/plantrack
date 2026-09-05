@@ -287,3 +287,30 @@ les anciens sont purgés). En suspens éventuel : Mariella n'a pas dit si elle
 veut retirer la signature Co-Authored-By de Claude (`includeCoAuthoredBy:
 false`) — ne rien faire sans sa demande. Prochain jalon (§16 Publication)
 réduit à la démo, conditionné aux chiffres de `plantrack stats`.
+
+## v1.7.0 — 2026-09-05 : le contrôle mesure l'usage (session « PlanTrack imposé à tous les projets »)
+
+Diagnostic à l'origine : bcc était **100 % vert au contrôle et muet à l'usage
+pendant sept jours** (0 commit journalisé sur 69). Le contrôle d'installation
+ne pouvait pas le voir. Quatre chantiers choisis par Mariella :
+
+- `doctor` compare les **commits du dépôt aux commits arrivés au carnet**
+  (fenêtre = 30 j, bornée à la date d'installation pour ne pas compter des
+  commits antérieurs) et signale les **bugs sans verdict humain > 7 jours** ;
+- `init` inscrit la racine dans `~/.plantrack-repos` (`PLANTRACK_REGISTRY`
+  pour les tests) ; **`plantrack doctor --all`** relance le doctor vendorisé
+  de chaque dépôt en sous-processus et n'affiche que les lignes `!!` ;
+- **fil ouvert d'office** par le hook post-commit quand aucun fil n'est actif
+  (nom = branche, drapeau `auto` rejoué, le bloc réinjecté invite à le
+  renommer) — le plafond `MAX_OPEN_THREADS` prime toujours ;
+- **`RULES` = source unique** : écrite dans `AGENTS.md` (agents sans hooks) et
+  réinjectée **après** la troncature du bloc, donc jamais coupée ni écrasable
+  par un outil tiers qui régénère `CLAUDE.md`.
+
+- ⚠️ **Le plafond de 1450 lignes est dépassé : pt.py fait 1542 lignes.**
+  Chiffre à retrancher par Mariella (1550 ? 1600 ?) — rien n'a été décidé.
+- ⚠️ Effet de bord assumé : chaque commit écrit désormais dans
+  `.plantrack/events.jsonl`, donc le dépôt n'est jamais propre juste après un
+  commit (la ligne part avec le commit suivant).
+- 253 checks verts. Version **1.7.0** dans `pyproject.toml`, **non publiée sur
+  PyPI** (publication réservée à Mariella).
