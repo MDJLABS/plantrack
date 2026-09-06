@@ -14,10 +14,22 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t1 : surveillance des repos plantrack [10 commits]
-  fichiers recemment ecrits : ../../../tmp/claude-0/-home-mariella-plantrack/25db747d-ebf4-407e-b1fe-4b9b89070138/scratchpad/carnet-deux-depots.html, ../../../tmp/claude-0/-home-mariella-plantrack/25db747d-ebf4-407e-b1fe-4b9b89070138/scratchpad/regle-manquante.html, .claude/hooks/pt.py
+!! BUG BLOQUANT — a traiter avant toute autre chose : b1 Troncature du bloc reinjecte : sur bcc le bloc re…
+
+FIL ACTIF — t1 : surveillance des repos plantrack [11 commits]
+  fichiers recemment ecrits : ../../../tmp/claude-0/-home-mariella-plantrack/25db747d-ebf4-407e-b1fe-4b9b89070138/scratchpad/carnet-deux-depots.html, ../../../tmp/claude-0/-home-mariella-plantrack/25db747d-ebf4-407e-b1fe-4b9b89070138/scratchpad/regle-manquante.html, .claude/hooks/pt.py, tests/scenario.sh
+
+BUGS OUVERTS (ne pas traiter maintenant, sauf demande explicite) :
+  b1 (open) [t1] Troncature du bloc reinjecte : sur bcc le bloc reel fait 4661 chars pour un budget de 3000 — 1661 chars coupes par la FIN, donc 4 decisions… (agent) [1 tentatives, derniere: Remplacer la troncature par caracteres par une elision par …]
+  b2 (open) [t1] doctor : le controle 'etat reinjecte sous le budget' mesure APRES troncature (n = len(context_block(st)) - len(RULES)), il rend donc toujou… (agent)
+  b3 (open) [t1] plantrack init --git-hook renonce quand un autre outil occupe .git/hooks/pre-commit (cas de bcc, occupe par lefthook) : le garde-fou des fi… (agent)
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
+
+Pieges connus :
+  pg1 : L'ecart 'commits arrives au carnet' du doctor remonte jusqu'a l'installation (U…
+
+Questions en attente (reponds via !answer qN ...) :
 ```
 <!-- plantrack:state-end -->

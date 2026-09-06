@@ -728,7 +728,12 @@ check "budget etrangle : les decisions sont les dernieres a partir" "DECISIONSUR
 d=$(CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" doctor 2>&1 | grep "budget")
 check_not "doctor : le chiffre n'est pas la taille apres elision" "3000/3000" "$d"
 check "doctor : le depassement reel est chiffre" "chars elides a chaque injection" "$d"
-rm -rf "$TMP18"
+# une section sans contenu ne doit pas annoncer son intitule dans le vide
+TMP18b=$(mktemp -d)
+vide=$(CLAUDE_PROJECT_DIR="$TMP18b" python3 "$PT" status 2>&1)
+check_not "aucune tete de section vide dans un projet neuf" "Questions en attente" "$vide"
+check_not "aucune tete de section vide dans un projet neuf (pieges)" "Pieges connus" "$vide"
+rm -rf "$TMP18" "$TMP18b"
 
 echo
 [ "$fail" = 0 ] && echo "TOUS LES TESTS PASSENT" || { echo "DES TESTS ECHOUENT"; exit 1; }

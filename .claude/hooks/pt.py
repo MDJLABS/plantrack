@@ -262,10 +262,14 @@ def context_block(st, header=True, rules=True, budget=CTX_MAX_CHARS):
     depassement, qu'une mesure prise apres coupe ne pouvait pas voir."""
     secs = []  # [rang, ligne de tete, lignes de detail], dans l'ordre d'affichage
 
-    def sec(rank, head, items=()):
-        items = [i for i in items if i]
-        if head or items:
-            secs.append([rank, head, items])
+    def sec(rank, head, items=None):
+        # items=None : section d'une seule ligne. Sinon la tete n'a de sens
+        # qu'avec au moins une ligne sous elle — sans quoi le bloc annonce des
+        # sections vides ("Questions en attente :" suivi de rien).
+        if items is None:
+            secs.append([rank, head, []])
+        elif items:
+            secs.append([rank, head, list(items)])
 
     blockers = [b for b in st["bugs"].values()
                 if b.get("blocking") and b["status"] not in ("validated", "wont_fix")]
@@ -282,7 +286,7 @@ def context_block(st, header=True, rules=True, budget=CTX_MAX_CHARS):
             det.append("  (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)")
         if a["files"]:
             det.append("  fichiers recemment ecrits : " + ", ".join(a["files"][-CTX_MAX_FILES:]))
-        sec(2, f"\nFIL ACTIF — {a['id']}{tag} : {trunc(a['label'])}{ctag}", det)
+        sec(2, f"\nFIL ACTIF — {a['id']}{tag} : {trunc(a['label'])}{ctag}", det or None)
     else:
         sec(2, "\nFIL ACTIF : aucun. Ouvre un fil avec `!focus <sujet>` avant de coder — sans fil, aucun de tes commits n'est rattache.")
 
