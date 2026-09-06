@@ -683,6 +683,17 @@ def hook_context():
         sys.exit(0)
     if src == "compact":
         print("(contexte compacte — etat du projet reinjecte depuis PlanTrack)")
+    # le diagnostic sort AVANT le bloc et hors de son budget : c'est la seule
+    # facon qu'une panne d'installation se voie sans que personne ait pense a
+    # lancer `plantrack doctor`. Il n'est jamais bloquant.
+    try:
+        ko = [lab for good, lab, _ in diagnose(st) if good is False]
+    except Exception:  # un diagnostic casse ne doit pas priver l'agent de son etat
+        ko = []
+    if ko:
+        print(f"\n!! PLANTRACK EN DEFAUT ({len(ko)}) — signale-le a l'humain et lance "
+              f"`plantrack doctor` : {' ; '.join(ko[:3])}"
+              + (f" ; +{len(ko) - 3} autre(s)" if len(ko) > 3 else ""))
     print(context_block(st))
     sys.exit(0)
 
@@ -697,12 +708,14 @@ def hook_commit():
         sys.exit(0)
     sha, subject = sys.argv[2], sys.argv[3]
     tid = st["active"]
-    if not tid:
-        if len(open_threads(st)) >= MAX_OPEN_THREADS:
-            sys.exit(0)  # le garde-fou des fils ouverts prime : rien d'automatique
+    if not tid and len(open_threads(st)) < MAX_OPEN_THREADS:
         tid = next_id("t")
         append("thread_open", id=tid, text=f"travaux sur {branch()}", auto=1)
     m = re.match(r"^([a-zA-Z]+)(\(.+\))?!?:", subject)
+    # tid peut rester None : le plafond de fils interdit d'en OUVRIR un de plus,
+    # jamais de perdre le commit. Un commit sans fil est journalise quand meme et
+    # le doctor le reclame — sortir en silence, c'est ce qui a coute 69 commits
+    # sur bcc sans que rien ne le signale.
     append("commit", sha=sha, ctype=m.group(1).lower() if m else "commit", thread=tid)
     write_state_block(project())
     sys.exit(0)
@@ -733,11 +746,17 @@ def hook_precompact():
 AGENT_ENV = ("CLAUDECODE", "CLAUDE_CODE_ENTRYPOINT", "CODEX_THREAD_ID", "CODEX_SANDBOX")
 
 
-GIT_HOOK = "#!/bin/sh\n# installe par plantrack init --git-hook\nexec python3 .claude/hooks/pt.py precommit\n"
+# les deux CALL sont ce qui est greffe sur le hook d'un autre outil : ils doivent
+# tenir seuls, sans shebang ni `exec` qui priverait l'occupant de son tour
+# le test de presence n'est pas cosmetique : greffe chez un autre outil, un pt.py
+# absent ferait echouer la ligne et bloquerait TOUS les commits du depot
+GIT_HOOK_CALL = "if [ -f .claude/hooks/pt.py ]; then python3 .claude/hooks/pt.py precommit || exit 1; fi\n"
+GIT_HOOK = "#!/bin/sh\n# installe par plantrack init --git-hook\n" + GIT_HOOK_CALL
 
+GIT_HOOK_POST_CALL = ('[ -f .claude/hooks/pt.py ] && python3 .claude/hooks/pt.py hook-commit '
+                      '"$(git rev-parse --short HEAD)" "$(git log -1 --pretty=%s)"\n')
 GIT_HOOK_POST = ("#!/bin/sh\n# installe d'office par plantrack init (journalisation, jamais bloquant)\n"
-                  '[ -f .claude/hooks/pt.py ] && python3 .claude/hooks/pt.py hook-commit '
-                  '"$(git rev-parse --short HEAD)" "$(git log -1 --pretty=%s)"\nexit 0\n')
+                 + GIT_HOOK_POST_CALL + "exit 0\n")
 
 WRAPPER = '#!/bin/sh\nexec python3 "$(dirname "$0")/.claude/hooks/pt.py" "$@"\n'
 
@@ -846,36 +865,49 @@ def write_state_block(st, quiet=True):
     write_md_block("AGENTS.md", body, STATE_START, STATE_END, "instantane de l'etat", quiet)
 
 
+def chain_hook(hook, script, call, label, marker):
+    """Pose un hook git, ou GREFFE l'appel PlanTrack sur celui d'un autre outil.
+    Renoncer parce que la place est prise laisse le garde-fou eteint pour de bon
+    (cas de bcc, ou lefthook occupait pre-commit depuis l'installation) : la
+    greffe s'insere juste apres le shebang, pour passer avant un `exit` de
+    l'occupant. Un outil qui regenere son hook l'efface — le diagnostic le voit."""
+    if not os.path.exists(hook):
+        os.makedirs(os.path.dirname(hook), exist_ok=True)
+        with open(hook, "w", encoding="utf-8") as f:
+            f.write(script)
+        os.chmod(hook, 0o755)
+        print(f"hook {label} installe.")
+        return
+    with open(hook, encoding="utf-8") as f:
+        cur = f.read()
+    # on cherche le MARQUEUR, pas la ligne exacte : une version anterieure de
+    # l'appel doit compter comme deja en place, sinon la greffe se redouble
+    if marker in cur:
+        print(f"hook {label} deja en place.")
+        return
+    lines = cur.splitlines(keepends=True)
+    at = 1 if lines and lines[0].startswith("#!") else 0
+    lines.insert(at, f"\n# greffe plantrack — a passer avant l'outil qui occupe ce hook\n{call}")
+    with open(hook, "w", encoding="utf-8") as f:
+        f.write("".join(lines))
+    os.chmod(hook, 0o755)
+    print(f"hook {label} : appel PlanTrack greffe sur le hook existant.")
+
+
 def install_git_hook():
     if not os.path.isdir(os.path.join(ROOT, ".git")):
         sys.exit("[PlanTrack] pas de depot git ici — lance `git init` d'abord.")
-    hook = os.path.join(ROOT, ".git", "hooks", "pre-commit")
-    if os.path.exists(hook):
-        sys.exit(f"[PlanTrack] {hook} existe deja — fusionne a la main, rien n'a ete ecrit.")
-    os.makedirs(os.path.dirname(hook), exist_ok=True)
-    with open(hook, "w", encoding="utf-8") as f:
-        f.write(GIT_HOOK)
-    os.chmod(hook, 0o755)
-    print("[PlanTrack] hook pre-commit installe (contournement : git commit --no-verify).")
+    chain_hook(os.path.join(ROOT, ".git", "hooks", "pre-commit"),
+               GIT_HOOK, GIT_HOOK_CALL, "pre-commit", "pt.py precommit")
+    print("[PlanTrack] contournement du garde-fou : git commit --no-verify.")
 
 
 def install_post_commit_hook():
-    """Post-commit journalisant, installe d'office (pre-commit reste opt-in, jamais destructif)."""
+    """Post-commit journalisant, installe d'office (pre-commit reste opt-in)."""
     if not os.path.isdir(os.path.join(ROOT, ".git")):
         return
-    hook = os.path.join(ROOT, ".git", "hooks", "post-commit")
-    cur = open(hook, encoding="utf-8").read() if os.path.exists(hook) else None
-    if cur == GIT_HOOK_POST:
-        print("hook post-commit deja en place.")
-    elif cur is None:
-        os.makedirs(os.path.dirname(hook), exist_ok=True)
-        with open(hook, "w", encoding="utf-8") as f:
-            f.write(GIT_HOOK_POST)
-        os.chmod(hook, 0o755)
-        print("hook post-commit installe (journalisation, jamais bloquant).")
-    else:
-        print("[PlanTrack] .git/hooks/post-commit existe deja — rien n'a ete ecrase. "
-              "Bloc a fusionner a la main :\n" + GIT_HOOK_POST)
+    chain_hook(os.path.join(ROOT, ".git", "hooks", "post-commit"),
+               GIT_HOOK_POST, GIT_HOOK_POST_CALL, "post-commit", "pt.py hook-commit")
 
 
 def write_hooks_file(path, obj, label, hint=""):
@@ -1076,10 +1108,16 @@ def usage_gap(days=USAGE_DAYS):
     stamps = [e["ts"] for e in evs if e.get("ts")]
     if not stamps:
         return None
-    # la fenetre ne remonte jamais avant l'installation : les commits d'avant ne
-    # pouvaient pas etre journalises, les compter serait un faux positif garanti
+    # la fenetre ne remonte jamais avant le PREMIER commit journalise : avant lui
+    # le hook ne journalisait demontrablement pas (version trop ancienne, hook
+    # jamais pose, aucun fil actif du temps ou ca faisait perdre le commit), et
+    # compter cette periode fige un ecart que plus rien ne peut rattraper —
+    # une alerte allumee en permanence n'alerte plus personne. Depot ou aucun
+    # commit n'est jamais arrive : on retombe sur l'installation, le hook est
+    # alors vraiment muet et doit se voir.
+    first_commit = [e["ts"] for e in evs if e.get("kind") == "commit" and e.get("ts")]
     since = max((datetime.now(timezone.utc) - timedelta(days=days)).isoformat(timespec="seconds"),
-                min(stamps))
+                min(first_commit) if first_commit else min(stamps))
     jc = sum(1 for e in evs if e.get("kind") == "commit" and e["ts"] >= since)
     try:
         r = subprocess.run(["git", "-C", ROOT, "log", f"--since={since}", "--pretty=%h"],
@@ -1089,17 +1127,16 @@ def usage_gap(days=USAGE_DAYS):
     return jc, len(r.stdout.split()), since[:10]
 
 
-def cmd_doctor(st):
-    """§12 : hooks installes, journal lisible, budget de contexte, usage reel."""
-    probs = 0
+def diagnose(st):
+    """§12 : hooks installes, journal lisible, budget de contexte, usage reel.
+    Rend une liste de (verdict, libelle, remede) ; verdict None = information.
+    Le diagnostic est separe de son affichage pour que le SessionStart puisse le
+    consulter : un controle qu'il faut penser a lancer a la main ne protege de
+    rien — c'est ainsi que bcc a tenu une semaine en defaut sans que ca se voie."""
+    out = []
 
     def chk(good, label, fix=""):
-        nonlocal probs
-        if good:
-            print(f"  ok  {label}")
-        else:
-            probs += 1
-            print(f"  !!  {label}" + (f" — {fix}" if fix else ""))
+        out.append((bool(good), label, fix))
 
     def slurp(*parts):
         p = os.path.join(ROOT, *parts)
@@ -1134,7 +1171,7 @@ def cmd_doctor(st):
             f"aucun agent n'a recu l'etat depuis {STALE_DAYS} jours — hooks declares mais "
             "jamais approuves ? (Codex : lance `/hooks`)")
     else:
-        print(f"  --  etat injecte ({detail}) — installation trop recente pour juger")
+        out.append((None, f"etat injecte ({detail}) — installation trop recente pour juger", ""))
     for name in ("CLAUDE.md", "GEMINI.md"):
         # un outil qui regenere ces fichiers (GSD...) peut faire sauter la reference
         chk("@AGENTS.md" in slurp(name), f"ligne d'import @AGENTS.md dans {name}",
@@ -1163,7 +1200,7 @@ def cmd_doctor(st):
         chk(raw == parsed, f"journal lisible ({parsed}/{raw} lignes)",
             f"{raw - parsed} ligne(s) corrompue(s) ignoree(s) au rejeu")
     else:
-        print("  --  aucun journal encore (.plantrack/events.jsonl)")
+        out.append((None, "aucun journal encore (.plantrack/events.jsonl)", ""))
     stale = [b for b in st["bugs"].values()
              if b["status"] == "to_verify" and b.get("status_ts", b["ts"]) < old]
     chk(not stale, f"bugs en attente de verdict humain ({len(stale)} depuis plus de {STALE_DAYS} jours)",
@@ -1175,7 +1212,26 @@ def cmd_doctor(st):
     chk(n <= CTX_MAX_CHARS, f"etat reinjecte sous le budget ({n}/{CTX_MAX_CHARS} chars)",
         f"{n - CTX_MAX_CHARS} chars elides a chaque injection, en partant des sections "
         "les moins prioritaires — ferme des fils ou valide des bugs")
-    sys.exit(1 if probs else 0)
+    # un commit journalise sans fil : le plafond de fils a empeche d'en ouvrir un.
+    # Le commit n'est plus perdu, encore faut-il que quelqu'un le rattache.
+    orph = [e for e in read_events() if e.get("kind") == "commit" and not e.get("thread")]
+    chk(not orph, f"commits rattaches a un fil ({len(orph)} sans fil)",
+        "plafond de fils ouverts atteint au moment du commit — `!close` un fil, "
+        "puis `!focus <sujet>` : " + ", ".join(e.get("sha", "?") for e in orph[:6]))
+    return out
+
+
+def cmd_doctor(st):
+    bad = 0
+    for good, label, fix in diagnose(st):
+        if good is None:
+            print(f"  --  {label}")
+        elif good:
+            print(f"  ok  {label}")
+        else:
+            bad += 1
+            print(f"  !!  {label}" + (f" — {fix}" if fix else ""))
+    sys.exit(1 if bad else 0)
 
 
 def registered_roots():

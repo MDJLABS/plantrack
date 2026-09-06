@@ -131,7 +131,7 @@ out=$(ctx startup)
 check "le bloc signale que ce fil attend son vrai nom" "ouvert d'office" "$out"
 prompt '!close' >/dev/null
 out=$(cd "$TMP" && python3 "$PT" init --git-hook 2>&1); rc=$?
-check "init refuse d ecraser un pre-commit existant" "existe deja" "$out"
+check "init reconnait son propre pre-commit sans le redoubler" "deja en place" "$out"
 
 # 11. couche 2 — plan phases/taches
 out=$(H phase add Authentification --goal parcours complet)
@@ -634,16 +634,33 @@ out=$(ctx compact)
 check "les regles sont reinjectees avec l etat" "REGLES PLANTRACK" "$out"
 check "et portent la regle du verdict humain" "Tu ne valides jamais un bug toi-même" "$out"
 
-# 31. v1.6.0 — un post-commit etranger n'est jamais ecrase, le reste de l'install continue
+# 31. un hook git occupe par un autre outil est GREFFE, jamais ecrase ni abandonne
+# (renoncer laissait le garde-fou eteint pour de bon — cas de bcc sous lefthook)
 TMP16=$(mktemp -d)
 git -C "$TMP16" init -q
-printf '#!/bin/sh\necho foreign-hook\n' > "$TMP16/.git/hooks/post-commit"
-chmod +x "$TMP16/.git/hooks/post-commit"
-out=$(CLAUDE_PROJECT_DIR="$TMP16" python3 "$PT" init 2>&1)
-check "un post-commit etranger n'est pas ecrase" "rien n'a ete ecrase" "$out"
-check "le bloc a fusionner a la main est imprime" "hook-commit" "$out"
-check "le contenu etranger est preserve" "foreign-hook" "$(cat "$TMP16/.git/hooks/post-commit")"
+for h in post-commit pre-commit; do
+  printf '#!/bin/sh\necho foreign-hook\nexit 0\n' > "$TMP16/.git/hooks/$h"
+  chmod +x "$TMP16/.git/hooks/$h"
+done
+out=$(CLAUDE_PROJECT_DIR="$TMP16" python3 "$PT" init --git-hook 2>&1)
+check "un hook etranger recoit la greffe PlanTrack" "greffe sur le hook existant" "$out"
 check "le reste de l'installation continue malgre tout" "insere dans AGENTS.md" "$out"
+post=$(cat "$TMP16/.git/hooks/post-commit")
+check "le contenu etranger est preserve" "foreign-hook" "$post"
+check "l appel PlanTrack est bien present" "hook-commit" "$post"
+pre=$(cat "$TMP16/.git/hooks/pre-commit")
+check "la greffe passe AVANT l exit de l occupant" \
+  "pt.py precommit" "$(printf '%s' "$pre" | sed -n '1,4p')"
+check "la greffe teste la presence de pt.py avant de bloquer" "[ -f .claude/hooks/pt.py ]" "$pre"
+out=$(CLAUDE_PROJECT_DIR="$TMP16" python3 "$PT" init --git-hook 2>&1)
+check "une seconde installation ne redouble pas la greffe" "deja en place" "$out"
+check_exit "hook greffe toujours executable" 0 \
+  "$(cd "$TMP16" && sh .git/hooks/post-commit >/dev/null 2>&1; echo $?)"
+# une version ANTERIEURE de l'appel compte comme deja en place : sinon chaque
+# mise a niveau empilerait une greffe de plus sur le meme hook
+printf '#!/bin/sh\nexec python3 .claude/hooks/pt.py precommit\n' > "$TMP16/.git/hooks/pre-commit"
+out=$(CLAUDE_PROJECT_DIR="$TMP16" python3 "$PT" init --git-hook 2>&1)
+check "un appel PlanTrack d une version anterieure n est pas redouble" "deja en place" "$out"
 rm -rf "$TMP16"
 
 # 32. v1.6.0 — guides de test coches, caches derriere !testcheck (off par defaut)
