@@ -65,3 +65,5 @@
 {"ts": "2026-09-06T21:36:20+00:00", "kind": "attempt", "id": "a4", "bug": "b1", "hypothesis": "Le resserrage (MIN_TRUNC=80) precede l'elision : les plafonds CTX_MAX_* additionnes depassent CTX_MAX_CHARS des qu'un projet murit, l'elision seule effacait donc les 8 bugs de bcc. Une ligne raccourcie vaut mieux qu'une ligne disparue.", "actor": "claude-code"}
 {"ts": "2026-09-06T21:36:20+00:00", "kind": "commit", "sha": "199788a", "ctype": "fix", "thread": "t1"}
 {"ts": "2026-09-06T21:38:50+00:00", "kind": "commit", "sha": "f438ca2", "ctype": "fix", "thread": "t1"}
+{"ts": "2026-09-06T21:39:21+00:00", "kind": "commit", "sha": "265fea6", "ctype": "fix", "thread": "t1"}
+{"ts": "2026-09-06T21:40:13+00:00", "kind": "bug", "id": "b4", "text": "Le fil actif auto-ouvert affiche une note pedagogique de 99 chars ('fil ouvert d'office...') au rang 2, donc protegee, tandis que des bugs de securite (rang 6) sont elides. Une consigne d'usage ne devrait pas primer sur un bug.", "thread": "t1", "severity": "normal", "par": "agent"}
