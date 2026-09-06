@@ -1228,7 +1228,7 @@ def diagnose(st):
     # resserrage fait tenir n'a rien perdu, et une alerte qui ne peut plus s'eteindre
     # cesse d'etre lue (d2). Trop long mais complet ressort en simple information.
     if perdu:
-        chk(False, f"etat reinjecte sans perte ({n}/{CTX_MAX_CHARS} chars au texte complet)",
+        chk(False, f"etat reinjecte ampute ({n}/{CTX_MAX_CHARS} chars au texte complet)",
             f"lignes resserrees a {MIN_TRUNC} chars, et {perdu} chars encore elides a chaque "
             "injection en partant des sections les moins prioritaires — ferme des fils ou valide des bugs")
     elif n > CTX_MAX_CHARS:
