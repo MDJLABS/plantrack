@@ -33,6 +33,9 @@ CTX_MAX_FILES = 6
 CTX_MAX_PIEGES = 6
 CTX_MAX_QUESTIONS = 6
 LINE_TRUNC = 140
+MIN_TRUNC = 80               # palier de resserrage : additionnes, les plafonds
+                             # CTX_MAX_* depassent CTX_MAX_CHARS des qu'un projet
+                             # murit — sans ce palier, bcc perdait ses 8 bugs d'un coup
 MAX_ARCHIVES = 5              # transcripts gardes : chacun pese la session entiere
 STALE_DAYS = 7                # au-dela, un bug sans verdict humain est un oubli
 USAGE_DAYS = 30               # fenetre du controle d'usage (commits vs journal)
@@ -252,12 +255,14 @@ def trunc(s, n=LINE_TRUNC):
 
 # ------------------------------------------------------------- bloc de contexte
 
-def context_block(st, header=True, rules=True, budget=CTX_MAX_CHARS):
+def context_block(st, header=True, rules=True, budget=CTX_MAX_CHARS, width=LINE_TRUNC):
     """§11 : les sections sortent dans l'ordre de lecture, mais c'est leur RANG qui
     decide qui survit au depassement — decisions > fil actif et notes de reprise >
     bugs bloquants > le reste. En cas de debordement on elide ligne a ligne en
     partant de la section la moins prioritaire (la plus ancienne d'abord) : le bloc
     ne se coupe plus au hasard par la fin, ou les decisions se trouvaient.
+    Avant d'elider, on RESSERRE (width -> MIN_TRUNC) : une ligne raccourcie vaut
+    mieux qu'une ligne disparue — savoir qu'un bug existe suffit a ne pas le refaire.
     budget=None rend le bloc entier — c'est ainsi que le doctor mesure le vrai
     depassement, qu'une mesure prise apres coupe ne pouvait pas voir."""
     secs = []  # [rang, ligne de tete, lignes de detail], dans l'ordre d'affichage
@@ -286,13 +291,13 @@ def context_block(st, header=True, rules=True, budget=CTX_MAX_CHARS):
             det.append("  (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)")
         if a["files"]:
             det.append("  fichiers recemment ecrits : " + ", ".join(a["files"][-CTX_MAX_FILES:]))
-        sec(2, f"\nFIL ACTIF — {a['id']}{tag} : {trunc(a['label'])}{ctag}", det or None)
+        sec(2, f"\nFIL ACTIF — {a['id']}{tag} : {trunc(a['label'], width)}{ctag}", det or None)
     else:
         sec(2, "\nFIL ACTIF : aucun. Ouvre un fil avec `!focus <sujet>` avant de coder — sans fil, aucun de tes commits n'est rattache.")
 
     parked = [t for t in st["threads"].values() if t["status"] == "parked"]
     sec(2, "\nFILS EN PAUSE (ne pas y toucher sans reprise explicite) :" if parked else None,
-        [f"  {t['id']} : {trunc(t['label'], 60)} — reprise : {trunc(t['note'] or 'aucune note', 110)}"
+        [f"  {t['id']} : {trunc(t['label'], 60)} — reprise : {trunc(t['note'] or 'aucune note', min(110, width))}"
          for t in parked])
 
     bugs = [b for b in st["bugs"].values() if b["status"] in ("open", "in_progress", "to_verify")]
@@ -302,29 +307,32 @@ def context_block(st, header=True, rules=True, budget=CTX_MAX_CHARS):
         tag = " (agent)" if b.get("par") == "agent" else ""
         att = ""
         if b["attempts"]:  # tentatives cablees en session (v1.5)
-            att = (f" [{len(b['attempts'])} tentatives, derniere: "
+            # resserre, la derniere hypothese saute : AGENTS.md impose deja de lire
+            # `plantrack attempts <id>` avant de toucher un bug — seul le compte informe
+            att = (f" [{len(b['attempts'])} tent.]" if width < LINE_TRUNC else
+                   f" [{len(b['attempts'])} tentatives, derniere: "
                    f"{trunc(b['attempts'][-1]['hypothesis'], 60)}]")
-        line = f"  {b['id']} ({b['status']}) {th}{trunc(b['text'])}{tag}{att}"
+        line = f"  {b['id']} ({b['status']}) {th}{trunc(b['text'], width)}{tag}{att}"
         rej = [x for x in b["attempts"] if x.get("rejected")]
         if rej:  # §5 : ce qui a deja ete tente doit survivre a la compaction — et
             # reste colle a son bug, sinon l'elision separerait l'un de l'autre
             plus = f" (+{len(rej) - 1}, voir plantrack attempts {b['id']})" if len(rej) > 1 else ""
-            line += (f"\n    deja rejete : {trunc(rej[-1]['hypothesis'], 60)}"
-                     f" — {trunc(rej[-1]['rejected'], 60)}{plus}")
+            line += (f"\n    deja rejete : {trunc(rej[-1]['hypothesis'], min(60, width))}"
+                     f" — {trunc(rej[-1]['rejected'], min(60, width))}{plus}")
         blines.append(line)
     sec(6, "\nBUGS OUVERTS (ne pas traiter maintenant, sauf demande explicite) :", blines)
 
     sec(1, "\nDECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :",
-        [f"  {d['id']} : {trunc(d['text'])}" + (" (agent)" if d.get("par") == "agent" else "")
+        [f"  {d['id']} : {trunc(d['text'], width)}" + (" (agent)" if d.get("par") == "agent" else "")
          for d in st["decisions"][-CTX_MAX_DECISIONS:]])
 
     sec(4, "\nPieges connus :",
-        [f"  {p['id']} : {trunc(p['text'], 80)}"
+        [f"  {p['id']} : {trunc(p['text'], min(80, width))}"
          for p in list(st["pieges"].values())[-CTX_MAX_PIEGES:]])
 
     pending_q = [q for q in st["questions"].values() if not q.get("answer")]
     sec(5, "\nQuestions en attente (reponds via !answer qN ...) :",
-        [f"  {q['id']} : {trunc(q['text'], 80)}" for q in pending_q[-CTX_MAX_QUESTIONS:]])
+        [f"  {q['id']} : {trunc(q['text'], min(80, width))}" for q in pending_q[-CTX_MAX_QUESTIONS:]])
 
     if st.get("testcheck"):
         for g in list(st["guides"].values())[:6]:
@@ -346,6 +354,10 @@ def context_block(st, header=True, rules=True, budget=CTX_MAX_CHARS):
         return "\n".join(L) + note
 
     out = render()
+    # resserrer d'abord, elider ensuite : perdre la fin d'une phrase se rattrape
+    # dans `plantrack status`, perdre la ligne entiere fait refaire le bug
+    if budget and len(out) > budget and width > MIN_TRUNC:
+        return context_block(st, header, rules, budget, MIN_TRUNC)
     cut = 0
     while budget and len(out) > budget:
         live = [s for s in secs if s[1] or s[2]]
@@ -1209,9 +1221,15 @@ def diagnose(st):
     # budget=None : on mesure le bloc ENTIER. Mesure apres elision, le chiffre
     # serait toujours egal au plafond et ne dirait jamais de combien ca deborde.
     n = len(context_block(st, rules=False, budget=None))
+    # ce qui est REELLEMENT perdu se mesure apres resserrage, pas avant : sinon le
+    # chiffre annonce un desastre que le palier MIN_TRUNC a deja absorbe
+    perdu = max(0, len(context_block(st, rules=False, budget=None, width=MIN_TRUNC)) - CTX_MAX_CHARS)
     chk(n <= CTX_MAX_CHARS, f"etat reinjecte sous le budget ({n}/{CTX_MAX_CHARS} chars)",
-        f"{n - CTX_MAX_CHARS} chars elides a chaque injection, en partant des sections "
-        "les moins prioritaires — ferme des fils ou valide des bugs")
+        (f"lignes resserrees a {MIN_TRUNC} chars, et {perdu} chars encore elides a chaque "
+         "injection en partant des sections les moins prioritaires — ferme des fils ou valide des bugs")
+        if perdu else
+        f"lignes resserrees a {MIN_TRUNC} chars a l'injection, rien n'est elide — "
+        "valide des bugs ou reponds aux questions pour retrouver le texte entier")
     # un commit journalise sans fil : le plafond de fils a empeche d'en ouvrir un.
     # Le commit n'est plus perdu, encore faut-il que quelqu'un le rattache.
     orph = [e for e in read_events() if e.get("kind") == "commit" and not e.get("thread")]

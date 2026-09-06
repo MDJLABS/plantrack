@@ -726,12 +726,17 @@ for i in 1 2 3 4 5 6; do
   CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" piege "PIEGESURVIVANT$i $L" >/dev/null
   CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" question "QUESTIONSURVIVANTE$i $L" >/dev/null
 done
+# a taille naturelle le resserrage suffit : RIEN ne doit disparaitre. Une ligne
+# raccourcie se rattrape dans `plantrack status`, une ligne disparue fait refaire le bug.
 blk=$(CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" status 2>&1)
-check "budget depasse : le bloc est elide" "ligne(s) elidee(s)" "$blk"
-check "les decisions actees survivent a l'elision" "DECISIONSURVIVANTE6" "$blk"
-check "les pieges connus survivent a l'elision" "PIEGESURVIVANT6" "$blk"
-check "les questions en attente survivent a l'elision" "QUESTIONSURVIVANTE6" "$blk"
-check_not "les bugs ouverts sont sacrifies en premier" "BUGSACRIFIABLE1" "$blk"
+check_not "budget depasse : le resserrage evite toute elision" "ligne(s) elidee(s)" "$blk"
+for i in 1 6; do
+  check "resserrage : le bug b$i est toujours annonce" "BUGSACRIFIABLE$i" "$blk"
+done
+check "les decisions actees survivent au resserrage" "DECISIONSURVIVANTE6" "$blk"
+check "les pieges connus survivent au resserrage" "PIEGESURVIVANT6" "$blk"
+check "les questions en attente survivent au resserrage" "QUESTIONSURVIVANTE6" "$blk"
+check_not "resserrage : les lignes sont bien raccourcies" "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" "$blk"
 # budget etrangle : la section entiere y passe, tete comprise (pas d'intitule orphelin)
 serre=$(CLAUDE_PROJECT_DIR="$TMP18" python3 -c "
 import importlib.util, sys
@@ -741,10 +746,15 @@ print(m.context_block(m.project(), rules=False, budget=1200))")
 check_not "pas de tete de section orpheline une fois la section videe" \
   "BUGS OUVERTS (ne pas traiter maintenant" "$serre"
 check "budget etrangle : les decisions sont les dernieres a partir" "DECISIONSURVIVANTE6" "$serre"
+check "budget etrangle : les pieges survivent aux bugs" "PIEGESURVIVANT6" "$serre"
+check_not "budget etrangle : les bugs ouverts partent en premier" "BUGSACRIFIABLE1" "$serre"
 # le doctor doit annoncer le depassement REEL, pas la taille apres elision
 d=$(CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" doctor 2>&1 | grep "budget")
 check_not "doctor : le chiffre n'est pas la taille apres elision" "3000/3000" "$d"
-check "doctor : le depassement reel est chiffre" "chars elides a chaque injection" "$d"
+check "doctor : le depassement reel est chiffre" "3718/3000" "$d"
+# le palier de resserrage doit absorber ce depassement AVANT toute elision : une
+# ligne raccourcie vaut mieux qu'une ligne disparue (sinon bcc perdait ses 8 bugs)
+check "doctor : le resserrage evite l'elision" "rien n'est elide" "$d"
 # une section sans contenu ne doit pas annoncer son intitule dans le vide
 TMP18b=$(mktemp -d)
 vide=$(CLAUDE_PROJECT_DIR="$TMP18b" python3 "$PT" status 2>&1)
