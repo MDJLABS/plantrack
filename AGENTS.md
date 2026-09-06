@@ -16,11 +16,11 @@
 
 !! BUG BLOQUANT — a traiter avant toute autre chose : b1 Troncature du bloc reinjecte : sur bcc le bloc re…
 
-FIL ACTIF — t1 : surveillance des repos plantrack [16 commits]
+FIL ACTIF — t1 : surveillance des repos plantrack [17 commits]
   fichiers recemment ecrits : ../../../tmp/claude-0/-home-mariella-plantrack/25db747d-ebf4-407e-b1fe-4b9b89070138/scratchpad/carnet-deux-depots.html, ../../../tmp/claude-0/-home-mariella-plantrack/25db747d-ebf4-407e-b1fe-4b9b89070138/scratchpad/regle-manquante.html, tests/scenario.sh, .claude/hooks/pt.py
 
 BUGS OUVERTS (ne pas traiter maintenant, sauf demande explicite) :
-  b1 (to_verify) [t1] Troncature du bloc reinjecte : sur bcc le bloc reel fait 4661 chars pour un budget de 3000 — 1661 chars coupes par la FIN, donc 4 decisions… (agent) [1 tentatives, derniere: Remplacer la troncature par caracteres par une elision par …]
+  b1 (to_verify) [t1] Troncature du bloc reinjecte : sur bcc le bloc reel fait 4661 chars pour un budget de 3000 — 1661 chars coupes par la FIN, donc 4 decisions… (agent) [2 tentatives, derniere: Le resserrage (MIN_TRUNC=80) precede l'elision : les plafon…]
   b2 (to_verify) [t1] doctor : le controle 'etat reinjecte sous le budget' mesure APRES troncature (n = len(context_block(st)) - len(RULES)), il rend donc toujou… (agent) [1 tentatives, derniere: Le doctor mesure desormais context_block(st, rules=False, b…]
   b3 (to_verify) [t1] plantrack init --git-hook renonce quand un autre outil occupe .git/hooks/pre-commit (cas de bcc, occupe par lefthook) : le garde-fou des fi… (agent) [1 tentatives, derniere: chain_hook : au lieu de renoncer quand la place est prise, …]
 

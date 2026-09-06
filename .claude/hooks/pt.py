@@ -1224,12 +1224,18 @@ def diagnose(st):
     # ce qui est REELLEMENT perdu se mesure apres resserrage, pas avant : sinon le
     # chiffre annonce un desastre que le palier MIN_TRUNC a deja absorbe
     perdu = max(0, len(context_block(st, rules=False, budget=None, width=MIN_TRUNC)) - CTX_MAX_CHARS)
-    chk(n <= CTX_MAX_CHARS, f"etat reinjecte sous le budget ({n}/{CTX_MAX_CHARS} chars)",
-        (f"lignes resserrees a {MIN_TRUNC} chars, et {perdu} chars encore elides a chaque "
-         "injection en partant des sections les moins prioritaires — ferme des fils ou valide des bugs")
-        if perdu else
-        f"lignes resserrees a {MIN_TRUNC} chars a l'injection, rien n'est elide — "
-        "valide des bugs ou reponds aux questions pour retrouver le texte entier")
+    # le verdict porte sur ce qui est PERDU, pas sur la taille brute : un bloc que le
+    # resserrage fait tenir n'a rien perdu, et une alerte qui ne peut plus s'eteindre
+    # cesse d'etre lue (d2). Trop long mais complet ressort en simple information.
+    if perdu:
+        chk(False, f"etat reinjecte sans perte ({n}/{CTX_MAX_CHARS} chars au texte complet)",
+            f"lignes resserrees a {MIN_TRUNC} chars, et {perdu} chars encore elides a chaque "
+            "injection en partant des sections les moins prioritaires — ferme des fils ou valide des bugs")
+    elif n > CTX_MAX_CHARS:
+        out.append((None, f"etat reinjecte sans perte, mais resserre a {MIN_TRUNC} chars "
+                          f"pour tenir ({n}/{CTX_MAX_CHARS} au texte complet)", ""))
+    else:
+        chk(True, f"etat reinjecte sous le budget ({n}/{CTX_MAX_CHARS} chars)")
     # un commit journalise sans fil : le plafond de fils a empeche d'en ouvrir un.
     # Le commit n'est plus perdu, encore faut-il que quelqu'un le rattache.
     orph = [e for e in read_events() if e.get("kind") == "commit" and not e.get("thread")]

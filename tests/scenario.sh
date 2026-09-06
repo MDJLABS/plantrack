@@ -749,12 +749,14 @@ check "budget etrangle : les decisions sont les dernieres a partir" "DECISIONSUR
 check "budget etrangle : les pieges survivent aux bugs" "PIEGESURVIVANT6" "$serre"
 check_not "budget etrangle : les bugs ouverts partent en premier" "BUGSACRIFIABLE1" "$serre"
 # le doctor doit annoncer le depassement REEL, pas la taille apres elision
-d=$(CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" doctor 2>&1 | grep "budget")
+d=$(CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" doctor 2>&1 | grep "etat reinjecte")
 check_not "doctor : le chiffre n'est pas la taille apres elision" "3000/3000" "$d"
 check "doctor : le depassement reel est chiffre" "3718/3000" "$d"
-# le palier de resserrage doit absorber ce depassement AVANT toute elision : une
-# ligne raccourcie vaut mieux qu'une ligne disparue (sinon bcc perdait ses 8 bugs)
-check "doctor : le resserrage evite l'elision" "rien n'est elide" "$d"
+# le palier de resserrage absorbe ce depassement AVANT toute elision : rien n'est
+# perdu, donc le controle ne doit PAS crier — une alerte qui ne s'eteint plus (d2)
+# cesse d'etre lue. Le depassement brut ressort en simple information.
+check "doctor : trop long mais complet n'est pas un defaut" "  --  " "$d"
+check_not "doctor : trop long mais complet n'est pas un defaut (pas de !!)" "!!" "$d"
 # une section sans contenu ne doit pas annoncer son intitule dans le vide
 TMP18b=$(mktemp -d)
 vide=$(CLAUDE_PROJECT_DIR="$TMP18b" python3 "$PT" status 2>&1)

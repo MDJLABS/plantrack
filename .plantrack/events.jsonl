@@ -63,3 +63,4 @@
 {"ts": "2026-09-06T21:27:35+00:00", "kind": "commit", "sha": "aebc468", "ctype": "chore", "thread": "t1"}
 {"ts": "2026-09-06T21:28:40+00:00", "kind": "commit", "sha": "49c6a11", "ctype": "chore", "thread": "t1"}
 {"ts": "2026-09-06T21:36:20+00:00", "kind": "attempt", "id": "a4", "bug": "b1", "hypothesis": "Le resserrage (MIN_TRUNC=80) precede l'elision : les plafonds CTX_MAX_* additionnes depassent CTX_MAX_CHARS des qu'un projet murit, l'elision seule effacait donc les 8 bugs de bcc. Une ligne raccourcie vaut mieux qu'une ligne disparue.", "actor": "claude-code"}
+{"ts": "2026-09-06T21:36:20+00:00", "kind": "commit", "sha": "199788a", "ctype": "fix", "thread": "t1"}
