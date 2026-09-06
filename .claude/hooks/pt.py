@@ -252,83 +252,111 @@ def trunc(s, n=LINE_TRUNC):
 
 # ------------------------------------------------------------- bloc de contexte
 
-def context_block(st, header=True, rules=True):
-    L = []
-    if header:
-        L.append("== PlanTrack — etat persistant du projet ==")
-        L.append("(reinjecte automatiquement, y compris apres compaction du contexte)")
+def context_block(st, header=True, rules=True, budget=CTX_MAX_CHARS):
+    """§11 : les sections sortent dans l'ordre de lecture, mais c'est leur RANG qui
+    decide qui survit au depassement — decisions > fil actif et notes de reprise >
+    bugs bloquants > le reste. En cas de debordement on elide ligne a ligne en
+    partant de la section la moins prioritaire (la plus ancienne d'abord) : le bloc
+    ne se coupe plus au hasard par la fin, ou les decisions se trouvaient.
+    budget=None rend le bloc entier — c'est ainsi que le doctor mesure le vrai
+    depassement, qu'une mesure prise apres coupe ne pouvait pas voir."""
+    secs = []  # [rang, ligne de tete, lignes de detail], dans l'ordre d'affichage
+
+    def sec(rank, head, items=()):
+        items = [i for i in items if i]
+        if head or items:
+            secs.append([rank, head, items])
 
     blockers = [b for b in st["bugs"].values()
                 if b.get("blocking") and b["status"] not in ("validated", "wont_fix")]
     if blockers:
         ids = " ; ".join(f"{b['id']} {trunc(b['text'], 50)}" for b in blockers[:2])
-        L.append(f"\n!! BUG BLOQUANT — a traiter avant toute autre chose : {ids}")
+        sec(3, f"\n!! BUG BLOQUANT — a traiter avant toute autre chose : {ids}")
 
     a = st["threads"].get(st["active"]) if st["active"] else None
     if a:
         tag = f" [{a['task']}]" if a.get("task") else ""
         ctag = f" [{len(a['commits'])} commits]" if a.get("commits") else ""
-        L.append(f"\nFIL ACTIF — {a['id']}{tag} : {trunc(a['label'])}{ctag}")
+        det = []
         if a.get("auto"):
-            L.append("  (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)")
+            det.append("  (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)")
         if a["files"]:
-            L.append("  fichiers recemment ecrits : " + ", ".join(a["files"][-CTX_MAX_FILES:]))
+            det.append("  fichiers recemment ecrits : " + ", ".join(a["files"][-CTX_MAX_FILES:]))
+        sec(2, f"\nFIL ACTIF — {a['id']}{tag} : {trunc(a['label'])}{ctag}", det)
     else:
-        L.append("\nFIL ACTIF : aucun. Ouvre un fil avec `!focus <sujet>` avant de coder — sans fil, aucun de tes commits n'est rattache.")
+        sec(2, "\nFIL ACTIF : aucun. Ouvre un fil avec `!focus <sujet>` avant de coder — sans fil, aucun de tes commits n'est rattache.")
 
     parked = [t for t in st["threads"].values() if t["status"] == "parked"]
-    if parked:
-        L.append("\nFILS EN PAUSE (ne pas y toucher sans reprise explicite) :")
-        for t in parked:
-            L.append(f"  {t['id']} : {trunc(t['label'], 60)} — reprise : {trunc(t['note'] or 'aucune note', 110)}")
+    sec(2, "\nFILS EN PAUSE (ne pas y toucher sans reprise explicite) :" if parked else None,
+        [f"  {t['id']} : {trunc(t['label'], 60)} — reprise : {trunc(t['note'] or 'aucune note', 110)}"
+         for t in parked])
 
     bugs = [b for b in st["bugs"].values() if b["status"] in ("open", "in_progress", "to_verify")]
-    if bugs:
-        L.append("\nBUGS OUVERTS (ne pas traiter maintenant, sauf demande explicite) :")
-        for b in bugs[-CTX_MAX_BUGS:]:
-            th = f"[{b['thread']}] " if b.get("thread") else ""
-            tag = " (agent)" if b.get("par") == "agent" else ""
-            att = ""
-            if b["attempts"]:  # tentatives cablees en session (v1.5)
-                att = (f" [{len(b['attempts'])} tentatives, derniere: "
-                       f"{trunc(b['attempts'][-1]['hypothesis'], 60)}]")
-            L.append(f"  {b['id']} ({b['status']}) {th}{trunc(b['text'])}{tag}{att}")
-            rej = [a for a in b["attempts"] if a.get("rejected")]
-            if rej:  # §5 : ce qui a deja ete tente doit survivre a la compaction
-                plus = f" (+{len(rej) - 1}, voir plantrack attempts {b['id']})" if len(rej) > 1 else ""
-                L.append(f"    deja rejete : {trunc(rej[-1]['hypothesis'], 60)}"
-                         f" — {trunc(rej[-1]['rejected'], 60)}{plus}")
+    blines = []
+    for b in bugs[-CTX_MAX_BUGS:]:
+        th = f"[{b['thread']}] " if b.get("thread") else ""
+        tag = " (agent)" if b.get("par") == "agent" else ""
+        att = ""
+        if b["attempts"]:  # tentatives cablees en session (v1.5)
+            att = (f" [{len(b['attempts'])} tentatives, derniere: "
+                   f"{trunc(b['attempts'][-1]['hypothesis'], 60)}]")
+        line = f"  {b['id']} ({b['status']}) {th}{trunc(b['text'])}{tag}{att}"
+        rej = [x for x in b["attempts"] if x.get("rejected")]
+        if rej:  # §5 : ce qui a deja ete tente doit survivre a la compaction — et
+            # reste colle a son bug, sinon l'elision separerait l'un de l'autre
+            plus = f" (+{len(rej) - 1}, voir plantrack attempts {b['id']})" if len(rej) > 1 else ""
+            line += (f"\n    deja rejete : {trunc(rej[-1]['hypothesis'], 60)}"
+                     f" — {trunc(rej[-1]['rejected'], 60)}{plus}")
+        blines.append(line)
+    sec(6, "\nBUGS OUVERTS (ne pas traiter maintenant, sauf demande explicite) :", blines)
 
-    if st["decisions"]:
-        L.append("\nDECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :")
-        for d in st["decisions"][-CTX_MAX_DECISIONS:]:
-            tag = " (agent)" if d.get("par") == "agent" else ""
-            L.append(f"  {d['id']} : {trunc(d['text'])}{tag}")
+    sec(1, "\nDECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :",
+        [f"  {d['id']} : {trunc(d['text'])}" + (" (agent)" if d.get("par") == "agent" else "")
+         for d in st["decisions"][-CTX_MAX_DECISIONS:]])
 
-    if st["pieges"]:
-        L.append("\nPieges connus :")
-        for p in list(st["pieges"].values())[-CTX_MAX_PIEGES:]:
-            L.append(f"  {p['id']} : {trunc(p['text'], 80)}")
+    sec(4, "\nPieges connus :",
+        [f"  {p['id']} : {trunc(p['text'], 80)}"
+         for p in list(st["pieges"].values())[-CTX_MAX_PIEGES:]])
 
     pending_q = [q for q in st["questions"].values() if not q.get("answer")]
-    if pending_q:
-        L.append("\nQuestions en attente (reponds via !answer qN ...) :")
-        for q in pending_q[-CTX_MAX_QUESTIONS:]:
-            L.append(f"  {q['id']} : {trunc(q['text'], 80)}")
+    sec(5, "\nQuestions en attente (reponds via !answer qN ...) :",
+        [f"  {q['id']} : {trunc(q['text'], 80)}" for q in pending_q[-CTX_MAX_QUESTIONS:]])
 
     if st.get("testcheck"):
         for g in list(st["guides"].values())[:6]:
             if (pend := [s for s in g["steps"] if st["steps"][s]["verdict"] is None]):
-                L.append(f"\nGuide {trunc(g['title'], 50)}: {len(pend)} etapes sans verdict ({', '.join(pend)})")
+                sec(7, f"\nGuide {trunc(g['title'], 50)}: {len(pend)} etapes sans verdict ({', '.join(pend)})")
 
     if st["inbox"]:
-        L.append(f"\nINBOX NON CLASSEE : {len(st['inbox'])} element(s), voir `plantrack inbox`.")
+        sec(8, f"\nINBOX NON CLASSEE : {len(st['inbox'])} element(s), voir `plantrack inbox`.")
 
-    out = "\n".join(L)
-    if len(out) > CTX_MAX_CHARS:
-        suffix = "\n[...tronque — budget de contexte atteint]"
-        out = out[:CTX_MAX_CHARS - len(suffix)] + suffix
-    # les regles sont ajoutees APRES la troncature : l'etat peut deborder, les
+    def render(note=""):
+        L = []
+        if header:
+            L.append("== PlanTrack — etat persistant du projet ==")
+            L.append("(reinjecte automatiquement, y compris apres compaction du contexte)")
+        for _, head, items in secs:
+            if head:
+                L.append(head)
+            L += items
+        return "\n".join(L) + note
+
+    out = render()
+    cut = 0
+    while budget and len(out) > budget:
+        live = [s for s in secs if s[1] or s[2]]
+        if not live:
+            break
+        v = max(live, key=lambda s: s[0])  # rangs distincts : pas d'ambiguite
+        if v[2]:
+            v[2].pop(0)
+            if not v[2]:
+                v[1] = None  # une tete sans ses lignes ferait croire a une section vide
+        else:
+            v[1] = None
+        cut += 1
+        out = render(f"\n\n[{cut} ligne(s) elidee(s) faute de budget — tout reste dans `plantrack status`]")
+    # les regles sont ajoutees APRES l'elision : l'etat peut deborder, les
     # regles jamais — c'est le seul canal qu'aucun outil tiers ne peut ecraser
     if not rules:
         return out
@@ -1137,9 +1165,12 @@ def cmd_doctor(st):
     chk(not stale, f"bugs en attente de verdict humain ({len(stale)} depuis plus de {STALE_DAYS} jours)",
         "l'agent a fini, personne n'a tranche : `plantrack verify <id>` ou `plantrack reject <id> \"motif\"` — "
         + ", ".join(b["id"] for b in stale[:6]))
-    n = len(context_block(st)) - len(RULES)
-    chk(n < CTX_MAX_CHARS, f"etat reinjecte sous le budget ({n}/{CTX_MAX_CHARS} chars)",
-        "le bloc EST tronque, la fin ne parvient plus a l'agent — ferme des fils ou valide des bugs")
+    # budget=None : on mesure le bloc ENTIER. Mesure apres elision, le chiffre
+    # serait toujours egal au plafond et ne dirait jamais de combien ca deborde.
+    n = len(context_block(st, rules=False, budget=None))
+    chk(n <= CTX_MAX_CHARS, f"etat reinjecte sous le budget ({n}/{CTX_MAX_CHARS} chars)",
+        f"{n - CTX_MAX_CHARS} chars elides a chaque injection, en partant des sections "
+        "les moins prioritaires — ferme des fils ou valide des bugs")
     sys.exit(1 if probs else 0)
 
 
