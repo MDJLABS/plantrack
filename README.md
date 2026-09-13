@@ -116,6 +116,7 @@ avant d'atteindre le modèle** : son contexte reste propre.
 | `!piege le cache invalide la session` | note un piège technique, rappelé à chaque session |
 | `!question faut-il garder l'ancien format ?` | pose une question à l'humain, rappelée tant que sans réponse |
 | `!answer q1 oui, on garde` | toi seule : réponds à une question en attente |
+| `!verify b1` / `!reject b1 le bouton reste mort` | toi seule : verdict sur un bug `to_verify`, sans quitter la session |
 | `!state` | affiche l'état persistant |
 | `!testcheck on\|off` | active/désactive les guides de test cochables (off par défaut) |
 | `!check s1 ok` / `!check s1 ko -m "motif"` | toi seule : verdict sur une étape de guide (motif obligatoire pour ko) |

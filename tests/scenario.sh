@@ -764,5 +764,37 @@ check_not "aucune tete de section vide dans un projet neuf" "Questions en attent
 check_not "aucune tete de section vide dans un projet neuf (pieges)" "Pieges connus" "$vide"
 rm -rf "$TMP18" "$TMP18b"
 
+# 19. Le verdict humain sans quitter la session : !verify / !reject (humain par
+# construction, comme !answer : seul l'humain tape un prompt) — audit du 13/09 :
+# 0 verdict sur 48 bugs, la CLI exigeait un second terminal.
+TMP19=$(mktemp -d)
+P19() { CLAUDE_PROJECT_DIR="$TMP19" prompt "$1"; }
+P19 '!focus verdicts' >/dev/null
+P19 '!bug le bouton ne repond pas' >/dev/null
+CLAUDE_PROJECT_DIR="$TMP19" python3 "$PT" attempt b1 "le handler n est pas branche" >/dev/null 2>&1
+out=$(P19 '!verify b1')
+check "!verify refuse un bug qui n est pas to_verify" "to_verify" "$out"
+CLAUDE_PROJECT_DIR="$TMP19" python3 "$PT" bug b1 to_verify >/dev/null 2>&1
+out=$(P19 '!reject b1'); check "!reject sans motif : usage" "usage" "$out"
+out=$(P19 '!reject b1 le bouton reste mort'); rc=$?
+check_exit "!reject rejette le prompt (exit 2)" 2 "$rc"
+check "!reject rouvre le bug avec motif" "b1 rouvert avec motif" "$out"
+out=$(CLAUDE_PROJECT_DIR="$TMP19" python3 "$PT" attempts b1 2>&1)
+check "!reject : le motif est attache a la derniere tentative" "rejetee : le bouton reste mort" "$out"
+CLAUDE_PROJECT_DIR="$TMP19" python3 "$PT" bug b1 to_verify >/dev/null 2>&1
+out=$(P19 '!verify b1'); rc=$?
+check_exit "!verify rejette le prompt (exit 2)" 2 "$rc"
+check "!verify valide le bug" "b1 valide" "$out"
+out=$(CLAUDE_PROJECT_DIR="$TMP19" python3 "$PT" status 2>&1)
+check_not "bug valide : il quitte le bloc reinjecte" "b1" "$out"
+out=$(P19 '!verify b9'); check "!verify sur id inconnu : erreur claire" "introuvable" "$out"
+out=$(P19 '!help'); check "!help documente !verify et !reject" "!verify <id>" "$out"
+# une question sans reponse depuis plus de 7 jours est un oubli au meme titre qu'un bug
+printf '{"ts":"2026-01-01T00:00:00+00:00","kind":"question","id":"q1","text":"on garde le format ?"}\n' >> "$TMP19/.plantrack/events.jsonl"
+d=$(CLAUDE_PROJECT_DIR="$TMP19" python3 "$PT" doctor 2>&1)
+check "doctor : question sans reponse > 7 jours signalee" "!!  questions sans reponse (1 depuis plus de 7 jours)" "$d"
+check "doctor : la question oubliee est nommee avec le geste" "!answer q1" "$d"
+rm -rf "$TMP19"
+
 echo
 [ "$fail" = 0 ] && echo "TOUS LES TESTS PASSENT" || { echo "DES TESTS ECHOUENT"; exit 1; }

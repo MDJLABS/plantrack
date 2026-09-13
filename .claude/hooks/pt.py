@@ -574,6 +574,13 @@ def handle_command(raw):
         return cmd_question(rest)
     if verb == "answer":
         return cmd_answer(rest, st)
+    if verb == "verify":
+        return cmd_verdict(st, rest.split()[0] if rest else "")[1]
+    if verb == "reject":
+        parts = rest.split(None, 1)
+        if len(parts) < 2 or not parts[1].strip():
+            return "usage : !reject <id> <pourquoi ca ne marche pas>"
+        return cmd_verdict(st, parts[0], parts[1].strip())[1]
     if verb == "testcheck":
         return cmd_testcheck(rest)
     if verb == "guide":
@@ -602,6 +609,7 @@ HELP = """[PlanTrack] commandes (dans le prompt de l'agent, jamais transmises au
   !piege <texte>      note un piege technique (rappele a chaque session)
   !question <texte>   pose une question a l'humain (rappelee tant que sans reponse)
   !answer <id> <texte>   toi seule : reponds a une question en attente
+  !verify <id> / !reject <id> <motif>   toi seule : verdict sur un bug to_verify, sans quitter la session
   !testcheck on|off / !guide <titre> / !step <id> <texte> / !check <id> ok|ko [motif]   guides de test, off par defaut (ko exige un motif)
   !state              affiche l'etat persistant courant
   !<texte libre>      capture dans l'inbox, a classer plus tard
@@ -1216,8 +1224,12 @@ def diagnose(st):
     stale = [b for b in st["bugs"].values()
              if b["status"] == "to_verify" and b.get("status_ts", b["ts"]) < old]
     chk(not stale, f"bugs en attente de verdict humain ({len(stale)} depuis plus de {STALE_DAYS} jours)",
-        "l'agent a fini, personne n'a tranche : `plantrack verify <id>` ou `plantrack reject <id> \"motif\"` — "
+        "l'agent a fini, personne n'a tranche : `!verify <id>` ou `!reject <id> motif` dans la session — "
         + ", ".join(b["id"] for b in stale[:6]))
+    muettes = [q for q in st["questions"].values() if not q.get("answer") and q["ts"] < old]
+    chk(not muettes, f"questions sans reponse ({len(muettes)} depuis plus de {STALE_DAYS} jours)",
+        "l'agent attend, la question ressort a chaque session : `!answer <id> <texte>` — "
+        + ", ".join(f"!answer {q['id']}" for q in muettes[:6]))
     # budget=None : on mesure le bloc ENTIER. Mesure apres elision, le chiffre
     # serait toujours egal au plafond et ne dirait jamais de combien ca deborde.
     n = len(context_block(st, rules=False, budget=None))
@@ -1534,6 +1546,26 @@ def cmd_bug_status(args, st):
         sys.exit("statuts : open | in_progress | to_verify | wont_fix (validated : via `plantrack verify`)")
 
 
+def cmd_verdict(st, bid, motif=None):
+    """verify (motif None) / reject (motif) — humain seul, par la CLI (require_human)
+    ou par le prompt (!verify / !reject : seul l'humain tape un prompt, comme !answer).
+    Renvoie (ok, message) sans jamais sys.exit : en hook, un exit 1 laisserait
+    passer le prompt au modele."""
+    b = st["bugs"].get(bid or "")
+    if not b:
+        return False, f"[PlanTrack] bug introuvable : {bid or '(manquant)'} — `plantrack bugs` pour la liste."
+    if b["status"] != "to_verify":
+        geste = "se rejette" if motif is not None else "se valide"
+        return False, (f"refuse : {b['id']} est \"{b['status']}\" — seul un bug \"to_verify\" "
+                       f"{geste} (machine a etats §9).")
+    if motif is None:
+        append("bug_status", id=b["id"], status="validated")
+        return True, f"{b['id']} valide."
+    append("bug_status", id=b["id"], status="open", text="rejete : " + motif)
+    extra = " (motif attache a la derniere tentative)" if b["attempts"] else ""
+    return True, f"{b['id']} rouvert avec motif{extra}."
+
+
 def require_human(cmd):
     """O6 : ecrire un verdict est reserve a l'humain. Refus deterministe quand
     la CLI est invoquee depuis un shell pilote par l'agent (env Claude Code)."""
@@ -1609,23 +1641,14 @@ def cli(argv):
                 print(f"        commits : {len(t['commits'])} (dernier {t['commits'][-1]['sha']})")
     elif cmd == "verify":
         require_human("verify")
-        b = get_bug(st, args[0] if args else "")
-        if b["status"] != "to_verify":
-            sys.exit(f"refuse : {b['id']} est \"{b['status']}\" — seul un bug \"to_verify\" "
-                     "se valide (machine a etats §9).")
-        append("bug_status", id=b["id"], status="validated")
-        print(f"{b['id']} valide.")
+        ok, msg = cmd_verdict(st, args[0] if args else "")
+        print(msg) if ok else sys.exit(msg)
     elif cmd == "reject":
         require_human("reject")
         if len(args) < 3 or args[1] != "-m":
             sys.exit("usage : plantrack reject <bug_id> -m \"pourquoi ca ne marche pas\"")
-        b = get_bug(st, args[0])
-        if b["status"] != "to_verify":
-            sys.exit(f"refuse : {b['id']} est \"{b['status']}\" — on ne rejette qu'un bug "
-                     "\"to_verify\" (machine a etats §9).")
-        append("bug_status", id=b["id"], status="open", text="rejete : " + " ".join(args[2:]))
-        extra = " (motif attache a la derniere tentative)" if b["attempts"] else ""
-        print(f"{b['id']} rouvert avec motif{extra}.")
+        ok, msg = cmd_verdict(st, args[0], " ".join(args[2:]))
+        print(msg) if ok else sys.exit(msg)
     elif cmd == "bug":
         # desambiguation : "bug b1 wont_fix" (changement de statut) vs
         # "bug <texte>" (creation par l'agent, v1.5)
