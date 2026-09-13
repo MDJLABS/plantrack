@@ -314,3 +314,16 @@ ne pouvait pas le voir. Quatre chantiers choisis par Mariella :
   commit (la ligne part avec le commit suivant).
 - 253 checks verts. Version **1.7.0** dans `pyproject.toml`, **non publiée sur
   PyPI** (publication réservée à Mariella).
+
+## Audit terrain — 2026-09-13 (session « analyse de fonctionnement »)
+Trois agents Sonnet en lecture seule (bcc, miamboost, cœur pt.py). Page de
+synthèse : https://claude.ai/code/artifact/11dd4df9-26cc-4d4e-bb0c-19fcee9d6d67
+Faits mesurés : 0 verdict humain sur 48 bugs et 0 réponse sur 13 questions en
+14 j ; 1 fil par dépôt (71–108 commits) ; 5 file_touched / 71 commits sur
+miamboost (matcher sans Bash) ; injection réelle 3 928–4 589 chars (RULES hors
+budget) ; hooks 65–90 ms, post-commit 4,4 s à 20 000 événements (relecture
+intégrale, 2×) ; worktrees cassés ; 9 except silencieux / 14 ; 282 checks
+verts en 23 s ; pt.py 1726 l. (plafond 1450).
+Consigné : b5 (worktree), b6 (filelog sans Bash), b7 (except silencieux),
+pg3 (relecture O(n)), pg4 (commits fantômes > 100 %), pg5 (Codex jamais prouvé).
+Rien n'est décidé : les 10 pistes sont sur la page, arbitrage à Mariella.

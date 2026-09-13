@@ -75,3 +75,4 @@
 {"ts": "2026-09-13T12:30:37+00:00", "kind": "piege", "id": "pg3", "text": "read_events relit et reparse tout le journal a chaque appel, hook_commit le lit 2x et next_id une 3e fois. Mesure 13/09 : 90 ms a 570 events, 330 ms post-commit a 5000, 4,4 s a 20000. Au rythme de bcc (40 ev/j) : 5000 en 4 mois."}
 {"ts": "2026-09-13T12:30:38+00:00", "kind": "piege", "id": "pg4", "text": "Un commit amende ou reset apres le post-commit reste dans le journal append-only : doctor affiche alors plus de 100 % (107/105 bcc, 71/67 miamboost). Ce n'est pas une double journalisation."}
 {"ts": "2026-09-13T12:30:38+00:00", "kind": "piege", "id": "pg5", "text": "injections.json ne porte que la cle 'claude' sur bcc et miamboost : rien ne prouve qu'un hook Codex ait jamais tourne, malgre la ligne 'ok' du doctor sur .codex/hooks.json."}
+{"ts": "2026-09-13T12:30:38+00:00", "kind": "commit", "sha": "86032c2", "ctype": "chore", "thread": "t1"}
