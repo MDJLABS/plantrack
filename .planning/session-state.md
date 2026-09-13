@@ -327,3 +327,13 @@ verts en 23 s ; pt.py 1726 l. (plafond 1450).
 Consigné : b5 (worktree), b6 (filelog sans Bash), b7 (except silencieux),
 pg3 (relecture O(n)), pg4 (commits fantômes > 100 %), pg5 (Codex jamais prouvé).
 Rien n'est décidé : les 10 pistes sont sur la page, arbitrage à Mariella.
+
+## v1.9.0 — 2026-09-13 : le verdict humain sans quitter la session
+Chantier choisi par Mariella après l'audit (0 verdict sur 48 bugs : trancher
+exigeait un second terminal). `!verify <id>` / `!reject <id> <motif>` dans le
+prompt, humain par construction comme `!answer` ; `cmd_verdict` partagé CLI +
+hook sans sys.exit ; doctor alerte sur les questions sans réponse > 7 j.
+Commit c846437, 294 checks verts, pt.py 1749 l. (plafond 1450 toujours dépassé,
+chiffre à trancher). Propagé : miamboost e60bd6b ; bcc → parti dans le commit
+5bec6bb d'une autre session active (voir pg7). Fil t1 fermé (audit livré),
+fil t2 actif. À faire par Mariella : tag v1.9.0 + publication PyPI.

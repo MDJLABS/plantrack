@@ -79,3 +79,9 @@
 {"ts": "2026-09-13T12:30:48+00:00", "kind": "commit", "sha": "187b64c", "ctype": "docs", "thread": "t1"}
 {"ts": "2026-09-13T22:51:06+00:00", "kind": "park", "id": "t1", "text": "audit terrain livre, page publiee ; reprise possible sur les 9 autres pistes"}
 {"ts": "2026-09-13T22:51:07+00:00", "kind": "thread_open", "id": "t2", "text": "verdict humain en session (!verify / !reject)"}
+{"ts": "2026-09-13T22:54:11+00:00", "kind": "precommit_block"}
+{"ts": "2026-09-13T22:54:32+00:00", "kind": "close", "id": "t1"}
+{"ts": "2026-09-13T22:54:33+00:00", "kind": "commit", "sha": "c846437", "ctype": "feat", "thread": "t2"}
+{"ts": "2026-09-13T22:55:18+00:00", "kind": "commit", "sha": "e60bd6b", "ctype": "chore", "thread": "t2"}
+{"ts": "2026-09-13T22:55:56+00:00", "kind": "piege", "id": "pg6", "text": "Le garde-fou pre-commit refuse tout fichier touche par un fil PARQUE : sur un outil mono-fichier, pt.py appartient toujours au fil precedent, donc chaque nouveau chantier bloque au premier commit. Constate le 13/09 (t1 parque -> commit refuse). Issue : fermer le fil precedent (plantrack close <id>) quand son travail est livre, plutot que --no-verify."}
+{"ts": "2026-09-13T22:55:56+00:00", "kind": "piege", "id": "pg7", "text": "Propager le coeur vendorise vers un depot ou une AUTRE session Claude travaille : le git add de pt.py est parti dans le commit de l'autre session (bcc 5bec6bb, 13/09). Verifier ps/git status avant, ou laisser cette session-la lancer 'plantrack update' elle-meme."}

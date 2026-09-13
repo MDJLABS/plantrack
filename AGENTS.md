@@ -16,8 +16,7 @@
 
 !! BUG BLOQUANT — a traiter avant toute autre chose : b1 Troncature du bloc reinjecte : sur bcc le bloc re…
 
-FIL ACTIF — t1 : surveillance des repos plantrack [23 commits]
-  fichiers recemment ecrits : ../../../tmp/claude-0/-home-mariella-plantrack/25db747d-ebf4-407e-b1fe-4b9b89070138/scratchpad/carnet-deux-depots.html, ../../../tmp/claude-0/-home-mariella-plantrack/25db747d-ebf4-407e-b1fe-4b9b89070138/scratchpad/regle-manquante.html, tests/scenario.sh, .claude/hooks/pt.py
+FIL ACTIF — t2 : verdict humain en session (!verify / !reject) [2 commits]
 
 BUGS OUVERTS (ne pas traiter maintenant, sauf demande explicite) :
   b1 (to_verify) [t1] Troncature du bloc reinjecte : sur bcc le bloc reel fait 4661 chars pour un budget de 3000 — 1661 chars coupes par la FIN, donc 4 decisions… (agent) [2 tentatives, derniere: Le resserrage (MIN_TRUNC=80) precede l'elision : les plafon…]
