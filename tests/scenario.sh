@@ -714,12 +714,17 @@ check "testcheck off : creer une nouvelle etape est de nouveau refuse" "testchec
 rm -rf "$TMP17"
 
 # 18. §11 — depassement du budget : l'elision part des sections les MOINS
-# prioritaires. Une decision, un piege et une question doivent survivre a des
-# bugs ouverts qui, eux, sont sacrifies.
+# prioritaires. Une decision, un piege et une question doivent survivre aux bugs
+# DEJA CORRIGES, qui n'attendent qu'un verdict ; mais un bug NON CORRIGE passe
+# devant eux — c'est un trou reel, pas une formalite.
 TMP18=$(mktemp -d)
 L=$(python3 -c 'print("x"*130)')
 for i in 1 2 3 4 5 6 7 8; do
   CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" bug "BUGSACRIFIABLE$i $L" >/dev/null
+done
+# la moitie passe en to_verify : ce sont eux, les sacrifiables
+for i in 5 6 7 8; do
+  CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" bug b$i to_verify >/dev/null
 done
 for i in 1 2 3 4 5 6; do
   CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" decide "DECISIONSURVIVANTE$i $L" >/dev/null
@@ -744,14 +749,15 @@ s = importlib.util.spec_from_file_location('pt', '$PT')
 m = importlib.util.module_from_spec(s); s.loader.exec_module(m)
 print(m.context_block(m.project(), rules=False, budget=1200))")
 check_not "pas de tete de section orpheline une fois la section videe" \
-  "BUGS OUVERTS (ne pas traiter maintenant" "$serre"
+  "BUGS EN ATTENTE DE TON VERDICT" "$serre"
 check "budget etrangle : les decisions sont les dernieres a partir" "DECISIONSURVIVANTE6" "$serre"
-check "budget etrangle : les pieges survivent aux bugs" "PIEGESURVIVANT6" "$serre"
-check_not "budget etrangle : les bugs ouverts partent en premier" "BUGSACRIFIABLE1" "$serre"
+check_not "budget etrangle : les bugs deja corriges partent en premier" "BUGSACRIFIABLE8" "$serre"
+check "budget etrangle : un bug NON CORRIGE survit aux pieges" "BUGSACRIFIABLE4" "$serre"
+check_not "budget etrangle : les pieges partent avant les bugs non corriges" "PIEGESURVIVANT6" "$serre"
 # le doctor doit annoncer le depassement REEL, pas la taille apres elision
 d=$(CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" doctor 2>&1 | grep "etat reinjecte")
 check_not "doctor : le chiffre n'est pas la taille apres elision" "3000/3000" "$d"
-check "doctor : le depassement reel est chiffre" "3718/3000" "$d"
+check "doctor : le depassement reel est chiffre" "3786/3000" "$d"
 # le palier de resserrage absorbe ce depassement AVANT toute elision : rien n'est
 # perdu, donc le controle ne doit PAS crier — une alerte qui ne s'eteint plus (d2)
 # cesse d'etre lue. Le depassement brut ressort en simple information.

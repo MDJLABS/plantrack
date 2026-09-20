@@ -258,7 +258,8 @@ def trunc(s, n=LINE_TRUNC):
 def context_block(st, header=True, rules=True, budget=CTX_MAX_CHARS, width=LINE_TRUNC):
     """§11 : les sections sortent dans l'ordre de lecture, mais c'est leur RANG qui
     decide qui survit au depassement — decisions > fil actif et notes de reprise >
-    bugs bloquants > le reste. En cas de debordement on elide ligne a ligne en
+    bugs bloquants > bugs non corriges > le reste, les bugs deja corriges en
+    dernier. En cas de debordement on elide ligne a ligne en
     partant de la section la moins prioritaire (la plus ancienne d'abord) : le bloc
     ne se coupe plus au hasard par la fin, ou les decisions se trouvaient.
     Avant d'elider, on RESSERRE (width -> MIN_TRUNC) : une ligne raccourcie vaut
@@ -300,9 +301,7 @@ def context_block(st, header=True, rules=True, budget=CTX_MAX_CHARS, width=LINE_
         [f"  {t['id']} : {trunc(t['label'], 60)} — reprise : {trunc(t['note'] or 'aucune note', min(110, width))}"
          for t in parked])
 
-    bugs = [b for b in st["bugs"].values() if b["status"] in ("open", "in_progress", "to_verify")]
-    blines = []
-    for b in bugs[-CTX_MAX_BUGS:]:
+    def bug_line(b):
         th = f"[{b['thread']}] " if b.get("thread") else ""
         tag = " (agent)" if b.get("par") == "agent" else ""
         att = ""
@@ -319,28 +318,41 @@ def context_block(st, header=True, rules=True, budget=CTX_MAX_CHARS, width=LINE_
             plus = f" (+{len(rej) - 1}, voir plantrack attempts {b['id']})" if len(rej) > 1 else ""
             line += (f"\n    deja rejete : {trunc(rej[-1]['hypothesis'], min(60, width))}"
                      f" — {trunc(rej[-1]['rejected'], min(60, width))}{plus}")
-        blines.append(line)
-    sec(6, "\nBUGS OUVERTS (ne pas traiter maintenant, sauf demande explicite) :", blines)
+        return line
+
+    # Deux sections, pas une : un bug JAMAIS corrige et un bug qui n'attend qu'un verdict
+    # ne meritent pas la meme place. Melanges, les plafonds partent aux plus recents —
+    # mesure du 20/09 sur bcc : 45 bugs, les 8 places prises par des to_verify, les deux
+    # seuls bugs non corriges (secrets en clair) jamais montres a l'agent. Et trier dans
+    # UNE section ne suffisait pas : l'elision mange la premiere ligne, donc les remettre
+    # en tete les aurait coupes en premier — il leur faut leur propre RANG.
+    bugs = list(st["bugs"].values())
+    troues = [b for b in bugs if b["status"] in ("open", "in_progress")]
+    verdict = [b for b in bugs if b["status"] == "to_verify"]
+    sec(4, "\nBUGS NON CORRIGES (personne ne s'en est occupe) :",
+        [bug_line(b) for b in troues[-CTX_MAX_BUGS:]])
+    sec(7, "\nBUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :",
+        [bug_line(b) for b in verdict[-CTX_MAX_BUGS:]])
 
     sec(1, "\nDECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :",
         [f"  {d['id']} : {trunc(d['text'], width)}" + (" (agent)" if d.get("par") == "agent" else "")
          for d in st["decisions"][-CTX_MAX_DECISIONS:]])
 
-    sec(4, "\nPieges connus :",
+    sec(5, "\nPieges connus :",
         [f"  {p['id']} : {trunc(p['text'], min(80, width))}"
          for p in list(st["pieges"].values())[-CTX_MAX_PIEGES:]])
 
     pending_q = [q for q in st["questions"].values() if not q.get("answer")]
-    sec(5, "\nQuestions en attente (reponds via !answer qN ...) :",
+    sec(6, "\nQuestions en attente (reponds via !answer qN ...) :",
         [f"  {q['id']} : {trunc(q['text'], min(80, width))}" for q in pending_q[-CTX_MAX_QUESTIONS:]])
 
     if st.get("testcheck"):
         for g in list(st["guides"].values())[:6]:
             if (pend := [s for s in g["steps"] if st["steps"][s]["verdict"] is None]):
-                sec(7, f"\nGuide {trunc(g['title'], 50)}: {len(pend)} etapes sans verdict ({', '.join(pend)})")
+                sec(8, f"\nGuide {trunc(g['title'], 50)}: {len(pend)} etapes sans verdict ({', '.join(pend)})")
 
     if st["inbox"]:
-        sec(8, f"\nINBOX NON CLASSEE : {len(st['inbox'])} element(s), voir `plantrack inbox`.")
+        sec(9, f"\nINBOX NON CLASSEE : {len(st['inbox'])} element(s), voir `plantrack inbox`.")
 
     def render(note=""):
         L = []
