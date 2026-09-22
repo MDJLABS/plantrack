@@ -920,5 +920,35 @@ out=$(CLAUDE_PROJECT_DIR="$TMP21" python3 "$PT" doctor 2>&1)
 check "un sha introuvable ne casse pas le controle d usage" "commits arrives au carnet" "$out"
 rm -rf "$TMP21"
 
+# 22. b5 — worktree git : `.git` est un FICHIER 'gitdir: <chemin>', pas un
+# repertoire. Sans resolution, branch() lit un HEAD absent et retombe en silence
+# sur 'le depot', et l'installation refuse 'pas de depot git ici'. Les hooks, eux,
+# vivent dans le repertoire COMMUN du depot principal, jamais dans le worktree.
+TMP22=$(mktemp -d)
+(cd "$TMP22" && git init -q principal && cd principal && git config user.email t@t \
+  && git config user.name t && git commit -q --allow-empty -m init \
+  && git worktree add -q ../feature -b feature) >/dev/null 2>&1
+WT="$TMP22/feature"
+out=$(CLAUDE_PROJECT_DIR="$WT" python3 "$PT" init --git-hook 2>&1)
+check "worktree : l installation ne refuse plus le depot" "installation terminee" "$out"
+check "worktree : le garde-fou pre-commit est pose" "hook pre-commit installe" "$out"
+check "worktree : les hooks vont au repertoire commun" ok \
+  "$([ -f "$TMP22/principal/.git/hooks/post-commit" ] && echo ok || echo absent)"
+check "worktree : rien n a ete ecrit dans le repertoire du worktree" ok \
+  "$([ -d "$TMP22/principal/.git/worktrees/feature/hooks" ] && echo dedans || echo ok)"
+(cd "$WT" && export CLAUDE_PROJECT_DIR="$WT" && echo x > f.txt && git add f.txt \
+  && git commit -q --no-verify -m "essai") >/dev/null 2>&1
+# le sha, pas le ratio du doctor : le commit d'amorce du depot principal tombe
+# dans la meme seconde et fausserait le compte (meme famille que pg8)
+SHA22=$(cd "$WT" && git log -1 --format=%h)
+check "worktree : le commit arrive au carnet" "$SHA22" "$(cat "$WT/.plantrack/events.jsonl")"
+out=$(CLAUDE_PROJECT_DIR="$WT" python3 -c "
+import importlib.util, sys
+s = importlib.util.spec_from_file_location('pt', sys.argv[1])
+m = importlib.util.module_from_spec(s); s.loader.exec_module(m)
+print(m.branch())" "$PT" 2>&1)
+check "worktree : la branche est lue, pas devinee" feature "$out"
+rm -rf "$TMP22"
+
 echo
 [ "$fail" = 0 ] && echo "TOUS LES TESTS PASSENT" || { echo "DES TESTS ECHOUENT"; exit 1; }

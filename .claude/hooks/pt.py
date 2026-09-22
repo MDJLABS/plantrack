@@ -295,11 +295,42 @@ def porte_bloquee(st, ph):
     return None
 
 
+def git_dir():
+    """Le repertoire git du depot, ou None. Dans un WORKTREE, `.git` n'est pas un
+    repertoire mais un fichier 'gitdir: <chemin>' : lire ROOT/.git/HEAD y echoue en
+    silence (b5). Pas de subprocess, le hook doit rester instantane."""
+    p = os.path.join(ROOT, ".git")
+    if os.path.isdir(p):
+        return p
+    try:
+        with open(p, encoding="utf-8") as f:
+            ligne = f.read().strip()
+    except OSError:
+        return None
+    if not ligne.startswith("gitdir:"):
+        return None
+    d = ligne.split(":", 1)[1].strip()
+    return d if os.path.isabs(d) else os.path.normpath(os.path.join(ROOT, d))
+
+
+def git_hooks_dir():
+    """Les hooks vivent dans le repertoire COMMUN : un worktree
+    (<git>/worktrees/<nom>) partage ceux du depot principal."""
+    d = git_dir()
+    if not d:
+        return None
+    parent, _ = os.path.split(d.rstrip(os.sep))
+    if os.path.basename(parent) == "worktrees":
+        d = os.path.dirname(parent)
+    return os.path.join(d, "hooks")
+
+
 def branch():
     """Nom de la branche courante, lu sans git (le hook doit rester instantane)."""
+    d = git_dir()
     try:
-        head = open(os.path.join(ROOT, ".git", "HEAD"), encoding="utf-8").read().strip()
-    except OSError:
+        head = open(os.path.join(d, "HEAD"), encoding="utf-8").read().strip()
+    except (OSError, TypeError):
         return "le depot"
     return head.rsplit("/", 1)[-1] if head.startswith("ref:") else "un commit detache"
 
@@ -1027,18 +1058,18 @@ def chain_hook(hook, script, call, label, marker):
 
 
 def install_git_hook():
-    if not os.path.isdir(os.path.join(ROOT, ".git")):
+    if not git_hooks_dir():
         sys.exit("[PlanTrack] pas de depot git ici — lance `git init` d'abord.")
-    chain_hook(os.path.join(ROOT, ".git", "hooks", "pre-commit"),
+    chain_hook(os.path.join(git_hooks_dir(), "pre-commit"),
                GIT_HOOK, GIT_HOOK_CALL, "pre-commit", "pt.py precommit")
     print("[PlanTrack] contournement du garde-fou : git commit --no-verify.")
 
 
 def install_post_commit_hook():
     """Post-commit journalisant, installe d'office (pre-commit reste opt-in)."""
-    if not os.path.isdir(os.path.join(ROOT, ".git")):
+    if not git_hooks_dir():
         return
-    chain_hook(os.path.join(ROOT, ".git", "hooks", "post-commit"),
+    chain_hook(os.path.join(git_hooks_dir(), "post-commit"),
                GIT_HOOK_POST, GIT_HOOK_POST_CALL, "post-commit", "pt.py hook-commit")
 
 
@@ -1343,8 +1374,8 @@ def diagnose(st):
             "un outil a regenere le fichier ? relance `plantrack init`")
     chk(os.path.exists(os.path.join(ROOT, ".deepcode", "skills", "plantrack", "SKILL.md")),
         "skill Deep Code presente", "lance `plantrack init`")
-    if os.path.isdir(os.path.join(ROOT, ".git")):
-        hook = os.path.join(ROOT, ".git", "hooks", "pre-commit")
+    if hooks_dir := git_hooks_dir():
+        hook = os.path.join(hooks_dir, "pre-commit")
         htxt = ""
         if os.path.exists(hook):
             with open(hook, encoding="utf-8") as f:
@@ -1352,7 +1383,9 @@ def diagnose(st):
         chk("pt.py precommit" in htxt, "garde-fou git pre-commit",
             "un autre outil occupe .git/hooks/pre-commit — fusionne a la main"
             if htxt else "lance `plantrack init --git-hook`")
-        post = "hook-commit" in slurp(".git", "hooks", "post-commit")
+        pc = os.path.join(hooks_dir, "post-commit")
+        post = "hook-commit" in (open(pc, encoding="utf-8").read()
+                                 if os.path.exists(pc) else "")
         chk(post, "hook git post-commit (journal des commits)", "lance `plantrack init`")
         if post and (u := usage_gap()):
             chk(u[0] >= u[1], f"commits arrives au carnet ({u[0]}/{u[1]} depuis le {u[2]})",
