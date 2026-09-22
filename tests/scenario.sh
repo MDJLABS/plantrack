@@ -950,5 +950,22 @@ print(m.branch())" "$PT" 2>&1)
 check "worktree : la branche est lue, pas devinee" feature "$out"
 rm -rf "$TMP22"
 
+# 23. b11 — "plantrack bug verify b5" : mots inverses. La desambiguation ne
+# regardait que le premier argument, donc la commande partait en TEXTE et creait
+# un bug fantome dans un journal qui ne s'efface pas. Refus + bonne forme.
+TMP23=$(mktemp -d)
+(cd "$TMP23" && git init -q .) >/dev/null 2>&1
+CLAUDE_PROJECT_DIR="$TMP23" python3 "$PT" init >/dev/null 2>&1
+CLAUDE_PROJECT_DIR="$TMP23" python3 "$PT" bug "un vrai bug" >/dev/null 2>&1
+out=$(CLAUDE_PROJECT_DIR="$TMP23" python3 "$PT" bug verify b1 2>&1)
+check "mots inverses : la commande est refusee" "mots inverses" "$out"
+check "et la bonne forme est rappelee" "plantrack bug b1 verify" "$out"
+check_not "aucun bug fantome n a ete cree" "b2 enregistre" "$out"
+out=$(CLAUDE_PROJECT_DIR="$TMP23" python3 "$PT" bug "regression sur b1" 2>&1)
+check "un texte libre qui cite un id reste un bug" "b2 enregistre" "$out"
+out=$(CLAUDE_PROJECT_DIR="$TMP23" python3 "$PT" bug b1 to_verify 2>&1)
+check "la forme correcte passe toujours" "b1 -> to_verify" "$out"
+rm -rf "$TMP23"
+
 echo
 [ "$fail" = 0 ] && echo "TOUS LES TESTS PASSENT" || { echo "DES TESTS ECHOUENT"; exit 1; }

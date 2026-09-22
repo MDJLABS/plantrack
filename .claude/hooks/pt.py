@@ -2034,6 +2034,15 @@ def cli(argv):
         # "bug <texte>" (creation par l'agent, v1.5)
         if args and re.match(r"^b[0-9]+$", args[0]):
             cmd_bug_status(args, st)
+        elif (len(args) == 2 and re.match(r"^b[0-9]+$", args[1])
+              and args[0] in ("verify", "reject", "open", "in_progress",
+                              "to_verify", "wont_fix", "validated")):
+            # mots inverses : sans ce garde-fou "bug verify b5" part en TEXTE et
+            # cree un bug fantome que le journal append-only ne rend jamais (b11)
+            sys.exit(f"[PlanTrack] mots inverses — l'id vient en premier : "
+                     f"`plantrack bug {args[1]} {args[0]}`"
+                     + (f" (ou `plantrack {args[0]} {args[1]}`)"
+                        if args[0] in ("verify", "reject") else ""))
         else:
             print(cmd_bug(" ".join(args), st, par="agent"))
     elif cmd == "decide":
