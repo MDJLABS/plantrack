@@ -64,6 +64,27 @@ ARCHIVE = os.path.join(PT_DIR, "transcripts")
 # registre des depots installes : personne n'ira lancer doctor dans vingt repos
 REGISTRY = os.environ.get("PLANTRACK_REGISTRY") or os.path.expanduser("~/.plantrack-repos")
 INJECTIONS = os.path.join(PT_DIR, "injections.json")
+INCIDENTS = os.path.join(PT_DIR, "incidents.log")
+MAX_INCIDENTS = 50            # une panne qui se repete se lit sur ses dernieres traces
+
+
+def trace(ou, e):
+    """Une panne avalee est une panne invisible (b7, contre d2). Un except qui ne
+    peut pas remonter — un hook ne doit jamais bloquer une session — depose sa
+    ligne ici, et le doctor l'annonce. Ne leve jamais : une trace qui plante
+    ferait deux pannes au lieu d'une."""
+    try:
+        os.makedirs(PT_DIR, exist_ok=True)
+        ligne = " ".join(f"{datetime.now(timezone.utc).isoformat(timespec='seconds')} "
+                         f"{ou} : {type(e).__name__}: {e}".split())[:300]
+        vieilles = []
+        if os.path.exists(INCIDENTS):
+            with open(INCIDENTS, encoding="utf-8") as f:
+                vieilles = f.read().splitlines()[-(MAX_INCIDENTS - 1):]
+        with open(INCIDENTS, "w", encoding="utf-8") as f:
+            f.write("\n".join(vieilles + [ligne]) + "\n")
+    except Exception:
+        pass
 
 
 # ---------------------------------------------------------------------- journal
@@ -778,7 +799,8 @@ CLI humaine : plantrack status | bugs | inbox | verify <id> | reject <id> -m ...
 def read_hook_input():
     try:
         return json.loads(sys.stdin.read() or "{}")
-    except json.JSONDecodeError:
+    except json.JSONDecodeError as e:
+        trace("hook : entree stdin illisible", e)
         return {}
 
 
@@ -833,8 +855,8 @@ def note_injection():
         os.makedirs(PT_DIR, exist_ok=True)
         with open(INJECTIONS, "w", encoding="utf-8") as f:
             json.dump(d, f, indent=1, sort_keys=True)
-    except (OSError, ValueError):
-        pass
+    except (OSError, ValueError) as e:
+        trace("note_injection", e)
 
 
 def hook_context():
@@ -853,7 +875,8 @@ def hook_context():
     # lancer `plantrack doctor`. Il n'est jamais bloquant.
     try:
         ko = [lab for good, lab, _ in diagnose(st) if good is False]
-    except Exception:  # un diagnostic casse ne doit pas priver l'agent de son etat
+    except Exception as e:  # un diagnostic casse ne doit pas priver l'agent de son etat
+        trace("diagnose (hook-context)", e)
         ko = []
     if ko:
         print(f"\n!! PLANTRACK EN DEFAUT ({len(ko)}) — signale-le a l'humain et lance "
@@ -898,8 +921,8 @@ def hook_precompact():
             shutil.copy(tp, os.path.join(ARCHIVE, f"{stamp}-{os.path.basename(tp)}"))
             for old in sorted(os.listdir(ARCHIVE))[:-MAX_ARCHIVES]:
                 os.unlink(os.path.join(ARCHIVE, old))
-        except OSError:
-            pass
+        except OSError as e:
+            trace("archive du transcript", e)
     sys.exit(0)
 
 
@@ -1177,9 +1200,9 @@ def cmd_init(args):
     if os.path.exists(gi):
         with open(gi, encoding="utf-8") as f:
             content = f.read()
-    # transcripts : trop lourds ; injections : propres a la machine
-    missing = [l for l in (".plantrack/transcripts/", ".plantrack/injections.json")
-               if l not in content]
+    # transcripts : trop lourds ; injections et incidents : propres a la machine
+    missing = [l for l in (".plantrack/transcripts/", ".plantrack/injections.json",
+                           ".plantrack/incidents.log") if l not in content]
     if missing:
         with open(gi, "a", encoding="utf-8") as f:
             f.write(("\n" if content and not content.endswith("\n") else "")
@@ -1275,7 +1298,8 @@ def git_commit_date(sha):
     try:
         r = subprocess.run(["git", "-C", ROOT, "show", "-s", "--format=%cI", sha],
                            capture_output=True, text=True, timeout=10)
-    except (OSError, subprocess.SubprocessError):
+    except (OSError, subprocess.SubprocessError) as e:
+        trace("git_commit_date", e)
         return None
     if r.returncode != 0 or not r.stdout.strip():
         return None
@@ -1320,7 +1344,8 @@ def usage_gap(days=USAGE_DAYS):
     try:
         r = subprocess.run(["git", "-C", ROOT, "log", f"--since={since}", "--pretty=%h"],
                            capture_output=True, text=True, timeout=10)
-    except (OSError, subprocess.SubprocessError):
+    except (OSError, subprocess.SubprocessError) as e:
+        trace("usage_gap : git log", e)
         return None
     return jc, len(r.stdout.split()), since[:10]
 
@@ -1401,6 +1426,15 @@ def diagnose(st):
             f"{raw - parsed} ligne(s) corrompue(s) ignoree(s) au rejeu")
     else:
         out.append((None, "aucun journal encore (.plantrack/events.jsonl)", ""))
+    # b7 : les pannes qu'un hook a avalees pour ne pas bloquer la session. Sans
+    # ce controle, un hook qui echoue a chaque appel ne se voit nulle part.
+    inc = []
+    if os.path.exists(INCIDENTS):
+        with open(INCIDENTS, encoding="utf-8") as f:
+            inc = [l for l in f.read().splitlines() if l.strip()]
+    chk(not inc, f"pannes avalees par les hooks ({len(inc)} tracee(s))",
+        f"derniere : {trunc(inc[-1], 120)} — tout est dans .plantrack/incidents.log "
+        "(efface le fichier une fois la panne traitee)" if inc else "")
     stale = [b for b in st["bugs"].values()
              if b["status"] == "to_verify" and b.get("status_ts", b["ts"]) < old]
     chk(not stale, f"bugs en attente de verdict humain ({len(stale)} depuis plus de {STALE_DAYS} jours)",

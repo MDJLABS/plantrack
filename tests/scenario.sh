@@ -990,5 +990,25 @@ check_not "budget etrangle : la consigne d usage part la premiere" "fil ouvert d
 check "budget etrangle : les bugs non corriges, eux, restent" "BUGVIVANT6" "$serre"
 rm -rf "$TMP24"
 
+# 25. b7 — un hook ne doit jamais bloquer une session, donc il avale ses pannes.
+# Avalees SANS TRACE, elles sont invisibles, meme pour le doctor (contre d2).
+# Ici la panne est reelle : injections.json illisible fait echouer note_injection
+# a chaque demarrage. Le hook continue de servir l'etat, mais il le dit.
+TMP25=$(mktemp -d)
+(cd "$TMP25" && git init -q .) >/dev/null 2>&1
+CLAUDE_PROJECT_DIR="$TMP25" python3 "$PT" init >/dev/null 2>&1
+CLAUDE_PROJECT_DIR="$TMP25" python3 "$PT" bug "un bug quelconque" >/dev/null
+check "incidents.log est gitignore" ".plantrack/incidents.log" "$(cat "$TMP25/.gitignore")"
+out=$(CLAUDE_PROJECT_DIR="$TMP25" python3 "$PT" doctor 2>&1)
+check "aucune panne avalee au depart" "ok  pannes avalees par les hooks (0" "$out"
+printf 'pas du json' > "$TMP25/.plantrack/injections.json"
+out=$(printf '{"source":"startup"}' | CLAUDE_PROJECT_DIR="$TMP25" python3 "$PT" hook-context 2>&1)
+check "la panne n empeche pas le hook de servir l etat" "BUGS NON CORRIGES" "$out"
+check "la panne est tracee, avec son origine" "note_injection" "$(cat "$TMP25/.plantrack/incidents.log")"
+out=$(CLAUDE_PROJECT_DIR="$TMP25" python3 "$PT" doctor 2>&1)
+check "le doctor annonce la panne avalee" "!!  pannes avalees par les hooks (1" "$out"
+check "et donne la derniere trace" "JSONDecodeError" "$out"
+rm -rf "$TMP25"
+
 echo
 [ "$fail" = 0 ] && echo "TOUS LES TESTS PASSENT" || { echo "DES TESTS ECHOUENT"; exit 1; }
