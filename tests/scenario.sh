@@ -892,5 +892,33 @@ out=$(CLAUDE_PROJECT_DIR="$TMP20b" ctx startup)
 check_not "une phase sans regle n encombre pas le bloc" "regle :" "$out"
 rm -rf "$TMP20" "$TMP20b"
 
+# 21. b10 — la fenetre d'usage se prend sur l'horloge de GIT, pas sur celle du
+# journal. Le hook post-commit tourne APRES le commit : qu'il franchisse une
+# seconde et `git log --since` excluait le premier commit que le journal, lui,
+# comptait — l'ecart annoncait 2/1 sans qu'un seul commit manque. C'etait le
+# test 30 rouge par intermittence (pg8). Ici la course est FORCEE, plus subie :
+# le ts du journal est pose une seconde apres la date du commit.
+TMP21=$(mktemp -d)
+(cd "$TMP21" && git init -q . && git config user.email t@t && git config user.name t \
+  && mkdir -p .plantrack .git/hooks && echo hook-commit > .git/hooks/post-commit \
+  && echo a > f && git add f && git commit -q -m one) >/dev/null 2>&1
+SHA=$(cd "$TMP21" && git log -1 --format=%H)
+CD=$(cd "$TMP21" && git log -1 --format=%cI)
+TS=$(python3 -c "
+from datetime import datetime, timedelta, timezone
+print((datetime.fromisoformat('$CD') + timedelta(seconds=1)).astimezone(timezone.utc).isoformat(timespec='seconds'))")
+printf '{"ts":"%s","kind":"commit","id":"c1","sha":"%s","thread":"t1"}\n' "$TS" "$SHA" \
+  > "$TMP21/.plantrack/events.jsonl"
+out=$(CLAUDE_PROJECT_DIR="$TMP21" python3 "$PT" doctor 2>&1)
+check "hook une seconde apres le commit : le commit reste dans la fenetre" \
+  "commits arrives au carnet (1/1" "$out"
+# sha introuvable (commit amende ou reset, pg4) : repli sur le ts du journal,
+# jamais une exception qui emporterait tout le doctor
+printf '{"ts":"%s","kind":"commit","id":"c2","sha":"0000000","thread":"t1"}\n' "$TS" \
+  >> "$TMP21/.plantrack/events.jsonl"
+out=$(CLAUDE_PROJECT_DIR="$TMP21" python3 "$PT" doctor 2>&1)
+check "un sha introuvable ne casse pas le controle d usage" "commits arrives au carnet" "$out"
+rm -rf "$TMP21"
+
 echo
 [ "$fail" = 0 ] && echo "TOUS LES TESTS PASSENT" || { echo "DES TESTS ECHOUENT"; exit 1; }

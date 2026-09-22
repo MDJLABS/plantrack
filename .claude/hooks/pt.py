@@ -1233,6 +1233,29 @@ def cmd_precommit():
     sys.exit(0)
 
 
+def git_commit_date(sha):
+    """Date ISO d'un commit, telle que git la lit. None si le sha est inconnu —
+    un commit amende ou reset ne se retrouve plus (pg4), et le journal
+    append-only garde quand meme sa ligne."""
+    if not sha:
+        return None
+    try:
+        r = subprocess.run(["git", "-C", ROOT, "show", "-s", "--format=%cI", sha],
+                           capture_output=True, text=True, timeout=10)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if r.returncode != 0 or not r.stdout.strip():
+        return None
+    try:
+        # git rend l'heure LOCALE du commit ('+02:00') ; le journal est en UTC.
+        # Sans cette conversion les deux chaines se comparent a l'octet et la
+        # fenetre saute de deux heures deux fois par an.
+        return datetime.fromisoformat(r.stdout.strip()).astimezone(
+            timezone.utc).isoformat(timespec="seconds")
+    except ValueError:
+        return None
+
+
 def usage_gap(days=USAGE_DAYS):
     """Commits reellement faits vs commits arrives au carnet. Le controle
     d'installation ne voit pas un depot vert et muet ; celui-la si."""
@@ -1247,9 +1270,19 @@ def usage_gap(days=USAGE_DAYS):
     # une alerte allumee en permanence n'alerte plus personne. Depot ou aucun
     # commit n'est jamais arrive : on retombe sur l'installation, le hook est
     # alors vraiment muet et doit se voir.
-    first_commit = [e["ts"] for e in evs if e.get("kind") == "commit" and e.get("ts")]
+    #
+    # Le plancher se prend sur l'horloge de GIT, pas sur celle du journal. Le ts
+    # d'un evenement `commit` est l'heure du HOOK, qui tourne APRES le commit :
+    # qu'il franchisse une seconde et `git log --since` exclut ce meme premier
+    # commit que le journal, lui, compte — l'ecart annonce alors 2/1 sans qu'un
+    # seul commit manque. Demander a git la date du commit reglait la question
+    # par construction ; une marge en secondes ne l'aurait reglee qu'en moyenne.
+    firsts = [e for e in evs if e.get("kind") == "commit" and e.get("ts")]
+    plancher = min(firsts, key=lambda e: e["ts"])["ts"] if firsts else min(stamps)
+    if firsts and (d := git_commit_date(min(firsts, key=lambda e: e["ts"]).get("sha"))):
+        plancher = d
     since = max((datetime.now(timezone.utc) - timedelta(days=days)).isoformat(timespec="seconds"),
-                min(first_commit) if first_commit else min(stamps))
+                plancher)
     jc = sum(1 for e in evs if e.get("kind") == "commit" and e["ts"] >= since)
     try:
         r = subprocess.run(["git", "-C", ROOT, "log", f"--since={since}", "--pretty=%h"],
