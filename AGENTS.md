@@ -16,27 +16,38 @@
 
 !! BUG BLOQUANT — a traiter avant toute autre chose : b1 Troncature du bloc reinjecte : sur bcc le bloc re…
 
-FIL ACTIF — t2 : verdict humain en session (!verify / !reject) [4 commits]
+FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [6 commits]
+  fichiers recemment ecrits : parcours/projet-client.json, .claude/hooks/pt.py, tests/scenario.sh
 
-BUGS OUVERTS (ne pas traiter maintenant, sauf demande explicite) :
-  b1 (to_verify) [t1] Troncature du bloc reinjecte : sur bcc le bloc reel fait 4661 chars pour un budget de 3000 — 1661 chars coupes par la FIN, donc 4 decisions… (agent) [2 tentatives, derniere: Le resserrage (MIN_TRUNC=80) precede l'elision : les plafon…]
-  b2 (to_verify) [t1] doctor : le controle 'etat reinjecte sous le budget' mesure APRES troncature (n = len(context_block(st)) - len(RULES)), il rend donc toujou… (agent) [1 tentatives, derniere: Le doctor mesure desormais context_block(st, rules=False, b…]
-  b3 (to_verify) [t1] plantrack init --git-hook renonce quand un autre outil occupe .git/hooks/pre-commit (cas de bcc, occupe par lefthook) : le garde-fou des fi… (agent) [1 tentatives, derniere: chain_hook : au lieu de renoncer quand la place est prise, …]
-  b4 (open) [t1] Le fil actif auto-ouvert affiche une note pedagogique de 99 chars ('fil ouvert d'office...') au rang 2, donc protegee, tandis que des bugs … (agent)
-  b5 (open) [t1] Worktree git (.git = fichier gitdir:) : branch() lit .git/HEAD et retombe en silence sur 'le depot' ; install_git_hook refuse 'pas de depot… (agent)
-  b6 (open) [t1] hook-filelog n'ecoute que Edit|Write|MultiEdit|NotebookEdit : les modifications via Bash (sed, heredoc) ne sont jamais journalisees. Mesure… (agent)
-  b7 (open) [t1] 9 des 14 except de pt.py avalent sans aucune trace (note_injection, diagnose dans hook_context, archive transcript, usage_gap...) : un hook… (agent)
+FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
+  t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider…
+
+BUGS NON CORRIGES (personne ne s'en est occupe) :
+  b6 (open) [t1] hook-filelog n'ecoute que Edit|Write|MultiEdit|NotebookEdit : les modifications… (agent)
+  b7 (open) [t1] 9 des 14 except de pt.py avalent sans aucune trace (note_injection, diagnose da… (agent) [1 tent.]
+  b9 (open) [t2] AGENTS.md n'est regenere qu'au post-commit : toute ecriture faite SANS commit d… (agent)
+
+BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
+  b1 (to_verify) [t1] Troncature du bloc reinjecte : sur bcc le bloc reel fait 4661 chars pour un bud… (agent) [2 tent.]
+  b2 (to_verify) [t1] doctor : le controle 'etat reinjecte sous le budget' mesure APRES troncature (n… (agent) [1 tent.]
+  b3 (to_verify) [t1] plantrack init --git-hook renonce quand un autre outil occupe .git/hooks/pre-co… (agent) [1 tent.]
+  b4 (to_verify) [t1] Le fil actif auto-ouvert affiche une note pedagogique de 99 chars ('fil ouvert … (agent) [1 tent.]
+  b5 (to_verify) [t1] Worktree git (.git = fichier gitdir:) : branch() lit .git/HEAD et retombe en si… (agent) [1 tent.]
+  b8 (to_verify) [t2] Selection des bugs du bloc reinjecte : context_block prend bugs[-CTX_MAX_BUGS:]… (agent) [2 tent.]
+  b10 (to_verify) [t3] usage_gap compare deux horloges differentes : la fenetre 'since' vient du times… (agent) [1 tent.]
+  b11 (to_verify) [t3] verify b5 (agent) [1 tent.]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
-  d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
-  d2 : Cause racine des pannes PlanTrack (constat du 06/09 sur bcc et miamboost) : l'outil se degrade en SILENCE et son seul controle, doctor, dev… (agent)
+  d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIV… (agent)
+  d2 : Cause racine des pannes PlanTrack (constat du 06/09 sur bcc et miamboost) : l'o… (agent)
+  d3 : Parcours retenu EN ENTIER (choix de Mariella, 22/09) : une phase porte regle + … (agent)
 
 Pieges connus :
-  pg2 : Un hook git greffe par PlanTrack est efface si son proprietaire le regenere (le…
-  pg3 : read_events relit et reparse tout le journal a chaque appel, hook_commit le lit…
   pg4 : Un commit amende ou reset apres le post-commit reste dans le journal append-onl…
   pg5 : injections.json ne porte que la cle 'claude' sur bcc et miamboost : rien ne pro…
   pg6 : Le garde-fou pre-commit refuse tout fichier touche par un fil PARQUE : sur un o…
   pg7 : Propager le coeur vendorise vers un depot ou une AUTRE session Claude travaille…
+  pg8 : tests/scenario.sh, test 30 ('commits arrives au carnet 2/2') : observe rouge un…
+  pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
 ```
 <!-- plantrack:state-end -->

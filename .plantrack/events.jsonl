@@ -91,3 +91,70 @@
 {"ts": "2026-09-20T20:31:14+00:00", "kind": "bug", "id": "b9", "text": "AGENTS.md n'est regenere qu'au post-commit : toute ecriture faite SANS commit derriere (bug_status, decision, question, piege) laisse le bloc d'etat du fichier perime. Mesure du 20/09 sur miamboost : AGENTS.md annonce 'b7 (open)' alors que le journal dit 'to_verify' depuis le 16/09 — un passage en to_verify sans commit suivant. Claude ne le voit pas (le hook lui sert le bloc frais), mais tout agent qui LIT AGENTS.md (Codex, Gemini, une relecture humaine) travaille sur un etat faux, sans aucun signe que le fichier est en retard.", "thread": "t2", "severity": "normal", "par": "agent"}
 {"ts": "2026-09-20T20:33:06+00:00", "kind": "attempt", "id": "a5", "bug": "b8", "hypothesis": "Trier ne suffit pas : l'elision mange v[2].pop(0), donc la PREMIERE ligne de la section — des bugs 'open' remis en tete seraient coupes les premiers. Il faut leur donner leur propre RANG. Nouvelle section 'BUGS NON CORRIGES' (open/in_progress) au rang 4, juste derriere le bug bloquant, et les to_verify descendent au rang 7 sous le titre 'BUGS EN ATTENTE DE TON VERDICT'. Les rangs suivants glissent : pieges 5, questions 6, guides 8, inbox 9. Chaque section garde son propre plafond CTX_MAX_BUGS.", "actor": "claude-code"}
 {"ts": "2026-09-20T20:40:20+00:00", "kind": "piege", "id": "pg8", "text": "tests/scenario.sh, test 30 ('commits arrives au carnet 2/2') : observe rouge une fois le 20/09 puis vert sur deux executions consecutives, sans changement de code entre les trois. Meme famille que b11 de bcc (collision entre deux runs concurrents). Ne pas conclure 'c'etait rien' : un garde-fou intermittent est un garde-fou qui ne garde pas."}
+{"ts": "2026-09-20T20:40:32+00:00", "kind": "commit", "sha": "c3e78c7", "ctype": "fix", "thread": "t2"}
+{"ts": "2026-09-20T20:40:38+00:00", "kind": "bug_status", "id": "b8", "status": "to_verify"}
+{"ts": "2026-09-20T20:40:38+00:00", "kind": "attempt", "id": "a6", "bug": "b8", "hypothesis": "Pose et verifie : deux sections (rang 4 non corriges, rang 7 en attente de verdict), rangs suivants glisses. Mesure sur les vraies donnees de bcc : b28 et b31 passent des invisibles aux deux premieres lignes de bugs ; l'elision (6 lignes) ne mord plus que sur les to_verify. 295 checks verts, commit c3e78c7.", "actor": "claude-code"}
+{"ts": "2026-09-22T10:30:31+00:00", "kind": "park", "id": "t2", "text": "tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella"}
+{"ts": "2026-09-22T10:30:31+00:00", "kind": "thread_open", "id": "t3", "text": "parcours : phases porteuses de regles (note bcc du 13/09)"}
+{"ts": "2026-09-22T10:30:34+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-22T10:30:38+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-22T10:30:41+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-22T10:30:48+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-22T10:31:02+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-22T10:31:11+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-22T10:31:14+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-22T10:31:22+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-22T10:31:36+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-22T10:32:10+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-22T10:32:21+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-22T10:32:28+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-22T10:32:32+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-22T10:32:36+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-22T10:32:45+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-22T10:32:48+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-22T10:32:51+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-22T10:33:08+00:00", "kind": "file_touched", "text": "parcours/projet-client.json", "thread": "t3"}
+{"ts": "2026-09-22T10:33:14+00:00", "kind": "file_touched", "text": "parcours/projet-client.json", "thread": "t3"}
+{"ts": "2026-09-22T15:20:00+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t3"}
+{"ts": "2026-09-22T15:21:12+00:00", "kind": "commit", "sha": "4b2b358", "ctype": "feat", "thread": "t3"}
+{"ts": "2026-09-22T15:21:19+00:00", "kind": "decision", "id": "d3", "text": "Parcours retenu EN ENTIER (choix de Mariella, 22/09) : une phase porte regle + livrable + porte (agent|humain) + questions(bool), 'phase next' enchaine, injection au rang 0, doctor avertit sans bloquer. Le budget du bloc se defend a l'IMPORT (regle > LINE_TRUNC refusee), jamais a l'injection. Source : note bcc du 13/09 (q14/d95), .planning/2026-09-13-note-plantrack-parcours.md.", "par": "agent"}
+{"ts": "2026-09-22T15:21:19+00:00", "kind": "piege", "id": "pg9", "text": "Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exige une question emise dans la phase ET sa reponse. Un agent qui traverse une phase a porte humaine sans jamais consulter l'humain sera bloque — c'est voulu, c'est la definition de la porte."}
+{"ts": "2026-09-22T15:22:08+00:00", "kind": "bug", "id": "b10", "text": "usage_gap compare deux horloges differentes : la fenetre 'since' vient du timestamp du HOOK post-commit (journal), mais 'git log --since' filtre sur la date du COMMIT. Le hook s'executant apres le commit, il suffit qu'il franchisse une seconde pour que git exclue le tout premier commit de la fenetre et rende N-1 la ou le journal rend N. D'ou le test 30 de scenario.sh rouge par intermittence (pg8) : attendu '2/2', obtenu '2/1'.", "thread": "t3", "severity": "normal", "par": "agent"}
+{"ts": "2026-09-22T15:22:12+00:00", "kind": "attempt", "id": "a7", "bug": "b10", "hypothesis": "Prendre le plancher de la fenetre sur l'horloge de GIT, pas sur celle du journal : demander a git la date du commit dont le sha est le premier evenement 'commit' journalise (git show -s --format=%cI <sha>) et s'en servir comme 'since'. Les deux cotes lisent alors la meme horloge, l'ecart d'une seconde disparait par construction plutot que par marge. Repli sur le timestamp du journal si le sha est introuvable (commit amende ou reset, pg4).", "actor": "claude-code"}
+{"ts": "2026-09-22T15:22:19+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-22T15:22:24+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-22T15:22:33+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-22T16:31:54+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t3"}
+{"ts": "2026-09-22T16:33:20+00:00", "kind": "commit", "sha": "1303f57", "ctype": "fix", "thread": "t3"}
+{"ts": "2026-09-22T16:33:22+00:00", "kind": "bug_status", "id": "b10", "status": "to_verify"}
+{"ts": "2026-09-22T23:08:02+00:00", "kind": "attempt", "id": "a8", "bug": "b5", "hypothesis": "Un seul point de verite : deux helpers stdlib, git_dir() qui resout .git qu'il soit repertoire OU fichier 'gitdir: <chemin>' (worktree), et git_hooks_dir() qui remonte de .git/worktrees/<nom> vers le repertoire commun (les hooks sont partages). branch(), install_git_hook, install_post_commit_hook et doctor passent tous par ces deux helpers au lieu de recoller ROOT/.git a la main. Pas de subprocess : le hook doit rester instantane.", "actor": "claude-code"}
+{"ts": "2026-09-22T23:08:10+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-22T23:08:14+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-22T23:08:16+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-22T23:08:24+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-22T23:10:24+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t3"}
+{"ts": "2026-09-22T23:12:03+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t3"}
+{"ts": "2026-09-22T23:13:26+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t3"}
+{"ts": "2026-09-22T23:14:04+00:00", "kind": "commit", "sha": "4f0c49a", "ctype": "fix", "thread": "t3"}
+{"ts": "2026-09-22T23:14:06+00:00", "kind": "bug", "id": "b11", "text": "verify b5", "thread": "t3", "severity": "normal", "par": "agent"}
+{"ts": "2026-09-22T23:14:13+00:00", "kind": "bug_status", "id": "b5", "status": "to_verify"}
+{"ts": "2026-09-22T23:14:36+00:00", "kind": "attempt", "id": "a9", "bug": "b11", "hypothesis": "b11 n'est pas un vrai bug : c'est la TRACE d'un defaut de la CLI. 'plantrack bug verify b5' (ordre des mots inverse) n'a pas ete refuse — la desambiguation ne regarde que le premier argument, donc 'verify b5' est parti en TEXTE et a cree un bug fantome dans un journal append-only. Correctif : refuser quand le premier mot est un verbe connu (verify, reject, open, in_progress, to_verify, wont_fix) suivi d'un id de bug existant, et rappeler la bonne forme.", "actor": "claude-code"}
+{"ts": "2026-09-22T23:14:42+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-22T23:15:35+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t3"}
+{"ts": "2026-09-22T23:16:08+00:00", "kind": "commit", "sha": "4743c87", "ctype": "fix", "thread": "t3"}
+{"ts": "2026-09-22T23:16:08+00:00", "kind": "bug_status", "id": "b11", "status": "to_verify"}
+{"ts": "2026-09-22T23:16:35+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-22T23:16:39+00:00", "kind": "attempt", "id": "a10", "bug": "b4", "hypothesis": "La note pedagogique sort du bloc FIL ACTIF (rang 2, protege) et devient sa propre section au rang 10, le plus bas. L'ordre d'INSERTION decide de l'affichage, le RANG decide de la survie : elle reste imprimee juste sous le fil, mais elle est la premiere ligne elidee quand le budget deborde — avant tout bug.", "actor": "claude-code"}
+{"ts": "2026-09-22T23:17:02+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t3"}
+{"ts": "2026-09-22T23:17:40+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t3"}
+{"ts": "2026-09-22T23:18:16+00:00", "kind": "commit", "sha": "277058b", "ctype": "fix", "thread": "t3"}
+{"ts": "2026-09-22T23:18:16+00:00", "kind": "bug_status", "id": "b4", "status": "to_verify"}
+{"ts": "2026-09-22T23:18:40+00:00", "kind": "attempt", "id": "a11", "bug": "b7", "hypothesis": "Un fichier de traces a part, .plantrack/incidents.log, jamais le journal (append-only et reinjecte : une panne repetee noierait l'etat). Helper trace(ou, e) qui ecrit une ligne horodatee et garde les 50 dernieres, incapable de lever lui-meme. Pose sur les avaleurs nommes dans b7 (note_injection, diagnose, archive transcript, usage_gap, lecture stdin des hooks, appels git). Le doctor lit ce fichier et annonce les incidents recents : c'est ce qui rend la panne visible sans que personne y pense.", "actor": "claude-code"}
+{"ts": "2026-09-22T23:18:44+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-22T23:18:58+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-22T23:19:26+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-22T23:19:32+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-22T23:19:39+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-22T23:21:04+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t3"}
+{"ts": "2026-09-22T23:21:47+00:00", "kind": "commit", "sha": "c734ff7", "ctype": "fix", "thread": "t3"}
+{"ts": "2026-09-22T23:21:47+00:00", "kind": "bug_status", "id": "b7", "status": "to_verify"}
