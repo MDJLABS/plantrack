@@ -802,5 +802,95 @@ check "doctor : question sans reponse > 7 jours signalee" "!!  questions sans re
 check "doctor : la question oubliee est nommee avec le geste" "!answer q1" "$d"
 rm -rf "$TMP19"
 
+# 20. Le parcours : une phase qui porte une REGLE, et une porte qui decide de la
+# sortie. PlanTrack savait dire "phase 2 en cours", pas "en phase 2 tu livres des
+# pistes avant toute question" (note bcc du 13/09, q14/d95).
+TMP20=$(mktemp -d)
+A20() { CLAUDE_PROJECT_DIR="$TMP20" python3 "$PT" "$@" 2>&1; }
+H20() { CLAUDE_PROJECT_DIR="$TMP20" H "$@"; }
+P20() { CLAUDE_PROJECT_DIR="$TMP20" prompt "$1"; }
+PARC="$(cd "$(dirname "$PT")/../.." && pwd)/parcours/projet-client.json"
+
+out=$(A20 parcours import "$PARC")
+check "parcours import est reserve a l humain" "reserve a l'humain" "$out"
+out=$(echo y | H20 parcours import "$PARC")
+check "parcours import ecrit apres confirmation" "parcours projet-client enregistre" "$out"
+
+# une regle plus longue que le budget de ligne est refusee A L IMPORT : injectee,
+# elle ferait elider le reste de l'etat sans que personne ne le voie
+LONGUE="$TMP20/longue.json"
+python3 - "$LONGUE" <<'PY'
+import json, sys
+json.dump({"nom": "trop-long", "phases": [{"nom": "p", "regle": "x" * 200}]},
+          open(sys.argv[1], "w", encoding="utf-8"))
+PY
+out=$(echo y | H20 parcours import "$LONGUE")
+check "une regle-paragraphe est refusee a l import" "maximum 140" "$out"
+SANSREGLE="$TMP20/sansregle.json"
+python3 - "$SANSREGLE" <<'PY'
+import json, sys
+json.dump({"nom": "creux", "phases": [{"nom": "p"}]}, open(sys.argv[1], "w", encoding="utf-8"))
+PY
+out=$(echo y | H20 parcours import "$SANSREGLE")
+check "une phase sans regle est refusee a l import" "regle" "$out"
+
+out=$(A20 parcours start projet-client)
+check "parcours start ouvre la phase 1" "phase 1/5" "$out"
+out=$(A20 parcours start projet-client)
+check "un parcours deja lance ne se relance pas" "tourne deja" "$out"
+
+# la regle sort en TETE du bloc et au rang 0 : une consigne elidee n'existe pas
+out=$(CLAUDE_PROJECT_DIR="$TMP20" ctx startup)
+check "la phase active est injectee dans le bloc" "PARCOURS projet-client — phase 1/5" "$out"
+check "la regle de la phase est injectee" "Au plus trois questions" "$out"
+check "la porte est annoncee a l agent" "porte agent" "$out"
+
+out=$(A20 phase next)
+check "porte agent : l agent passe seul" "phase 2/5" "$out"
+out=$(A20 phase next)
+check "porte humaine sans question : refus" "aucune question n'a ete posee" "$out"
+A20 question "laquelle des trois ?" >/dev/null
+out=$(A20 phase next)
+check "porte humaine, question sans reponse : refus" "attend(ent) toujours une reponse" "$out"
+out=$(CLAUDE_PROJECT_DIR="$TMP20" ctx startup)
+check "porte humaine : le bloc l annonce" "porte humaine" "$out"
+H20 answer q1 "la deuxieme" >/dev/null
+out=$(A20 phase next)
+check "porte humaine : la reponse ouvre la porte" "phase 3/5" "$out"
+
+# une question posee dans une phase qui n'en veut pas : avertissement, pas blocage
+A20 question "on valide ?" >/dev/null; H20 answer q2 "oui" >/dev/null
+A20 phase next >/dev/null
+out=$(A20 question "je fais quoi pour la couleur ?")
+check "question dans une phase sans question : avertie sur le champ" "n'admet pas de question" "$out"
+out=$(A20 doctor)
+check "doctor : question posee hors porte" "questions posees hors porte (1)" "$out"
+check_not "doctor n interdit rien, il avertit" "refuse" "$out"
+
+# fin de parcours : pas de phase 6 inventee
+A20 phase next >/dev/null
+A20 question "verdict ?" >/dev/null; H20 answer q4 "ok" >/dev/null
+out=$(A20 phase next)
+check "la derniere phase acheve le parcours" "parcours projet-client acheve" "$out"
+out=$(CLAUDE_PROJECT_DIR="$TMP20" ctx startup)
+check_not "parcours acheve : plus de regle injectee" "PARCOURS projet-client" "$out"
+
+# ce que bcc lit pour son ecran de completude
+A20 parcours start projet-client >/dev/null 2>&1
+out=$(A20 parcours json)
+check "parcours json : la phase courante" '"parcours": null' "$out"
+out=$(A20 phase next)
+check "phase next sans phase active : message clair" "aucune phase active" "$out"
+
+# une phase creee a la main n'appartient a aucun parcours : phase done reste le chemin
+TMP20b=$(mktemp -d)
+CLAUDE_PROJECT_DIR="$TMP20b" python3 "$PT" phase add "au fil de l eau" >/dev/null 2>&1
+CLAUDE_PROJECT_DIR="$TMP20b" python3 "$PT" phase start p1 >/dev/null 2>&1
+out=$(CLAUDE_PROJECT_DIR="$TMP20b" python3 "$PT" phase next 2>&1)
+check "phase hors parcours : next renvoie vers phase done" "n'appartient a aucun parcours" "$out"
+out=$(CLAUDE_PROJECT_DIR="$TMP20b" ctx startup)
+check_not "une phase sans regle n encombre pas le bloc" "regle :" "$out"
+rm -rf "$TMP20" "$TMP20b"
+
 echo
 [ "$fail" = 0 ] && echo "TOUS LES TESTS PASSENT" || { echo "DES TESTS ECHOUENT"; exit 1; }

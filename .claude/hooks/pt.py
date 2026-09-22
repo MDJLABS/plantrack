@@ -39,6 +39,8 @@ MIN_TRUNC = 80               # palier de resserrage : additionnes, les plafonds
 MAX_ARCHIVES = 5              # transcripts gardes : chacun pese la session entiere
 STALE_DAYS = 7                # au-dela, un bug sans verdict humain est un oubli
 USAGE_DAYS = 30               # fenetre du controle d'usage (commits vs journal)
+PHASE_STALE_HOURS = 24        # phase active sans le moindre evenement : elle dort
+PORTES = ("agent", "humain")  # qui autorise la sortie d'une phase
 
 # Source unique des regles : elles vivent ici, sont ecrites dans AGENTS.md (agents
 # sans hooks) ET reinjectees hors budget a chaque session — un outil tiers peut
@@ -101,7 +103,7 @@ def project():
     """Rejoue le journal et renvoie l'etat courant."""
     st = {"threads": {}, "bugs": {}, "decisions": [], "inbox": [], "active": None,
           "phases": {}, "tasks": {}, "pieges": {}, "questions": {}, "testcheck": False,
-          "guides": {}, "steps": {}}
+          "guides": {}, "steps": {}, "parcours": {}}
     for ev in read_events():
         k = ev.get("kind") if isinstance(ev, dict) else None
         if k is None:
@@ -178,7 +180,10 @@ def project():
             st["pieges"][ev["id"]] = {"id": ev["id"], "text": ev.get("text", ""), "ts": ev["ts"]}
         elif k == "question":
             st["questions"][ev["id"]] = {"id": ev["id"], "text": ev.get("text", ""),
-                                         "ts": ev["ts"], "answer": None}
+                                         "ts": ev["ts"], "answer": None,
+                                         # la phase d'ou part la question : c'est elle
+                                         # qui decide si la porte peut s'ouvrir (§parcours)
+                                         "phase": ev.get("phase")}
         elif k == "answer":
             q = st["questions"].get(ev["id"])
             if q:
@@ -198,15 +203,26 @@ def project():
         elif k == "check":
             if (s := st["steps"].get(ev["id"])):
                 s["verdict"], s["motif"] = ev.get("verdict"), ev.get("text")
+        elif k == "parcours_defini":
+            st["parcours"][ev.get("text", "")] = {
+                "id": ev["id"], "nom": ev.get("text", ""), "ts": ev["ts"],
+                "phases": ev.get("phases") or [],
+            }
         elif k == "phase_open":
             st["phases"][ev["id"]] = {
                 "id": ev["id"], "title": ev.get("text", ""), "goal": ev.get("goal", ""),
                 "status": "open", "ts": ev["ts"],
+                # champs de parcours : absents sur une phase creee a la main, et
+                # c'est bien ainsi — une phase sans regle reste une phase valide
+                "regle": ev.get("regle", ""), "livrable": ev.get("livrable", ""),
+                "porte": ev.get("porte", ""), "parcours": ev.get("parcours"),
+                "ordre": ev.get("ordre"), "questions": ev.get("questions", True),
             }
         elif k == "phase_status":
             p = st["phases"].get(ev["id"])
             if p:
                 p["status"] = ev.get("status", p["status"])
+                p["status_ts"] = ev["ts"]
                 if ev.get("text"):
                     p["motif"] = ev["text"]
         elif k == "task_open":
@@ -239,6 +255,46 @@ def open_threads(st):
     return [t for t in st["threads"].values() if t["status"] in ("active", "parked")]
 
 
+# ------------------------------------------------------------------- parcours
+# Un parcours est une suite ORDONNEE de phases declarees une fois, ou chaque phase
+# porte une regle injectee dans le contexte de l'agent. PlanTrack savait deja dire
+# "phase 2 en cours" ; il ne savait pas dire "en phase 2 tu livres des pistes avant
+# toute question". Rien de nouveau sous le capot : ce sont les phases existantes,
+# avec quatre champs de plus et une commande pour enchainer.
+
+def active_phase(st):
+    """La phase en cours. Une seule a la fois : `phase next` ferme avant d'ouvrir."""
+    act = [p for p in st["phases"].values() if p["status"] == "active"]
+    # au cas ou deux phases auraient ete demarrees a la main : la plus recente gagne
+    return max(act, key=lambda p: p.get("status_ts", p["ts"])) if act else None
+
+
+def phases_du_parcours(st, nom):
+    """Les phases instanciees d'un parcours, dans l'ordre declare."""
+    return sorted((p for p in st["phases"].values() if p.get("parcours") == nom),
+                  key=lambda p: (p.get("ordre") if p.get("ordre") is not None else 0))
+
+
+def porte_bloquee(st, ph):
+    """Ce qui empeche de sortir de la phase `ph`, ou None si la voie est libre.
+
+    Porte `agent` : l'agent sort quand il veut. Porte `humain` : il faut qu'une
+    question ait ete posee DANS cette phase et qu'elle ait recu une reponse —
+    c'est la seule preuve qu'un humain a tranche. Aucune question du tout n'est
+    pas un raccourci : c'est justement le cas que la porte humaine interdit."""
+    if ph.get("porte") != "humain":
+        return None
+    qs = [q for q in st["questions"].values() if q.get("phase") == ph["id"]]
+    if not qs:
+        return ("porte humaine : aucune question n'a ete posee dans cette phase — "
+                "`plantrack question \"...\"` puis attends la reponse")
+    muettes = [q["id"] for q in qs if not q.get("answer")]
+    if muettes:
+        return (f"porte humaine : {', '.join(muettes)} attend(ent) toujours une reponse "
+                f"(`!answer {muettes[0]} <texte>`)")
+    return None
+
+
 def branch():
     """Nom de la branche courante, lu sans git (le hook doit rester instantane)."""
     try:
@@ -257,7 +313,7 @@ def trunc(s, n=LINE_TRUNC):
 
 def context_block(st, header=True, rules=True, budget=CTX_MAX_CHARS, width=LINE_TRUNC):
     """§11 : les sections sortent dans l'ordre de lecture, mais c'est leur RANG qui
-    decide qui survit au depassement — decisions > fil actif et notes de reprise >
+    decide qui survit au depassement — regle de phase > decisions > fil actif et notes de reprise >
     bugs bloquants > bugs non corriges > le reste, les bugs deja corriges en
     dernier. En cas de debordement on elide ligne a ligne en
     partant de la section la moins prioritaire (la plus ancienne d'abord) : le bloc
@@ -276,6 +332,31 @@ def context_block(st, header=True, rules=True, budget=CTX_MAX_CHARS, width=LINE_
             secs.append([rank, head, []])
         elif items:
             secs.append([rank, head, list(items)])
+
+    # rang 0 : la regle de phase passe avant tout le reste. Une consigne elidee est
+    # une consigne qui n'existe pas — et c'est la seule ligne du bloc qui dit a
+    # l'agent COMMENT travailler maintenant, pas seulement ce qu'il ne doit pas refaire.
+    ph = active_phase(st)
+    if ph and (ph.get("regle") or ph.get("parcours")):
+        det = []
+        if ph.get("regle"):
+            det.append(f"  regle : {trunc(ph['regle'], width)}")
+        if ph.get("porte") == "humain":
+            det.append("  sortie : porte humaine — il faut une question posee ET sa reponse"
+                       " avant `plantrack phase next`")
+        elif ph.get("porte") == "agent":
+            det.append("  sortie : porte agent — tu passes a la suite toi-meme"
+                       " (`plantrack phase next`)")
+        if ph.get("livrable"):
+            det.append(f"  livrable attendu : {trunc(ph['livrable'], min(90, width))}")
+        rang = ""
+        if ph.get("parcours"):
+            suite = phases_du_parcours(st, ph["parcours"])
+            ids = [p["id"] for p in suite]
+            if ph["id"] in ids:
+                rang = f" — phase {ids.index(ph['id']) + 1}/{len(ids)}"
+        nom = f"PARCOURS {ph['parcours']}{rang} : " if ph.get("parcours") else "PHASE EN COURS : "
+        sec(0, f"\n{nom}{trunc(ph['title'], 60)}", det or None)
 
     blockers = [b for b in st["bugs"].values()
                 if b.get("blocking") and b["status"] not in ("validated", "wont_fix")]
@@ -429,13 +510,20 @@ def cmd_piege(text):
     return f"[PlanTrack] piege {pid} note : {trunc(text, 80)}"
 
 
-def cmd_question(text):
+def cmd_question(text, st=None):
     if not text:
         return "usage : !question <texte>"
     qid = next_id("q")
-    append("question", id=qid, text=text)
+    # la phase d'origine est stockee a l'emission : c'est elle qui ouvrira (ou non)
+    # la porte au moment du `phase next`, et le doctor s'en sert pour reperer une
+    # question posee dans une phase qui n'en veut pas
+    ph = active_phase(st) if st else None
+    append("question", id=qid, text=text, phase=ph["id"] if ph else None)
+    hors = ""
+    if ph and not ph.get("questions", True):
+        hors = f"\n!! la phase {ph['id']} ({ph['title']}) n'admet pas de question — {ph.get('regle', '')}"
     return (f"[PlanTrack] question {qid} enregistree : {trunc(text, 80)}\n"
-            "(sans reponse, elle sera rappelee a chaque session)")
+            "(sans reponse, elle sera rappelee a chaque session)" + hors)
 
 
 def cmd_answer(rest, st):
@@ -583,7 +671,7 @@ def handle_command(raw):
     if verb == "piege":
         return cmd_piege(rest)
     if verb == "question":
-        return cmd_question(rest)
+        return cmd_question(rest, st)
     if verb == "answer":
         return cmd_answer(rest, st)
     if verb == "verify":
@@ -604,6 +692,15 @@ def handle_command(raw):
         if len(parts) < 2:
             return "usage : !check <step_id> ok|ko [motif]"
         return cmd_check(parts[0], parts[1], parts[2] if len(parts) > 2 else None, st)
+    if verb == "parcours":
+        if not rest:
+            return ("usage : !parcours <nom> — parcours declares : "
+                    + (", ".join(sorted(st["parcours"])) or "aucun"))
+        return parcours_start(st, rest.split()[0])[1]
+    if verb == "phase":
+        if rest.split()[:1] != ["next"]:
+            return "usage : !phase next   (le reste : `plantrack phase ...` en CLI)"
+        return cmd_phase_next(st)
     if verb == "state":
         return context_block(st)
     if verb == "help":
@@ -623,13 +720,16 @@ HELP = """[PlanTrack] commandes (dans le prompt de l'agent, jamais transmises au
   !answer <id> <texte>   toi seule : reponds a une question en attente
   !verify <id> / !reject <id> <motif>   toi seule : verdict sur un bug to_verify, sans quitter la session
   !testcheck on|off / !guide <titre> / !step <id> <texte> / !check <id> ok|ko [motif]   guides de test, off par defaut (ko exige un motif)
+  !parcours <nom>     lance un parcours declare (ses phases portent les regles de travail)
+  !phase next         clot la phase en cours et ouvre la suivante (porte humaine : exige une question repondue)
   !state              affiche l'etat persistant courant
   !<texte libre>      capture dans l'inbox, a classer plus tard
 CLI humaine : plantrack status | bugs | inbox | verify <id> | reject <id> -m ... | close <id>
               plantrack attempt <bug_id> <hypothese> | attempts <bug_id>
               plantrack bug <id> open|in_progress|to_verify|wont_fix   (wont_fix : humain seul)
               plantrack plan [import <f.md>] | decisions
-              plantrack phase add|start|done|cancel   (done/cancel : humain seul)
+              plantrack parcours list | import <f.json> (humain seul) | start <nom> | json
+              plantrack phase add|start|done|next|cancel   (done/cancel : humain seul ; next : la porte decide)
               plantrack task add|start|verify|done|cancel|replace   (done/cancel/replace : humain seul)
               plantrack decide <texte> | bug <texte> [--low|--high|--blocker]   ecriture agent (marquee (agent))
               plantrack piege <texte> | question <texte>   utilisables par l'agent
@@ -1260,6 +1360,28 @@ def diagnose(st):
                           f"pour tenir ({n}/{CTX_MAX_CHARS} au texte complet)", ""))
     else:
         chk(True, f"etat reinjecte sous le budget ({n}/{CTX_MAX_CHARS} chars)")
+    # --- parcours : avertir, jamais bloquer (meme regle que les bugs sans verdict)
+    hors = [q for q in st["questions"].values()
+            if q.get("phase") and (p := st["phases"].get(q["phase"]))
+            and not p.get("questions", True)]
+    if any(p.get("questions") is False for p in st["phases"].values()):
+        chk(not hors, f"questions posees hors porte ({len(hors)})",
+            "la regle de la phase interdit les questions — corrige la regle ou "
+            "retire la question : " + ", ".join(q["id"] for q in hors[:6]))
+    if (ph := active_phase(st)) and ph.get("parcours"):
+        depuis = ph.get("status_ts", ph["ts"])
+        # "sans livrable" ne se mesure pas : PlanTrack ne sait pas ouvrir un PDF.
+        # Ce qu'il sait voir, c'est une phase ou plus RIEN ne s'est journalise —
+        # pas un commit, pas une question, pas une decision. Une phase qui dort.
+        bouge = [e for e in read_events() if e.get("ts", "") > depuis
+                 and e.get("kind") not in ("phase_status", "phase_open", "file_touched")]
+        limite = (datetime.now(timezone.utc) - timedelta(hours=PHASE_STALE_HOURS)).isoformat(timespec="seconds")
+        chk(bool(bouge) or depuis >= limite,
+            f"phase {ph['id']} ({trunc(ph['title'], 30)}) vivante",
+            f"active depuis le {depuis[:16]} sans le moindre evenement — livrable attendu : "
+            f"{trunc(ph.get('livrable') or ph.get('regle', ''), 80)}")
+        if (bloc := porte_bloquee(st, ph)):
+            out.append((None, f"phase {ph['id']} : {bloc}", ""))
     # un commit journalise sans fil : le plafond de fils a empeche d'en ouvrir un.
     # Le commit n'est plus perdu, encore faut-il que quelqu'un le rattache.
     orph = [e for e in read_events() if e.get("kind") == "commit" and not e.get("thread")]
@@ -1411,8 +1533,11 @@ def cmd_phase(args, st):
         append("phase_open", id=pid, text=" ".join(rest), goal=goal or None)
         print(f"phase {pid} creee.")
         return
+    if sub == "next":
+        print(cmd_phase_next(st))
+        return
     if len(args) < 2 or args[1] not in st["phases"]:
-        sys.exit("usage : plantrack phase add|start|done|cancel <id> [-m motif]")
+        sys.exit("usage : plantrack phase add|start|done|next|cancel <id> [-m motif]")
     pid = args[1]
     if sub == "start":
         append("phase_status", id=pid, status="active")
@@ -1428,7 +1553,182 @@ def cmd_phase(args, st):
         append("decision", id=next_id("d"), text=f"phase {pid} annulee : {motif}")
         print(f"phase {pid} annulee (decision actee).")
     else:
-        sys.exit("usage : plantrack phase add|start|done|cancel <id> [-m motif]")
+        sys.exit("usage : plantrack phase add|start|done|next|cancel <id> [-m motif]")
+
+
+def cmd_phase_next(st):
+    """Clot la phase courante et ouvre la suivante du parcours.
+
+    C'est la seule facon de terminer une phase sans passer par `phase done`
+    (humain seul) : la porte remplace ici la signature humaine. Porte agent, il
+    passe ; porte humaine, il faut la trace d'un arbitrage — une question posee
+    dans la phase et sa reponse. Le refus est un message, jamais un blocage dur :
+    l'agent doit pouvoir continuer a travailler dans la phase en cours."""
+    ph = active_phase(st)
+    if not ph:
+        return ("[PlanTrack] aucune phase active — `plantrack parcours start <nom>` "
+                "ou `plantrack phase start <id>`.")
+    if not ph.get("parcours"):
+        return (f"[PlanTrack] la phase {ph['id']} n'appartient a aucun parcours : "
+                "`plantrack phase done` (humain seul) la termine.")
+    if (bloc := porte_bloquee(st, ph)):
+        return f"[PlanTrack] refuse — {bloc}"
+    suite = phases_du_parcours(st, ph["parcours"])
+    ids = [p["id"] for p in suite]
+    append("phase_status", id=ph["id"], status="done")
+    i = ids.index(ph["id"]) if ph["id"] in ids else len(ids) - 1
+    if i + 1 >= len(ids):
+        return (f"[PlanTrack] phase {ph['id']} ({ph['title']}) terminee — "
+                f"parcours {ph['parcours']} acheve, plus aucune phase apres celle-ci.")
+    nxt = suite[i + 1]
+    append("phase_status", id=nxt["id"], status="active")
+    return (f"[PlanTrack] phase {ph['id']} ({ph['title']}) terminee.\n"
+            f"phase {i + 2}/{len(ids)} — {nxt['title']} : {nxt.get('regle', 'aucune regle')}")
+
+
+def lire_parcours(chemin):
+    """Charge et valide un fichier de parcours. Un parcours mal forme doit mourir
+    ICI, pas a l'injection : une regle absente laisserait l'agent sans consigne
+    sans que personne ne le voie."""
+    try:
+        with open(chemin, encoding="utf-8") as f:
+            data = json.load(f)
+    except OSError as e:
+        sys.exit(f"[PlanTrack] illisible : {e}")
+    except ValueError as e:
+        sys.exit(f"[PlanTrack] JSON invalide : {e}")
+    nom = str(data.get("nom") or "").strip()
+    phases = data.get("phases")
+    if not nom:
+        sys.exit("[PlanTrack] le parcours doit porter un `nom`.")
+    if not isinstance(phases, list) or not phases:
+        sys.exit("[PlanTrack] le parcours doit porter une liste `phases` non vide.")
+    propres = []
+    for i, p in enumerate(phases, 1):
+        if not isinstance(p, dict):
+            sys.exit(f"[PlanTrack] phase {i} : un objet est attendu.")
+        titre = str(p.get("nom") or "").strip()
+        regle = str(p.get("regle") or "").strip()
+        porte = str(p.get("porte") or "agent").strip()
+        if not titre:
+            sys.exit(f"[PlanTrack] phase {i} : `nom` manquant.")
+        if not regle:
+            sys.exit(f"[PlanTrack] phase {i} ({titre}) : `regle` manquante — une phase "
+                     "sans regle n'apporte rien de plus qu'une phase ordinaire.")
+        if porte not in PORTES:
+            sys.exit(f"[PlanTrack] phase {i} ({titre}) : `porte` doit valoir "
+                     f"{' ou '.join(PORTES)}, pas {porte!r}.")
+        # la regle part dans un bloc au budget serre : une regle-paragraphe ferait
+        # elider le reste de l'etat sans prevenir
+        if len(regle) > LINE_TRUNC:
+            sys.exit(f"[PlanTrack] phase {i} ({titre}) : regle de {len(regle)} chars, "
+                     f"maximum {LINE_TRUNC} — le bloc reinjecte tient dans "
+                     f"{CTX_MAX_CHARS} chars, une regle longue en chasse le reste.")
+        propres.append({"nom": titre, "regle": regle, "porte": porte,
+                        "livrable": str(p.get("livrable") or "").strip(),
+                        "questions": bool(p.get("questions", True))})
+    return nom, propres
+
+
+def cmd_parcours(args, st):
+    sub = args[0] if args else ""
+    if sub == "import":
+        require_human("parcours import")
+        if len(args) < 2:
+            sys.exit("usage : plantrack parcours import <fichier.json>")
+        nom, phases = lire_parcours(args[1])
+        print(f"Parcours propose : {nom} ({len(phases)} phases)")
+        for i, p in enumerate(phases, 1):
+            print(f"  {i}. {p['nom']} [porte {p['porte']}"
+                  + ("" if p["questions"] else ", sans question") + "]")
+            print(f"     regle : {trunc(p['regle'], 100)}")
+            if p["livrable"]:
+                print(f"     livrable : {trunc(p['livrable'], 100)}")
+        if nom in st["parcours"]:
+            print(f"(un parcours {nom} existe deja — la nouvelle definition le remplacera)")
+        if input("Ecrire ce parcours dans le journal ? [y/N] ").strip().lower() not in ("y", "yes", "o", "oui"):
+            sys.exit("abandon — rien n'a ete ecrit.")
+        append("parcours_defini", id=next_id("pc"), text=nom, phases=phases)
+        print(f"parcours {nom} enregistre. `plantrack parcours start {nom}` pour le lancer.")
+        return
+    if sub in ("", "list"):
+        if not st["parcours"]:
+            sys.exit("aucun parcours declare. `plantrack parcours import <fichier.json>`.")
+        for nom, pc in st["parcours"].items():
+            inst = phases_du_parcours(st, nom)
+            etat = ""
+            if inst:
+                faites = sum(1 for p in inst if p["status"] == "done")
+                etat = f" — lance, {faites}/{len(inst)} phases terminees"
+            print(f"{nom} ({len(pc['phases'])} phases){etat}")
+            for i, p in enumerate(pc["phases"], 1):
+                print(f"  {i}. {p['nom']} [porte {p['porte']}] : {trunc(p['regle'], 90)}")
+        return
+    if sub == "start":
+        if len(args) < 2:
+            sys.exit("usage : plantrack parcours start <nom>")
+        ok, msg = parcours_start(st, args[1])
+        print(msg)
+        if not ok:
+            sys.exit(1)
+        return
+    if sub == "json":
+        print(json.dumps(parcours_json(st), ensure_ascii=False, indent=2))
+        return
+    sys.exit("usage : plantrack parcours list|import <f.json>|start <nom>|json")
+
+
+def parcours_start(st, nom):
+    """Instancie les phases d'un parcours declare et active la premiere.
+    Partage entre la CLI et `!parcours <nom>` : un hook ne doit jamais sys.exit,
+    d'ou le couple (ok, message) plutot qu'une sortie de processus."""
+    pc = st["parcours"].get(nom)
+    if not pc:
+        dispo = ", ".join(sorted(st["parcours"])) or "aucun"
+        return False, f"[PlanTrack] parcours {nom} inconnu — declares : {dispo}."
+    if phases_du_parcours(st, nom):
+        return False, (f"[PlanTrack] le parcours {nom} tourne deja — `plantrack phase next` "
+                       "pour avancer, `plantrack plan` pour l'arbre.")
+    if (ph := active_phase(st)):
+        return False, (f"[PlanTrack] la phase {ph['id']} ({ph['title']}) est encore active — "
+                       "termine-la avant d'ouvrir un parcours.")
+    ids = []
+    for i, p in enumerate(pc["phases"]):
+        pid = next_id("p")
+        append("phase_open", id=pid, text=p["nom"], regle=p["regle"], porte=p["porte"],
+               livrable=p.get("livrable") or None, parcours=nom, ordre=i,
+               questions=p.get("questions", True))
+        ids.append(pid)
+    append("phase_status", id=ids[0], status="active")
+    p0 = pc["phases"][0]
+    return True, (f"[PlanTrack] parcours {nom} lance — phase 1/{len(ids)} ({ids[0]}) : "
+                  f"{p0['nom']}\nregle : {p0['regle']}")
+
+
+def parcours_json(st):
+    """Ce que bcc lit pour son ecran de completude : la phase courante et sa regle,
+    pour montrer au client 'votre agent vous prepare des propositions' plutot qu'un
+    fil vide. Rend toujours un objet, meme sans parcours en cours."""
+    ph = active_phase(st)
+    if not ph:
+        return {"parcours": None, "phase": None,
+                "parcours_declares": sorted(st["parcours"])}
+    suite = phases_du_parcours(st, ph["parcours"]) if ph.get("parcours") else []
+    ids = [p["id"] for p in suite]
+    return {
+        "parcours": ph.get("parcours"),
+        "rang": ids.index(ph["id"]) + 1 if ph["id"] in ids else None,
+        "total": len(ids) or None,
+        "phase": {
+            "id": ph["id"], "nom": ph["title"], "regle": ph.get("regle", ""),
+            "livrable": ph.get("livrable", ""), "porte": ph.get("porte", ""),
+            "questions": ph.get("questions", True),
+            "bloque_par": porte_bloquee(st, ph),
+            "depuis": ph.get("status_ts", ph["ts"]),
+        },
+        "phases": [{"id": p["id"], "nom": p["title"], "etat": p["status"]} for p in suite],
+        "parcours_declares": sorted(st["parcours"]),
+    }
 
 
 def cmd_task(args, st):
@@ -1612,6 +1912,8 @@ def cli(argv):
                 for t in (t for t in st["tasks"].values() if t["phase"] == p["id"]):
                     rb = f" -> {t['replaced_by']}" if t.get("replaced_by") else ""
                     print(f"   {t['id']:>4}  {t['status']:<12} {trunc(t['text'], 60)}{rb}")
+    elif cmd == "parcours":
+        cmd_parcours(args, st)
     elif cmd == "phase":
         cmd_phase(args, st)
     elif cmd == "task":
@@ -1679,7 +1981,7 @@ def cli(argv):
     elif cmd == "question":
         if not args:
             sys.exit("usage : plantrack question <texte>")
-        print(cmd_question(" ".join(args)))
+        print(cmd_question(" ".join(args), st))
     elif cmd == "answer":
         require_human("answer")
         if len(args) < 2:

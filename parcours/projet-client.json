@@ -1,0 +1,37 @@
+{
+  "nom": "projet-client",
+  "_note": "Parcours generique decide le 13/09/2026 (note bcc, q14/d95). Ce qui varie d'une famille de projet a l'autre (flyer, site, application, document) n'est pas le parcours mais ce que la phase 'proposer' propose : bcc le fournit dans le CLAUDE.md de la famille. PlanTrack n'a pas a connaitre les familles.",
+  "phases": [
+    {
+      "nom": "comprendre",
+      "regle": "Au plus trois questions, en une seule carte.",
+      "livrable": "une carte de trois questions maximum",
+      "porte": "agent"
+    },
+    {
+      "nom": "proposer",
+      "regle": "Deux ou trois pistes concrètes, chacune avec un exemple visible, ta reco en premier. Aucune question avant d'avoir livré les pistes.",
+      "livrable": "une carte avec 2-3 options et une reco",
+      "porte": "humain"
+    },
+    {
+      "nom": "cadrer",
+      "regle": "Une page : ce qu'on fait, ce qu'on ne fait pas, ce que le client verra à la fin.",
+      "livrable": "une page de cadrage validée par le client",
+      "porte": "humain"
+    },
+    {
+      "nom": "construire",
+      "regle": "Ne pose une question que si tu es bloqué. Le reste, tu décides et tu le notes en décision.",
+      "livrable": "le travail avance, les arbitrages sont notés en décisions",
+      "porte": "agent",
+      "questions": false
+    },
+    {
+      "nom": "livrer",
+      "regle": "Montre le résultat dans `sortie/`, demande le verdict.",
+      "livrable": "le résultat dans sortie/ et une carte de verdict",
+      "porte": "humain"
+    }
+  ]
+}
