@@ -967,5 +967,28 @@ out=$(CLAUDE_PROJECT_DIR="$TMP23" python3 "$PT" bug b1 to_verify 2>&1)
 check "la forme correcte passe toujours" "b1 -> to_verify" "$out"
 rm -rf "$TMP23"
 
+# 24. b4 — la note pedagogique du fil auto-ouvert vivait DANS la section du fil
+# actif (rang 2, protege) : une consigne d'usage survivait a des bugs elides.
+# Elle reste affichee sous le fil, mais elle part la premiere.
+TMP24=$(mktemp -d)
+(cd "$TMP24" && git init -q . && git config user.email t@t && git config user.name t) >/dev/null 2>&1
+CLAUDE_PROJECT_DIR="$TMP24" python3 "$PT" init >/dev/null 2>&1
+(cd "$TMP24" && export CLAUDE_PROJECT_DIR="$TMP24" && echo a > f \
+  && git add f && git commit -q --no-verify -m un) >/dev/null 2>&1
+L24=$(python3 -c 'print("y"*130)')
+for i in 1 2 3 4 5 6; do
+  CLAUDE_PROJECT_DIR="$TMP24" python3 "$PT" bug "BUGVIVANT$i $L24" >/dev/null
+done
+blk=$(CLAUDE_PROJECT_DIR="$TMP24" python3 "$PT" status 2>&1)
+check "fil auto-ouvert : la note reste affichee a taille normale" "fil ouvert d'office" "$blk"
+serre=$(CLAUDE_PROJECT_DIR="$TMP24" python3 -c "
+import importlib.util
+s = importlib.util.spec_from_file_location('pt', '$PT')
+m = importlib.util.module_from_spec(s); s.loader.exec_module(m)
+print(m.context_block(m.project(), rules=False, budget=900))")
+check_not "budget etrangle : la consigne d usage part la premiere" "fil ouvert d'office" "$serre"
+check "budget etrangle : les bugs non corriges, eux, restent" "BUGVIVANT6" "$serre"
+rm -rf "$TMP24"
+
 echo
 [ "$fail" = 0 ] && echo "TOUS LES TESTS PASSENT" || { echo "DES TESTS ECHOUENT"; exit 1; }

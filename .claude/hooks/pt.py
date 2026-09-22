@@ -400,11 +400,13 @@ def context_block(st, header=True, rules=True, budget=CTX_MAX_CHARS, width=LINE_
         tag = f" [{a['task']}]" if a.get("task") else ""
         ctag = f" [{len(a['commits'])} commits]" if a.get("commits") else ""
         det = []
-        if a.get("auto"):
-            det.append("  (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)")
         if a["files"]:
             det.append("  fichiers recemment ecrits : " + ", ".join(a["files"][-CTX_MAX_FILES:]))
         sec(2, f"\nFIL ACTIF — {a['id']}{tag} : {trunc(a['label'], width)}{ctag}", det or None)
+        if a.get("auto"):
+            # rang 10 : affichee juste sous le fil, mais elidee la PREMIERE. Une
+            # consigne d'usage ne doit jamais chasser un bug du bloc (b4)
+            sec(10, "  (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)")
     else:
         sec(2, "\nFIL ACTIF : aucun. Ouvre un fil avec `!focus <sujet>` avant de coder — sans fil, aucun de tes commits n'est rattache.")
 
