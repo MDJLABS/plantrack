@@ -382,4 +382,9 @@ fil t2 actif. À faire par Mariella : tag v1.9.0 + publication PyPI.
   TOUS VALIDÉS par Mariella — plantrack b4-b11 (d7), bcc b59-b66 (d106),
   miamboost b2-b9 (d23). Reste sa saisie officielle `plantrack verify …` par
   repo (CLI hors env agent) + les verdicts d5 (verify b3, reject b1/b2).
-  Questions sans réponse (13 : bcc 12, miamboost 1) non traitées.
+  Questions sans réponse : TOUTES traitées au tel dans la foulée (14 réelles :
+  bcc 13 → d107, miamboost 1 → d24). Points saillants : permission limitée
+  systemctl restart mere.service accordée ; catégories de projet à élargir
+  (liste à proposer) ; extinction atelier après 15 min de silence ; chantier
+  retenu « canal humain » (carnet web/tél reconnus par PlanTrack — q15, même
+  garde qui bloque la saisie des verdicts d'aujourd'hui).

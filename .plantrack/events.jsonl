@@ -228,3 +228,4 @@
 {"ts": "2026-09-23T16:32:12+00:00", "kind": "decision", "id": "d7", "text": "Verdicts de Mariella (23/09, tel, suite) : b4, b5, b6, b7, b8, b9, b10, b11 TOUS VALIDES. La CLI refuse verify cote agent : saisie officielle a faire par Mariella (plantrack verify b4 ... b11), les statuts restent to_verify d'ici la.", "par": "agent"}
 {"ts": "2026-09-23T16:32:16+00:00", "kind": "commit", "sha": "884989c", "ctype": "chore", "thread": "t3"}
 {"ts": "2026-09-23T16:36:14+00:00", "kind": "file_touched", "text": ".planning/session-state.md", "thread": "t3"}
+{"ts": "2026-09-23T16:36:17+00:00", "kind": "commit", "sha": "c85ddae", "ctype": "chore", "thread": "t3"}
