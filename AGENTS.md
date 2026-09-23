@@ -16,8 +16,8 @@
 
 !! BUG BLOQUANT — a traiter avant toute autre chose : b1 Troncature du bloc reinjecte : sur bcc le bloc re…
 
-FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [15 commits]
-  fichiers recemment ecrits : ../../../root/.claude/projects/-home-mariella-plantrack/memory/MEMORY.md, ../../../root/.claude/projects/-home-mariella-plantrack/memory/mission-surveillance-plantrack.md, .claude/hooks/pt.py, AGENTS.md, tests/scenario.sh, ../../../tmp/testout.txt
+FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [17 commits]
+  fichiers recemment ecrits : ../../../root/.claude/projects/-home-mariella-plantrack/memory/mission-surveillance-plantrack.md, .claude/hooks/pt.py, AGENTS.md, tests/scenario.sh, ../../../tmp/testout.txt, .planning/session-state.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella

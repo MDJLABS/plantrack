@@ -370,5 +370,11 @@ fil t2 actif. À faire par Mariella : tag v1.9.0 + publication PyPI.
   AGENTS.md devient la fiche ENTIÈRE (plus aucune troncature nulle part,
   élision/resserrage supprimés). doctor : mesure du résumé réel + contrôle
   fiche à jour. Tests 18/24 réécrits : 349 checks verts.
-- b1 et b2 repassés to_verify (tentatives a18/a19). Propagation bcc/miamboost
-  toujours à faire (pg7). Appel 1980 : rien à trier (faux numéro).
+- b1 et b2 repassés to_verify (tentatives a18/a19). Appel 1980 : rien à trier
+  (faux numéro).
+- **Propagation v-d6 faite** (choix Mariella) après contrôle pg7 (aucune autre
+  session sur ces repos) : bcc f3c79ec + fix b6 (matcher Bash) + b210bd8 ;
+  miamboost 554e4ba + be3604d. Doctor vert partout — résumés : plantrack 1061,
+  bcc 974 (4661 avant), miamboost 643 chars. Découvert au passage : verdicts
+  humains en attente — bcc 9 bugs + 12 questions, miamboost 7 bugs + 1 question,
+  plantrack 8 bugs.
