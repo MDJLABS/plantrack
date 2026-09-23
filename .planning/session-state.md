@@ -388,3 +388,15 @@ fil t2 actif. À faire par Mariella : tag v1.9.0 + publication PyPI.
   (liste à proposer) ; extinction atelier après 15 min de silence ; chantier
   retenu « canal humain » (carnet web/tél reconnus par PlanTrack — q15, même
   garde qui bloque la saisie des verdicts d'aujourd'hui).
+
+## Session du 23/09 (soir, fil bcc) — canal humain + purge totale des verdicts
+- **Chantier « canal humain » livré** (commit 16a1e76, 357 checks) : verify/
+  reject/answer acceptent `--de "<canal> : <réponse citée>"` en env agent —
+  attestation journalisée (champ canal). Autres gestes humains inchangés.
+  Règle ajoutée à RULES. Propagé bcc (f9b46c4) + miamboost.
+- **Purge complète via le canal** : plantrack b1-b11 TOUS validés (dont b1/b2
+  nouvelle approche, verdict tel) ; bcc b59-b66 + 26 anciens (b1..b58) validés,
+  13 réponses q* saisies ; miamboost b1-b9 validés + q1 répondue. Doctor : 0
+  verdict / 0 question en attente sur les TROIS repos.
+- **b12 ouvert** (plantrack) : la fiche « complète » plafonne encore la section
+  bugs à CTX_MAX_BUGS (8) — c'est ce qui cachait les 27 anciens bugs. À corriger.
