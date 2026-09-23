@@ -16,7 +16,7 @@
 
 !! BUG BLOQUANT — a traiter avant toute autre chose : b1 Troncature du bloc reinjecte : sur bcc le bloc re…
 
-FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [11 commits]
+FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [12 commits]
   fichiers recemment ecrits : parcours/projet-client.json, tests/scenario.sh, .claude/hooks/pt.py, .planning/session-state.md, ../../../root/.claude/projects/-home-mariella-plantrack/memory/MEMORY.md, ../../../root/.claude/projects/-home-mariella-plantrack/memory/mission-surveillance-plantrack.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
