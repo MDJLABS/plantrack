@@ -465,21 +465,23 @@ def context_block(st, header=True, rules=True, full=True):
     pending_q = [q for q in st["questions"].values() if not q.get("answer")]
 
     if full:
+        # b12 : la fiche promet l'etat COMPLET (d6) — aucun plafond CTX_MAX_* ici,
+        # sinon les entrees anciennes disparaissent de partout (27 bugs caches le 23/09)
         sec("\nBUGS NON CORRIGES (personne ne s'en est occupe) :",
-            [bug_line(b) for b in troues[-CTX_MAX_BUGS:]])
+            [bug_line(b) for b in troues])
         sec("\nBUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :",
-            [bug_line(b) for b in verdict[-CTX_MAX_BUGS:]])
+            [bug_line(b) for b in verdict])
 
         sec("\nDECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :",
             [f"  {d['id']} : {trunc(d['text'])}" + (" (agent)" if d.get("par") == "agent" else "")
-             for d in st["decisions"][-CTX_MAX_DECISIONS:]])
+             for d in st["decisions"]])
 
         sec("\nPieges connus :",
             [f"  {p['id']} : {trunc(p['text'], 80)}"
-             for p in list(st["pieges"].values())[-CTX_MAX_PIEGES:]])
+             for p in st["pieges"].values()])
 
         sec("\nQuestions en attente (reponds via !answer qN ...) :",
-            [f"  {q['id']} : {trunc(q['text'], 80)}" for q in pending_q[-CTX_MAX_QUESTIONS:]])
+            [f"  {q['id']} : {trunc(q['text'], 80)}" for q in pending_q])
     else:
         # resume : des compteurs, jamais le detail — l'etat entier est dans la
         # fiche AGENTS.md que chaque agent charge d'office. Rien a elider, donc

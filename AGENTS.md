@@ -14,16 +14,18 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [25 commits]
+FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [26 commits]
   fichiers recemment ecrits : ../../../root/.claude/projects/-home-mariella-plantrack/memory/mission-surveillance-plantrack.md, AGENTS.md, ../../../tmp/testout.txt, .planning/session-state.md, .claude/hooks/pt.py, tests/scenario.sh
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
 
-BUGS NON CORRIGES (personne ne s'en est occupe) :
-  b12 (open) [t3] Fiche d'etat (d6) : la section BUGS EN ATTENTE DE TON VERDICT plafonne encore a CTX_MAX_BUGS meme en mode fiche complete — sur bcc 9 bugs t… (agent)
+BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
+  b12 (to_verify) [t3] Fiche d'etat (d6) : la section BUGS EN ATTENTE DE TON VERDICT plafonne encore a CTX_MAX_BUGS meme en mode fiche complete — sur bcc 9 bugs t… (agent) [1 tentatives, derniere: En mode fiche (full=True), ne plus plafonner les listes a C…]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
+  d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
+  d2 : Cause racine des pannes PlanTrack (constat du 06/09 sur bcc et miamboost) : l'outil se degrade en SILENCE et son seul controle, doctor, dev… (agent)
   d3 : Parcours retenu EN ENTIER (choix de Mariella, 22/09) : une phase porte regle + livrable + porte (agent|humain) + questions(bool), 'phase ne… (agent)
   d4 : Mariella (23/09, tel) : abandon de l'implementation du design (erreur de projet). Nouvelle mission de la session : surveiller le bon foncti… (agent)
   d5 : Verdicts de Mariella (23/09, tel, via fil bcc) : b3 VALIDE ; b1 et b2 REFUSES (motif en attente). Le statut reste to_verify car verify/reje… (agent)
@@ -32,6 +34,9 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d8 : Chantier canal humain (q15/d107) LIVRE : verify, reject et answer acceptent --de "<canal> : <reponse citee>" en env agent — le verdict rela… (agent)
 
 Pieges connus :
+  pg1 : L'ecart 'commits arrives au carnet' du doctor remonte jusqu'a l'installation (U…
+  pg2 : Un hook git greffe par PlanTrack est efface si son proprietaire le regenere (le…
+  pg3 : read_events relit et reparse tout le journal a chaque appel, hook_commit le lit…
   pg4 : Un commit amende ou reset apres le post-commit reste dans le journal append-onl…
   pg5 : injections.json ne porte que la cle 'claude' sur bcc et miamboost : rien ne pro…
   pg6 : Le garde-fou pre-commit refuse tout fichier touche par un fil PARQUE : sur un o…

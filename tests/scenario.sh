@@ -1072,6 +1072,11 @@ out=$(CLAUDE_PROJECT_DIR="$TMP31" python3 "$PT" verify b1 --de 2>&1) && ec=0 || 
 check "d107 : --de sans attestation refuse" "attend l'attestation" "$out"
 out=$(CLAUDE_PROJECT_DIR="$TMP31" python3 "$PT" plan import /dev/null 2>&1) && ec=0 || ec=$?
 check "d107 : les autres gestes humains restent verrouilles" "reserve a l'humain" "$out"
+# b12 : la fiche complete n'a AUCUN plafond de nombre — un 9e/10e bug reste visible
+for i in $(seq 1 10); do CLAUDE_PROJECT_DIR="$TMP31" python3 "$PT" bug "defaut numero special$i" >/dev/null; done
+out=$(CLAUDE_PROJECT_DIR="$TMP31" python3 "$PT" status)
+check "b12 : le 1er des 10 bugs reste dans la fiche" "special1" "$out"
+check "b12 : le 10e aussi" "special10" "$out"
 rm -rf "$TMP31"
 
 echo
