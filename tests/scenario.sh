@@ -41,13 +41,15 @@ out=$(prompt '!focus page inscription'); rc=$?
 check_exit "!focus rejette le prompt (exit 2)" 2 "$rc"
 check "!focus ouvre le fil t1" "nouveau fil t1" "$out"
 
-# 2. !bug capture sans interrompre, et reapparait dans le bloc reinjecte apres compaction
+# 2. !bug capture sans interrompre, et reapparait apres compaction : au compteur
+# du resume (d6), en entier dans la fiche
 out=$(prompt '!bug l avatar ne se rafraichit pas'); rc=$?
 check_exit "!bug rejette le prompt (exit 2)" 2 "$rc"
 check "!bug enregistre b1" "bug b1 enregistre" "$out"
 out=$(ctx compact)
-check "b1 present apres compaction" "b1" "$out"
+check "le resume signale le bug apres compaction" "1 bug(s) non corrige(s)" "$out"
 check "bandeau de reinjection post-compaction" "contexte compacte" "$out"
+check "b1 est entier dans la fiche" "b1" "$(python3 "$PT" status 2>&1)"
 
 # 3. !focus sur un second sujet echoue tant que le fil actif n'est pas parque
 out=$(prompt '!focus autre page')
@@ -146,8 +148,8 @@ out=$(H task cancel k1)
 check "task cancel sans motif refuse" "motif obligatoire" "$out"
 out=$(H task cancel k1 -m "parcours simplifie retenu")
 check "task cancel avec motif passe" "decision actee" "$out"
-out=$(ctx compact)
-check "l annulation alimente les decisions reinjectees" "k1 annulee" "$out"
+out=$(python3 "$PT" status 2>&1)
+check "l annulation alimente les decisions de la fiche" "k1 annulee" "$out"
 H task add p1 Upload v1 >/dev/null
 H task add p1 Upload unifie >/dev/null
 out=$(H task replace k2 k9 -m x)
@@ -334,8 +336,8 @@ check "attempt consigne l hypothese (§9)" "z-index du header" "$out"
 check "attempt consigne l acteur (§9)" '"actor": "claude-code"' "$out"
 python3 "$PT" bug b5 to_verify >/dev/null 2>&1
 H reject b5 -m "le z-index etait correct" >/dev/null
-out=$(ctx compact)
-check "le bloc restitue la tentative rejetee (§5)" "deja rejete" "$out"
+out=$(python3 "$PT" status 2>&1)
+check "la fiche restitue la tentative rejetee (§5)" "deja rejete" "$out"
 check "la tentative rejetee porte son motif" "le z-index etait correct" "$out"
 python3 "$PT" bug b5 to_verify >/dev/null 2>&1
 out=$(python3 "$PT" bug b5 open 2>&1); rc=$?
@@ -485,9 +487,11 @@ check "!piege note pg1 (prefixe dedie, pas de collision avec les phases)" "piege
 out=$(CLAUDE_PROJECT_DIR="$TMP11" python3 "$PT" piege "ne jamais committer .env" 2>&1)
 check "plantrack piege cree pg2" "piege pg2 note" "$out"
 out=$(printf '{"source":"startup"}' | CLAUDE_PROJECT_DIR="$TMP11" python3 "$PT" hook-context 2>&1)
-check "les pieges sont reinjectes" "Pieges connus" "$out"
-check "pg1 apparait dans le bloc" "pg1 :" "$out"
-check "pg2 apparait dans le bloc" "pg2 :" "$out"
+check "les pieges sont comptes dans le resume" "2 piege(s) connu(s)" "$out"
+out=$(CLAUDE_PROJECT_DIR="$TMP11" python3 "$PT" status 2>&1)
+check "les pieges sont dans la fiche" "Pieges connus" "$out"
+check "pg1 apparait dans la fiche" "pg1 :" "$out"
+check "pg2 apparait dans la fiche" "pg2 :" "$out"
 rm -rf "$TMP11"
 
 # 27. v1.5 — questions en attente de verdict : hook + CLI, reponse fait disparaitre du bloc
@@ -497,8 +501,10 @@ out=$(printf '{"prompt":"!question faut-il garder l ancien format d export ?"}' 
 check_exit "!question rejette le prompt (exit 2)" 2 "$rc"
 check "!question enregistre q1" "question q1 enregistree" "$out"
 out=$(printf '{"source":"startup"}' | CLAUDE_PROJECT_DIR="$TMP12" python3 "$PT" hook-context 2>&1)
-check "la question en attente ressort dans le bloc" "Questions en attente" "$out"
-check "q1 apparait dans le bloc" "q1 :" "$out"
+check "la question en attente ressort au compteur du resume" "1 question(s) sans reponse" "$out"
+out=$(CLAUDE_PROJECT_DIR="$TMP12" python3 "$PT" status 2>&1)
+check "la question en attente ressort dans la fiche" "Questions en attente" "$out"
+check "q1 apparait dans la fiche" "q1 :" "$out"
 
 out=$(CLAUDE_PROJECT_DIR="$TMP12" python3 "$PT" question "prochaine version : 2.0 ou 1.6 ?" 2>&1)
 check "plantrack question cree q2" "question q2 enregistree" "$out"
@@ -506,8 +512,10 @@ check "plantrack question cree q2" "question q2 enregistree" "$out"
 out=$(env -u CLAUDECODE -u CLAUDE_CODE_ENTRYPOINT CLAUDE_PROJECT_DIR="$TMP12" python3 "$PT" answer q1 "oui, on garde l ancien format" 2>&1)
 check "plantrack answer repond a q1" "q1 repondue" "$out"
 out=$(printf '{"source":"startup"}' | CLAUDE_PROJECT_DIR="$TMP12" python3 "$PT" hook-context 2>&1)
-check_not "q1 repondue disparait du bloc" "q1 :" "$out"
-check "q2 encore sans reponse reste dans le bloc" "q2 :" "$out"
+check "le compteur du resume redescend a la reponse" "1 question(s) sans reponse" "$out"
+out=$(CLAUDE_PROJECT_DIR="$TMP12" python3 "$PT" status 2>&1)
+check_not "q1 repondue disparait de la fiche" "q1 :" "$out"
+check "q2 encore sans reponse reste dans la fiche" "q2 :" "$out"
 
 out=$(env -u CLAUDECODE -u CLAUDE_CODE_ENTRYPOINT CLAUDE_PROJECT_DIR="$TMP12" python3 "$PT" answer qX "texte" 2>&1); rc=$?
 check "answer sur id inconnu : erreur claire" "introuvable" "$out"
@@ -531,9 +539,9 @@ TMP13=$(mktemp -d)
 printf '{"prompt":"!bug le paiement echoue"}' | CLAUDE_PROJECT_DIR="$TMP13" python3 "$PT" hook-prompt >/dev/null 2>&1
 CLAUDE_PROJECT_DIR="$TMP13" python3 "$PT" attempt b1 le cache invalide la session >/dev/null 2>&1
 CLAUDE_PROJECT_DIR="$TMP13" python3 "$PT" attempt b1 la variable d environnement manque en prod >/dev/null 2>&1
-out=$(printf '{"source":"startup"}' | CLAUDE_PROJECT_DIR="$TMP13" python3 "$PT" hook-context 2>&1)
-check "le bloc affiche le compteur de tentatives" "2 tentatives" "$out"
-check "le bloc affiche la derniere hypothese" "derniere: la variable d environnement" "$out"
+out=$(CLAUDE_PROJECT_DIR="$TMP13" python3 "$PT" status 2>&1)
+check "la fiche affiche le compteur de tentatives" "2 tentatives" "$out"
+check "la fiche affiche la derniere hypothese" "derniere: la variable d environnement" "$out"
 rm -rf "$TMP13"
 
 # 29. v1.5 — init rejoue sur une installation existante : MD_BLOCK mis a niveau, idempotent
@@ -713,56 +721,41 @@ out=$(CLAUDE_PROJECT_DIR="$TMP17" python3 "$PT" step g1 "nouvelle etape" 2>&1)
 check "testcheck off : creer une nouvelle etape est de nouveau refuse" "testcheck desactivee" "$out"
 rm -rf "$TMP17"
 
-# 18. §11 — depassement du budget : l'elision part des sections les MOINS
-# prioritaires. Une decision, un piege et une question doivent survivre aux bugs
-# DEJA CORRIGES, qui n'attendent qu'un verdict ; mais un bug NON CORRIGE passe
-# devant eux — c'est un trou reel, pas une formalite.
+# 18. d6 — plus aucune coupe : la fiche est ENTIERE (bugs, decisions, pieges,
+# questions au complet), et le resume injecte en session ne porte que des
+# compteurs et le renvoi vers la fiche — court par construction.
 TMP18=$(mktemp -d)
 L=$(python3 -c 'print("x"*130)')
 for i in 1 2 3 4 5 6 7 8; do
-  CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" bug "BUGSACRIFIABLE$i $L" >/dev/null
+  CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" bug "BUGCONSERVE$i $L" >/dev/null
 done
-# la moitie passe en to_verify : ce sont eux, les sacrifiables
 for i in 5 6 7 8; do
   CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" bug b$i to_verify >/dev/null
 done
 for i in 1 2 3 4 5 6; do
-  CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" decide "DECISIONSURVIVANTE$i $L" >/dev/null
-  CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" piege "PIEGESURVIVANT$i $L" >/dev/null
-  CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" question "QUESTIONSURVIVANTE$i $L" >/dev/null
+  CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" decide "DECISIONCONSERVEE$i $L" >/dev/null
+  CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" piege "PIEGECONSERVE$i $L" >/dev/null
+  CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" question "QUESTIONCONSERVEE$i $L" >/dev/null
 done
-# a taille naturelle le resserrage suffit : RIEN ne doit disparaitre. Une ligne
-# raccourcie se rattrape dans `plantrack status`, une ligne disparue fait refaire le bug.
 blk=$(CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" status 2>&1)
-check_not "budget depasse : le resserrage evite toute elision" "ligne(s) elidee(s)" "$blk"
-for i in 1 6; do
-  check "resserrage : le bug b$i est toujours annonce" "BUGSACRIFIABLE$i" "$blk"
+for i in 1 8; do
+  check "fiche : le bug b$i est entier" "BUGCONSERVE$i" "$blk"
 done
-check "les decisions actees survivent au resserrage" "DECISIONSURVIVANTE6" "$blk"
-check "les pieges connus survivent au resserrage" "PIEGESURVIVANT6" "$blk"
-check "les questions en attente survivent au resserrage" "QUESTIONSURVIVANTE6" "$blk"
-check_not "resserrage : les lignes sont bien raccourcies" "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" "$blk"
-# budget etrangle : la section entiere y passe, tete comprise (pas d'intitule orphelin)
-serre=$(CLAUDE_PROJECT_DIR="$TMP18" python3 -c "
-import importlib.util, sys
-s = importlib.util.spec_from_file_location('pt', '$PT')
-m = importlib.util.module_from_spec(s); s.loader.exec_module(m)
-print(m.context_block(m.project(), rules=False, budget=1200))")
-check_not "pas de tete de section orpheline une fois la section videe" \
-  "BUGS EN ATTENTE DE TON VERDICT" "$serre"
-check "budget etrangle : les decisions sont les dernieres a partir" "DECISIONSURVIVANTE6" "$serre"
-check_not "budget etrangle : les bugs deja corriges partent en premier" "BUGSACRIFIABLE8" "$serre"
-check "budget etrangle : un bug NON CORRIGE survit aux pieges" "BUGSACRIFIABLE4" "$serre"
-check_not "budget etrangle : les pieges partent avant les bugs non corriges" "PIEGESURVIVANT6" "$serre"
-# le doctor doit annoncer le depassement REEL, pas la taille apres elision
-d=$(CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" doctor 2>&1 | grep "etat reinjecte")
-check_not "doctor : le chiffre n'est pas la taille apres elision" "3000/3000" "$d"
-check "doctor : le depassement reel est chiffre" "3786/3000" "$d"
-# le palier de resserrage absorbe ce depassement AVANT toute elision : rien n'est
-# perdu, donc le controle ne doit PAS crier — une alerte qui ne s'eteint plus (d2)
-# cesse d'etre lue. Le depassement brut ressort en simple information.
-check "doctor : trop long mais complet n'est pas un defaut" "  --  " "$d"
-check_not "doctor : trop long mais complet n'est pas un defaut (pas de !!)" "!!" "$d"
+check "fiche : les decisions actees au complet" "DECISIONCONSERVEE6" "$blk"
+check "fiche : les pieges connus au complet" "PIEGECONSERVE6" "$blk"
+check "fiche : les questions en attente au complet" "QUESTIONCONSERVEE6" "$blk"
+check_not "fiche : plus jamais d elision" "elidee" "$blk"
+# le resume injecte ne porte que des compteurs, et tient sous le plafond
+r=$(printf '{"source":"startup"}' | CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" hook-context 2>&1)
+check_not "resume : pas de detail de bug" "BUGCONSERVE1" "$r"
+check "resume : le compteur des bugs non corriges" "4 bug(s) non corrige(s)" "$r"
+check "resume : le compteur des bugs a verdict" "4 bug(s) corrige(s) en attente de verdict humain" "$r"
+check "resume : le renvoi vers la fiche est present" "instantane de l'etat" "$r"
+n=$(printf '%s' "$r" | wc -c)
+if [ "$n" -le 3000 ]; then echo "ok   - resume charge : toujours sous le plafond ($n chars)"
+else echo "FAIL - resume charge : $n chars (> 3000)"; fail=1; fi
+d=$(CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" doctor 2>&1)
+check "doctor : le resume reste sous le budget" "ok  resume de session sous le budget" "$d"
 # une section sans contenu ne doit pas annoncer son intitule dans le vide
 TMP18b=$(mktemp -d)
 vide=$(CLAUDE_PROJECT_DIR="$TMP18b" python3 "$PT" status 2>&1)
@@ -967,9 +960,8 @@ out=$(CLAUDE_PROJECT_DIR="$TMP23" python3 "$PT" bug b1 to_verify 2>&1)
 check "la forme correcte passe toujours" "b1 -> to_verify" "$out"
 rm -rf "$TMP23"
 
-# 24. b4 — la note pedagogique du fil auto-ouvert vivait DANS la section du fil
-# actif (rang 2, protege) : une consigne d'usage survivait a des bugs elides.
-# Elle reste affichee sous le fil, mais elle part la premiere.
+# 24. b4/d6 — la note pedagogique du fil auto-ouvert reste affichee sous le fil,
+# et plus rien ne s'elide : les bugs restent entiers dans la fiche a cote d'elle.
 TMP24=$(mktemp -d)
 (cd "$TMP24" && git init -q . && git config user.email t@t && git config user.name t) >/dev/null 2>&1
 CLAUDE_PROJECT_DIR="$TMP24" python3 "$PT" init >/dev/null 2>&1
@@ -981,13 +973,7 @@ for i in 1 2 3 4 5 6; do
 done
 blk=$(CLAUDE_PROJECT_DIR="$TMP24" python3 "$PT" status 2>&1)
 check "fil auto-ouvert : la note reste affichee a taille normale" "fil ouvert d'office" "$blk"
-serre=$(CLAUDE_PROJECT_DIR="$TMP24" python3 -c "
-import importlib.util
-s = importlib.util.spec_from_file_location('pt', '$PT')
-m = importlib.util.module_from_spec(s); s.loader.exec_module(m)
-print(m.context_block(m.project(), rules=False, budget=900))")
-check_not "budget etrangle : la consigne d usage part la premiere" "fil ouvert d'office" "$serre"
-check "budget etrangle : les bugs non corriges, eux, restent" "BUGVIVANT6" "$serre"
+check "les bugs non corriges restent entiers a cote de la note" "BUGVIVANT6" "$blk"
 rm -rf "$TMP24"
 
 # 25. b7 — un hook ne doit jamais bloquer une session, donc il avale ses pannes.
@@ -1003,7 +989,7 @@ out=$(CLAUDE_PROJECT_DIR="$TMP25" python3 "$PT" doctor 2>&1)
 check "aucune panne avalee au depart" "ok  pannes avalees par les hooks (0" "$out"
 printf 'pas du json' > "$TMP25/.plantrack/injections.json"
 out=$(printf '{"source":"startup"}' | CLAUDE_PROJECT_DIR="$TMP25" python3 "$PT" hook-context 2>&1)
-check "la panne n empeche pas le hook de servir l etat" "BUGS NON CORRIGES" "$out"
+check "la panne n empeche pas le hook de servir l etat" "1 bug(s) non corrige(s)" "$out"
 check "la panne est tracee, avec son origine" "note_injection" "$(cat "$TMP25/.plantrack/incidents.log")"
 out=$(CLAUDE_PROJECT_DIR="$TMP25" python3 "$PT" doctor 2>&1)
 check "le doctor annonce la panne avalee" "!!  pannes avalees par les hooks (1" "$out"

@@ -27,16 +27,13 @@ from datetime import datetime, timedelta, timezone
 # ---------------------------------------------------------------- configuration
 
 MAX_OPEN_THREADS = 3          # garde-fou : au-dela, le contexte reinjecte enfle
-CTX_MAX_CHARS = 3000          # budget dur du bloc reinjecte
+CTX_MAX_CHARS = 3000          # plafond de sante du RESUME injecte (d6) — la fiche, elle, n'est jamais coupee
 CTX_MAX_BUGS = 8
 CTX_MAX_DECISIONS = 6
 CTX_MAX_FILES = 6
 CTX_MAX_PIEGES = 6
 CTX_MAX_QUESTIONS = 6
 LINE_TRUNC = 140
-MIN_TRUNC = 80               # palier de resserrage : additionnes, les plafonds
-                             # CTX_MAX_* depassent CTX_MAX_CHARS des qu'un projet
-                             # murit — sans ce palier, bcc perdait ses 8 bugs d'un coup
 MAX_ARCHIVES = 5              # transcripts gardes : chacun pese la session entiere
 STALE_DAYS = 7                # au-dela, un bug sans verdict humain est un oubli
 USAGE_DAYS = 30               # fenetre du controle d'usage (commits vs journal)
@@ -46,7 +43,7 @@ PORTES = ("agent", "humain")  # qui autorise la sortie d'une phase
 # Source unique des regles : elles vivent ici, sont ecrites dans AGENTS.md (agents
 # sans hooks) ET reinjectees hors budget a chaque session — un outil tiers peut
 # regenerer un fichier de consignes, il ne peut pas toucher au bloc injecte.
-RULES = """- L'état du projet t'est injecté automatiquement en début de session et après chaque compaction. Fie-toi à ce bloc, pas à ta mémoire de la conversation.
+RULES = """- Un RÉSUMÉ de l'état t'est injecté en début de session et après chaque compaction ; l'état COMPLET (décisions, bugs, pièges, questions) est dans AGENTS.md, section « instantané de l'état ». Fie-toi à lui, pas à ta mémoire de la conversation.
 - Ne réimplémente jamais ce qui figure sous DECISIONS ACTEES.
 - Ne modifie pas les fichiers d'un fil en pause.
 - Après correction d'un bug : consigne la tentative, puis passe-le en "to_verify". Tu ne valides jamais un bug toi-même.
@@ -372,36 +369,35 @@ def trunc(s, n=LINE_TRUNC):
 
 # ------------------------------------------------------------- bloc de contexte
 
-def context_block(st, header=True, rules=True, budget=CTX_MAX_CHARS, width=LINE_TRUNC):
-    """§11 : les sections sortent dans l'ordre de lecture, mais c'est leur RANG qui
-    decide qui survit au depassement — regle de phase > decisions > fil actif et notes de reprise >
-    bugs bloquants > bugs non corriges > le reste, les bugs deja corriges en
-    dernier. En cas de debordement on elide ligne a ligne en
-    partant de la section la moins prioritaire (la plus ancienne d'abord) : le bloc
-    ne se coupe plus au hasard par la fin, ou les decisions se trouvaient.
-    Avant d'elider, on RESSERRE (width -> MIN_TRUNC) : une ligne raccourcie vaut
-    mieux qu'une ligne disparue — savoir qu'un bug existe suffit a ne pas le refaire.
-    budget=None rend le bloc entier — c'est ainsi que le doctor mesure le vrai
-    depassement, qu'une mesure prise apres coupe ne pouvait pas voir."""
-    secs = []  # [rang, ligne de tete, lignes de detail], dans l'ordre d'affichage
+def context_block(st, header=True, rules=True, full=True):
+    """d6 (b1/b2 — remplace l'elision par priorite, refusee) : plus AUCUNE coupe.
+    En entier (full=True) ce rendu est la FICHE : AGENTS.md, `plantrack status`,
+    `!state`. Les plafonds CTX_MAX_* la bornent par le NOMBRE d'entrees, jamais
+    par les chars — rien ne s'y perd. En resume (full=False, SessionStart) seul
+    l'immediat est injecte — regle de phase, bloquants, fils — plus les compteurs
+    et le renvoi a la fiche, que tous les agents chargent d'office (AGENTS.md)."""
+    L = []
+    if header:
+        L.append("== PlanTrack — etat persistant du projet ==")
+        L.append("(reinjecte automatiquement, y compris apres compaction du contexte)")
 
-    def sec(rank, head, items=None):
+    def sec(head, items=None):
         # items=None : section d'une seule ligne. Sinon la tete n'a de sens
         # qu'avec au moins une ligne sous elle — sans quoi le bloc annonce des
         # sections vides ("Questions en attente :" suivi de rien).
         if items is None:
-            secs.append([rank, head, []])
+            L.append(head)
         elif items:
-            secs.append([rank, head, list(items)])
+            L.append(head)
+            L.extend(items)
 
-    # rang 0 : la regle de phase passe avant tout le reste. Une consigne elidee est
-    # une consigne qui n'existe pas — et c'est la seule ligne du bloc qui dit a
-    # l'agent COMMENT travailler maintenant, pas seulement ce qu'il ne doit pas refaire.
+    # la regle de phase sort meme en resume : c'est la seule ligne du bloc qui dit
+    # a l'agent COMMENT travailler maintenant, pas seulement ce qu'il ne doit pas refaire.
     ph = active_phase(st)
     if ph and (ph.get("regle") or ph.get("parcours")):
         det = []
         if ph.get("regle"):
-            det.append(f"  regle : {trunc(ph['regle'], width)}")
+            det.append(f"  regle : {trunc(ph['regle'])}")
         if ph.get("porte") == "humain":
             det.append("  sortie : porte humaine — il faut une question posee ET sa reponse"
                        " avant `plantrack phase next`")
@@ -409,7 +405,7 @@ def context_block(st, header=True, rules=True, budget=CTX_MAX_CHARS, width=LINE_
             det.append("  sortie : porte agent — tu passes a la suite toi-meme"
                        " (`plantrack phase next`)")
         if ph.get("livrable"):
-            det.append(f"  livrable attendu : {trunc(ph['livrable'], min(90, width))}")
+            det.append(f"  livrable attendu : {trunc(ph['livrable'], 90)}")
         rang = ""
         if ph.get("parcours"):
             suite = phases_du_parcours(st, ph["parcours"])
@@ -417,13 +413,13 @@ def context_block(st, header=True, rules=True, budget=CTX_MAX_CHARS, width=LINE_
             if ph["id"] in ids:
                 rang = f" — phase {ids.index(ph['id']) + 1}/{len(ids)}"
         nom = f"PARCOURS {ph['parcours']}{rang} : " if ph.get("parcours") else "PHASE EN COURS : "
-        sec(0, f"\n{nom}{trunc(ph['title'], 60)}", det or None)
+        sec(f"\n{nom}{trunc(ph['title'], 60)}", det or None)
 
     blockers = [b for b in st["bugs"].values()
                 if b.get("blocking") and b["status"] not in ("validated", "wont_fix")]
     if blockers:
         ids = " ; ".join(f"{b['id']} {trunc(b['text'], 50)}" for b in blockers[:2])
-        sec(3, f"\n!! BUG BLOQUANT — a traiter avant toute autre chose : {ids}")
+        sec(f"\n!! BUG BLOQUANT — a traiter avant toute autre chose : {ids}")
 
     a = st["threads"].get(st["active"]) if st["active"] else None
     if a:
@@ -432,17 +428,15 @@ def context_block(st, header=True, rules=True, budget=CTX_MAX_CHARS, width=LINE_
         det = []
         if a["files"]:
             det.append("  fichiers recemment ecrits : " + ", ".join(a["files"][-CTX_MAX_FILES:]))
-        sec(2, f"\nFIL ACTIF — {a['id']}{tag} : {trunc(a['label'], width)}{ctag}", det or None)
+        sec(f"\nFIL ACTIF — {a['id']}{tag} : {trunc(a['label'])}{ctag}", det or None)
         if a.get("auto"):
-            # rang 10 : affichee juste sous le fil, mais elidee la PREMIERE. Une
-            # consigne d'usage ne doit jamais chasser un bug du bloc (b4)
-            sec(10, "  (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)")
+            sec("  (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)")
     else:
-        sec(2, "\nFIL ACTIF : aucun. Ouvre un fil avec `!focus <sujet>` avant de coder — sans fil, aucun de tes commits n'est rattache.")
+        sec("\nFIL ACTIF : aucun. Ouvre un fil avec `!focus <sujet>` avant de coder — sans fil, aucun de tes commits n'est rattache.")
 
     parked = [t for t in st["threads"].values() if t["status"] == "parked"]
-    sec(2, "\nFILS EN PAUSE (ne pas y toucher sans reprise explicite) :" if parked else None,
-        [f"  {t['id']} : {trunc(t['label'], 60)} — reprise : {trunc(t['note'] or 'aucune note', min(110, width))}"
+    sec("\nFILS EN PAUSE (ne pas y toucher sans reprise explicite) :" if parked else None,
+        [f"  {t['id']} : {trunc(t['label'], 60)} — reprise : {trunc(t['note'] or 'aucune note', 110)}"
          for t in parked])
 
     def bug_line(b):
@@ -450,86 +444,66 @@ def context_block(st, header=True, rules=True, budget=CTX_MAX_CHARS, width=LINE_
         tag = " (agent)" if b.get("par") == "agent" else ""
         att = ""
         if b["attempts"]:  # tentatives cablees en session (v1.5)
-            # resserre, la derniere hypothese saute : AGENTS.md impose deja de lire
-            # `plantrack attempts <id>` avant de toucher un bug — seul le compte informe
-            att = (f" [{len(b['attempts'])} tent.]" if width < LINE_TRUNC else
-                   f" [{len(b['attempts'])} tentatives, derniere: "
+            att = (f" [{len(b['attempts'])} tentatives, derniere: "
                    f"{trunc(b['attempts'][-1]['hypothesis'], 60)}]")
-        line = f"  {b['id']} ({b['status']}) {th}{trunc(b['text'], width)}{tag}{att}"
+        line = f"  {b['id']} ({b['status']}) {th}{trunc(b['text'])}{tag}{att}"
         rej = [x for x in b["attempts"] if x.get("rejected")]
         if rej:  # §5 : ce qui a deja ete tente doit survivre a la compaction — et
-            # reste colle a son bug, sinon l'elision separerait l'un de l'autre
+            # reste colle a son bug pour ne jamais s'en separer a la lecture
             plus = f" (+{len(rej) - 1}, voir plantrack attempts {b['id']})" if len(rej) > 1 else ""
-            line += (f"\n    deja rejete : {trunc(rej[-1]['hypothesis'], min(60, width))}"
-                     f" — {trunc(rej[-1]['rejected'], min(60, width))}{plus}")
+            line += (f"\n    deja rejete : {trunc(rej[-1]['hypothesis'], 60)}"
+                     f" — {trunc(rej[-1]['rejected'], 60)}{plus}")
         return line
 
     # Deux sections, pas une : un bug JAMAIS corrige et un bug qui n'attend qu'un verdict
     # ne meritent pas la meme place. Melanges, les plafonds partent aux plus recents —
     # mesure du 20/09 sur bcc : 45 bugs, les 8 places prises par des to_verify, les deux
-    # seuls bugs non corriges (secrets en clair) jamais montres a l'agent. Et trier dans
-    # UNE section ne suffisait pas : l'elision mange la premiere ligne, donc les remettre
-    # en tete les aurait coupes en premier — il leur faut leur propre RANG.
+    # seuls bugs non corriges (secrets en clair) jamais montres a l'agent.
     bugs = list(st["bugs"].values())
     troues = [b for b in bugs if b["status"] in ("open", "in_progress")]
     verdict = [b for b in bugs if b["status"] == "to_verify"]
-    sec(4, "\nBUGS NON CORRIGES (personne ne s'en est occupe) :",
-        [bug_line(b) for b in troues[-CTX_MAX_BUGS:]])
-    sec(7, "\nBUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :",
-        [bug_line(b) for b in verdict[-CTX_MAX_BUGS:]])
-
-    sec(1, "\nDECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :",
-        [f"  {d['id']} : {trunc(d['text'], width)}" + (" (agent)" if d.get("par") == "agent" else "")
-         for d in st["decisions"][-CTX_MAX_DECISIONS:]])
-
-    sec(5, "\nPieges connus :",
-        [f"  {p['id']} : {trunc(p['text'], min(80, width))}"
-         for p in list(st["pieges"].values())[-CTX_MAX_PIEGES:]])
-
     pending_q = [q for q in st["questions"].values() if not q.get("answer")]
-    sec(6, "\nQuestions en attente (reponds via !answer qN ...) :",
-        [f"  {q['id']} : {trunc(q['text'], min(80, width))}" for q in pending_q[-CTX_MAX_QUESTIONS:]])
+
+    if full:
+        sec("\nBUGS NON CORRIGES (personne ne s'en est occupe) :",
+            [bug_line(b) for b in troues[-CTX_MAX_BUGS:]])
+        sec("\nBUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :",
+            [bug_line(b) for b in verdict[-CTX_MAX_BUGS:]])
+
+        sec("\nDECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :",
+            [f"  {d['id']} : {trunc(d['text'])}" + (" (agent)" if d.get("par") == "agent" else "")
+             for d in st["decisions"][-CTX_MAX_DECISIONS:]])
+
+        sec("\nPieges connus :",
+            [f"  {p['id']} : {trunc(p['text'], 80)}"
+             for p in list(st["pieges"].values())[-CTX_MAX_PIEGES:]])
+
+        sec("\nQuestions en attente (reponds via !answer qN ...) :",
+            [f"  {q['id']} : {trunc(q['text'], 80)}" for q in pending_q[-CTX_MAX_QUESTIONS:]])
+    else:
+        # resume : des compteurs, jamais le detail — l'etat entier est dans la
+        # fiche AGENTS.md que chaque agent charge d'office. Rien a elider, donc
+        # rien a perdre (b1) ni a mesurer apres coupe (b2).
+        n = [f"{len(troues)} bug(s) non corrige(s)" if troues else "",
+             f"{len(verdict)} bug(s) corrige(s) en attente de verdict humain" if verdict else "",
+             f"{len(st['decisions'])} decision(s) actee(s)" if st["decisions"] else "",
+             f"{len(st['pieges'])} piege(s) connu(s)" if st["pieges"] else "",
+             f"{len(pending_q)} question(s) sans reponse" if pending_q else ""]
+        if any(n):
+            sec("\nDANS LA FICHE D'ETAT : " + " ; ".join(x for x in n if x) + ".")
+        sec("Lis l'etat COMPLET avant de coder : AGENTS.md, section « instantane de l'etat » (ou `plantrack status`).")
 
     if st.get("testcheck"):
         for g in list(st["guides"].values())[:6]:
             if (pend := [s for s in g["steps"] if st["steps"][s]["verdict"] is None]):
-                sec(8, f"\nGuide {trunc(g['title'], 50)}: {len(pend)} etapes sans verdict ({', '.join(pend)})")
+                sec(f"\nGuide {trunc(g['title'], 50)}: {len(pend)} etapes sans verdict ({', '.join(pend)})")
 
     if st["inbox"]:
-        sec(9, f"\nINBOX NON CLASSEE : {len(st['inbox'])} element(s), voir `plantrack inbox`.")
+        sec(f"\nINBOX NON CLASSEE : {len(st['inbox'])} element(s), voir `plantrack inbox`.")
 
-    def render(note=""):
-        L = []
-        if header:
-            L.append("== PlanTrack — etat persistant du projet ==")
-            L.append("(reinjecte automatiquement, y compris apres compaction du contexte)")
-        for _, head, items in secs:
-            if head:
-                L.append(head)
-            L += items
-        return "\n".join(L) + note
-
-    out = render()
-    # resserrer d'abord, elider ensuite : perdre la fin d'une phrase se rattrape
-    # dans `plantrack status`, perdre la ligne entiere fait refaire le bug
-    if budget and len(out) > budget and width > MIN_TRUNC:
-        return context_block(st, header, rules, budget, MIN_TRUNC)
-    cut = 0
-    while budget and len(out) > budget:
-        live = [s for s in secs if s[1] or s[2]]
-        if not live:
-            break
-        v = max(live, key=lambda s: s[0])  # rangs distincts : pas d'ambiguite
-        if v[2]:
-            v[2].pop(0)
-            if not v[2]:
-                v[1] = None  # une tete sans ses lignes ferait croire a une section vide
-        else:
-            v[1] = None
-        cut += 1
-        out = render(f"\n\n[{cut} ligne(s) elidee(s) faute de budget — tout reste dans `plantrack status`]")
-    # les regles sont ajoutees APRES l'elision : l'etat peut deborder, les
-    # regles jamais — c'est le seul canal qu'aucun outil tiers ne peut ecraser
+    out = "\n".join(L)
+    # les regles ferment le bloc : l'etat vit dans la fiche, les regles restent
+    # ici — c'est le seul canal qu'aucun outil tiers ne peut ecraser
     if not rules:
         return out
     return out + "\n\nREGLES PLANTRACK (elles priment sur ta memoire de la conversation) :\n" + RULES.rstrip()
@@ -910,7 +884,7 @@ def hook_context():
         print(f"\n!! PLANTRACK EN DEFAUT ({len(ko)}) — signale-le a l'humain et lance "
               f"`plantrack doctor` : {' ; '.join(ko[:3])}"
               + (f" ; +{len(ko) - 3} autre(s)" if len(ko) > 3 else ""))
-    print(context_block(st))
+    print(context_block(st, full=False))
     sys.exit(0)
 
 
@@ -1071,9 +1045,10 @@ def write_md_block(name, block, start=MD_START, end=MD_END,
 
 
 def write_state_block(st, quiet=True):
-    """Instantane de l'etat dans AGENTS.md. C'est le seul canal qu'un agent sans
-    hooks (Deep Code) lit de toute facon, et il est regenere par le post-commit
-    git : peu importe quel agent a commite, l'etat suit."""
+    """Fiche complete de l'etat dans AGENTS.md (d6) : c'est ELLE que le resume de
+    session renvoie lire, et le seul canal qu'un agent sans hooks (Deep Code) lit
+    de toute facon. Regeneree a chaque ecriture au journal (b9) et au post-commit
+    git : peu importe quel agent a ecrit, l'etat suit."""
     if not os.path.exists(os.path.join(ROOT, "AGENTS.md")):
         return
     body = (f"{STATE_START}\n<!-- genere par plantrack a chaque commit — ne pas editer a la main -->\n"
@@ -1481,24 +1456,19 @@ def diagnose(st):
     chk(not muettes, f"questions sans reponse ({len(muettes)} depuis plus de {STALE_DAYS} jours)",
         "l'agent attend, la question ressort a chaque session : `!answer <id> <texte>` — "
         + ", ".join(f"!answer {q['id']}" for q in muettes[:6]))
-    # budget=None : on mesure le bloc ENTIER. Mesure apres elision, le chiffre
-    # serait toujours egal au plafond et ne dirait jamais de combien ca deborde.
-    n = len(context_block(st, rules=False, budget=None))
-    # ce qui est REELLEMENT perdu se mesure apres resserrage, pas avant : sinon le
-    # chiffre annonce un desastre que le palier MIN_TRUNC a deja absorbe
-    perdu = max(0, len(context_block(st, rules=False, budget=None, width=MIN_TRUNC)) - CTX_MAX_CHARS)
-    # le verdict porte sur ce qui est PERDU, pas sur la taille brute : un bloc que le
-    # resserrage fait tenir n'a rien perdu, et une alerte qui ne peut plus s'eteindre
-    # cesse d'etre lue (d2). Trop long mais complet ressort en simple information.
-    if perdu:
-        chk(False, f"etat reinjecte ampute ({n}/{CTX_MAX_CHARS} chars au texte complet)",
-            f"lignes resserrees a {MIN_TRUNC} chars, et {perdu} chars encore elides a chaque "
-            "injection en partant des sections les moins prioritaires — ferme des fils ou valide des bugs")
-    elif n > CTX_MAX_CHARS:
-        out.append((None, f"etat reinjecte sans perte, mais resserre a {MIN_TRUNC} chars "
-                          f"pour tenir ({n}/{CTX_MAX_CHARS} au texte complet)", ""))
-    else:
-        chk(True, f"etat reinjecte sous le budget ({n}/{CTX_MAX_CHARS} chars)")
+    # d6 : plus de coupe a mesurer (b2). Deux controles a la place : le resume
+    # injecte reste court par construction, et la fiche AGENTS.md — l'etat
+    # entier — est bien celle de l'etat courant.
+    n = len(context_block(st, rules=False, full=False))
+    chk(n <= CTX_MAX_CHARS, f"resume de session sous le budget ({n}/{CTX_MAX_CHARS} chars)",
+        "le resume ne porte que phase, bloquants et fils : ferme des fils (!close) "
+        "ou fais valider des bugs bloquants")
+    agents_md = slurp("AGENTS.md")
+    if STATE_START in agents_md:
+        chk(context_block(st, header=False, rules=False) in agents_md,
+            "fiche d'etat a jour dans AGENTS.md",
+            "elle se regenere a chaque ecriture au journal — n'importe quelle "
+            "commande plantrack qui ecrit la remet d'aplomb")
     # --- parcours : avertir, jamais bloquer (meme regle que les bugs sans verdict)
     hors = [q for q in st["questions"].values()
             if q.get("phase") and (p := st["phases"].get(q["phase"]))
