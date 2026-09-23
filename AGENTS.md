@@ -16,7 +16,7 @@
 
 !! BUG BLOQUANT — a traiter avant toute autre chose : b1 Troncature du bloc reinjecte : sur bcc le bloc re…
 
-FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [17 commits]
+FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [18 commits]
   fichiers recemment ecrits : ../../../root/.claude/projects/-home-mariella-plantrack/memory/mission-surveillance-plantrack.md, .claude/hooks/pt.py, AGENTS.md, tests/scenario.sh, ../../../tmp/testout.txt, .planning/session-state.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -33,12 +33,12 @@ BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b11 (to_verify) [t3] verify b5 (agent) [1 tentatives, derniere: b11 n'est pas un vrai bug : c'est la TRACE d'un defaut de l…]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
-  d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
   d2 : Cause racine des pannes PlanTrack (constat du 06/09 sur bcc et miamboost) : l'outil se degrade en SILENCE et son seul controle, doctor, dev… (agent)
   d3 : Parcours retenu EN ENTIER (choix de Mariella, 22/09) : une phase porte regle + livrable + porte (agent|humain) + questions(bool), 'phase ne… (agent)
   d4 : Mariella (23/09, tel) : abandon de l'implementation du design (erreur de projet). Nouvelle mission de la session : surveiller le bon foncti… (agent)
   d5 : Verdicts de Mariella (23/09, tel, via fil bcc) : b3 VALIDE ; b1 et b2 REFUSES (motif en attente). Le statut reste to_verify car verify/reje… (agent)
   d6 : Mariella (23/09, tel) : nouvelle approche b1/b2 = resume court + fiche complete. Le bloc reinjecte devient un resume minimal (bloquant, fil… (agent)
+  d7 : Verdicts de Mariella (23/09, tel, suite) : b4, b5, b6, b7, b8, b9, b10, b11 TOUS VALIDES. La CLI refuse verify cote agent : saisie officiel… (agent)
 
 Pieges connus :
   pg4 : Un commit amende ou reset apres le post-commit reste dans le journal append-onl…
