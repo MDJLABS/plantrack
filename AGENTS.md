@@ -16,15 +16,11 @@
 
 !! BUG BLOQUANT — a traiter avant toute autre chose : b1 Troncature du bloc reinjecte : sur bcc le bloc re…
 
-FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [13 commits]
+FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [14 commits]
   fichiers recemment ecrits : ../../../root/.claude/projects/-home-mariella-plantrack/memory/MEMORY.md, ../../../root/.claude/projects/-home-mariella-plantrack/memory/mission-surveillance-plantrack.md, .claude/hooks/pt.py, AGENTS.md, tests/scenario.sh, ../../../tmp/testout.txt
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
-
-BUGS NON CORRIGES (personne ne s'en est occupe) :
-  b1 (in_progress) [t1] Troncature du bloc reinjecte : sur bcc le bloc reel fait 4661 chars pour un budget de 3000 — 1661 chars coupes par la FIN, donc 4 decisions… (agent) [3 tentatives, derniere: Approche fiche : context_block n'injecte plus tout l'etat m…]
-  b2 (in_progress) [t1] doctor : le controle 'etat reinjecte sous le budget' mesure APRES troncature (n = len(context_block(st)) - len(RULES)), il rend donc toujou… (agent) [2 tentatives, derniere: Avec la fiche (cf b1), il n'y a plus de coupe a mesurer : l…]
 
 BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b4 (to_verify) [t1] Le fil actif auto-ouvert affiche une note pedagogique de 99 chars ('fil ouvert d'office...') au rang 2, donc protegee, tandis que des bugs … (agent) [1 tentatives, derniere: La note pedagogique sort du bloc FIL ACTIF (rang 2, protege…]
