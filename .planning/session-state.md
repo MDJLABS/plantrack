@@ -378,3 +378,8 @@ fil t2 actif. À faire par Mariella : tag v1.9.0 + publication PyPI.
   bcc 974 (4661 avant), miamboost 643 chars. Découvert au passage : verdicts
   humains en attente — bcc 9 bugs + 12 questions, miamboost 7 bugs + 1 question,
   plantrack 8 bugs.
+- **Tri des verdicts fait au tel (23/09)** : les 24 bugs to_verify des 3 repos
+  TOUS VALIDÉS par Mariella — plantrack b4-b11 (d7), bcc b59-b66 (d106),
+  miamboost b2-b9 (d23). Reste sa saisie officielle `plantrack verify …` par
+  repo (CLI hors env agent) + les verdicts d5 (verify b3, reject b1/b2).
+  Questions sans réponse (13 : bcc 12, miamboost 1) non traitées.
