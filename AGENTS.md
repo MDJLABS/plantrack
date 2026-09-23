@@ -16,11 +16,14 @@
 
 !! BUG BLOQUANT — a traiter avant toute autre chose : b1 Troncature du bloc reinjecte : sur bcc le bloc re…
 
-FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [22 commits]
+FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [23 commits]
   fichiers recemment ecrits : ../../../root/.claude/projects/-home-mariella-plantrack/memory/mission-surveillance-plantrack.md, AGENTS.md, ../../../tmp/testout.txt, .planning/session-state.md, .claude/hooks/pt.py, tests/scenario.sh
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
+
+BUGS NON CORRIGES (personne ne s'en est occupe) :
+  b12 (open) [t3] Fiche d'etat (d6) : la section BUGS EN ATTENTE DE TON VERDICT plafonne encore a CTX_MAX_BUGS meme en mode fiche complete — sur bcc 9 bugs t… (agent)
 
 BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b1 (to_verify) [t1] Troncature du bloc reinjecte : sur bcc le bloc reel fait 4661 chars pour un budget de 3000 — 1661 chars coupes par la FIN, donc 4 decisions… (agent) [4 tentatives, derniere: RESULTAT (commit 2f0aec8) : approche fiche livree — hook-co…]
