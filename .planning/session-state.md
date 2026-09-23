@@ -398,5 +398,7 @@ fil t2 actif. À faire par Mariella : tag v1.9.0 + publication PyPI.
   nouvelle approche, verdict tel) ; bcc b59-b66 + 26 anciens (b1..b58) validés,
   13 réponses q* saisies ; miamboost b1-b9 validés + q1 répondue. Doctor : 0
   verdict / 0 question en attente sur les TROIS repos.
-- **b12 ouvert** (plantrack) : la fiche « complète » plafonne encore la section
-  bugs à CTX_MAX_BUGS (8) — c'est ce qui cachait les 27 anciens bugs. À corriger.
+- **b12 corrigé et VALIDÉ** (verdict tel 23/09 via --de) : plus aucun plafond
+  CTX_MAX_* en mode fiche complète (359 checks), propagé bcc + miamboost.
+  Séance close sur décision de Mariella : « On s'arrête là ». Zéro verdict,
+  zéro question en attente sur les trois repos.

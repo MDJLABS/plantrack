@@ -14,14 +14,11 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [27 commits]
-  fichiers recemment ecrits : ../../../root/.claude/projects/-home-mariella-plantrack/memory/mission-surveillance-plantrack.md, AGENTS.md, ../../../tmp/testout.txt, .planning/session-state.md, .claude/hooks/pt.py, tests/scenario.sh
+FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [28 commits]
+  fichiers recemment ecrits : ../../../root/.claude/projects/-home-mariella-plantrack/memory/mission-surveillance-plantrack.md, AGENTS.md, ../../../tmp/testout.txt, .claude/hooks/pt.py, tests/scenario.sh, .planning/session-state.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
-
-BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
-  b12 (to_verify) [t3] Fiche d'etat (d6) : la section BUGS EN ATTENTE DE TON VERDICT plafonne encore a CTX_MAX_BUGS meme en mode fiche complete — sur bcc 9 bugs t… (agent) [1 tentatives, derniere: En mode fiche (full=True), ne plus plafonner les listes a C…]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
