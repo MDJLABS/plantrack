@@ -16,23 +16,19 @@
 
 !! BUG BLOQUANT — a traiter avant toute autre chose : b1 Troncature du bloc reinjecte : sur bcc le bloc re…
 
-FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [7 commits]
+FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [8 commits]
   fichiers recemment ecrits : parcours/projet-client.json, tests/scenario.sh, .claude/hooks/pt.py
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider…
 
-BUGS NON CORRIGES (personne ne s'en est occupe) :
-  b6 (open) [t1] hook-filelog n'ecoute que Edit|Write|MultiEdit|NotebookEdit : les modifications… (agent) [1 tent.]
-  b9 (open) [t2] AGENTS.md n'est regenere qu'au post-commit : toute ecriture faite SANS commit d… (agent)
-
 BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
-  b2 (to_verify) [t1] doctor : le controle 'etat reinjecte sous le budget' mesure APRES troncature (n… (agent) [1 tent.]
-  b3 (to_verify) [t1] plantrack init --git-hook renonce quand un autre outil occupe .git/hooks/pre-co… (agent) [1 tent.]
   b4 (to_verify) [t1] Le fil actif auto-ouvert affiche une note pedagogique de 99 chars ('fil ouvert … (agent) [1 tent.]
   b5 (to_verify) [t1] Worktree git (.git = fichier gitdir:) : branch() lit .git/HEAD et retombe en si… (agent) [1 tent.]
+  b6 (to_verify) [t1] hook-filelog n'ecoute que Edit|Write|MultiEdit|NotebookEdit : les modifications… (agent) [2 tent.]
   b7 (to_verify) [t1] 9 des 14 except de pt.py avalent sans aucune trace (note_injection, diagnose da… (agent) [1 tent.]
   b8 (to_verify) [t2] Selection des bugs du bloc reinjecte : context_block prend bugs[-CTX_MAX_BUGS:]… (agent) [2 tent.]
+  b9 (to_verify) [t2] AGENTS.md n'est regenere qu'au post-commit : toute ecriture faite SANS commit d… (agent) [2 tent.]
   b10 (to_verify) [t3] usage_gap compare deux horloges differentes : la fenetre 'since' vient du times… (agent) [1 tent.]
   b11 (to_verify) [t3] verify b5 (agent) [1 tent.]
 

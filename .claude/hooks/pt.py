@@ -14,6 +14,7 @@ Points d'entree :
   <commande>       CLI humaine       -> status, bugs, inbox, verify, reject, ...
 """
 
+import atexit
 import difflib
 import json
 import os
@@ -99,6 +100,14 @@ def append(kind, **fields):
     ev.update({k: v for k, v in fields.items() if v is not None})
     with open(LOG, "a", encoding="utf-8") as f:
         f.write(json.dumps(ev, ensure_ascii=False) + "\n")
+    if not getattr(append, "dirty", False):
+        # b9 : l'instantane AGENTS.md ne suivait que le post-commit — une ecriture
+        # sans commit derriere (decision, bug_status…) le laissait perime pour tout
+        # agent qui LIT le fichier. Tout processus qui ecrit au journal le regenere
+        # en sortant (atexit survit aux sys.exit des hooks). Cout : un rejeu de
+        # plus par invocation mutante.
+        append.dirty = True
+        atexit.register(lambda: write_state_block(project()))
     return ev
 
 

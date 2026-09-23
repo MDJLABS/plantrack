@@ -1044,5 +1044,21 @@ CLAUDE_PROJECT_DIR="$TMP26" python3 "$PT" init >/dev/null 2>&1
 check "b6 : init rafraichit un matcher perime" "Edit|Write|MultiEdit|NotebookEdit|Bash" "$(cat "$TMP26/.claude/settings.json")"
 rm -rf "$TMP26"
 
+# 27. b9 — l'instantane AGENTS.md n'etait regenere qu'au post-commit : une
+# ecriture sans commit derriere (decision, bug_status, question) laissait le
+# fichier perime pour tout agent qui le LIT (Codex, Gemini, relecture humaine).
+# Desormais tout processus qui ecrit au journal rafraichit l'instantane en sortant.
+TMP27=$(mktemp -d)
+(cd "$TMP27" && git init -q .) >/dev/null 2>&1
+CLAUDE_PROJECT_DIR="$TMP27" python3 "$PT" init >/dev/null 2>&1
+CLAUDE_PROJECT_DIR="$TMP27" python3 "$PT" decide "le cache passe sur redis, sans commit" >/dev/null
+check "b9 : une decision CLI sans commit rafraichit AGENTS.md" "le cache passe sur redis" "$(cat "$TMP27/AGENTS.md")"
+printf '{"prompt":"!bug la pagination saute une page"}' | CLAUDE_PROJECT_DIR="$TMP27" python3 "$PT" hook-prompt >/dev/null 2>&1
+check "b9 : un !bug via hook (exit 2) rafraichit AGENTS.md" "la pagination saute une page" "$(cat "$TMP27/AGENTS.md")"
+CLAUDE_PROJECT_DIR="$TMP27" python3 "$PT" attempt b1 "hypothese posee" >/dev/null
+CLAUDE_PROJECT_DIR="$TMP27" python3 "$PT" bug b1 to_verify >/dev/null
+check "b9 : un changement de statut sans commit suit dans AGENTS.md" "b1 (to_verify)" "$(cat "$TMP27/AGENTS.md")"
+rm -rf "$TMP27"
+
 echo
 [ "$fail" = 0 ] && echo "TOUS LES TESTS PASSENT" || { echo "DES TESTS ECHOUENT"; exit 1; }

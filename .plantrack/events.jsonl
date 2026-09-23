@@ -167,3 +167,10 @@
 {"ts": "2026-09-23T05:55:32+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
 {"ts": "2026-09-23T05:56:18+00:00", "kind": "attempt", "id": "a13", "bug": "b6", "hypothesis": "RESULTAT : Bash ajoute au matcher PostToolUse ; bash_targets() extrait redirections/tee/sed -i, ne retient que les chemins existants ; write_hooks_file rafraichit un matcher perime (la fusion sur la commande seule l'aurait fige a vie). 7 checks ajoutes (333 verts). Rejoue en reel sur ce depot : init a bien rafraichi le matcher.", "actor": "claude-code"}
 {"ts": "2026-09-23T05:56:18+00:00", "kind": "bug_status", "id": "b6", "status": "to_verify"}
+{"ts": "2026-09-23T05:56:21+00:00", "kind": "commit", "sha": "ea50bef", "ctype": "fix", "thread": "t3"}
+{"ts": "2026-09-23T05:57:19+00:00", "kind": "attempt", "id": "a14", "bug": "b9", "hypothesis": "Enregistrer dans append() un atexit unique : tout processus ayant ecrit au moins un evenement regenere l'instantane AGENTS.md (write_state_block) en sortant — couvre CLI, hook-prompt (meme en exit 2), hook-filelog, sans toucher aux sites d'appel. Cout : un rejeu de plus par invocation mutante (pg3 assume).", "actor": "claude-code"}
+{"ts": "2026-09-23T05:57:29+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t3"}
+{"ts": "2026-09-23T05:58:27+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-23T05:58:32+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-23T06:00:36+00:00", "kind": "attempt", "id": "a15", "bug": "b9", "hypothesis": "RESULTAT : append() enregistre un atexit unique — tout processus ayant ecrit au journal regenere l'instantane AGENTS.md en sortant (survit aux sys.exit des hooks). 3 checks ajoutes (336 verts) : decision CLI, !bug via hook exit 2, changement de statut, tous sans commit.", "actor": "claude-code"}
+{"ts": "2026-09-23T06:00:36+00:00", "kind": "bug_status", "id": "b9", "status": "to_verify"}
