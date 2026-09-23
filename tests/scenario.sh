@@ -1046,5 +1046,33 @@ CLAUDE_PROJECT_DIR="$TMP27" python3 "$PT" bug b1 to_verify >/dev/null
 check "b9 : un changement de statut sans commit suit dans AGENTS.md" "b1 (to_verify)" "$(cat "$TMP27/AGENTS.md")"
 rm -rf "$TMP27"
 
+# --- 31. canal humain relaye (--de, d107) : verify/reject/answer attestes ---
+echo; echo "-- canal humain relaye (--de) --"
+TMP31=$(mktemp -d)
+(cd "$TMP31" && git init -q .) >/dev/null 2>&1
+CLAUDE_PROJECT_DIR="$TMP31" python3 "$PT" init >/dev/null 2>&1
+CLAUDE_PROJECT_DIR="$TMP31" python3 "$PT" bug "le tri saute une ligne" >/dev/null
+CLAUDE_PROJECT_DIR="$TMP31" python3 "$PT" attempt b1 "corrige l'index de depart" >/dev/null
+CLAUDE_PROJECT_DIR="$TMP31" python3 "$PT" bug b1 to_verify >/dev/null
+out=$(CLAUDE_PROJECT_DIR="$TMP31" python3 "$PT" verify b1 2>&1) && ec=0 || ec=$?
+check "d107 : verify sans --de reste bloque en env agent" "reserve a l'humain" "$out"
+check "d107 : le refus enseigne la forme relayee" '--de' "$out"
+out=$(CLAUDE_PROJECT_DIR="$TMP31" python3 "$PT" verify b1 --de "tel 23/09 : carte 'b1 ton verdict ?' -> Valider" 2>&1)
+check "d107 : verify --de atteste passe en env agent" "b1 valide" "$out"
+check "d107 : le canal est journalise avec le verdict" '"canal": "tel 23/09' "$(cat "$TMP31/.plantrack/events.jsonl")"
+CLAUDE_PROJECT_DIR="$TMP31" python3 "$PT" bug "le filtre perd la casse" >/dev/null
+CLAUDE_PROJECT_DIR="$TMP31" python3 "$PT" attempt b2 "normalise en minuscules" >/dev/null
+CLAUDE_PROJECT_DIR="$TMP31" python3 "$PT" bug b2 to_verify >/dev/null
+out=$(CLAUDE_PROJECT_DIR="$TMP31" python3 "$PT" reject b2 --de "carnet web 23/09 : coche Refuser" -m "la casse revient sur les accents" 2>&1)
+check "d107 : reject --de atteste rouvre le bug" "b2 rouvert avec motif" "$out"
+out=$(CLAUDE_PROJECT_DIR="$TMP31" python3 "$PT" question "faut-il paginer la liste ?" 2>&1)
+out=$(CLAUDE_PROJECT_DIR="$TMP31" python3 "$PT" answer q1 oui, par 20 --de "tel 23/09 : carte pagination -> oui par 20" 2>&1)
+check "d107 : answer --de atteste enregistre la reponse" "q1 repondue" "$out"
+out=$(CLAUDE_PROJECT_DIR="$TMP31" python3 "$PT" verify b1 --de 2>&1) && ec=0 || ec=$?
+check "d107 : --de sans attestation refuse" "attend l'attestation" "$out"
+out=$(CLAUDE_PROJECT_DIR="$TMP31" python3 "$PT" plan import /dev/null 2>&1) && ec=0 || ec=$?
+check "d107 : les autres gestes humains restent verrouilles" "reserve a l'humain" "$out"
+rm -rf "$TMP31"
+
 echo
 [ "$fail" = 0 ] && echo "TOUS LES TESTS PASSENT" || { echo "DES TESTS ECHOUENT"; exit 1; }

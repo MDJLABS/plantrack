@@ -46,7 +46,7 @@ PORTES = ("agent", "humain")  # qui autorise la sortie d'une phase
 RULES = """- Un RÉSUMÉ de l'état t'est injecté en début de session et après chaque compaction ; l'état COMPLET (décisions, bugs, pièges, questions) est dans AGENTS.md, section « instantané de l'état ». Fie-toi à lui, pas à ta mémoire de la conversation.
 - Ne réimplémente jamais ce qui figure sous DECISIONS ACTEES.
 - Ne modifie pas les fichiers d'un fil en pause.
-- Après correction d'un bug : consigne la tentative, puis passe-le en "to_verify". Tu ne valides jamais un bug toi-même.
+- Après correction d'un bug : consigne la tentative, puis passe-le en "to_verify". Tu ne valides jamais un bug toi-même. Exception : l'humain t'a donné son verdict par un canal relayé (téléphone, carnet web) → saisis-le avec son attestation citée : `./plantrack verify <id> --de "<canal> : <sa réponse>"` (idem reject/answer). Jamais sans citation réelle.
 - Quand une décision se prend en conversation, enregistre-la toi-même : `./plantrack decide "..."` (marquée agent). Un bug repéré en passant : `./plantrack bug "..."`. Un piège technique découvert : `./plantrack piege "..."`.
 - Avant de corriger un bug : lis `./plantrack attempts <id>`, puis dépose ton hypothèse `./plantrack attempt <id> "..."` avant de coder ; une hypothèse refusée a déjà été tentée, change d'approche.
 - Une question posée à l'humain restée sans réponse : `./plantrack question "..."` — elle ressortira à chaque session jusqu'à la réponse.
@@ -1584,6 +1584,17 @@ def cmd_stats():
         print(f"!! bugs rejetes plusieurs fois (signal de boucle) : {', '.join(loops)}")
 
 
+def arg_de(args):
+    """Attestation d'un verdict humain relaye (d107) : extrait `--de <texte>`.
+    Un seul argument, cite : --de "<canal> : <la reponse de l'humain>"."""
+    if "--de" not in args:
+        return None, args
+    i = args.index("--de")
+    if i + 1 >= len(args) or not args[i + 1].strip():
+        sys.exit("--de attend l'attestation : --de \"<canal> : <la reponse de l'humain, citee>\"")
+    return args[i + 1].strip(), args[:i] + args[i + 2:]
+
+
 def arg_motif(args, pos):
     """Extrait le motif obligatoire `-m <texte>` a partir de args[pos]."""
     if len(args) <= pos + 1 or args[pos] != "-m":
@@ -1967,9 +1978,10 @@ def cmd_bug_status(args, st):
         sys.exit("statuts : open | in_progress | to_verify | wont_fix (validated : via `plantrack verify`)")
 
 
-def cmd_verdict(st, bid, motif=None):
+def cmd_verdict(st, bid, motif=None, canal=None):
     """verify (motif None) / reject (motif) — humain seul, par la CLI (require_human)
-    ou par le prompt (!verify / !reject : seul l'humain tape un prompt, comme !answer).
+    ou par le prompt (!verify / !reject : seul l'humain tape un prompt, comme !answer),
+    ou relaye par l'agent avec attestation (canal, d107).
     Renvoie (ok, message) sans jamais sys.exit : en hook, un exit 1 laisserait
     passer le prompt au modele."""
     b = st["bugs"].get(bid or "")
@@ -1980,21 +1992,28 @@ def cmd_verdict(st, bid, motif=None):
         return False, (f"refuse : {b['id']} est \"{b['status']}\" — seul un bug \"to_verify\" "
                        f"{geste} (machine a etats §9).")
     if motif is None:
-        append("bug_status", id=b["id"], status="validated")
-        return True, f"{b['id']} valide."
-    append("bug_status", id=b["id"], status="open", text="rejete : " + motif)
+        append("bug_status", id=b["id"], status="validated", canal=canal)
+        return True, f"{b['id']} valide." + (f" (canal : {trunc(canal, 60)})" if canal else "")
+    append("bug_status", id=b["id"], status="open", text="rejete : " + motif, canal=canal)
     extra = " (motif attache a la derniere tentative)" if b["attempts"] else ""
     return True, f"{b['id']} rouvert avec motif{extra}."
 
 
-def require_human(cmd):
+def require_human(cmd, de=None):
     """O6 : ecrire un verdict est reserve a l'humain. Refus deterministe quand
-    la CLI est invoquee depuis un shell pilote par l'agent (env Claude Code)."""
+    la CLI est invoquee depuis un shell pilote par l'agent (env Claude Code) —
+    sauf attestation d'un canal humain relaye (--de, decision d107) : le verdict
+    vient bien de l'humain (telephone, carnet web), l'agent n'est que le
+    messager, et l'attestation citee est journalisee avec le geste."""
+    if de:
+        return
     if any(os.environ.get(v) for v in AGENT_ENV):
         sys.exit(
             f"[PlanTrack] refuse : `{cmd}` est reserve a l'humain (environnement agent detecte).\n"
             "Propose l'action dans ta reponse (statut maximum pour toi : to_verify / in_progress) ; "
-            "l'humain tranchera via la CLI `plantrack`."
+            "l'humain tranchera via la CLI `plantrack`.\n"
+            "Il a DEJA tranche par un canal relaye (telephone, carnet web) ? Rejoue la commande avec "
+            "--de \"<canal> : <sa reponse, citee>\" — l'attestation est journalisee avec le verdict."
         )
 
 
@@ -2063,14 +2082,16 @@ def cli(argv):
             if t["commits"]:
                 print(f"        commits : {len(t['commits'])} (dernier {t['commits'][-1]['sha']})")
     elif cmd == "verify":
-        require_human("verify")
-        ok, msg = cmd_verdict(st, args[0] if args else "")
+        de, args = arg_de(args)
+        require_human("verify", de)
+        ok, msg = cmd_verdict(st, args[0] if args else "", canal=de)
         print(msg) if ok else sys.exit(msg)
     elif cmd == "reject":
-        require_human("reject")
+        de, args = arg_de(args)
+        require_human("reject", de)
         if len(args) < 3 or args[1] != "-m":
             sys.exit("usage : plantrack reject <bug_id> -m \"pourquoi ca ne marche pas\"")
-        ok, msg = cmd_verdict(st, args[0], " ".join(args[2:]))
+        ok, msg = cmd_verdict(st, args[0], " ".join(args[2:]), canal=de)
         print(msg) if ok else sys.exit(msg)
     elif cmd == "bug":
         # desambiguation : "bug b1 wont_fix" (changement de statut) vs
@@ -2101,7 +2122,8 @@ def cli(argv):
             sys.exit("usage : plantrack question <texte>")
         print(cmd_question(" ".join(args), st))
     elif cmd == "answer":
-        require_human("answer")
+        de, args = arg_de(args)
+        require_human("answer", de)
         if len(args) < 2:
             sys.exit("usage : plantrack answer <question_id> <texte>")
         qid, text = args[0], " ".join(args[1:])
@@ -2110,8 +2132,8 @@ def cli(argv):
             sys.exit(f"question introuvable : {qid} — `plantrack status` pour la liste.")
         if q.get("answer"):
             sys.exit(f"{qid} a deja une reponse.")
-        append("answer", id=qid, text=text)
-        print(f"{qid} repondue.")
+        append("answer", id=qid, text=text, canal=de)
+        print(f"{qid} repondue." + (f" (canal : {trunc(de, 60)})" if de else ""))
     elif cmd == "testcheck":
         if not args:
             sys.exit("usage : plantrack testcheck on|off")
