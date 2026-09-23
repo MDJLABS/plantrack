@@ -158,3 +158,12 @@
 {"ts": "2026-09-22T23:21:04+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t3"}
 {"ts": "2026-09-22T23:21:47+00:00", "kind": "commit", "sha": "c734ff7", "ctype": "fix", "thread": "t3"}
 {"ts": "2026-09-22T23:21:47+00:00", "kind": "bug_status", "id": "b7", "status": "to_verify"}
+{"ts": "2026-09-22T23:22:17+00:00", "kind": "commit", "sha": "a6fe322", "ctype": "chore", "thread": "t3"}
+{"ts": "2026-09-23T05:52:45+00:00", "kind": "attempt", "id": "a12", "bug": "b6", "hypothesis": "Ajouter Bash au matcher PostToolUse (SETTINGS + settings.json du repo) et, dans hook_filelog, extraire les cibles d'ecriture d'une commande Bash par heuristique (redirections > >>, tee, sed -i, mv/cp dest, touch) en ne gardant que les chemins qui existent reellement apres la commande — best effort assume, telemetre pas garde.", "actor": "claude-code"}
+{"ts": "2026-09-23T05:54:34+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t3"}
+{"ts": "2026-09-23T05:55:16+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-23T05:55:22+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-23T05:55:28+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-23T05:55:32+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-23T05:56:18+00:00", "kind": "attempt", "id": "a13", "bug": "b6", "hypothesis": "RESULTAT : Bash ajoute au matcher PostToolUse ; bash_targets() extrait redirections/tee/sed -i, ne retient que les chemins existants ; write_hooks_file rafraichit un matcher perime (la fusion sur la commande seule l'aurait fige a vie). 7 checks ajoutes (333 verts). Rejoue en reel sur ce depot : init a bien rafraichi le matcher.", "actor": "claude-code"}
+{"ts": "2026-09-23T05:56:18+00:00", "kind": "bug_status", "id": "b6", "status": "to_verify"}

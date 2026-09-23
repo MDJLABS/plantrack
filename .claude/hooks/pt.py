@@ -819,6 +819,17 @@ def hook_prompt():
     sys.exit(2)
 
 
+def bash_targets(cmd):
+    """Cibles d'ecriture d'une commande Bash (b6), par heuristique : redirections
+    (> >>), tee, sed -i. Best effort assume — telemetre, pas garde : mv/cp/touch
+    et les cibles calculees ($f) passent au travers ; l'appelant ne retient que
+    les chemins qui existent vraiment apres la commande."""
+    t = re.findall(r"(?:>>?|\btee\b(?:\s+-\S+)*)\s*([^\s;|&<>()'\"]+)", cmd)
+    t += re.findall(r"\bsed\b\s+(?:-\S+\s+)*-i\S*\s+(?:'[^']*'|\"[^\"]*\"|\S+)\s+"
+                    r"([^\s;|&<>'\"]+)", cmd)
+    return [p for p in t if not p.startswith(("-", "/dev/"))]
+
+
 def hook_filelog():
     """PostToolUse sur les outils d'ecriture : journalise le(s) fichier(s) touches.
     Codex n'a pas de champ file_path : apply_patch livre le patch entier dans
@@ -826,16 +837,24 @@ def hook_filelog():
     data = read_hook_input()
     ti = data.get("tool_input") or {}
     p = ti.get("file_path") or ti.get("path") or ti.get("notebook_path")
-    paths = [p] if p else re.findall(r"^\*\*\* (?:Add|Update|Delete) File: (.+)$",
-                                     ti.get("command") or "", re.M)
+    bash = data.get("tool_name") == "Bash"
+    if p:
+        paths = [p]
+    elif bash:  # b6 : sed -i, redirections, heredoc — cibles extraites de la commande
+        paths = bash_targets(ti.get("command") or "")
+    else:
+        paths = re.findall(r"^\*\*\* (?:Add|Update|Delete) File: (.+)$",
+                           ti.get("command") or "", re.M)
     if not paths:
         sys.exit(0)
     st = project()
     if not st["active"]:
         sys.exit(0)
     for path in paths:
-        if not os.path.isabs(path):  # apply_patch : chemins relatifs au cwd de session
+        if not os.path.isabs(path):  # apply_patch/Bash : chemins relatifs au cwd de session
             path = os.path.join(data.get("cwd") or ROOT, path)
+        if bash and not os.path.isfile(path):
+            continue  # l'heuristique se prouve sur le disque : une fausse cible n'existe pas
         try:
             path = os.path.relpath(path, ROOT)
         except ValueError:
@@ -951,7 +970,7 @@ WRAPPER = '#!/bin/sh\nexec python3 "$(dirname "$0")/.claude/hooks/pt.py" "$@"\n'
 SETTINGS = {"hooks": {
     "UserPromptSubmit": [{"hooks": [
         {"type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/pt.py\" hook-prompt"}]}],
-    "PostToolUse": [{"matcher": "Edit|Write|MultiEdit|NotebookEdit", "hooks": [
+    "PostToolUse": [{"matcher": "Edit|Write|MultiEdit|NotebookEdit|Bash", "hooks": [
         {"type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/pt.py\" hook-filelog"}]}],
     "SessionStart": [{"hooks": [
         {"type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/pt.py\" hook-context"}]}],
@@ -1130,6 +1149,15 @@ def write_hooks_file(path, obj, label, hint=""):
             if any(h.get("command") not in have for h in e["hooks"]):
                 cur.append(e)
                 added += 1
+            elif "matcher" in e:
+                # l'entree est en place mais son matcher peut etre perime (b6) :
+                # la comparaison sur la commande seule ne le rafraichirait jamais
+                mine = {h.get("command") for h in e["hooks"]}
+                for c in cur:
+                    if mine & {h.get("command") for h in c.get("hooks", [])} \
+                            and c.get("matcher") != e["matcher"]:
+                        c["matcher"] = e["matcher"]
+                        added += 1
     if not added:
         print(f"{label} deja en place.")
         return True

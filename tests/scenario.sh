@@ -1010,5 +1010,39 @@ check "le doctor annonce la panne avalee" "!!  pannes avalees par les hooks (1" 
 check "et donne la derniere trace" "JSONDecodeError" "$out"
 rm -rf "$TMP25"
 
+# 26. b6 — hook-filelog n'ecoutait que Edit|Write|MultiEdit|NotebookEdit : une
+# ecriture via Bash (sed -i, redirection, heredoc) n'etait jamais journalisee.
+# Le hook extrait desormais les cibles d'ecriture de la commande — best effort :
+# seul un chemin qui existe vraiment apres la commande est retenu.
+TMP26=$(mktemp -d)
+(cd "$TMP26" && git init -q .) >/dev/null 2>&1
+CLAUDE_PROJECT_DIR="$TMP26" python3 "$PT" init >/dev/null 2>&1
+printf '{"prompt":"!focus fil bash"}' | CLAUDE_PROJECT_DIR="$TMP26" python3 "$PT" hook-prompt >/dev/null 2>&1
+mkdir -p "$TMP26/src"
+echo v1 > "$TMP26/src/conf.txt"; echo v1 > "$TMP26/src/log.txt"; echo v1 > "$TMP26/src/notes.md"
+flog() { printf '{"tool_name":"Bash","tool_input":{"command":"%s"},"cwd":"%s"}' "$1" "$TMP26" | CLAUDE_PROJECT_DIR="$TMP26" python3 "$PT" hook-filelog; }
+flog "sed -i s/v1/v2/ src/conf.txt"
+check "b6 : sed -i journalise sa cible" '"text": "src/conf.txt"' "$(cat "$TMP26/.plantrack/events.jsonl")"
+flog "echo ligne >> src/log.txt 2>/dev/null"
+check "b6 : la redirection >> est journalisee" '"text": "src/log.txt"' "$(cat "$TMP26/.plantrack/events.jsonl")"
+check_not "b6 : /dev/null n est pas un fichier touche" '"text": "/dev/null"' "$(cat "$TMP26/.plantrack/events.jsonl")"
+flog "cat > src/notes.md <<EOF"
+check "b6 : le heredoc journalise sa cible" '"text": "src/notes.md"' "$(cat "$TMP26/.plantrack/events.jsonl")"
+flog "grep -n motif src/conf.txt > /tmp/inexistant-b6-xyz.txt"
+check_not "b6 : une cible qui n existe pas n est pas journalisee" "inexistant-b6-xyz" "$(cat "$TMP26/.plantrack/events.jsonl")"
+n=$(grep -c '"text": "src/conf.txt"' "$TMP26/.plantrack/events.jsonl")
+check "b6 : une lecture pure ne journalise pas son argument" "1" "$n"
+# le matcher d'une installation existante doit etre rafraichi par init (la
+# fusion comparait sur la commande seule : l'entree etait 'deja en place')
+python3 - "$TMP26/.claude/settings.json" <<'EOF'
+import json, sys
+p = sys.argv[1]; d = json.load(open(p))
+d["hooks"]["PostToolUse"][0]["matcher"] = "Edit|Write|MultiEdit|NotebookEdit"
+json.dump(d, open(p, "w"), indent=2)
+EOF
+CLAUDE_PROJECT_DIR="$TMP26" python3 "$PT" init >/dev/null 2>&1
+check "b6 : init rafraichit un matcher perime" "Edit|Write|MultiEdit|NotebookEdit|Bash" "$(cat "$TMP26/.claude/settings.json")"
+rm -rf "$TMP26"
+
 echo
 [ "$fail" = 0 ] && echo "TOUS LES TESTS PASSENT" || { echo "DES TESTS ECHOUENT"; exit 1; }
