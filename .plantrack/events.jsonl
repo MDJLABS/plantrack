@@ -260,3 +260,4 @@
 {"ts": "2026-09-23T16:58:45+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
 {"ts": "2026-09-23T16:58:52+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t3"}
 {"ts": "2026-09-23T17:00:04+00:00", "kind": "bug_status", "id": "b12", "status": "to_verify"}
+{"ts": "2026-09-23T17:00:04+00:00", "kind": "commit", "sha": "4498e30", "ctype": "fix", "thread": "t3"}
