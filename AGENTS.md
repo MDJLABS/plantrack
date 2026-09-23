@@ -16,8 +16,8 @@
 
 !! BUG BLOQUANT — a traiter avant toute autre chose : b1 Troncature du bloc reinjecte : sur bcc le bloc re…
 
-FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [8 commits]
-  fichiers recemment ecrits : parcours/projet-client.json, tests/scenario.sh, .claude/hooks/pt.py
+FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [9 commits]
+  fichiers recemment ecrits : parcours/projet-client.json, tests/scenario.sh, .claude/hooks/pt.py, .planning/session-state.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider…

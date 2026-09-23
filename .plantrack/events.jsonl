@@ -174,3 +174,5 @@
 {"ts": "2026-09-23T05:58:32+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
 {"ts": "2026-09-23T06:00:36+00:00", "kind": "attempt", "id": "a15", "bug": "b9", "hypothesis": "RESULTAT : append() enregistre un atexit unique — tout processus ayant ecrit au journal regenere l'instantane AGENTS.md en sortant (survit aux sys.exit des hooks). 3 checks ajoutes (336 verts) : decision CLI, !bug via hook exit 2, changement de statut, tous sans commit.", "actor": "claude-code"}
 {"ts": "2026-09-23T06:00:36+00:00", "kind": "bug_status", "id": "b9", "status": "to_verify"}
+{"ts": "2026-09-23T06:00:36+00:00", "kind": "commit", "sha": "7a17e8d", "ctype": "fix", "thread": "t3"}
+{"ts": "2026-09-23T06:00:50+00:00", "kind": "file_touched", "text": ".planning/session-state.md", "thread": "t3"}

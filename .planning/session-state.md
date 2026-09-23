@@ -328,6 +328,29 @@ Consigné : b5 (worktree), b6 (filelog sans Bash), b7 (except silencieux),
 pg3 (relecture O(n)), pg4 (commits fantômes > 100 %), pg5 (Codex jamais prouvé).
 Rien n'est décidé : les 10 pistes sont sur la page, arbitrage à Mariella.
 
+## 2026-09-23 — parcours complet, plus aucun bug ouvert (session BCC)
+Demande Mariella (appel 1898 + courrier) : vérifier si l'analyse du « nouveau
+design » (= le parcours à phases, note bcc du 13/09) est faite, planifier
+sinon, continuer les tâches. Constat : le parcours est implémenté EN ENTIER
+(d3, commit 4b2b358) — import/`!parcours`, `phase next` avec portes humaines
+(pg9), injection rang 0, gardes doctor (questions hors porte, phase endormie),
+export JSON — rien à re-planifier dans ce dépôt. Faits nouveaux :
+- **b6 corrigé** (commit ea50bef) : matcher PostToolUse += `Bash`,
+  `bash_targets()` (redirections, tee, sed -i ; seuls les chemins EXISTANTS
+  sont retenus), et `write_hooks_file` rafraîchit un matcher périmé — sans ça
+  la fusion (comparaison sur la commande seule) aurait figé l'ancien matcher à
+  vie chez toutes les installations existantes. Rejoué en réel sur ce dépôt.
+- **b9 corrigé** (commit 7a17e8d) : `append()` pose un atexit unique — tout
+  processus qui écrit au journal régénère l'instantané AGENTS.md en sortant
+  (survit aux sys.exit des hooks). Coût assumé : un rejeu de plus par
+  invocation mutante (pg3).
+- 336 checks verts. pt.py : 2211 lignes (plafond 1450 TOUJOURS à retrancher
+  par Mariella — jamais tranché depuis v1.9.0).
+- Plus AUCUN bug open ; 10 bugs to_verify attendent le verdict de Mariella
+  (b1, b2, b3 depuis plus de 7 jours — alerte doctor). Version non publiée
+  depuis 1.9.0 ; propagation bcc/miamboost non faite (pg7 : session active).
+- Rien dans l'appel 1898 ne décrivait un bug (tri demandé : que des demandes).
+
 ## v1.9.0 — 2026-09-13 : le verdict humain sans quitter la session
 Chantier choisi par Mariella après l'audit (0 verdict sur 48 bugs : trancher
 exigeait un second terminal). `!verify <id>` / `!reject <id> <motif>` dans le
