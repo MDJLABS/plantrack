@@ -402,3 +402,8 @@ fil t2 actif. À faire par Mariella : tag v1.9.0 + publication PyPI.
   CTX_MAX_* en mode fiche complète (359 checks), propagé bcc + miamboost.
   Séance close sur décision de Mariella : « On s'arrête là ». Zéro verdict,
   zéro question en attente sur les trois repos.
+
+## Session du 24/09 (relance auto) — rangement
+- Journal et instantané commités (b7d6fae). Piège pg10 consigné : le
+  post-commit laisse TOUJOURS un résidu d'une ligne non commité — structurel,
+  pas une panne, ne pas boucler dessus. Rien d'autre en attente.
