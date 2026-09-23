@@ -16,8 +16,8 @@
 
 !! BUG BLOQUANT — a traiter avant toute autre chose : b1 Troncature du bloc reinjecte : sur bcc le bloc re…
 
-FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [9 commits]
-  fichiers recemment ecrits : parcours/projet-client.json, tests/scenario.sh, .claude/hooks/pt.py, .planning/session-state.md
+FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [10 commits]
+  fichiers recemment ecrits : parcours/projet-client.json, tests/scenario.sh, .claude/hooks/pt.py, .planning/session-state.md, ../../../root/.claude/projects/-home-mariella-plantrack/memory/MEMORY.md, ../../../root/.claude/projects/-home-mariella-plantrack/memory/mission-surveillance-plantrack.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider…
@@ -36,6 +36,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIV… (agent)
   d2 : Cause racine des pannes PlanTrack (constat du 06/09 sur bcc et miamboost) : l'o… (agent)
   d3 : Parcours retenu EN ENTIER (choix de Mariella, 22/09) : une phase porte regle + … (agent)
+  d4 : Mariella (23/09, tel) : abandon de l'implementation du design (erreur de projet… (agent)
 
 Pieges connus :
   pg4 : Un commit amende ou reset apres le post-commit reste dans le journal append-onl…

@@ -176,3 +176,8 @@
 {"ts": "2026-09-23T06:00:36+00:00", "kind": "bug_status", "id": "b9", "status": "to_verify"}
 {"ts": "2026-09-23T06:00:36+00:00", "kind": "commit", "sha": "7a17e8d", "ctype": "fix", "thread": "t3"}
 {"ts": "2026-09-23T06:00:50+00:00", "kind": "file_touched", "text": ".planning/session-state.md", "thread": "t3"}
+{"ts": "2026-09-23T06:00:53+00:00", "kind": "commit", "sha": "99e4e57", "ctype": "docs", "thread": "t3"}
+{"ts": "2026-09-23T08:45:34+00:00", "kind": "decision", "id": "d4", "text": "Mariella (23/09, tel) : abandon de l'implementation du design (erreur de projet). Nouvelle mission de la session : surveiller le bon fonctionnement de PlanTrack sur les repos equipes (plantrack, bcc, miamboost, profil).", "par": "agent"}
+{"ts": "2026-09-23T08:45:38+00:00", "kind": "file_touched", "text": "../../../root/.claude/projects/-home-mariella-plantrack/memory/mission-surveillance-plantrack.md", "thread": "t3"}
+{"ts": "2026-09-23T08:45:43+00:00", "kind": "file_touched", "text": "../../../root/.claude/projects/-home-mariella-plantrack/memory/MEMORY.md", "thread": "t3"}
+{"ts": "2026-09-23T09:18:04+00:00", "kind": "file_touched", "text": "../../../root/.claude/projects/-home-mariella-plantrack/memory/mission-surveillance-plantrack.md", "thread": "t3"}
