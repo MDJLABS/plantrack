@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [30 commits]
+FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [31 commits]
   fichiers recemment ecrits : ../../../root/.claude/projects/-home-mariella-plantrack/memory/mission-surveillance-plantrack.md, AGENTS.md, ../../../tmp/testout.txt, .claude/hooks/pt.py, tests/scenario.sh, .planning/session-state.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -41,5 +41,6 @@ Pieges connus :
   pg7 : Propager le coeur vendorise vers un depot ou une AUTRE session Claude travaille…
   pg8 : tests/scenario.sh, test 30 ('commits arrives au carnet 2/2') : observe rouge un…
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
+  pg10 : Le post-commit journalise le commit lui-meme (events.jsonl) et regenere l'insta…
 ```
 <!-- plantrack:state-end -->
