@@ -251,3 +251,6 @@
 {"ts": "2026-09-23T16:50:33+00:00", "kind": "bug_status", "id": "b11", "status": "validated", "canal": "tel 23/09 (fil bcc), d7 : carte 'ton verdict ?' -> Valider (Recommande)"}
 {"ts": "2026-09-23T16:50:38+00:00", "kind": "commit", "sha": "f490e0c", "ctype": "chore", "thread": "t3"}
 {"ts": "2026-09-23T16:51:26+00:00", "kind": "bug", "id": "b12", "text": "Fiche d'etat (d6) : la section BUGS EN ATTENTE DE TON VERDICT plafonne encore a CTX_MAX_BUGS meme en mode fiche complete — sur bcc 9 bugs to_verify anciens (b1, b5, b12...) n'apparaissent nulle part alors que la fiche promet l'etat COMPLET. Mesure le 23/09 via doctor.", "thread": "t3", "severity": "normal", "par": "agent"}
+{"ts": "2026-09-23T16:52:05+00:00", "kind": "commit", "sha": "0985532", "ctype": "chore", "thread": "t3"}
+{"ts": "2026-09-23T16:52:53+00:00", "kind": "bug_status", "id": "b1", "status": "validated", "canal": "tel 23/09 (fil bcc) : carte 'b1 et b2 — ton verdict ?' -> Valider les deux (Recommande)"}
+{"ts": "2026-09-23T16:52:53+00:00", "kind": "bug_status", "id": "b2", "status": "validated", "canal": "tel 23/09 (fil bcc) : carte 'b1 et b2 — ton verdict ?' -> Valider les deux (Recommande)"}

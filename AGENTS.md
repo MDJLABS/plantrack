@@ -14,9 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-!! BUG BLOQUANT — a traiter avant toute autre chose : b1 Troncature du bloc reinjecte : sur bcc le bloc re…
-
-FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [23 commits]
+FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [24 commits]
   fichiers recemment ecrits : ../../../root/.claude/projects/-home-mariella-plantrack/memory/mission-surveillance-plantrack.md, AGENTS.md, ../../../tmp/testout.txt, .planning/session-state.md, .claude/hooks/pt.py, tests/scenario.sh
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -24,10 +22,6 @@ FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
 
 BUGS NON CORRIGES (personne ne s'en est occupe) :
   b12 (open) [t3] Fiche d'etat (d6) : la section BUGS EN ATTENTE DE TON VERDICT plafonne encore a CTX_MAX_BUGS meme en mode fiche complete — sur bcc 9 bugs t… (agent)
-
-BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
-  b1 (to_verify) [t1] Troncature du bloc reinjecte : sur bcc le bloc reel fait 4661 chars pour un budget de 3000 — 1661 chars coupes par la FIN, donc 4 decisions… (agent) [4 tentatives, derniere: RESULTAT (commit 2f0aec8) : approche fiche livree — hook-co…]
-  b2 (to_verify) [t1] doctor : le controle 'etat reinjecte sous le budget' mesure APRES troncature (n = len(context_block(st)) - len(RULES)), il rend donc toujou… (agent) [3 tentatives, derniere: RESULTAT (commit 2f0aec8) : le doctor mesure le resume reel…]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d3 : Parcours retenu EN ENTIER (choix de Mariella, 22/09) : une phase porte regle + livrable + porte (agent|humain) + questions(bool), 'phase ne… (agent)
