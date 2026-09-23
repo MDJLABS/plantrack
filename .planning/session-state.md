@@ -360,3 +360,15 @@ Commit c846437, 294 checks verts, pt.py 1749 l. (plafond 1450 toujours dépassé
 chiffre à trancher). Propagé : miamboost e60bd6b ; bcc → parti dans le commit
 5bec6bb d'une autre session active (voir pg7). Fil t1 fermé (audit livré),
 fil t2 actif. À faire par Mariella : tag v1.9.0 + publication PyPI.
+
+## Session du 23/09 (après-midi, fil bcc) — verdicts tel + approche fiche (d6)
+- Verdicts de Mariella par téléphone (d5) : b3 VALIDÉ ; b1 et b2 REFUSÉS —
+  elle veut une autre approche. La CLI refuse verify/reject côté agent (voulu) :
+  les statuts restent to_verify jusqu'à sa saisie (`plantrack verify b3`…).
+- **d6 livrée** (commit 2f0aec8) : résumé court + fiche complète. hook-context
+  n'injecte plus que phase/bloquants/fils/compteurs + renvoi ; l'instantané
+  AGENTS.md devient la fiche ENTIÈRE (plus aucune troncature nulle part,
+  élision/resserrage supprimés). doctor : mesure du résumé réel + contrôle
+  fiche à jour. Tests 18/24 réécrits : 349 checks verts.
+- b1 et b2 repassés to_verify (tentatives a18/a19). Propagation bcc/miamboost
+  toujours à faire (pg7). Appel 1980 : rien à trier (faux numéro).
