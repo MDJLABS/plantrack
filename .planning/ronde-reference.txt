@@ -1,0 +1,6 @@
+# Référence de la ronde de surveillance (doctor --all)
+# La ronde n'alerte Mariella QUE sur une ligne !! absente d'ici.
+# Mise à jour : 2026-09-24 (registre nettoyé : /tmp retirés, profil ajouté)
+
+!!  /home/mariella/Clients/s69-francoviet — garde-fou git pre-commit absent (opt-in jamais installé ; question posée à Mariella le 24/09)
+!!  /home/mariella/profil — commits sans fil : plafond de 3 fils ouverts atteint (q11 déposée au carnet profil le 24/09)

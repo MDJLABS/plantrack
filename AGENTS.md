@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [32 commits]
-  fichiers recemment ecrits : ../../../root/.claude/projects/-home-mariella-plantrack/memory/mission-surveillance-plantrack.md, AGENTS.md, ../../../tmp/testout.txt, .claude/hooks/pt.py, tests/scenario.sh, .planning/session-state.md
+FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [33 commits]
+  fichiers recemment ecrits : AGENTS.md, ../../../tmp/testout.txt, .claude/hooks/pt.py, tests/scenario.sh, .planning/session-state.md, .planning/ronde-reference.txt
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -42,5 +42,6 @@ Pieges connus :
   pg8 : tests/scenario.sh, test 30 ('commits arrives au carnet 2/2') : observe rouge un…
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
   pg10 : Le post-commit journalise le commit lui-meme (events.jsonl) et regenere l'insta…
+  pg11 : Les tests en reel laissent leurs depots /tmp dans ~/.plantrack-repos : doctor -…
 ```
 <!-- plantrack:state-end -->
