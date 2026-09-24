@@ -407,3 +407,22 @@ fil t2 actif. À faire par Mariella : tag v1.9.0 + publication PyPI.
 - Journal et instantané commités (b7d6fae). Piège pg10 consigné : le
   post-commit laisse TOUJOURS un résidu d'une ligne non commité — structurel,
   pas une panne, ne pas boucler dessus. Rien d'autre en attente.
+
+## Session du 24/09 (matin) — les 2 défauts de la ronde soldés (d10)
+- Cron de ronde réarmé (toutes les 4 h à :23, session-only — à réarmer à
+  chaque session, cf. mémoire mission).
+- Verdicts Mariella (tél, AskUserQuestion reposée — celle de 07:41 était
+  morte avec le redémarrage du poste) : s69 → installer le garde-fou ;
+  profil → fermer un chantier fini.
+- s69-francoviet : `init --git-hook` passé, doctor tout vert.
+- profil : t8 fermé (Préalables p5, tout en to_verify — rien à coder),
+  q11 répondue via `--de`. Pour ça il a fallu PROPAGER le cœur (sa copie
+  1726 l. ignorait --de ; pg7 vérifié : aucune session active sur profil ;
+  backup fait). Commits profil 61bcac4 + suivant ; fil auto t12 fermé pour
+  garder une place libre sous le plafond de 3.
+- Nouveau doctor sur profil révèle q1–q3 (> 7 j) + q4–q10 : 10 questions
+  PRODUIT en attente dans le carnet profil (fichiers/infos à fournir par
+  Mariella). Signalé dans le fil ; à traiter côté projet profil.
+- ronde-reference.txt réécrite : s69 retiré (corrigé), 2 lignes profil
+  restantes (questions produit ; 4 commits orphelins historiques qui
+  sortiront de la fenêtre de 30 j).

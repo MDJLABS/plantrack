@@ -1,6 +1,6 @@
 # Référence de la ronde de surveillance (doctor --all)
 # La ronde n'alerte Mariella QUE sur une ligne !! absente d'ici.
-# Mise à jour : 2026-09-24 (registre nettoyé : /tmp retirés, profil ajouté)
+# Mise à jour : 2026-09-24 matin (s69 corrigé — garde-fou installé ; profil : t8+t12 fermés, cœur propagé)
 
-!!  /home/mariella/Clients/s69-francoviet — garde-fou git pre-commit absent (opt-in jamais installé ; question posée à Mariella le 24/09)
-!!  /home/mariella/profil — commits sans fil : plafond de 3 fils ouverts atteint (q11 déposée au carnet profil le 24/09)
+!!  /home/mariella/profil — questions sans reponse (q1, q2, q3 > 7 jours) : questions PRODUIT du projet profil (format scan 3D, PDF soudure, longueur de contrôle) — signalées à Mariella le 24/09, à traiter dans le fil profil, pas une panne
+!!  /home/mariella/profil — commits rattaches a un fil (4 sans fil : 1fbb440, 853e112, 3e2009b, 699158f) : historique, plafond atteint AVANT la correction du 24/09 (t8 fermé, place libre) — disparaîtra quand ces commits sortiront de la fenêtre de 30 jours

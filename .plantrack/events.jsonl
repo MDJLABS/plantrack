@@ -274,3 +274,10 @@
 {"ts": "2026-09-23T23:45:51+00:00", "kind": "commit", "sha": "4ef9204", "ctype": "chore", "thread": "t3"}
 {"ts": "2026-09-24T07:40:42+00:00", "kind": "piege", "id": "pg11", "text": "Les tests en reel laissent leurs depots /tmp dans ~/.plantrack-repos : doctor --all les compte en defaut tant que le registre n'est pas nettoye a la main (24/09 : 4 entrees /tmp retirees, profil ajoute — il etait equipe mais hors registre, donc hors ronde)"}
 {"ts": "2026-09-24T07:40:50+00:00", "kind": "file_touched", "text": ".planning/ronde-reference.txt", "thread": "t3"}
+{"ts": "2026-09-24T07:40:54+00:00", "kind": "commit", "sha": "ad20598", "ctype": "chore", "thread": "t3"}
+{"ts": "2026-09-24T07:41:05+00:00", "kind": "file_touched", "text": "../../../root/.claude/projects/-home-mariella-plantrack/memory/mission-surveillance-plantrack.md", "thread": "t3"}
+{"ts": "2026-09-24T07:41:10+00:00", "kind": "file_touched", "text": "../../../root/.claude/projects/-home-mariella-plantrack/memory/mission-surveillance-plantrack.md", "thread": "t3"}
+{"ts": "2026-09-24T08:35:30+00:00", "kind": "decision", "id": "d10", "text": "Verdicts Mariella (tel, 24/09, via AskUserQuestion) : (1) s69-francoviet — garde-fou pre-commit INSTALLE (init --git-hook, doctor vert) ; (2) profil — 'ferme un chantier fini' : t8 (Prealables p5, tout en to_verify) ferme, q11 repondue via --de, coeur propage vers profil (pg7 verifie : aucune session active) car sa copie (1726 l.) ignorait --de ; fil auto t12 ferme pour garder une place libre.", "par": "agent"}
+{"ts": "2026-09-24T08:35:36+00:00", "kind": "file_touched", "text": ".planning/ronde-reference.txt", "thread": "t3"}
+{"ts": "2026-09-24T08:35:48+00:00", "kind": "file_touched", "text": ".planning/session-state.md", "thread": "t3"}
+{"ts": "2026-09-24T08:35:56+00:00", "kind": "file_touched", "text": "../../../root/.claude/projects/-home-mariella-plantrack/memory/mission-surveillance-plantrack.md", "thread": "t3"}
