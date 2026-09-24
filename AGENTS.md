@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [35 commits]
+FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [36 commits]
   fichiers recemment ecrits : ../../../tmp/testout.txt, .claude/hooks/pt.py, tests/scenario.sh, .planning/ronde-reference.txt, .planning/session-state.md, ../../../root/.claude/projects/-home-mariella-plantrack/memory/mission-surveillance-plantrack.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -44,5 +44,6 @@ Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
   pg10 : Le post-commit journalise le commit lui-meme (events.jsonl) et regenere l'insta…
   pg11 : Les tests en reel laissent leurs depots /tmp dans ~/.plantrack-repos : doctor -…
+  pg12 : Le defaut doctor 'commits rattaches a un fil' est RETROACTIF comme pg1 : sur pr…
 ```
 <!-- plantrack:state-end -->
