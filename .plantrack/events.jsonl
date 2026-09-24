@@ -285,3 +285,4 @@
 {"ts": "2026-09-24T17:29:12+00:00", "kind": "commit", "sha": "f8a0a59", "ctype": "chore", "thread": "t3"}
 {"ts": "2026-09-24T18:31:13+00:00", "kind": "piege", "id": "pg12", "text": "Le defaut doctor 'commits rattaches a un fil' est RETROACTIF comme pg1 : sur profil, les 4 commits sans fil (1fbb440, 853e112 du 23/09 ; 3e2009b, 699158f du 24/09 01h) datent d'AVANT la fermeture de t8 (24/09 matin, verdict Mariella d10). La cause est reglee — la place sous le plafond de 3 fils est libre — mais le compteur restera rouge jusqu'a ce que ces commits sortent de la fenetre USAGE_DAYS=30. Ne pas rouvrir le chantier : verifier la DATE des commits listes avant de conclure a une panne."}
 {"ts": "2026-09-24T18:31:16+00:00", "kind": "commit", "sha": "1b392fc", "ctype": "chore", "thread": "t3"}
+{"ts": "2026-09-24T18:34:16+00:00", "kind": "commit", "sha": "634314a", "ctype": "chore", "thread": "t3"}
