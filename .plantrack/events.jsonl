@@ -292,3 +292,4 @@
 {"ts": "2026-09-25T17:22:13+00:00", "kind": "decision", "id": "d11", "text": "Mariella (tel, 25/09) : ne JAMAIS relayer dans le fil plantrack les questions produit d'un AUTRE projet (soudure/profil). Sa reponse citee : 'Si tu parles de soudure alors que tu me parles de Plantrack, c'est impossible. C'est forcement qu'il se trompe.' Les questions q4,q6-q10,q12 du carnet profil restent en attente COTE PROFIL et ne ressortent plus ici.", "par": "agent"}
 {"ts": "2026-09-25T17:22:16+00:00", "kind": "commit", "sha": "2101927", "ctype": "chore", "thread": "t3"}
 {"ts": "2026-09-25T17:23:01+00:00", "kind": "file_touched", "text": ".planning/ronde-reference.txt", "thread": "t3"}
+{"ts": "2026-09-25T17:23:13+00:00", "kind": "commit", "sha": "662070d", "ctype": "fix", "thread": "t3"}
