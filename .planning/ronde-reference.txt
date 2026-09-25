@@ -1,6 +1,14 @@
 # Référence de la ronde de surveillance (doctor --all)
 # La ronde n'alerte Mariella QUE sur une ligne !! absente d'ici.
-# Mise à jour : 2026-09-25 (q1/q3 répondues par Mariella au tél le 24/09 — la ligne
-# « questions sans reponse » a disparu du doctor, elle est retirée d'ici)
+#
+# REGLE ABSOLUE (d11, verdict tel du 25/09) : la ronde ne remonte dans CE fil que
+# des PANNES TECHNIQUES de PlanTrack. Les questions/bugs PRODUIT d'un autre depot
+# (profil, s69, miamboost...) ne sont JAMAIS relayes ici : ils appartiennent au fil
+# de leur projet. Melanger deux projets dans la meme conversation est une erreur.
+#
+# Mise à jour : 2026-09-25 (q1/q3 répondues par Mariella au tél le 24/09)
+
+# --- lignes connues, a ignorer ---
+!!  /home/mariella/profil — questions sans reponse (toute ligne, quel que soit le qN) : questions PRODUIT du projet profil — NE JAMAIS les poser dans le fil plantrack (d11)
 
 !!  /home/mariella/profil — commits rattaches a un fil (4 sans fil : 1fbb440, 853e112, 3e2009b, 699158f) : historique, plafond atteint AVANT la correction du 24/09 (t8 fermé, place libre) — disparaîtra quand ces commits sortiront de la fenêtre de 30 jours
