@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [45 commits]
-  fichiers recemment ecrits : tests/scenario.sh, .planning/session-state.md, ../../../root/.claude/projects/-home-mariella-plantrack/memory/mission-surveillance-plantrack.md, .planning/ronde-reference.txt, .claude/hooks/pt.py, .planning/scenario.log
+FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [46 commits]
+  fichiers recemment ecrits : .planning/session-state.md, ../../../root/.claude/projects/-home-mariella-plantrack/memory/mission-surveillance-plantrack.md, .planning/ronde-reference.txt, .claude/hooks/pt.py, .planning/scenario.log, .gitignore
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -35,6 +35,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d9 : Mariella (tel, appels 1989/2003 du 23/09, phrase notee telle quelle) : 'Je ne veux pas perdre d'informations. On me propose la meilleure so… (agent)
   d10 : Verdicts Mariella (tel, 24/09, via AskUserQuestion) : (1) s69-francoviet — garde-fou pre-commit INSTALLE (init --git-hook, doctor vert) ; (… (agent)
   d11 : Mariella (tel, 25/09) : ne JAMAIS relayer dans le fil plantrack les questions produit d'un AUTRE projet (soudure/profil). Sa reponse citee … (agent)
+  d12 : Mariella (tel, 26/09) : on reste en surveillance — rondes quotidiennes, ne la deranger que sur une vraie panne technique PlanTrack. Le chan… (agent)
 
 Pieges connus :
   pg1 : L'ecart 'commits arrives au carnet' du doctor remonte jusqu'a l'installation (U…
