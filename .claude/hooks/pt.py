@@ -22,6 +22,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 from datetime import datetime, timedelta, timezone
 
 # ---------------------------------------------------------------- configuration
@@ -1522,11 +1523,21 @@ def registered_roots():
         return [r for r in dict.fromkeys(l.strip() for l in f) if r]
 
 
+def jetable(root):
+    """Un depot sous /tmp est un bac a sable (essais, tests en reel) : l'inscrire au
+    registre reel noie la ronde sous du bruit et masque les vraies pannes (pg11).
+    Un registre explicite (PLANTRACK_REGISTRY) est un harnais de test : on n'y touche pas,
+    ses depots vivent justement dans /tmp."""
+    if os.environ.get("PLANTRACK_REGISTRY"):
+        return False
+    return os.path.realpath(root).startswith(os.path.realpath(tempfile.gettempdir()) + os.sep)
+
+
 def register_root():
     """Inscrit le depot au registre a l'installation — sans lui, `doctor --all`
     n'aurait rien a parcourir et chaque depot resterait a verifier a la main."""
     try:
-        if ROOT not in registered_roots():
+        if ROOT not in registered_roots() and not jetable(ROOT):
             with open(REGISTRY, "a", encoding="utf-8") as f:
                 f.write(ROOT + "\n")
             print(f"depot inscrit au registre ({REGISTRY}) — visible dans `plantrack doctor --all`.")
@@ -1542,8 +1553,8 @@ def cmd_doctor_all():
     bad, gone = 0, []
     for r in roots:
         core = os.path.join(r, ".claude", "hooks", "pt.py")
-        if not os.path.isdir(r):
-            gone.append(r)  # depot efface : l'entree n'a plus de sens, on la retire
+        if not os.path.isdir(r) or jetable(r):
+            gone.append(r)  # depot efface ou bac a sable : l'entree n'a plus de sens, on la retire
             continue
         if not os.path.exists(core):
             bad += 1
