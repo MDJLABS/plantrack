@@ -6,3 +6,4 @@ build/
 __pycache__/
 .plantrack/injections.json
 .plantrack/incidents.log
+.planning/scenario.log

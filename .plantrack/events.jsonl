@@ -294,3 +294,12 @@
 {"ts": "2026-09-25T17:23:01+00:00", "kind": "file_touched", "text": ".planning/ronde-reference.txt", "thread": "t3"}
 {"ts": "2026-09-25T17:23:13+00:00", "kind": "commit", "sha": "662070d", "ctype": "fix", "thread": "t3"}
 {"ts": "2026-09-25T21:20:43+00:00", "kind": "commit", "sha": "d319614", "ctype": "chore", "thread": "t3"}
+{"ts": "2026-09-25T21:20:45+00:00", "kind": "commit", "sha": "f123af1", "ctype": "chore", "thread": "t3"}
+{"ts": "2026-09-26T03:12:37+00:00", "kind": "bug", "id": "b13", "text": "Ronde noyee par le bruit : les depots jetables sous /tmp (essais bcc, tests en reel) s'inscrivent au registre reel et ressortent en defaut a chaque doctor --all — 16 lignes de bruit sur 22 depots le 26/09, les vraies pannes (prorent) passent inapercues. Cf pg11.", "thread": "t3", "severity": "high", "par": "agent"}
+{"ts": "2026-09-26T03:12:43+00:00", "kind": "attempt", "id": "a21", "bug": "b13", "hypothesis": "Cause racine : register_root() inscrit tout depot au registre, y compris un bac a sable sous /tmp. Garde unique dans register_root (ne pas inscrire un chemin sous tempfile.gettempdir()) + doctor --all retire ces entrees comme il retire deja les depots effaces. Exception : si PLANTRACK_REGISTRY est pose (harnais de test), aucun filtre — les tests scenario.sh travaillent justement dans /tmp avec leur propre registre.", "actor": "claude-code"}
+{"ts": "2026-09-26T03:12:48+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-26T03:12:54+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-26T03:12:57+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t3"}
+{"ts": "2026-09-26T03:13:08+00:00", "kind": "file_touched", "text": ".planning/scenario.log", "thread": "t3"}
+{"ts": "2026-09-26T03:18:41+00:00", "kind": "commit", "sha": "3c13aa9", "ctype": "fix", "thread": "t3"}
+{"ts": "2026-09-26T03:18:45+00:00", "kind": "bug_status", "id": "b13", "status": "to_verify"}
