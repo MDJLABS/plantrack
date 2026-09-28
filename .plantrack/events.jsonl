@@ -308,3 +308,5 @@
 {"ts": "2026-09-26T03:19:55+00:00", "kind": "decision", "id": "d12", "text": "Mariella (tel, 26/09) : on reste en surveillance — rondes quotidiennes, ne la deranger que sur une vraie panne technique PlanTrack. Le chantier parcours (t3) et le solde des bugs attendent.", "par": "agent"}
 {"ts": "2026-09-26T03:19:55+00:00", "kind": "commit", "sha": "603f621", "ctype": "chore", "thread": "t3"}
 {"ts": "2026-09-28T07:14:51+00:00", "kind": "commit", "sha": "02c70ae", "ctype": "chore", "thread": "t3"}
+{"ts": "2026-09-28T15:14:03+00:00", "kind": "commit", "sha": "006a82a", "ctype": "chore", "thread": "t3"}
+{"ts": "2026-09-28T15:14:36+00:00", "kind": "piege", "id": "pg13", "text": "Gabarit de parcours : la phase de construction est a 'questions: false', mais une construction reelle fait surgir des besoins que seul l'humain peut combler (ouvrir un compte Stripe/Brevo, fournir des cles). Constate sur prorent le 28/09 : 4 questions legitimes en p4, doctor les signale 'hors porte'. Ce n'est pas une panne ; si ca se repete sur d'autres depots, proposer a Mariella d'autoriser les questions de type 'prerequis humain' en construction."}

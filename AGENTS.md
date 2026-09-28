@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [48 commits]
+FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [49 commits]
   fichiers recemment ecrits : .planning/session-state.md, ../../../root/.claude/projects/-home-mariella-plantrack/memory/mission-surveillance-plantrack.md, .planning/ronde-reference.txt, .claude/hooks/pt.py, .planning/scenario.log, .gitignore
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -50,5 +50,6 @@ Pieges connus :
   pg10 : Le post-commit journalise le commit lui-meme (events.jsonl) et regenere l'insta…
   pg11 : Les tests en reel laissent leurs depots /tmp dans ~/.plantrack-repos : doctor -…
   pg12 : Le defaut doctor 'commits rattaches a un fil' est RETROACTIF comme pg1 : sur pr…
+  pg13 : Gabarit de parcours : la phase de construction est a 'questions: false', mais u…
 ```
 <!-- plantrack:state-end -->
