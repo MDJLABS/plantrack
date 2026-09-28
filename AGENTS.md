@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [47 commits]
+FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [48 commits]
   fichiers recemment ecrits : .planning/session-state.md, ../../../root/.claude/projects/-home-mariella-plantrack/memory/mission-surveillance-plantrack.md, .planning/ronde-reference.txt, .claude/hooks/pt.py, .planning/scenario.log, .gitignore
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :

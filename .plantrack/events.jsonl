@@ -307,3 +307,4 @@
 {"ts": "2026-09-26T03:18:45+00:00", "kind": "file_touched", "text": ".gitignore", "thread": "t3"}
 {"ts": "2026-09-26T03:19:55+00:00", "kind": "decision", "id": "d12", "text": "Mariella (tel, 26/09) : on reste en surveillance — rondes quotidiennes, ne la deranger que sur une vraie panne technique PlanTrack. Le chantier parcours (t3) et le solde des bugs attendent.", "par": "agent"}
 {"ts": "2026-09-26T03:19:55+00:00", "kind": "commit", "sha": "603f621", "ctype": "chore", "thread": "t3"}
+{"ts": "2026-09-28T07:14:51+00:00", "kind": "commit", "sha": "02c70ae", "ctype": "chore", "thread": "t3"}
