@@ -426,3 +426,9 @@ fil t2 actif. À faire par Mariella : tag v1.9.0 + publication PyPI.
 - ronde-reference.txt réécrite : s69 retiré (corrigé), 2 lignes profil
   restantes (questions produit ; 4 commits orphelins historiques qui
   sortiront de la fenêtre de 30 j).
+
+## Ronde du 29/09 (soir) — s69 à propager (d13)
+- s69-francoviet : résumé réinjecté 3070/3000, tronqué — cœur ancien (avant
+  d6). Verdict tel : propager APRÈS la fin de la session s69 en cours (pg7).
+  **À FAIRE** si pas encore fait : quand s69 est calme (journal + git inchangés
+  30 min), backup puis copier pt.py de plantrack, commit, doctor vert.
