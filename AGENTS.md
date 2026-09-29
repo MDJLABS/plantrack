@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [53 commits]
-  fichiers recemment ecrits : ../../../root/.claude/projects/-home-mariella-plantrack/memory/mission-surveillance-plantrack.md, .planning/ronde-reference.txt, .claude/hooks/pt.py, .planning/scenario.log, .gitignore, .planning/session-state.md
+FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [54 commits]
+  fichiers recemment ecrits : .planning/ronde-reference.txt, .claude/hooks/pt.py, .planning/scenario.log, .gitignore, .planning/session-state.md, ../Clients/s69-francoviet/.gitignore
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella

@@ -432,3 +432,6 @@ fil t2 actif. À faire par Mariella : tag v1.9.0 + publication PyPI.
   d6). Verdict tel : propager APRÈS la fin de la session s69 en cours (pg7).
   **À FAIRE** si pas encore fait : quand s69 est calme (journal + git inchangés
   30 min), backup puis copier pt.py de plantrack, commit, doctor vert.
+- **s69 propagé (29/09 soir, d13)** : plus aucune session sur s69 → cœur v-d6
+  copié (pt.py + lanceur + .gitignore incidents.log), commit 8afd359. Budget
+  3070 → 905/3000, doctor vert hors q1/q2 (contenu projet, d11).

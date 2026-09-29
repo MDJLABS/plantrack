@@ -316,3 +316,5 @@
 {"ts": "2026-09-28T21:14:05+00:00", "kind": "commit", "sha": "dd68e0b", "ctype": "chore", "thread": "t3"}
 {"ts": "2026-09-29T17:19:18+00:00", "kind": "decision", "id": "d13", "text": "Mariella (tel, 29/09) : s69-francoviet depasse le budget de reinjection (3070/3000) car il tourne sur l'ancien coeur (avant resume court d6). Choix : mettre a jour s69 APRES la fin de sa session en cours (pg7), pas pendant.", "par": "agent"}
 {"ts": "2026-09-29T17:19:36+00:00", "kind": "file_touched", "text": ".planning/session-state.md", "thread": "t3"}
+{"ts": "2026-09-29T17:19:39+00:00", "kind": "commit", "sha": "c84699b", "ctype": "chore", "thread": "t3"}
+{"ts": "2026-09-29T20:00:22+00:00", "kind": "file_touched", "text": "../Clients/s69-francoviet/.gitignore", "thread": "t3"}
