@@ -318,3 +318,6 @@
 {"ts": "2026-09-29T17:19:36+00:00", "kind": "file_touched", "text": ".planning/session-state.md", "thread": "t3"}
 {"ts": "2026-09-29T17:19:39+00:00", "kind": "commit", "sha": "c84699b", "ctype": "chore", "thread": "t3"}
 {"ts": "2026-09-29T20:00:22+00:00", "kind": "file_touched", "text": "../Clients/s69-francoviet/.gitignore", "thread": "t3"}
+{"ts": "2026-09-29T20:00:45+00:00", "kind": "commit", "sha": "5376dce", "ctype": "chore", "thread": "t3"}
+{"ts": "2026-09-29T20:00:45+00:00", "kind": "file_touched", "text": ".planning/session-state.md", "thread": "t3"}
+{"ts": "2026-09-29T20:00:59+00:00", "kind": "decision", "id": "d14", "text": "Mariella (tel, 29/09 soir) : apres propagation s69 (budget 905/3000), choix 'Rester en veille' — ronde demain, ne la deranger que sur panne technique (cf d12).", "par": "agent"}
