@@ -6,7 +6,7 @@
 # (profil, s69, miamboost...) ne sont JAMAIS relayes ici : ils appartiennent au fil
 # de leur projet. Melanger deux projets dans la meme conversation est une erreur.
 #
-# Mise à jour : 2026-09-28 (ronde du 28/09 : profil b1 + prorent hors porte)
+# Mise à jour : 2026-09-30 (ronde du 30/09 : s69 q1/q2 = questions du fil s69)
 
 # --- lignes connues, a ignorer ---
 !!  /home/mariella/profil — questions sans reponse (toute ligne, quel que soit le qN) : questions PRODUIT du projet profil — NE JAMAIS les poser dans le fil plantrack (d11)
@@ -16,3 +16,5 @@
 !!  /home/mariella/profil — bugs en attente de verdict humain (toute ligne) : verdicts PRODUIT du projet profil — a trancher dans le fil profil, jamais ici (d11)
 
 !!  /home/mariella/prorent — questions posees hors porte (q3..q6, phase p4 'questions: false') : besoins reels (comptes Brevo/Stripe...) poses par la session prorent pendant la construction — le detecteur fait son travail, c'est le reglage du parcours prorent (d11 : fil prorent). Voir piege sur le gabarit.
+
+!!  /home/mariella/Clients/s69-francoviet — questions sans reponse (q1 tracker de juillet, q2 annulation phase p1) : questions posees par la session s69 a son humain — a trancher dans le fil s69, jamais ici (d11)

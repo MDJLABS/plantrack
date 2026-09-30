@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [55 commits]
+FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [56 commits]
   fichiers recemment ecrits : .planning/ronde-reference.txt, .claude/hooks/pt.py, .planning/scenario.log, .gitignore, ../Clients/s69-francoviet/.gitignore, .planning/session-state.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
