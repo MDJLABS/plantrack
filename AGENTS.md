@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [65 commits]
+FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [67 commits]
   fichiers recemment ecrits : .claude/hooks/pt.py, .planning/scenario.log, .gitignore, ../Clients/s69-francoviet/.gitignore, .planning/session-state.md, .planning/ronde-reference.txt
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -37,6 +37,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d14 : Mariella (tel, 29/09 soir) : apres propagation s69 (budget 905/3000), choix 'Rester en veille' — ronde demain, ne la deranger que sur panne… (agent)
   d15 : Mariella (tel, 01/10, via AskUserQuestion) : promovie sans garde-fou -> 'Poser le garde-fou (Recommande)'. Installe (init --git-hook), doct… (agent)
   d16 : Mariella (tel, 01/10) : apres garde-fou promovie et b13 valide, choix 'Rester en veille (Recommande)' — ronde toutes les 4 h, ne la derange… (agent)
+  d17 : Mariella (tel, 01/10 14h, via AskUserQuestion) : ronde de 14h verte (alerte miamboost b11 = fil miamboost, d11), choix 'Rester en veille (R… (agent)
 
 Pieges connus :
   pg1 : L'ecart 'commits arrives au carnet' du doctor remonte jusqu'a l'installation (U…

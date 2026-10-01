@@ -337,3 +337,8 @@
 {"ts": "2026-10-01T05:58:13+00:00", "kind": "commit", "sha": "ee94378", "ctype": "chore", "thread": "t3"}
 {"ts": "2026-10-01T08:49:51+00:00", "kind": "decision", "id": "d16", "text": "Mariella (tel, 01/10) : apres garde-fou promovie et b13 valide, choix 'Rester en veille (Recommande)' — ronde toutes les 4 h, ne la deranger que sur panne technique.", "par": "agent"}
 {"ts": "2026-10-01T08:49:51+00:00", "kind": "commit", "sha": "08d28e6", "ctype": "chore", "thread": "t3"}
+{"ts": "2026-10-01T08:49:51+00:00", "kind": "commit", "sha": "7c5edfe", "ctype": "chore", "thread": "t3"}
+{"ts": "2026-10-01T12:18:18+00:00", "kind": "commit", "sha": "1a98d0e", "ctype": "chore", "thread": "t3"}
+{"ts": "2026-10-01T12:18:18+00:00", "kind": "file_touched", "text": ".planning/ronde-reference.txt", "thread": "t3"}
+{"ts": "2026-10-01T12:18:18+00:00", "kind": "file_touched", "text": ".planning/ronde-reference.txt", "thread": "t3"}
+{"ts": "2026-10-01T13:22:18+00:00", "kind": "decision", "id": "d17", "text": "Mariella (tel, 01/10 14h, via AskUserQuestion) : ronde de 14h verte (alerte miamboost b11 = fil miamboost, d11), choix 'Rester en veille (Recommande)' — ronde toutes les 4 h, ne la deranger que sur panne technique PlanTrack.", "par": "agent"}
