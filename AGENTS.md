@@ -14,14 +14,11 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [61 commits]
+FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [62 commits]
   fichiers recemment ecrits : .claude/hooks/pt.py, .planning/scenario.log, .gitignore, ../Clients/s69-francoviet/.gitignore, .planning/session-state.md, .planning/ronde-reference.txt
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
-
-BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
-  b13 (to_verify) [t3] Ronde noyee par le bruit : les depots jetables sous /tmp (essais bcc, tests en reel) s'inscrivent au registre reel et ressortent en defaut … (agent) [1 tentatives, derniere: Cause racine : register_root() inscrit tout depot au regist…]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
