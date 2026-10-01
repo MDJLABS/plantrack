@@ -334,3 +334,5 @@
 {"ts": "2026-10-01T05:52:56+00:00", "kind": "commit", "sha": "4082426", "ctype": "chore", "thread": "t3"}
 {"ts": "2026-10-01T05:58:13+00:00", "kind": "bug_status", "id": "b13", "status": "validated", "canal": "telephone (AskUserQuestion, 01/10) : Valider (Recommandé)"}
 {"ts": "2026-10-01T05:58:13+00:00", "kind": "commit", "sha": "cfbe015", "ctype": "chore", "thread": "t3"}
+{"ts": "2026-10-01T05:58:13+00:00", "kind": "commit", "sha": "ee94378", "ctype": "chore", "thread": "t3"}
+{"ts": "2026-10-01T08:49:51+00:00", "kind": "decision", "id": "d16", "text": "Mariella (tel, 01/10) : apres garde-fou promovie et b13 valide, choix 'Rester en veille (Recommande)' — ronde toutes les 4 h, ne la deranger que sur panne technique.", "par": "agent"}
