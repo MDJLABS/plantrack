@@ -327,3 +327,6 @@
 {"ts": "2026-09-30T05:30:51+00:00", "kind": "file_touched", "text": ".planning/ronde-reference.txt", "thread": "t3"}
 {"ts": "2026-09-30T05:30:53+00:00", "kind": "commit", "sha": "66d3a42", "ctype": "chore", "thread": "t3"}
 {"ts": "2026-09-30T12:45:01+00:00", "kind": "commit", "sha": "f3d5b59", "ctype": "chore", "thread": "t3"}
+{"ts": "2026-10-01T05:50:16+00:00", "kind": "commit", "sha": "88b3419", "ctype": "chore", "thread": "t3"}
+{"ts": "2026-10-01T05:50:17+00:00", "kind": "file_touched", "text": ".planning/ronde-reference.txt", "thread": "t3"}
+{"ts": "2026-10-01T05:52:53+00:00", "kind": "decision", "id": "d15", "text": "Mariella (tel, 01/10, via AskUserQuestion) : promovie sans garde-fou -> 'Poser le garde-fou (Recommande)'. Installe (init --git-hook), doctor promovie vert. Ronde du 01/10 : s69 q3 classee fil s69 (d11).", "par": "agent"}
