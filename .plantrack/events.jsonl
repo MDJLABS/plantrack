@@ -343,3 +343,4 @@
 {"ts": "2026-10-01T12:18:18+00:00", "kind": "file_touched", "text": ".planning/ronde-reference.txt", "thread": "t3"}
 {"ts": "2026-10-01T13:22:18+00:00", "kind": "decision", "id": "d17", "text": "Mariella (tel, 01/10 14h, via AskUserQuestion) : ronde de 14h verte (alerte miamboost b11 = fil miamboost, d11), choix 'Rester en veille (Recommande)' — ronde toutes les 4 h, ne la deranger que sur panne technique PlanTrack.", "par": "agent"}
 {"ts": "2026-10-01T13:22:18+00:00", "kind": "commit", "sha": "b7ec9f1", "ctype": "chore", "thread": "t3"}
+{"ts": "2026-10-01T13:22:20+00:00", "kind": "commit", "sha": "de1844c", "ctype": "chore", "thread": "t3"}
