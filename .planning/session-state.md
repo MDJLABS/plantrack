@@ -438,3 +438,6 @@ fil t2 actif. À faire par Mariella : tag v1.9.0 + publication PyPI.
 
 ## Ronde du 01/10 19h — verte
 - doctor --all : 4 dépôts en !!, toutes lignes déjà dans ronde-reference.txt (d11). Aucune panne PlanTrack. Veille maintenue (d17).
+
+## Ronde du 02/10 15h — verte
+- doctor --all : 4 dépôts en !!, toutes lignes déjà dans ronde-reference.txt (d11). Aucune panne PlanTrack. Veille maintenue (d17).
