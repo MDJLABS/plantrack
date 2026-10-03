@@ -6,7 +6,7 @@
 # (profil, s69, miamboost...) ne sont JAMAIS relayes ici : ils appartiennent au fil
 # de leur projet. Melanger deux projets dans la meme conversation est une erreur.
 #
-# Mise à jour : 2026-10-03 10h45 (Myview : garde-fou posé, d18)
+# Mise à jour : 2026-10-03 17h (prorent : verdicts produit classés, d11)
 
 # --- lignes connues, a ignorer ---
 !!  /home/mariella/profil — questions sans reponse (toute ligne, quel que soit le qN) : questions PRODUIT du projet profil — NE JAMAIS les poser dans le fil plantrack (d11)
@@ -20,3 +20,5 @@
 !!  /home/mariella/Clients/s69-francoviet — questions sans reponse (toute ligne : q1, q2, q3 lot 2 design admin...) : questions posees par la session s69 a son humain — a trancher dans le fil s69, jamais ici (d11)
 
 !!  /home/mariella/miamboost — bugs en attente de verdict humain (toute ligne : b11, b12, b13...) : verdict PRODUIT du projet miamboost — a trancher dans le fil miamboost, jamais ici (d11)
+
+!!  /home/mariella/prorent — bugs en attente de verdict humain (toute ligne : b2, b3, b5...) : verdicts PRODUIT du projet prorent — a trancher dans le fil prorent, jamais ici (d11). Ajoutee le 03/10 17h (seuil des 7 jours franchi).
