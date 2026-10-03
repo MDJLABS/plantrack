@@ -6,7 +6,7 @@
 # (profil, s69, miamboost...) ne sont JAMAIS relayes ici : ils appartiennent au fil
 # de leur projet. Melanger deux projets dans la meme conversation est une erreur.
 #
-# Mise à jour : 2026-10-02 22h (miamboost : b12/b13 = verdicts du fil miamboost)
+# Mise à jour : 2026-10-03 10h45 (Myview : garde-fou posé, d18)
 
 # --- lignes connues, a ignorer ---
 !!  /home/mariella/profil — questions sans reponse (toute ligne, quel que soit le qN) : questions PRODUIT du projet profil — NE JAMAIS les poser dans le fil plantrack (d11)
