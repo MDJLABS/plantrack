@@ -354,3 +354,6 @@
 {"ts": "2026-10-03T04:31:19+00:00", "kind": "commit", "sha": "2b19d32", "ctype": "chore", "thread": "t3"}
 {"ts": "2026-10-03T08:48:14+00:00", "kind": "decision", "id": "d18", "text": "Mariella (tel, 03/10 10h45, via AskUserQuestion) : Myview (nouveau projet du 03/10) sans garde-fou -> 'Poser le garde-fou (Recommande)'. Installe avec ./plantrack init --git-hook DANS Myview, doctor vert sur ce point.", "par": "agent"}
 {"ts": "2026-10-03T08:48:14+00:00", "kind": "piege", "id": "pg14", "text": "Lancer /home/mariella/plantrack/plantrack depuis un autre depot agit sur le depot PlanTrack, pas sur le cwd : init --git-hook repond 'deja en place' et doctor est vert alors que rien n'est pose. Toujours utiliser le ./plantrack vendorise du depot cible."}
+{"ts": "2026-10-03T08:48:19+00:00", "kind": "commit", "sha": "11b3d17", "ctype": "chore", "thread": "t3"}
+{"ts": "2026-10-03T08:48:19+00:00", "kind": "file_touched", "text": ".planning/ronde-reference.txt", "thread": "t3"}
+{"ts": "2026-10-03T08:48:51+00:00", "kind": "decision", "id": "d19", "text": "Mariella (tel, 03/10 10h50) : apres garde-fou Myview, choix 'Rester en veille (Recommande)' — ronde toutes les 4 h, ne la deranger que sur vraie panne.", "par": "agent"}
