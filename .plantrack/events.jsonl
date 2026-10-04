@@ -374,3 +374,6 @@
 {"ts": "2026-10-04T15:44:19+00:00", "kind": "commit", "sha": "4c3b55b", "ctype": "chore", "thread": "t3"}
 {"ts": "2026-10-04T15:44:19+00:00", "kind": "file_touched", "text": ".planning/session-state.md", "thread": "t3"}
 {"ts": "2026-10-04T15:45:01+00:00", "kind": "decision", "id": "d21", "text": "Mariella (tel, 04/10 apres-midi) : apres garde-fou essai-d180, choix 'Rester en veille (Recommande)' — ronde toutes les 4 h, ne la deranger que sur vraie panne PlanTrack.", "par": "agent"}
+{"ts": "2026-10-04T15:45:02+00:00", "kind": "commit", "sha": "a03e6fb", "ctype": "chore", "thread": "t3"}
+{"ts": "2026-10-04T18:49:49+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-humming-lerdorf.md", "thread": "t3"}
+{"ts": "2026-10-04T18:50:11+00:00", "kind": "decision", "id": "d22", "text": "Mariella (tel, 04/10 18h07, via AskUserQuestion) : relance auto sans travail, choix 'Rester en veille (Recommande)' — prochaine ronde vers 19h40, ne la deranger que sur panne PlanTrack (d12).", "par": "agent"}
