@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [77 commits]
-  fichiers recemment ecrits : .gitignore, ../Clients/s69-francoviet/.gitignore, .planning/session-state.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-fizzy-zephyr.md, .planning/ronde-reference.txt, ../../../root/.claude/plans/contexte-reconstruit-par-le-parsed-ladybug.md
+FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [78 commits]
+  fichiers recemment ecrits : .planning/session-state.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-fizzy-zephyr.md, .planning/ronde-reference.txt, ../../../root/.claude/plans/contexte-reconstruit-par-le-parsed-ladybug.md, .planning/demander.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-polished-pearl.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
