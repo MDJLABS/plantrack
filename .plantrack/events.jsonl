@@ -371,3 +371,6 @@
 {"ts": "2026-10-04T15:42:31+00:00", "kind": "file_touched", "text": ".planning/session-state.md", "thread": "t3"}
 {"ts": "2026-10-04T15:42:31+00:00", "kind": "file_touched", "text": ".planning/ronde-reference.txt", "thread": "t3"}
 {"ts": "2026-10-04T15:44:19+00:00", "kind": "decision", "id": "d20", "text": "Mariella (tel, 04/10 15h40, via AskUserQuestion) : essai-d180 (jeu Robo Defense, nouveau depot du 03/10) sans garde-fou -> 'Poser le garde-fou (Recommande)'. Installe avec le ./plantrack vendorise du depot (pg14), doctor vert. 4 defauts restants = verdicts/questions produit des autres projets (d11).", "par": "agent"}
+{"ts": "2026-10-04T15:44:19+00:00", "kind": "commit", "sha": "4c3b55b", "ctype": "chore", "thread": "t3"}
+{"ts": "2026-10-04T15:44:19+00:00", "kind": "file_touched", "text": ".planning/session-state.md", "thread": "t3"}
+{"ts": "2026-10-04T15:45:01+00:00", "kind": "decision", "id": "d21", "text": "Mariella (tel, 04/10 apres-midi) : apres garde-fou essai-d180, choix 'Rester en veille (Recommande)' — ronde toutes les 4 h, ne la deranger que sur vraie panne PlanTrack.", "par": "agent"}

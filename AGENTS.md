@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [79 commits]
-  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-fizzy-zephyr.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-parsed-ladybug.md, .planning/demander.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-polished-pearl.md, .planning/session-state.md, .planning/ronde-reference.txt
+FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [80 commits]
+  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-fizzy-zephyr.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-parsed-ladybug.md, .planning/demander.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-polished-pearl.md, .planning/ronde-reference.txt, .planning/session-state.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -41,6 +41,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d18 : Mariella (tel, 03/10 10h45, via AskUserQuestion) : Myview (nouveau projet du 03/10) sans garde-fou -> 'Poser le garde-fou (Recommande)'. In… (agent)
   d19 : Mariella (tel, 03/10 10h50) : apres garde-fou Myview, choix 'Rester en veille (Recommande)' — ronde toutes les 4 h, ne la deranger que sur … (agent)
   d20 : Mariella (tel, 04/10 15h40, via AskUserQuestion) : essai-d180 (jeu Robo Defense, nouveau depot du 03/10) sans garde-fou -> 'Poser le garde-… (agent)
+  d21 : Mariella (tel, 04/10 apres-midi) : apres garde-fou essai-d180, choix 'Rester en veille (Recommande)' — ronde toutes les 4 h, ne la deranger… (agent)
 
 Pieges connus :
   pg1 : L'ecart 'commits arrives au carnet' du doctor remonte jusqu'a l'installation (U…
