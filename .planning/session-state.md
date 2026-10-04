@@ -444,3 +444,4 @@ fil t2 actif. À faire par Mariella : tag v1.9.0 + publication PyPI.
 
 ## Ronde 04/10 15h40
 - doctor --all : 10 depots, 5 en defaut ; tout connu (d11) sauf essai-d180 (jeu Robo Defense, nouveau depot du 03/10) sans garde-fou pre-commit -> question posee a Mariella.
+- essai-d180 : garde-fou pose (choix Mariella), doctor vert.
