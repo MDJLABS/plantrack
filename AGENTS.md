@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [87 commits]
-  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-resilient-tome.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-bright-perlis.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-misty-noodle.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-spicy-origami.md, .planning/demander.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-moonlit-hammock.md
+FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [88 commits]
+  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-bright-perlis.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-misty-noodle.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-spicy-origami.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-moonlit-hammock.md, .planning/demander.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-vectorized-haven.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
