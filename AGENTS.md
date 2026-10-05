@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [88 commits]
-  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-bright-perlis.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-misty-noodle.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-spicy-origami.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-moonlit-hammock.md, .planning/demander.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-vectorized-haven.md
+FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [89 commits]
+  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-moonlit-hammock.md, .planning/demander.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-vectorized-haven.md, .planning/demander-suite.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-crispy-hickey.md, ../../../root/.claude/projects/-home-mariella-plantrack/memory/veille-silencieuse.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -43,6 +43,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d20 : Mariella (tel, 04/10 15h40, via AskUserQuestion) : essai-d180 (jeu Robo Defense, nouveau depot du 03/10) sans garde-fou -> 'Poser le garde-… (agent)
   d21 : Mariella (tel, 04/10 apres-midi) : apres garde-fou essai-d180, choix 'Rester en veille (Recommande)' — ronde toutes les 4 h, ne la deranger… (agent)
   d22 : Mariella (tel, 04/10 18h07, via AskUserQuestion) : relance auto sans travail, choix 'Rester en veille (Recommande)' — prochaine ronde vers … (agent)
+  d23 : Mariella (tel, 05/10, via AskUserQuestion) : veille SILENCIEUSE — 'Silence sauf panne (Recommande)'. Plus jamais de carte 'on fait quoi ens… (agent)
 
 Pieges connus :
   pg1 : L'ecart 'commits arrives au carnet' du doctor remonte jusqu'a l'installation (U…
