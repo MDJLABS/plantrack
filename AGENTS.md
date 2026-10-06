@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [90 commits]
+FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [91 commits]
   fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-crispy-hickey.md, ../../../root/.claude/projects/-home-mariella-plantrack/memory/veille-silencieuse.md, ../../../root/.claude/projects/-home-mariella-plantrack/memory/MEMORY.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-wild-whistle.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-mutable-wilkinson.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-lively-castle.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
