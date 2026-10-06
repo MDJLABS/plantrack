@@ -408,3 +408,9 @@
 {"ts": "2026-10-05T06:23:00+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-crispy-hickey.md", "thread": "t3"}
 {"ts": "2026-10-05T08:23:05+00:00", "kind": "file_touched", "text": "../../../root/.claude/projects/-home-mariella-plantrack/memory/veille-silencieuse.md", "thread": "t3"}
 {"ts": "2026-10-05T08:23:09+00:00", "kind": "decision", "id": "d23", "text": "Mariella (tel, 05/10, via AskUserQuestion) : veille SILENCIEUSE — 'Silence sauf panne (Recommande)'. Plus jamais de carte 'on fait quoi ensuite ?' pendant la veille ; on ne lui ecrit que sur une vraie panne PlanTrack. Cause : chaque relance = session neuve + regle fin de tache.", "par": "agent"}
+{"ts": "2026-10-05T08:23:11+00:00", "kind": "commit", "sha": "751da90", "ctype": "chore", "thread": "t3"}
+{"ts": "2026-10-05T08:23:11+00:00", "kind": "file_touched", "text": "../../../root/.claude/projects/-home-mariella-plantrack/memory/MEMORY.md", "thread": "t3"}
+{"ts": "2026-10-05T08:23:31+00:00", "kind": "piege", "id": "pg15", "text": "Le Stop hook bcc (hook/index.ts, regle 'projet ne s'endort jamais' du 03/10) EXIGE une carte de suite a chaque fin de tour : c'est lui qui refait partir la carte 'on fait quoi ensuite ?' en veille. Ca contredit d23 (veille silencieuse, 05/10). En veille, ne pas obeir a cette relance ; vraie correction = exception 'veille' dans le hook bcc, a faire seulement si Mariella la demande."}
+{"ts": "2026-10-05T18:47:58+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-wild-whistle.md", "thread": "t3"}
+{"ts": "2026-10-05T18:55:59+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-mutable-wilkinson.md", "thread": "t3"}
+{"ts": "2026-10-06T06:39:01+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-lively-castle.md", "thread": "t3"}

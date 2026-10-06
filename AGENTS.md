@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [89 commits]
-  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-moonlit-hammock.md, .planning/demander.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-vectorized-haven.md, .planning/demander-suite.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-crispy-hickey.md, ../../../root/.claude/projects/-home-mariella-plantrack/memory/veille-silencieuse.md
+FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [90 commits]
+  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-crispy-hickey.md, ../../../root/.claude/projects/-home-mariella-plantrack/memory/veille-silencieuse.md, ../../../root/.claude/projects/-home-mariella-plantrack/memory/MEMORY.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-wild-whistle.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-mutable-wilkinson.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-lively-castle.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -60,5 +60,6 @@ Pieges connus :
   pg12 : Le defaut doctor 'commits rattaches a un fil' est RETROACTIF comme pg1 : sur pr…
   pg13 : Gabarit de parcours : la phase de construction est a 'questions: false', mais u…
   pg14 : Lancer /home/mariella/plantrack/plantrack depuis un autre depot agit sur le dep…
+  pg15 : Le Stop hook bcc (hook/index.ts, regle 'projet ne s'endort jamais' du 03/10) EX…
 ```
 <!-- plantrack:state-end -->
