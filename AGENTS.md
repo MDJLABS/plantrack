@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [92 commits]
-  fichiers recemment ecrits : ../../../root/.claude/projects/-home-mariella-plantrack/memory/veille-silencieuse.md, ../../../root/.claude/projects/-home-mariella-plantrack/memory/MEMORY.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-wild-whistle.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-mutable-wilkinson.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-lively-castle.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-binary-rocket.md
+FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [93 commits]
+  fichiers recemment ecrits : ../../../root/.claude/projects/-home-mariella-plantrack/memory/MEMORY.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-wild-whistle.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-mutable-wilkinson.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-lively-castle.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-binary-rocket.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-witty-giraffe.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
