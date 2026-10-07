@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [96 commits]
-  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-binary-rocket.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-witty-giraffe.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-immutable-goose.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-recursive-bumblebee.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-lovely-pretzel.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-nested-fern.md
+FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [97 commits]
+  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-witty-giraffe.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-immutable-goose.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-recursive-bumblebee.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-lovely-pretzel.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-nested-fern.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-atomic-petal.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
