@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [98 commits]
-  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-recursive-star.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-mossy-taco.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-snappy-squirrel.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-bubbly-eagle.md, sortie/carte-suite.log, sortie/carte-brainstorm.log
+FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [100 commits]
+  fichiers recemment ecrits : sortie/carte-suite.log, sortie/carte-brainstorm.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-graceful-mitten.md, ronde.sh, ../../../etc/systemd/system/plantrack-ronde.service, ../../../etc/systemd/system/plantrack-ronde.timer
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -45,6 +45,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d22 : Mariella (tel, 04/10 18h07, via AskUserQuestion) : relance auto sans travail, choix 'Rester en veille (Recommande)' — prochaine ronde vers … (agent)
   d23 : Mariella (tel, 05/10, via AskUserQuestion) : veille SILENCIEUSE — 'Silence sauf panne (Recommande)'. Plus jamais de carte 'on fait quoi ens… (agent)
   d24 : Mariella (tel, 09/10 soir, via carte Suite) : refus de la ronde sans rien faire, puis choix 'Brainstorming de la suite (Recommande)' — on c… (agent)
+  d25 : Ronde automatique LIVREE (choix Mariella 09/10, carte brainstorm) : minuteur systeme plantrack-ronde.timer toutes les 4 h lance ronde.sh (d… (agent)
 
 Pieges connus :
   pg1 : L'ecart 'commits arrives au carnet' du doctor remonte jusqu'a l'installation (U…

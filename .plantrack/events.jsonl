@@ -443,3 +443,10 @@
 {"ts": "2026-10-09T17:58:27+00:00", "kind": "file_touched", "text": "sortie/carte-suite.log", "thread": "t3"}
 {"ts": "2026-10-09T17:58:37+00:00", "kind": "decision", "id": "d24", "text": "Mariella (tel, 09/10 soir, via carte Suite) : refus de la ronde sans rien faire, puis choix 'Brainstorming de la suite (Recommande)' — on choisit ensemble le prochain chantier de PlanTrack. --de telephone : PlanTrack est stable, tout est au vert. On fait quoi ensuite ? → Brainstorming de la suite (Recommandé)", "par": "agent"}
 {"ts": "2026-10-09T17:59:05+00:00", "kind": "file_touched", "text": "sortie/carte-brainstorm.log", "thread": "t3"}
+{"ts": "2026-10-09T17:59:07+00:00", "kind": "commit", "sha": "1d24284", "ctype": "chore", "thread": "t3"}
+{"ts": "2026-10-09T18:12:38+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-graceful-mitten.md", "thread": "t3"}
+{"ts": "2026-10-09T18:46:52+00:00", "kind": "file_touched", "text": "ronde.sh", "thread": "t3"}
+{"ts": "2026-10-09T18:53:34+00:00", "kind": "file_touched", "text": "../../../etc/systemd/system/plantrack-ronde.service", "thread": "t3"}
+{"ts": "2026-10-09T18:53:34+00:00", "kind": "file_touched", "text": "../../../etc/systemd/system/plantrack-ronde.timer", "thread": "t3"}
+{"ts": "2026-10-09T18:53:39+00:00", "kind": "commit", "sha": "288bfdd", "ctype": "feat", "thread": "t3"}
+{"ts": "2026-10-09T18:53:39+00:00", "kind": "decision", "id": "d25", "text": "Ronde automatique LIVREE (choix Mariella 09/10, carte brainstorm) : minuteur systeme plantrack-ronde.timer toutes les 4 h lance ronde.sh (doctor --all, sans agent) ; e-mail Resend uniquement pour une panne hors .planning/ronde-reference.txt et pas deja signalee (etat /var/lib/plantrack-ronde). Joker '*' dans la reference : questions/verdicts produit ignores partout (d11). Les agents n'ont plus a faire la ronde a la main.", "par": "agent"}
