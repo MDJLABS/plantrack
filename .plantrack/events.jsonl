@@ -463,3 +463,9 @@
 {"ts": "2026-10-09T19:09:30+00:00", "kind": "question", "id": "q1", "text": "Propager le correctif b14 (worktree) vers bcc, prorent et cvslim des que leurs sessions sont fermees (pg7) — a faire par l'agent, pas une question pour Mariella"}
 {"ts": "2026-10-09T19:09:30+00:00", "kind": "commit", "sha": "de79432", "ctype": "chore", "thread": "t3"}
 {"ts": "2026-10-09T19:12:18+00:00", "kind": "bug_status", "id": "b14", "status": "validated", "canal": "tel 09/10 : carte Verdict -> Je valide (Recommande)"}
+{"ts": "2026-10-09T19:12:18+00:00", "kind": "commit", "sha": "acc6652", "ctype": "chore", "thread": "t3"}
+{"ts": "2026-10-09T19:13:00+00:00", "kind": "bug", "id": "b15", "text": "Garde-fou pre-commit opt-in alors que doctor le compte en panne : chaque nouveau depot (promovie, Myview, essai-d180, essai-opencode) sort en defaut et demande une intervention.", "thread": "t3", "severity": "normal", "par": "agent"}
+{"ts": "2026-10-09T19:13:37+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t3"}
+{"ts": "2026-10-09T19:14:16+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t3"}
+{"ts": "2026-10-09T19:14:23+00:00", "kind": "commit", "sha": "52b99cc", "ctype": "fix", "thread": "t3"}
+{"ts": "2026-10-09T19:14:24+00:00", "kind": "bug_status", "id": "b15", "status": "to_verify"}

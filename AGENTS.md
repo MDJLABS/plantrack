@@ -14,11 +14,14 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [105 commits]
-  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-graceful-mitten.md, ronde.sh, ../../../etc/systemd/system/plantrack-ronde.service, ../../../etc/systemd/system/plantrack-ronde.timer, ../../../root/.claude/projects/-home-mariella-plantrack/memory/veille-silencieuse.md, .plantrack/events.jsonl
+FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [107 commits]
+  fichiers recemment ecrits : ronde.sh, ../../../etc/systemd/system/plantrack-ronde.service, ../../../etc/systemd/system/plantrack-ronde.timer, ../../../root/.claude/projects/-home-mariella-plantrack/memory/veille-silencieuse.md, .plantrack/events.jsonl, tests/scenario.sh
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
+
+BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
+  b15 (to_verify) [t3] Garde-fou pre-commit opt-in alors que doctor le compte en panne : chaque nouveau depot (promovie, Myview, essai-d180, essai-opencode) sort … (agent)
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
