@@ -14,14 +14,14 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [102 commits]
-  fichiers recemment ecrits : sortie/carte-brainstorm.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-graceful-mitten.md, ronde.sh, ../../../etc/systemd/system/plantrack-ronde.service, ../../../etc/systemd/system/plantrack-ronde.timer, ../../../root/.claude/projects/-home-mariella-plantrack/memory/veille-silencieuse.md
+FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [104 commits]
+  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-graceful-mitten.md, ronde.sh, ../../../etc/systemd/system/plantrack-ronde.service, ../../../etc/systemd/system/plantrack-ronde.timer, ../../../root/.claude/projects/-home-mariella-plantrack/memory/veille-silencieuse.md, .plantrack/events.jsonl
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
 
-BUGS NON CORRIGES (personne ne s'en est occupe) :
-  b14 (open) [t3] Worktree git = carnet coupe en deux : les commits/decisions/pieges faits dans une copie de travail (git worktree) s'ecrivent dans le events… (agent)
+BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
+  b14 (to_verify) [t3] Worktree git = carnet coupe en deux : les commits/decisions/pieges faits dans une copie de travail (git worktree) s'ecrivent dans le events… (agent) [1 tentatives, derniere: Le carnet (.plantrack) se resout depuis ROOT = dossier de l…]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
@@ -49,6 +49,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d23 : Mariella (tel, 05/10, via AskUserQuestion) : veille SILENCIEUSE — 'Silence sauf panne (Recommande)'. Plus jamais de carte 'on fait quoi ens… (agent)
   d24 : Mariella (tel, 09/10 soir, via carte Suite) : refus de la ronde sans rien faire, puis choix 'Brainstorming de la suite (Recommande)' — on c… (agent)
   d25 : Ronde automatique LIVREE (choix Mariella 09/10, carte brainstorm) : minuteur systeme plantrack-ronde.timer toutes les 4 h lance ronde.sh (d… (agent)
+  d26 : Mariella (tel, 09/10, via AskUserQuestion) : bug worktree s69 -> 'Rapatrier + corriger (Recommande)' : recopier les 9 evenements de la copi… (agent)
 
 Pieges connus :
   pg1 : L'ecart 'commits arrives au carnet' du doctor remonte jusqu'a l'installation (U…
@@ -66,5 +67,8 @@ Pieges connus :
   pg13 : Gabarit de parcours : la phase de construction est a 'questions: false', mais u…
   pg14 : Lancer /home/mariella/plantrack/plantrack depuis un autre depot agit sur le dep…
   pg15 : Le Stop hook bcc (hook/index.ts, regle 'projet ne s'endort jamais' du 03/10) EX…
+
+Questions en attente (reponds via !answer qN ...) :
+  q1 : Propager le correctif b14 (worktree) vers bcc, prorent et cvslim des que leurs …
 ```
 <!-- plantrack:state-end -->
