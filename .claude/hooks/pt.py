@@ -124,20 +124,33 @@ def append(kind, **fields):
     return ev
 
 
+_LUS = [0, []]  # (octets deja analyses, evenements) — pg3 : un seul rejeu par processus
+
+
 def read_events():
+    """Le journal n'est analyse qu'une fois par processus : un appel suivant ne lit
+    que la queue ajoutee depuis (par ce processus ou un autre). Un fichier qui a
+    retreci (reecrit) est relu en entier."""
+    # ponytail: cache en memoire seulement — chaque hook relit le journal une fois ;
+    # un etat projete sur disque si un hook depasse ~0,3 s (vers 15-20 000 evenements)
     if not os.path.exists(LOG):
         return []
-    out = []
-    with open(LOG, encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                out.append(json.loads(line))
-            except json.JSONDecodeError:
-                continue  # une ligne corrompue ne doit jamais casser une session
-    return out
+    if os.path.getsize(LOG) < _LUS[0]:
+        _LUS[:] = [0, []]
+    with open(LOG, "rb") as f:
+        f.seek(_LUS[0])
+        neuf = f.read()
+    fin = neuf.rfind(b"\n") + 1  # une ligne en cours d'ecriture attend l'appel suivant
+    for line in neuf[:fin].decode("utf-8", "replace").splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            _LUS[1].append(json.loads(line))
+        except json.JSONDecodeError:
+            continue  # une ligne corrompue ne doit jamais casser une session
+    _LUS[0] += fin
+    return list(_LUS[1])
 
 
 # -------------------------------------------------------------------- projection
@@ -924,8 +937,8 @@ def hook_commit():
     # jamais de perdre le commit. Un commit sans fil est journalise quand meme et
     # le doctor le reclame — sortir en silence, c'est ce qui a coute 69 commits
     # sur bcc sans que rien ne le signale.
+    # l'instantane AGENTS.md est regenere en sortie par l'atexit d'append (b9)
     append("commit", sha=sha, ctype=m.group(1).lower() if m else "commit", thread=tid)
-    write_state_block(project())
     sys.exit(0)
 
 

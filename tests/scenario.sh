@@ -1110,5 +1110,24 @@ check "ronde : commit du rattrapage" "par la ronde" "$(git -C "$D" log -1 --form
 check "ronde : travail en cours non embarque" "?? en-cours.txt" "$(git -C "$D" status --porcelain)"
 rm -rf "$R"
 
+# pg3 (10/10) : le journal n'est analyse qu'une fois par processus, la queue ajoutee
+# ensuite (meme processus ou un autre) est bien vue
+out=$(python3 - "$PT" <<'EOF'
+import json, sys, importlib.util as u
+s = u.spec_from_file_location("pt", sys.argv[1]); m = u.module_from_spec(s); sys.argv = ["x"]; s.loader.exec_module(m)
+n = [0]; vrai = json.loads
+def compte(x): n[0] += 1; return vrai(x)
+m.json.loads = compte
+lignes = len(m.read_events()) and sum(1 for l in open(m.LOG) if l.strip())
+n[0] = 0; m._LUS[:] = [0, []]
+m.project(); m.next_id("t"); m.project()
+print("analyses", n[0] == lignes)
+with open(m.LOG, "a") as f: f.write(json.dumps({"ts": m.now(), "kind": "note", "id": "n999", "text": "queue"}) + "\n")
+print("queue", any(e.get("id") == "n999" for e in m.read_events()), n[0] == lignes + 1)
+EOF
+)
+check "carnet : une seule analyse du journal par processus" "analyses True" "$out"
+check "carnet : la queue ajoutee est relue seule" "queue True True" "$out"
+
 echo
 [ "$fail" = 0 ] && echo "TOUS LES TESTS PASSENT" || { echo "DES TESTS ECHOUENT"; exit 1; }
