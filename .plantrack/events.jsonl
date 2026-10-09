@@ -496,3 +496,5 @@
 {"ts": "2026-10-09T23:51:40+00:00", "kind": "decision", "id": "d29", "text": "Carnet accelere LIVRE (choix Mariella 10/10, carte 'Accelerer le carnet (Recommande)') : read_events analyse le journal une seule fois par processus puis ne lit que la queue ajoutee ; hook_commit ne regenere plus AGENTS.md en double (l'atexit d'append le fait). Mesure a 19 000 evenements : 372 -> 194 ms pour 3 rejeux. Plafond restant (pg3) : un rejeu complet par processus ; etat projete sur disque si un hook depasse ~0,3 s. Publie v1.9.1.", "par": "agent"}
 {"ts": "2026-10-09T23:51:40+00:00", "kind": "precommit_block"}
 {"ts": "2026-10-09T23:51:45+00:00", "kind": "close", "id": "t3"}
+{"ts": "2026-10-09T23:51:46+00:00", "kind": "commit", "sha": "b35d607", "ctype": "chore", "thread": "t4"}
+{"ts": "2026-10-09T23:52:56+00:00", "kind": "close", "id": "t4"}

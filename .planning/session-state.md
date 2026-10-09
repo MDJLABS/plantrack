@@ -451,3 +451,6 @@ fil t2 actif. À faire par Mariella : tag v1.9.0 + publication PyPI.
 
 ## Ronde 04/10 21h22 — verte
 - doctor --all : 5 depots en !!, tout connu ; seule nouveaute bcc b85 (verdict produit, classe d11). Aucune panne PlanTrack. Veille maintenue (d22). Prochaine ronde vers 01h20.
+
+## v1.9.1 — 2026-10-10 : carnet accéléré (pg3)
+read_events analyse le journal une fois par processus puis lit la queue ; post-commit sans double régénération. 372 -> 194 ms à 19 000 év. Publié GitHub + PyPI. Fils t3 et t4 fermés.
