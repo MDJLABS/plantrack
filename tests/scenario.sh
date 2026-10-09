@@ -1079,5 +1079,15 @@ check "b12 : le 1er des 10 bugs reste dans la fiche" "special1" "$out"
 check "b12 : le 10e aussi" "special10" "$out"
 rm -rf "$TMP31"
 
+# Ronde automatique (09/10) : seule une panne hors reference et pas deja signalee part
+R=$(mktemp -d)
+printf '!!  /x/a — 1 probleme(s)\n      !!  questions sans reponse (2) — q1\n!!  /x/b — 1 probleme(s)\n      !!  garde-fou git pre-commit — lance init\n' > "$R/doc"
+printf '!!  * — questions sans reponse : produit (d11)\n' > "$R/ref"
+r() { RONDE_DOCTOR="cat $R/doc" RONDE_REF="$R/ref" RONDE_ETAT="$R/etat" RONDE_ENVOI=echo bash "$(dirname "$0")/../ronde.sh"; }
+out=$(r); check "ronde : panne nouvelle signalee" "/x/b — garde-fou git pre-commit" "$out"
+check_not "ronde : panne de la reference muette" "questions sans reponse" "$out"
+out=$(r); check_not "ronde : une seule alerte par panne" "garde-fou" "$out"
+rm -rf "$R"
+
 echo
 [ "$fail" = 0 ] && echo "TOUS LES TESTS PASSENT" || { echo "DES TESTS ECHOUENT"; exit 1; }

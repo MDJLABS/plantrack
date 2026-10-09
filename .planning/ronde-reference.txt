@@ -9,6 +9,11 @@
 # Mise à jour : 2026-10-04 21h22 (bcc : verdict produit b85 classé, d11)
 
 # --- lignes connues, a ignorer ---
+# Format lu par ronde.sh : "!!  <depot> — <nom du controle> ..." ; depot "*" = partout.
+!!  * — questions sans reponse : questions PRODUIT, elles vivent dans le fil de leur projet (d11)
+
+!!  * — bugs en attente de verdict humain : verdicts PRODUIT, fil de leur projet (d11)
+
 !!  /home/mariella/profil — questions sans reponse (toute ligne, quel que soit le qN) : questions PRODUIT du projet profil — NE JAMAIS les poser dans le fil plantrack (d11)
 
 !!  /home/mariella/profil — commits rattaches a un fil (4 sans fil : 1fbb440, 853e112, 3e2009b, 699158f) : historique, plafond atteint AVANT la correction du 24/09 (t8 fermé, place libre) — disparaîtra quand ces commits sortiront de la fenêtre de 30 jours
