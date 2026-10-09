@@ -57,7 +57,22 @@ RULES = """- Un RÉSUMÉ de l'état t'est injecté en début de session et aprè
 
 ROOT = (os.environ.get("CLAUDE_PROJECT_DIR") or os.environ.get("PLANTRACK_ROOT")
         or os.getcwd())
-PT_DIR = os.path.join(ROOT, ".plantrack")
+
+
+def journal_root(root):
+    """b14 : une copie `git worktree` ecrit dans le carnet du depot principal, sinon il se coupe en deux."""
+    try:
+        gitdir = open(os.path.join(root, ".git"), encoding="utf-8").read().split("gitdir:", 1)[1].strip()
+    except (OSError, IndexError):
+        return root  # depot ordinaire (.git est un dossier) ou pas de git
+    gitdir = os.path.join(root, gitdir)
+    if not os.path.exists(os.path.join(gitdir, "commondir")):
+        return root  # sous-module, pas une copie de travail
+    main = os.path.dirname(os.path.dirname(os.path.dirname(os.path.normpath(gitdir))))
+    return main if os.path.isdir(os.path.join(main, ".plantrack")) else root
+
+
+PT_DIR = os.path.join(journal_root(ROOT), ".plantrack")
 LOG = os.path.join(PT_DIR, "events.jsonl")
 ARCHIVE = os.path.join(PT_DIR, "transcripts")
 # registre des depots installes : personne n'ira lancer doctor dans vingt repos

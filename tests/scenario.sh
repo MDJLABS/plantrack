@@ -1079,6 +1079,13 @@ check "b12 : le 1er des 10 bugs reste dans la fiche" "special1" "$out"
 check "b12 : le 10e aussi" "special10" "$out"
 rm -rf "$TMP31"
 
+# b14 : un commit fait dans une copie git worktree arrive dans le carnet du depot principal
+W=$(mktemp -d); git -C "$W" init -q m && cd "$W/m" && git commit -q --allow-empty -m init
+mkdir .plantrack && : > .plantrack/events.jsonl && git worktree add -q "$W/copie" 2>/dev/null; cd - >/dev/null
+CLAUDE_PROJECT_DIR="$W/copie" python3 "$PT" decide "prise dans la copie" >/dev/null 2>&1
+check "b14 : decision d'une copie dans le carnet principal" "prise dans la copie" "$(cat "$W/m/.plantrack/events.jsonl")"
+rm -rf "$W"
+
 # Ronde automatique (09/10) : seule une panne hors reference et pas deja signalee part
 R=$(mktemp -d)
 printf '!!  /x/a — 1 probleme(s)\n      !!  questions sans reponse (2) — q1\n!!  /x/b — 1 probleme(s)\n      !!  garde-fou git pre-commit — lance init\n' > "$R/doc"
