@@ -461,3 +461,5 @@
 {"ts": "2026-10-09T19:08:58+00:00", "kind": "commit", "sha": "375c011", "ctype": "fix", "thread": "t3"}
 {"ts": "2026-10-09T19:08:58+00:00", "kind": "bug_status", "id": "b14", "status": "to_verify"}
 {"ts": "2026-10-09T19:09:30+00:00", "kind": "question", "id": "q1", "text": "Propager le correctif b14 (worktree) vers bcc, prorent et cvslim des que leurs sessions sont fermees (pg7) — a faire par l'agent, pas une question pour Mariella"}
+{"ts": "2026-10-09T19:09:30+00:00", "kind": "commit", "sha": "de79432", "ctype": "chore", "thread": "t3"}
+{"ts": "2026-10-09T19:12:18+00:00", "kind": "bug_status", "id": "b14", "status": "validated", "canal": "tel 09/10 : carte Verdict -> Je valide (Recommande)"}
