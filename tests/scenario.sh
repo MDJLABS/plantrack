@@ -1090,10 +1090,24 @@ rm -rf "$W"
 R=$(mktemp -d)
 printf '!!  /x/a — 1 probleme(s)\n      !!  questions sans reponse (2) — q1\n!!  /x/b — 1 probleme(s)\n      !!  garde-fou git pre-commit — lance init\n' > "$R/doc"
 printf '!!  * — questions sans reponse : produit (d11)\n' > "$R/ref"
-r() { RONDE_DOCTOR="cat $R/doc" RONDE_REF="$R/ref" RONDE_ETAT="$R/etat" RONDE_ENVOI=echo bash "$(dirname "$0")/../ronde.sh"; }
+r() { RONDE_REPOS=${RONDE_REPOS:-/dev/null} RONDE_DOCTOR=${RONDE_DOCTOR:-"cat $R/doc"} RONDE_REF="$R/ref" RONDE_ETAT="$R/etat" RONDE_ENVOI=echo bash "$(dirname "$0")/../ronde.sh"; }
 out=$(r); check "ronde : panne nouvelle signalee" "/x/b — garde-fou git pre-commit" "$out"
 check_not "ronde : panne de la reference muette" "questions sans reponse" "$out"
 out=$(r); check_not "ronde : une seule alerte par panne" "garde-fou" "$out"
+
+# Rattrapage du coeur par la ronde (10/10) : depot en retard mis a jour et commite seul,
+# sans embarquer le travail en cours ; depot ou un processus travaille : pas touche
+D="$R/depot"; git init -q "$D" && CLAUDE_PROJECT_DIR="$D" python3 "$PT" init >/dev/null 2>&1
+git -C "$D" add -A && git -C "$D" commit -qm init
+echo "# ancienne version" >> "$D/.claude/hooks/pt.py" && git -C "$D" commit -qam vieux
+echo travail > "$D/en-cours.txt"; echo "$D" > "$R/repos"
+(cd "$D" && exec sleep 30) & occ=$!; sleep 0.3
+RONDE_REPOS="$R/repos" RONDE_DOCTOR=true r >/dev/null; kill $occ
+check_not "ronde : depot occupe pas touche" "OK" "$(cmp -s "$D/.claude/hooks/pt.py" "$PT" && echo OK)"
+RONDE_REPOS="$R/repos" RONDE_DOCTOR=true r >/dev/null
+check "ronde : coeur rattrape" "OK" "$(cmp -s "$D/.claude/hooks/pt.py" "$PT" && echo OK)"
+check "ronde : commit du rattrapage" "par la ronde" "$(git -C "$D" log -1 --format=%s)"
+check "ronde : travail en cours non embarque" "?? en-cours.txt" "$(git -C "$D" status --porcelain)"
 rm -rf "$R"
 
 echo
