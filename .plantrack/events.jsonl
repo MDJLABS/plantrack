@@ -484,3 +484,15 @@
 {"ts": "2026-10-09T23:12:52+00:00", "kind": "file_touched", "text": "ronde.sh", "thread": "t3"}
 {"ts": "2026-10-09T23:13:06+00:00", "kind": "commit", "sha": "75cd316", "ctype": "feat", "thread": "t3"}
 {"ts": "2026-10-09T23:13:06+00:00", "kind": "decision", "id": "d28", "text": "Rattrapage auto LIVRE (choix Mariella 10/10, carte brainstorm 'Rattrapage auto (Recommande)') : ronde.sh passe 'update' sur chaque depot de ~/.plantrack-repos en retard SI aucun processus n'y a son cwd (pg7) et si pt.py n'y est pas deja modifie ; commit ne prenant QUE les fichiers touches par l'update ; silence en cas de succes. Teste (scenario.sh) ; 1re ronde reelle : bcc, prorent, cvslim, prostule sautes (session ouverte).", "par": "agent"}
+{"ts": "2026-10-09T23:13:06+00:00", "kind": "commit", "sha": "807e3f5", "ctype": "chore", "thread": "t3"}
+{"ts": "2026-10-09T23:13:28+00:00", "kind": "file_touched", "text": "../bcc/sortie/carte-suite.log", "thread": "t3"}
+{"ts": "2026-10-09T23:38:38+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-indexed-scott.md", "thread": "t3"}
+{"ts": "2026-10-09T23:49:41+00:00", "kind": "park", "id": "t3", "text": "rattrapage auto livre (d28) ; reprise : surveillance"}
+{"ts": "2026-10-09T23:49:41+00:00", "kind": "thread_open", "id": "t4", "text": "accelerer le carnet (pg3)"}
+{"ts": "2026-10-09T23:49:48+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t4"}
+{"ts": "2026-10-09T23:49:49+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t4"}
+{"ts": "2026-10-09T23:50:02+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t4"}
+{"ts": "2026-10-09T23:51:28+00:00", "kind": "commit", "sha": "783f577", "ctype": "perf", "thread": "t4"}
+{"ts": "2026-10-09T23:51:40+00:00", "kind": "decision", "id": "d29", "text": "Carnet accelere LIVRE (choix Mariella 10/10, carte 'Accelerer le carnet (Recommande)') : read_events analyse le journal une seule fois par processus puis ne lit que la queue ajoutee ; hook_commit ne regenere plus AGENTS.md en double (l'atexit d'append le fait). Mesure a 19 000 evenements : 372 -> 194 ms pour 3 rejeux. Plafond restant (pg3) : un rejeu complet par processus ; etat projete sur disque si un hook depasse ~0,3 s. Publie v1.9.1.", "par": "agent"}
+{"ts": "2026-10-09T23:51:40+00:00", "kind": "precommit_block"}
+{"ts": "2026-10-09T23:51:45+00:00", "kind": "close", "id": "t3"}
