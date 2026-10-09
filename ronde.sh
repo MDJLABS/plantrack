@@ -26,10 +26,10 @@ actives=$(printf '%s\n' "$pannes" | awk -v k="$connues" 'BEGIN{ n=split(k,a,"\n"
 nouvelles=$(comm -23 <(printf '%s\n' "$actives" | sed '/^$/d') <(sort -u "$ETAT"))
 
 courriel() {
-  set -a; . /root/.config/mdj/resend.env; set +a
+  . /root/.config/mdj/resend.env   # sans export : la cle ne passe pas dans l'environnement des enfants
   jq -n --arg t "$1" '{from:"PlanTrack <alerte@mdjlabs.com>", to:["slimanemedjahdi@gmail.com"],
     subject:"PlanTrack : panne detectee par la ronde", text:$t}' |
-  curl -sS -X POST https://api.resend.com/emails -H "Authorization: Bearer $RESEND_API_KEY" \
+  curl -sS -X POST https://api.resend.com/emails -H @<(printf 'Authorization: Bearer %s\n' "$RESEND_API_KEY") \
     -H "Content-Type: application/json" -d @- | grep -q '"id"'
 }
 [ -z "$nouvelles" ] || $ENVOI "La ronde PlanTrack a trouve une panne nouvelle :
