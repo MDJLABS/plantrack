@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [107 commits]
+FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [108 commits]
   fichiers recemment ecrits : ronde.sh, ../../../etc/systemd/system/plantrack-ronde.service, ../../../etc/systemd/system/plantrack-ronde.timer, ../../../root/.claude/projects/-home-mariella-plantrack/memory/veille-silencieuse.md, .plantrack/events.jsonl, tests/scenario.sh
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -50,6 +50,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d24 : Mariella (tel, 09/10 soir, via carte Suite) : refus de la ronde sans rien faire, puis choix 'Brainstorming de la suite (Recommande)' — on c… (agent)
   d25 : Ronde automatique LIVREE (choix Mariella 09/10, carte brainstorm) : minuteur systeme plantrack-ronde.timer toutes les 4 h lance ronde.sh (d… (agent)
   d26 : Mariella (tel, 09/10, via AskUserQuestion) : bug worktree s69 -> 'Rapatrier + corriger (Recommande)' : recopier les 9 evenements de la copi… (agent)
+  d27 : Publication v1.9.0 (demande Mariella 09/10, tel : 'mettre a jour GitHub et l'autre plateforme') : main pousse sur GitHub, tag v1.9.0, PyPI … (agent)
 
 Pieges connus :
   pg1 : L'ecart 'commits arrives au carnet' du doctor remonte jusqu'a l'installation (U…
