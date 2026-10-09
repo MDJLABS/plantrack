@@ -23,7 +23,6 @@ Depuis la racine du projet cible :
 
 ```bash
 uvx plantrack init               # ou : pipx run plantrack init
-./plantrack init --git-hook      # optionnel : le garde-fou git pre-commit
 ```
 
 Redémarre ton agent, c'est tout. Vérifie avec `/hooks` (Claude Code) ou :
@@ -188,7 +187,9 @@ complet dans `AGENTS.md` (la source unique) plus une ligne d'import
 `@AGENTS.md` entre marqueurs dans `CLAUDE.md` et `GEMINI.md`, une skill
 Deep Code qui renvoie vers `AGENTS.md`, et installe d'office un hook git
 `post-commit` qui journalise chaque commit sur le fil actif (pur logging,
-jamais bloquant — sans rapport avec le `pre-commit` garde-fou, resté opt-in).
+jamais bloquant), ainsi que le `pre-commit` garde-fou ci-dessous.
+Une copie `git worktree` écrit dans le carnet du dépôt principal : le journal ne
+se coupe jamais en deux.
 
 ## Quels agents sont couverts ?
 
@@ -219,8 +220,8 @@ regénère son propre `CLAUDE.md` et peut écraser la ligne d'import —
 - **Trois fils ouverts maximum.** Au-delà, le bloc réinjecté deviendrait trop
   gros pour survivre à une compaction.
 - **Rien ne se supprime.** Journal append-only : l'état est reconstruit par rejeu.
-- **Un commit ne touche pas un fil en pause.** `plantrack init --git-hook`
-  installe un `pre-commit` qui bloque tout commit d'un fichier appartenant à un
+- **Un commit ne touche pas un fil en pause.** `plantrack init`
+  installe d'office un `pre-commit` qui bloque tout commit d'un fichier appartenant à un
   fil parqué — le seul garde-fou qui ne dépende d'aucun modèle. Contournement
   assumé : `git commit --no-verify`.
 

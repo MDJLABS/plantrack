@@ -557,12 +557,12 @@ n=$(grep -c "plantrack:start" "$TMP14/AGENTS.md")
 check_exit "un seul jeu de marqueurs apres mise a niveau" 1 "$n"
 rm -rf "$TMP14"
 
-# 30. v1.6.0 — post-commit journalisant installe d'office (pre-commit reste opt-in)
+# 30. v1.6.0 — post-commit journalisant installe d'office (pre-commit aussi depuis b15)
 TMP15=$(mktemp -d)
 git -C "$TMP15" init -q
 out=$(CLAUDE_PROJECT_DIR="$TMP15" python3 "$PT" init 2>&1)
 check "init installe le post-commit d'office (sans --git-hook)" "hook post-commit installe" "$out"
-check_not "et n'installe PAS le pre-commit garde-fou (reste opt-in)" "pre-commit installe" "$out"
+check "init pose le garde-fou pre-commit d office (b15)" "hook pre-commit installe" "$out"
 out=$(CLAUDE_PROJECT_DIR="$TMP15" python3 "$PT" init 2>&1)
 check "second init : post-commit deja en place (idempotent)" "hook post-commit deja en place" "$out"
 

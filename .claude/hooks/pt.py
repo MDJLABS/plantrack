@@ -790,7 +790,7 @@ CLI humaine : plantrack status | bugs | inbox | verify <id> | reject <id> -m ...
               plantrack piege <texte> | question <texte>   utilisables par l'agent
               plantrack answer <question_id> <texte>   toi seule, hors session
               plantrack testcheck on|off | guide <titre>|<id> | step <id> <texte> | check <id> ok|ko [-m motif]
-              plantrack init [--git-hook]   installation vendoree (tous agents, + hook post-commit d'office)
+              plantrack init   installation vendoree (tous agents, + hooks git post-commit et pre-commit d'office)
               uvx plantrack@latest update   mise a jour d'une installation existante
               plantrack doctor [--all]   verifie l'installation et l'usage reel | plantrack stats   usage sur 14 jours"""
 
@@ -1112,7 +1112,7 @@ def install_git_hook():
 
 
 def install_post_commit_hook():
-    """Post-commit journalisant, installe d'office (pre-commit reste opt-in)."""
+    """Post-commit journalisant, installe d'office (comme le pre-commit)."""
     if not git_hooks_dir():
         return
     chain_hook(os.path.join(git_hooks_dir(), "post-commit"),
@@ -1175,7 +1175,7 @@ def write_hooks_file(path, obj, label, hint=""):
 def cmd_init(args):
     """§13 : installation vendoree dans le projet courant (CLAUDE_PROJECT_DIR ou cwd).
     Copie pt.py, ecrit/fusionne les hooks + wrapper, insere le bloc d'instructions.
-    `--git-hook` ajoute le garde-fou git a l'installation complete."""
+    Pose d'office les hooks git post-commit et pre-commit (`--git-hook` garde pour compatibilite)."""
     known = {"--git-hook", "--agent"}
     if any(a.startswith("--") and a not in known for a in args):
         sys.exit("usage : plantrack init [--git-hook]")
@@ -1245,8 +1245,7 @@ def cmd_init(args):
         with open(INJECTIONS, "w", encoding="utf-8") as f:
             json.dump({"_depuis": now()}, f, indent=1, sort_keys=True)
     install_post_commit_hook()
-    if "--git-hook" in args:
-        install_git_hook()
+    install_git_hook()  # d'office : doctor le compte en panne, chaque nouveau depot sortait en defaut
     print("[PlanTrack] installation terminee. Redemarre l'agent puis verifie avec /hooks."
           if complete else
           "[PlanTrack] installation INCOMPLETE — fusionne le bloc ci-dessus a la main, "
