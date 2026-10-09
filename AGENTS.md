@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [108 commits]
-  fichiers recemment ecrits : ronde.sh, ../../../etc/systemd/system/plantrack-ronde.service, ../../../etc/systemd/system/plantrack-ronde.timer, ../../../root/.claude/projects/-home-mariella-plantrack/memory/veille-silencieuse.md, .plantrack/events.jsonl, tests/scenario.sh
+FIL ACTIF — t3 : parcours : phases porteuses de regles (note bcc du 13/09) [109 commits]
+  fichiers recemment ecrits : ../../../root/.claude/projects/-home-mariella-plantrack/memory/veille-silencieuse.md, .plantrack/events.jsonl, tests/scenario.sh, ../../../root/.claude/projects/-home-mariella-plantrack/memory/pannes-corriger-en-general-et-publier.md, ../bcc/sortie/carte-suite.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-misty-island.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
