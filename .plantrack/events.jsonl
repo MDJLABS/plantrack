@@ -546,3 +546,9 @@
 {"ts": "2026-10-10T07:52:10+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t8"}
 {"ts": "2026-10-10T07:52:17+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t8"}
 {"ts": "2026-10-10T07:52:19+00:00", "kind": "file_touched", "text": "README.md", "thread": "t8"}
+{"ts": "2026-10-10T07:53:48+00:00", "kind": "commit", "sha": "b1da177", "ctype": "feat", "thread": "t8"}
+{"ts": "2026-10-10T07:53:59+00:00", "kind": "precommit_block"}
+{"ts": "2026-10-10T07:54:42+00:00", "kind": "commit", "sha": "be8aa2d", "ctype": "chore", "thread": "t8"}
+{"ts": "2026-10-10T07:54:45+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t8"}
+{"ts": "2026-10-10T07:54:48+00:00", "kind": "file_touched", "text": "sortie/publication-v1.9.4.log", "thread": "t8"}
+{"ts": "2026-10-10T07:55:36+00:00", "kind": "decision", "id": "d33", "text": "v1.9.4 publiee (10/10, choix Mariella tel 'Publier v1.9.4 (Recommande)') : guide de test facon prolearn (step --attendu, check --de, guide affiche attendu/motif). GitHub tag v1.9.4 + PyPI verifie ; propagation aux depots par la ronde (d28).", "par": "agent"}
