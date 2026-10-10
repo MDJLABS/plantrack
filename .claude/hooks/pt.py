@@ -52,7 +52,7 @@ RULES = """- Un RÉSUMÉ de l'état t'est injecté en début de session et aprè
 - Avant de corriger un bug : lis `./plantrack attempts <id>`, puis dépose ton hypothèse `./plantrack attempt <id> "..."` avant de coder ; une hypothèse refusée a déjà été tentée, change d'approche.
 - Une question posée à l'humain restée sans réponse : `./plantrack question "..."` — elle ressortira à chaque session jusqu'à la réponse.
 - Ouvre un fil AVANT de coder : `!focus <sujet>` (`!park <note>` pour changer de sujet, `!close` quand c'est fini). Chaque commit est journalisé sur le fil actif ; à défaut de fil, PlanTrack en ouvre un d'office au nom de la branche — nomme-le toi-même, c'est plus utile.
-- Si `!testcheck on` est actif, structure les recettes de test en guide/étapes (`./plantrack guide`, `./plantrack step`) ; tu ne poses JAMAIS le verdict toi-même, il est réservé à l'humain (`./plantrack check`).
+- Si `!testcheck on` est actif, structure les recettes de test en guide/étapes (`./plantrack guide`, `./plantrack step <g> "<un geste>" --attendu "<ce qu'on doit voir>"`) ; tu ne poses JAMAIS le verdict toi-même, il est réservé à l'humain (`./plantrack check`). Verdict donné par un canal relayé (téléphone) → `./plantrack check <s> ok|ko --de "<canal> : <sa réponse>"`.
 """
 
 ROOT = (os.environ.get("CLAUDE_PROJECT_DIR") or os.environ.get("PLANTRACK_ROOT")
@@ -253,12 +253,13 @@ def project():
             st["guides"][ev["id"]] = {"id": ev["id"], "title": ev.get("text", ""), "steps": [], "ts": ev["ts"]}
         elif k == "step":
             st["steps"][ev["id"]] = {"id": ev["id"], "guide": ev.get("guide"), "text": ev.get("text", ""),
-                                     "verdict": None, "motif": None, "ts": ev["ts"]}
+                                     "attendu": ev.get("attendu"), "verdict": None, "motif": None,
+                                     "canal": None, "ts": ev["ts"]}
             if (g := st["guides"].get(ev.get("guide"))):
                 g["steps"].append(ev["id"])
         elif k == "check":
             if (s := st["steps"].get(ev["id"])):
-                s["verdict"], s["motif"] = ev.get("verdict"), ev.get("text")
+                s["verdict"], s["motif"], s["canal"] = ev.get("verdict"), ev.get("text"), ev.get("canal")
         elif k == "parcours_defini":
             st["parcours"][ev.get("text", "")] = {
                 "id": ev["id"], "nom": ev.get("text", ""), "ts": ev["ts"],
@@ -628,14 +629,16 @@ def cmd_guide(text, st):
 def cmd_step(rest, st):
     if not st.get("testcheck"):
         return "[PlanTrack] option testcheck desactivee — active avec !testcheck on"
+    # Point facon guide de test prolearn (d32) : un geste, puis ce qu'on doit voir.
+    rest, _, attendu = rest.partition(" --attendu ")
     parts = rest.split(None, 1)
     if len(parts) < 2 or parts[0] not in st["guides"]:
-        return "usage : !step <guide_id> <texte>"
+        return "usage : !step <guide_id> <geste> [--attendu <ce qu'on doit voir>]"
     sid = next_id("s")
-    append("step", id=sid, guide=parts[0], text=parts[1])
+    append("step", id=sid, guide=parts[0], text=parts[1], attendu=attendu.strip() or None)
     return f"[PlanTrack] etape {sid} ajoutee a {parts[0]} : {trunc(parts[1], 80)}"
 
-def cmd_check(sid, verdict, motif, st):
+def cmd_check(sid, verdict, motif, st, canal=None):
     """Verdict humain, partage entre !check (hook) et `plantrack check` (CLI)."""
     if not st.get("testcheck"):
         return "[PlanTrack] option testcheck desactivee — active avec !testcheck on"
@@ -643,8 +646,9 @@ def cmd_check(sid, verdict, motif, st):
         return "usage : check <step_id> ok|ko [motif]"
     if verdict == "ko" and not motif:
         return "refuse : motif obligatoire pour un ko."
-    append("check", id=sid, verdict=verdict, text=motif)
-    return f"[PlanTrack] {sid} : {verdict}" + (f" — {trunc(motif, 80)}" if motif else "")
+    append("check", id=sid, verdict=verdict, text=motif, canal=canal)
+    return (f"[PlanTrack] {sid} : {verdict}" + (f" — {trunc(motif, 80)}" if motif else "")
+            + (f" (canal : {trunc(canal, 60)})" if canal else ""))
 
 
 def cmd_focus(arg, st):
@@ -2188,16 +2192,21 @@ def cli(argv):
                 s = st["steps"][sid]
                 mark = "✓" if s["verdict"] == "ok" else "✗" if s["verdict"] == "ko" else "·"
                 print(f"  {mark} {s['id']}  {trunc(s['text'], 80)}")
+                if s.get("attendu"):
+                    print(f"        attendu : {trunc(s['attendu'], 80)}")
+                if s.get("motif"):
+                    print(f"        motif : {trunc(s['motif'], 80)}")
         else:
             print(cmd_guide(" ".join(args), st))
     elif cmd == "step":
         print(cmd_step(" ".join(args), st))
     elif cmd == "check":
-        require_human("check")
+        de, args = arg_de(args)
+        require_human("check", de)
         if len(args) < 2:
-            sys.exit("usage : plantrack check <step_id> ok|ko [-m motif]")
+            sys.exit("usage : plantrack check <step_id> ok|ko [-m motif] [--de \"<canal> : <reponse>\"]")
         motif = arg_motif(args, 2) if len(args) > 2 else None
-        print(cmd_check(args[0], args[1], motif, st))
+        print(cmd_check(args[0], args[1], motif, st, canal=de))
     elif cmd == "attempt":
         cmd_attempt(args, st)
     elif cmd == "attempts":

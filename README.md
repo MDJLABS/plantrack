@@ -159,7 +159,11 @@ Côté agent, dans son propre shell (v1.5) :
 l'agent structure les étapes (`./plantrack guide`, `./plantrack step`), mais ne
 pose jamais le verdict lui-même — c'est le même principe que pour un bug,
 réservé à l'humain (`./plantrack check s1 ok` ou `ko -m "motif"`, motif
-obligatoire pour un échec). Tant qu'une étape n'a pas de verdict, elle
+obligatoire pour un échec). Chaque étape s'écrit comme un point de guide de
+test : un geste, puis ce qu'on doit voir (`./plantrack step g1 "ouvrir le menu"
+--attendu "trois onglets visibles"`). Si l'humain répond depuis son téléphone,
+l'agent relaie son verdict avec la réponse citée (`./plantrack check s1 ok --de
+"telephone : …"`). Tant qu'une étape n'a pas de verdict, elle
 ressort dans le bloc réinjecté à chaque session — impossible d'oublier une
 recette à moitié testée. Option coupée par défaut : `!testcheck off` ne
 supprime rien, elle cache juste le bloc.

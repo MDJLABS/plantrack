@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t8 : travaux sur main [2 commits]
-  fichiers recemment ecrits : sortie/carte-b16.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-harmonic-turtle.md, sortie/carte-b15.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-delegated-stardust.md
+FIL ACTIF — t8 : travaux sur main [3 commits]
+  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-harmonic-turtle.md, sortie/carte-b15.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-delegated-stardust.md, .claude/hooks/pt.py, tests/scenario.sh, README.md
   (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -54,6 +54,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d29 : Carnet accelere LIVRE (choix Mariella 10/10, carte 'Accelerer le carnet (Recommande)') : read_events analyse le journal une seule fois par … (agent)
   d30 : Mariella (tel, 10/10, via AskUserQuestion) : apres carnet accelere (v1.9.1), choix 'Rester en veille (Recommande)' — veille silencieuse (d2… (agent)
   d31 : v1.9.3 publiee (10/10) : correctif b16 — la ronde rattrape un pt.py modifie non commite s'il est identique a une version publiee (tag), lai… (agent)
+  d32 : Mariella (tel, 10/10, carte brainstorm BMAD guide de test prolearn) : 'Telephone d'abord (Recommande)' — PlanTrack ecrit les points de test… (agent)
 
 Pieges connus :
   pg1 : L'ecart 'commits arrives au carnet' du doctor remonte jusqu'a l'installation (U…

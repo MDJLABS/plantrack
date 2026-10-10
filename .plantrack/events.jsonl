@@ -535,3 +535,14 @@
 {"ts": "2026-10-10T07:36:43+00:00", "kind": "file_touched", "text": "sortie/carte-b15.log", "thread": "t8"}
 {"ts": "2026-10-10T07:43:11+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-delegated-stardust.md", "thread": "t8"}
 {"ts": "2026-10-10T07:44:13+00:00", "kind": "bug_status", "id": "b15", "status": "validated", "canal": "telephone : Dernier correctif en attente de ton avis : chaque nouveau projet reçoit maintenant d office le garde-fou (avant il fallait le poser à la main, projet par projet). Tu valides ? → Valider (Recommandé)"}
+{"ts": "2026-10-10T07:44:13+00:00", "kind": "commit", "sha": "fab0781", "ctype": "chore", "thread": "t8"}
+{"ts": "2026-10-10T07:51:33+00:00", "kind": "decision", "id": "d32", "text": "Mariella (tel, 10/10, carte brainstorm BMAD guide de test prolearn) : 'Telephone d'abord (Recommande)' — PlanTrack ecrit les points de test comme prolearn (action + resultat attendu) et Mariella repond ok/ko depuis son telephone (check --de). Le guide visuel integre aux sites (overlay prolearn) n'est PAS dans ce lot.", "par": "agent"}
+{"ts": "2026-10-10T07:51:59+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t8"}
+{"ts": "2026-10-10T07:52:00+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t8"}
+{"ts": "2026-10-10T07:52:01+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t8"}
+{"ts": "2026-10-10T07:52:05+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t8"}
+{"ts": "2026-10-10T07:52:07+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t8"}
+{"ts": "2026-10-10T07:52:08+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t8"}
+{"ts": "2026-10-10T07:52:10+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t8"}
+{"ts": "2026-10-10T07:52:17+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t8"}
+{"ts": "2026-10-10T07:52:19+00:00", "kind": "file_touched", "text": "README.md", "thread": "t8"}

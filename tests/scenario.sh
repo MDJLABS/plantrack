@@ -702,6 +702,13 @@ out=$(env -u CLAUDECODE -u CLAUDE_CODE_ENTRYPOINT CLAUDE_PROJECT_DIR="$TMP17" py
 check "check ko sans motif refuse" "motif obligatoire" "$out"
 out=$(env -u CLAUDECODE -u CLAUDE_CODE_ENTRYPOINT CLAUDE_PROJECT_DIR="$TMP17" python3 "$PT" check s1 ko -m "bouton introuvable" 2>&1)
 check "check ko avec motif passe (humain)" "s1 : ko" "$out"
+# d32 : point facon prolearn (geste + attendu), verdict relaye par telephone
+CLAUDE_PROJECT_DIR="$TMP17" python3 "$PT" step g1 "ouvrir le menu" --attendu "trois onglets visibles" >/dev/null 2>&1
+out=$(CLAUDE_PROJECT_DIR="$TMP17" python3 "$PT" check s3 ok --de "telephone : ouvrir le menu → ok" 2>&1)
+check "check --de passe en env agent (verdict relaye)" "s3 : ok (canal : telephone" "$out"
+out=$(CLAUDE_PROJECT_DIR="$TMP17" python3 "$PT" guide g1 2>&1)
+check "le guide affiche le resultat attendu" "attendu : trois onglets visibles" "$out"
+check "le guide affiche le motif d'un ko" "motif : bouton introuvable" "$out"
 
 out=$(printf '{"prompt":"!check s2 ok"}' | CLAUDE_PROJECT_DIR="$TMP17" python3 "$PT" hook-prompt 2>&1); rc=$?
 check_exit "!check rejette le prompt (exit 2)" 2 "$rc"
