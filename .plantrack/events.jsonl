@@ -508,3 +508,21 @@
 {"ts": "2026-10-10T00:11:57+00:00", "kind": "commit", "sha": "c1c41ea", "ctype": "fix", "thread": "t6"}
 {"ts": "2026-10-10T00:12:08+00:00", "kind": "close", "id": "t6"}
 {"ts": "2026-10-10T05:48:27+00:00", "kind": "thread_open", "id": "t7", "text": "publication v1.9.2 (correctif securite)"}
+{"ts": "2026-10-10T05:48:27+00:00", "kind": "commit", "sha": "8cbd016", "ctype": "chore", "thread": "t7"}
+{"ts": "2026-10-10T05:48:30+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t7"}
+{"ts": "2026-10-10T05:52:13+00:00", "kind": "bug", "id": "b16", "text": "Rattrapage auto bloque pour toujours : ronde.sh saute un depot des que pt.py y est modifie non commite, meme quand cette modif est une ancienne mise a jour PlanTrack jamais commitee (v1.9.0 en suspens dans miamboost, s69-francoviet, profil ; s69-soirees rattrape a la main le 10/10)", "thread": "t7", "severity": "normal", "par": "agent"}
+{"ts": "2026-10-10T05:52:19+00:00", "kind": "attempt", "id": "a23", "bug": "b16", "hypothesis": "ronde.sh : un pt.py modifie non commite qui est identique a une version publiee (tag) du coeur est une vieille mise a jour PlanTrack, pas du travail : on le rattrape et on le commite ; une modif a la main reste intouchee", "actor": "claude-code"}
+{"ts": "2026-10-10T05:52:22+00:00", "kind": "file_touched", "text": "ronde.sh", "thread": "t7"}
+{"ts": "2026-10-10T05:52:24+00:00", "kind": "file_touched", "text": "ronde.sh", "thread": "t7"}
+{"ts": "2026-10-10T05:52:29+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t7"}
+{"ts": "2026-10-10T06:34:30+00:00", "kind": "file_touched", "text": "ronde.sh", "thread": "t7"}
+{"ts": "2026-10-10T06:50:03+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-majestic-abelson.md", "thread": "t7"}
+{"ts": "2026-10-10T07:05:03+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-wild-robin.md", "thread": "t7"}
+{"ts": "2026-10-10T07:29:41+00:00", "kind": "file_touched", "text": "sortie/scenario-b16.log", "thread": "t7"}
+{"ts": "2026-10-10T07:30:35+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-shiny-neumann.md", "thread": "t7"}
+{"ts": "2026-10-10T07:32:54+00:00", "kind": "commit", "sha": "b52dd85", "ctype": "fix", "thread": "t7"}
+{"ts": "2026-10-10T07:32:57+00:00", "kind": "bug_status", "id": "b16", "status": "to_verify"}
+{"ts": "2026-10-10T07:33:00+00:00", "kind": "commit", "sha": "6f9077d", "ctype": "chore", "thread": "t7"}
+{"ts": "2026-10-10T07:33:03+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t7"}
+{"ts": "2026-10-10T07:34:13+00:00", "kind": "decision", "id": "d31", "text": "v1.9.3 publiee (10/10) : correctif b16 — la ronde rattrape un pt.py modifie non commite s'il est identique a une version publiee (tag), laisse intacte une retouche manuelle. Tests verts, PyPI sert 1.9.3. b16 en to_verify.", "par": "agent"}
+{"ts": "2026-10-10T07:34:13+00:00", "kind": "close", "id": "t7"}

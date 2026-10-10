@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t7 : publication v1.9.2 (correctif securite)
+FIL ACTIF : aucun. Ouvre un fil avec `!focus <sujet>` avant de coder — sans fil, aucun de tes commits n'est rattache.
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -22,6 +22,7 @@ FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
 
 BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b15 (to_verify) [t3] Garde-fou pre-commit opt-in alors que doctor le compte en panne : chaque nouveau depot (promovie, Myview, essai-d180, essai-opencode) sort … (agent)
+  b16 (to_verify) [t7] Rattrapage auto bloque pour toujours : ronde.sh saute un depot des que pt.py y est modifie non commite, meme quand cette modif est une anci… (agent) [1 tentatives, derniere: ronde.sh : un pt.py modifie non commite qui est identique a…]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
@@ -54,6 +55,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d28 : Rattrapage auto LIVRE (choix Mariella 10/10, carte brainstorm 'Rattrapage auto (Recommande)') : ronde.sh passe 'update' sur chaque depot de… (agent)
   d29 : Carnet accelere LIVRE (choix Mariella 10/10, carte 'Accelerer le carnet (Recommande)') : read_events analyse le journal une seule fois par … (agent)
   d30 : Mariella (tel, 10/10, via AskUserQuestion) : apres carnet accelere (v1.9.1), choix 'Rester en veille (Recommande)' — veille silencieuse (d2… (agent)
+  d31 : v1.9.3 publiee (10/10) : correctif b16 — la ronde rattrape un pt.py modifie non commite s'il est identique a une version publiee (tag), lai… (agent)
 
 Pieges connus :
   pg1 : L'ecart 'commits arrives au carnet' du doctor remonte jusqu'a l'installation (U…
