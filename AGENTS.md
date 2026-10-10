@@ -14,7 +14,9 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF : aucun. Ouvre un fil avec `!focus <sujet>` avant de coder — sans fil, aucun de tes commits n'est rattache.
+FIL ACTIF — t8 : travaux sur main [1 commits]
+  fichiers recemment ecrits : sortie/carte-b16.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-harmonic-turtle.md
+  (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -22,7 +24,6 @@ FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
 
 BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b15 (to_verify) [t3] Garde-fou pre-commit opt-in alors que doctor le compte en panne : chaque nouveau depot (promovie, Myview, essai-d180, essai-opencode) sort … (agent)
-  b16 (to_verify) [t7] Rattrapage auto bloque pour toujours : ronde.sh saute un depot des que pt.py y est modifie non commite, meme quand cette modif est une anci… (agent) [1 tentatives, derniere: ronde.sh : un pt.py modifie non commite qui est identique a…]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
