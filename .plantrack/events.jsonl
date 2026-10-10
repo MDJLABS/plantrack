@@ -573,3 +573,5 @@
 {"ts": "2026-10-10T18:44:18+00:00", "kind": "commit", "sha": "b3949c7", "ctype": "fix", "thread": "t9"}
 {"ts": "2026-10-10T18:44:18+00:00", "kind": "commit", "sha": "ea924d9", "ctype": "chore", "thread": "t9"}
 {"ts": "2026-10-10T18:46:03+00:00", "kind": "decision", "id": "d35", "text": "v1.9.5 publiee (10/10, GitHub + PyPI verifie) : moteur du guide de test dans .claude/hooks/plantrack_guide, recopie par init/update dans tout site qui a deja lib/guide/types.ts (racine ou src/), scenarios.ts jamais touche ; police en repli --font-sans puis --sans. La ronde propage (pt.py change). 382 tests verts, tsc propre sur copie francoviet.", "par": "agent"}
+{"ts": "2026-10-10T18:46:03+00:00", "kind": "commit", "sha": "1633cf3", "ctype": "chore", "thread": "t9"}
+{"ts": "2026-10-10T20:16:50+00:00", "kind": "decision", "id": "d36", "text": "Mariella (tel, 10/10 soir, via AskUserQuestion) : apres v1.9.5 (guide dans PlanTrack), choix 'Laisser la ronde faire (Recommande)' — propagation par la ronde, veille silencieuse (d23).", "par": "agent"}

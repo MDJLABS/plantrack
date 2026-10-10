@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t9 : guide de test dans PlanTrack [3 commits]
+FIL ACTIF — t9 : guide de test dans PlanTrack [4 commits]
   fichiers recemment ecrits : backup/code/.claude/hooks/pt.py, backup/code/pyproject.toml, sortie/build.log, tests/scenario.sh, .claude/hooks/pt.py, sortie/tests-guide.log
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -57,6 +57,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d33 : v1.9.4 publiee (10/10, choix Mariella tel 'Publier v1.9.4 (Recommande)') : guide de test facon prolearn (step --attendu, check --de, guide … (agent)
   d34 : Le moteur du guide de test (Next.js) vit dans PlanTrack, propage par update ; scenarios propres a chaque site (choix Mariella tel 10/10 : '… (agent)
   d35 : v1.9.5 publiee (10/10, GitHub + PyPI verifie) : moteur du guide de test dans .claude/hooks/plantrack_guide, recopie par init/update dans to… (agent)
+  d36 : Mariella (tel, 10/10 soir, via AskUserQuestion) : apres v1.9.5 (guide dans PlanTrack), choix 'Laisser la ronde faire (Recommande)' — propag… (agent)
 
 Pieges connus :
   pg1 : L'ecart 'commits arrives au carnet' du doctor remonte jusqu'a l'installation (U…
