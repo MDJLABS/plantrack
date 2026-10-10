@@ -52,7 +52,7 @@ RULES = """- Un RÉSUMÉ de l'état t'est injecté en début de session et aprè
 - Avant de corriger un bug : lis `./plantrack attempts <id>`, puis dépose ton hypothèse `./plantrack attempt <id> "..."` avant de coder ; une hypothèse refusée a déjà été tentée, change d'approche.
 - Une question posée à l'humain restée sans réponse : `./plantrack question "..."` — elle ressortira à chaque session jusqu'à la réponse.
 - Ouvre un fil AVANT de coder : `!focus <sujet>` (`!park <note>` pour changer de sujet, `!close` quand c'est fini). Chaque commit est journalisé sur le fil actif ; à défaut de fil, PlanTrack en ouvre un d'office au nom de la branche — nomme-le toi-même, c'est plus utile.
-- Si `!testcheck on` est actif, structure les recettes de test en guide/étapes (`./plantrack guide`, `./plantrack step <g> "<un geste>" --attendu "<ce qu'on doit voir>"`) ; tu ne poses JAMAIS le verdict toi-même, il est réservé à l'humain (`./plantrack check`). Verdict donné par un canal relayé (téléphone) → `./plantrack check <s> ok|ko --de "<canal> : <sa réponse>"`.
+- Si `!testcheck on` est actif, structure les recettes de test en guide/étapes (`./plantrack guide`, `./plantrack step <g> "<un geste>" --attendu "<ce qu'on doit voir>"`) ; tu ne poses JAMAIS le verdict toi-même, il est réservé à l'humain (`./plantrack check`). Verdict donné par un canal relayé (téléphone) → `./plantrack check <s> ok|ko --de "<canal> : <sa réponse>"` — idem pour chaque point d'un compte-rendu du guide de test qu'il colle dans le chat.
 """
 
 ROOT = (os.environ.get("CLAUDE_PROJECT_DIR") or os.environ.get("PLANTRACK_ROOT")
@@ -1256,6 +1256,7 @@ def cmd_init(args):
                     + "\n".join(missing) + "\n")
         print(f".gitignore : {len(missing)} entree(s) PlanTrack ajoutee(s).")
 
+    sync_guide()
     register_root()
     if not os.path.exists(INJECTIONS):
         os.makedirs(PT_DIR, exist_ok=True)
@@ -1267,6 +1268,30 @@ def cmd_init(args):
           if complete else
           "[PlanTrack] installation INCOMPLETE — fusionne le bloc ci-dessus a la main, "
           "puis verifie avec `plantrack doctor`.")
+
+
+def sync_guide():
+    """Le moteur du guide de test (Next.js) vit ici, en un seul exemplaire (d34) : un site
+    qui l'a deja (lib/guide/types.ts) recoit la derniere version. Ses scenarios.ts restent a lui.
+    Un depot sans guide n'est pas touche."""
+    src = os.path.join(os.path.dirname(os.path.abspath(__file__)), "plantrack_guide")
+    if not os.path.isdir(src):
+        return  # copie vendoree : le moteur ne voyage qu'avec le paquet ou le depot plantrack
+    for base in ("", "src"):
+        if not os.path.exists(os.path.join(ROOT, base, "lib", "guide", "types.ts")):
+            continue
+        changes = 0
+        for dirpath, _, files in os.walk(src):
+            for name in files:
+                s = os.path.join(dirpath, name)
+                d = os.path.join(ROOT, base, os.path.relpath(s, src))
+                if os.path.exists(d) and open(d, "rb").read() == open(s, "rb").read():
+                    continue
+                os.makedirs(os.path.dirname(d), exist_ok=True)
+                shutil.copy(s, d)
+                changes += 1
+        print(f"guide de test : {changes} fichier(s) du moteur mis a jour." if changes
+              else "guide de test deja a jour.")
 
 
 def cmd_update(args):

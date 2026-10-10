@@ -431,6 +431,18 @@ check "update idempotent" "pt.py deja a jour" "$out"
 out=$(CLAUDE_PROJECT_DIR="$TMP8" python3 "$TMP8/.claude/hooks/pt.py" update 2>&1); rc=$?
 check_exit "la copie installee ne se met pas a jour seule" 1 "$rc"
 check "et renvoie vers uvx" "uvx plantrack@latest update" "$out"
+check_not "update : un depot sans guide de test n en recoit pas" "guide de test" "$out$(ls "$TMP8")"
+# d34 : le moteur du guide de test suit PlanTrack ; les scenarios du site ne bougent pas
+mkdir -p "$TMP8/src/lib/guide"
+echo vieux > "$TMP8/src/lib/guide/types.ts"; echo miens > "$TMP8/src/lib/guide/scenarios.ts"
+out=$(CLAUDE_PROJECT_DIR="$TMP8" python3 "$PT" update 2>&1)
+check "update : le moteur du guide de test est mis a jour" "fichier(s) du moteur mis a jour" "$out"
+check "update : types.ts remplace par la version PlanTrack" "ok" \
+  "$(cmp -s "$TMP8/src/lib/guide/types.ts" "$(dirname "$PT")/plantrack_guide/lib/guide/types.ts" && echo ok)"
+check "update : scenarios.ts du site intact" "miens" "$(cat "$TMP8/src/lib/guide/scenarios.ts")"
+check "update : composant du guide pose" "ok" "$([ -f "$TMP8/src/components/guide/GuideDeTest.tsx" ] && echo ok)"
+out=$(CLAUDE_PROJECT_DIR="$TMP8" python3 "$PT" update 2>&1)
+check "update : guide idempotent" "guide de test deja a jour" "$out"
 rm -rf "$TMP8"
 
 # 24. garde-fou surcouches — un outil (GSD...) regenere CLAUDE.md sans la reference

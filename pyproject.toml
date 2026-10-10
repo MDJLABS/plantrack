@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "plantrack"
-version = "1.9.4"
+version = "1.9.5"
 description = "Contexte, plan et bugs persistants pour les longues sessions d'agent de code — journal JSONL append-only + hooks Claude Code"
 readme = "README.md"
 license = "MIT"
@@ -21,4 +21,9 @@ plantrack = "pt:main"
 
 [tool.setuptools]
 py-modules = ["pt"]
+packages = ["plantrack_guide"]
+include-package-data = false
 package-dir = {"" = ".claude/hooks"}
+
+[tool.setuptools.package-data]
+plantrack_guide = ["**/*.ts", "**/*.tsx"]
