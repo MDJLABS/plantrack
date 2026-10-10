@@ -14,12 +14,11 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t5 : travaux sur main [1 commits]
-  fichiers recemment ecrits : .planning/session-state.md
-  (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
+FIL ACTIF — t7 : publication v1.9.2 (correctif securite)
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
+  t5 : travaux sur main — reprise : retour au travail courant apres la faille
 
 BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b15 (to_verify) [t3] Garde-fou pre-commit opt-in alors que doctor le compte en panne : chaque nouveau depot (promovie, Myview, essai-d180, essai-opencode) sort … (agent)
