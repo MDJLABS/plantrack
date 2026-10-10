@@ -498,3 +498,7 @@
 {"ts": "2026-10-09T23:51:45+00:00", "kind": "close", "id": "t3"}
 {"ts": "2026-10-09T23:51:46+00:00", "kind": "commit", "sha": "b35d607", "ctype": "chore", "thread": "t4"}
 {"ts": "2026-10-09T23:52:56+00:00", "kind": "close", "id": "t4"}
+{"ts": "2026-10-09T23:52:56+00:00", "kind": "thread_open", "id": "t5", "text": "travaux sur main", "auto": 1}
+{"ts": "2026-10-09T23:52:56+00:00", "kind": "commit", "sha": "496d028", "ctype": "chore", "thread": "t5"}
+{"ts": "2026-10-09T23:52:58+00:00", "kind": "file_touched", "text": ".planning/session-state.md", "thread": "t5"}
+{"ts": "2026-10-10T00:09:18+00:00", "kind": "decision", "id": "d30", "text": "Mariella (tel, 10/10, via AskUserQuestion) : apres carnet accelere (v1.9.1), choix 'Rester en veille (Recommande)' — veille silencieuse (d23), ronde auto toutes les 4 h, ne la deranger que sur panne.", "par": "agent"}
