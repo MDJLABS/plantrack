@@ -1335,7 +1335,9 @@ def git_commit_date(sha):
     """Date ISO d'un commit, telle que git la lit. None si le sha est inconnu —
     un commit amende ou reset ne se retrouve plus (pg4), et le journal
     append-only garde quand meme sa ligne."""
-    if not sha:
+    # le journal arrive par git pull : un « sha » en forme d'option (--output=...)
+    # ferait ecrire git n'importe ou — seul un hexadecimal passe
+    if not sha or not re.fullmatch(r"[0-9a-fA-F]{4,64}", sha):
         return None
     try:
         r = subprocess.run(["git", "-C", ROOT, "show", "-s", "--format=%cI", sha],

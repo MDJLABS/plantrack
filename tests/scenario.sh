@@ -911,6 +911,13 @@ printf '{"ts":"%s","kind":"commit","id":"c2","sha":"0000000","thread":"t1"}\n' "
   >> "$TMP21/.plantrack/events.jsonl"
 out=$(CLAUDE_PROJECT_DIR="$TMP21" python3 "$PT" doctor 2>&1)
 check "un sha introuvable ne casse pas le controle d usage" "commits arrives au carnet" "$out"
+# un journal venu d'un pull est une entree non fiable : un « sha » en forme
+# d'option (--output=...) ferait ecrire git n'importe ou
+printf '{"ts":"2000-01-01T00:00:00+00:00","kind":"commit","id":"c0","sha":"--output=%s","thread":"t1"}\n' \
+  "$TMP21/pirate" >> "$TMP21/.plantrack/events.jsonl"
+CLAUDE_PROJECT_DIR="$TMP21" python3 "$PT" doctor >/dev/null 2>&1
+check "un sha en forme d option n est jamais passe a git" absent \
+  "$([ -e "$TMP21/pirate" ] && echo ecrit || echo absent)"
 rm -rf "$TMP21"
 
 # 22. b5 — worktree git : `.git` est un FICHIER 'gitdir: <chemin>', pas un
