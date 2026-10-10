@@ -1285,6 +1285,11 @@ def sync_guide():
             for name in files:
                 s = os.path.join(dirpath, name)
                 d = os.path.join(ROOT, base, os.path.relpath(s, src))
+                # jamais d'ecriture a travers un lien symbolique qui sortirait du depot
+                if os.path.islink(d) or not os.path.realpath(d).startswith(
+                        os.path.realpath(ROOT) + os.sep):
+                    print(f"guide de test : {os.path.relpath(d, ROOT)} ignore (lien hors du depot).")
+                    continue
                 if os.path.exists(d) and open(d, "rb").read() == open(s, "rb").read():
                     continue
                 os.makedirs(os.path.dirname(d), exist_ok=True)
