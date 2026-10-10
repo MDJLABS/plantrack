@@ -552,3 +552,24 @@
 {"ts": "2026-10-10T07:54:45+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t8"}
 {"ts": "2026-10-10T07:54:48+00:00", "kind": "file_touched", "text": "sortie/publication-v1.9.4.log", "thread": "t8"}
 {"ts": "2026-10-10T07:55:36+00:00", "kind": "decision", "id": "d33", "text": "v1.9.4 publiee (10/10, choix Mariella tel 'Publier v1.9.4 (Recommande)') : guide de test facon prolearn (step --attendu, check --de, guide affiche attendu/motif). GitHub tag v1.9.4 + PyPI verifie ; propagation aux depots par la ronde (d28).", "par": "agent"}
+{"ts": "2026-10-10T07:55:36+00:00", "kind": "commit", "sha": "555a1ec", "ctype": "chore", "thread": "t8"}
+{"ts": "2026-10-10T08:32:34+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-snug-firefly.md", "thread": "t8"}
+{"ts": "2026-10-10T08:33:15+00:00", "kind": "file_touched", "text": "sortie/endurance.log", "thread": "t8"}
+{"ts": "2026-10-10T12:15:40+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-greedy-iverson.md", "thread": "t8"}
+{"ts": "2026-10-10T13:02:46+00:00", "kind": "decision", "id": "d34", "text": "Le moteur du guide de test (Next.js) vit dans PlanTrack, propage par update ; scenarios propres a chaque site (choix Mariella tel 10/10 : 'Je valide, vas-y (Recommande)')", "par": "agent"}
+{"ts": "2026-10-10T13:02:49+00:00", "kind": "close", "id": "t8"}
+{"ts": "2026-10-10T13:02:55+00:00", "kind": "thread_open", "id": "t9", "text": "guide de test dans PlanTrack"}
+{"ts": "2026-10-10T13:03:39+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t9"}
+{"ts": "2026-10-10T13:03:43+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t9"}
+{"ts": "2026-10-10T13:03:47+00:00", "kind": "file_touched", "text": "backup/code/.claude/hooks/pt.py", "thread": "t9"}
+{"ts": "2026-10-10T13:03:47+00:00", "kind": "file_touched", "text": "backup/code/pyproject.toml", "thread": "t9"}
+{"ts": "2026-10-10T13:08:13+00:00", "kind": "file_touched", "text": "sortie/build.log", "thread": "t9"}
+{"ts": "2026-10-10T13:08:13+00:00", "kind": "file_touched", "text": "sortie/build.log", "thread": "t9"}
+{"ts": "2026-10-10T13:08:24+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t9"}
+{"ts": "2026-10-10T13:08:26+00:00", "kind": "file_touched", "text": "sortie/tests-guide.log", "thread": "t9"}
+{"ts": "2026-10-10T17:48:49+00:00", "kind": "commit", "sha": "0239fa6", "ctype": "feat", "thread": "t9"}
+{"ts": "2026-10-10T17:49:53+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t9"}
+{"ts": "2026-10-10T18:44:13+00:00", "kind": "file_touched", "text": "sortie/tests-guide.log", "thread": "t9"}
+{"ts": "2026-10-10T18:44:18+00:00", "kind": "commit", "sha": "b3949c7", "ctype": "fix", "thread": "t9"}
+{"ts": "2026-10-10T18:44:18+00:00", "kind": "commit", "sha": "ea924d9", "ctype": "chore", "thread": "t9"}
+{"ts": "2026-10-10T18:46:03+00:00", "kind": "decision", "id": "d35", "text": "v1.9.5 publiee (10/10, GitHub + PyPI verifie) : moteur du guide de test dans .claude/hooks/plantrack_guide, recopie par init/update dans tout site qui a deja lib/guide/types.ts (racine ou src/), scenarios.ts jamais touche ; police en repli --font-sans puis --sans. La ronde propage (pt.py change). 382 tests verts, tsc propre sur copie francoviet.", "par": "agent"}

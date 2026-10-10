@@ -14,9 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t8 : travaux sur main [5 commits]
-  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-delegated-stardust.md, .claude/hooks/pt.py, tests/scenario.sh, README.md, pyproject.toml, sortie/publication-v1.9.4.log
-  (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
+FIL ACTIF — t9 : guide de test dans PlanTrack [3 commits]
+  fichiers recemment ecrits : backup/code/.claude/hooks/pt.py, backup/code/pyproject.toml, sortie/build.log, tests/scenario.sh, .claude/hooks/pt.py, sortie/tests-guide.log
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -56,6 +55,8 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d31 : v1.9.3 publiee (10/10) : correctif b16 — la ronde rattrape un pt.py modifie non commite s'il est identique a une version publiee (tag), lai… (agent)
   d32 : Mariella (tel, 10/10, carte brainstorm BMAD guide de test prolearn) : 'Telephone d'abord (Recommande)' — PlanTrack ecrit les points de test… (agent)
   d33 : v1.9.4 publiee (10/10, choix Mariella tel 'Publier v1.9.4 (Recommande)') : guide de test facon prolearn (step --attendu, check --de, guide … (agent)
+  d34 : Le moteur du guide de test (Next.js) vit dans PlanTrack, propage par update ; scenarios propres a chaque site (choix Mariella tel 10/10 : '… (agent)
+  d35 : v1.9.5 publiee (10/10, GitHub + PyPI verifie) : moteur du guide de test dans .claude/hooks/plantrack_guide, recopie par init/update dans to… (agent)
 
 Pieges connus :
   pg1 : L'ecart 'commits arrives au carnet' du doctor remonte jusqu'a l'installation (U…
