@@ -1115,6 +1115,15 @@ RONDE_REPOS="$R/repos" RONDE_DOCTOR=true r >/dev/null
 check "ronde : coeur rattrape" "OK" "$(cmp -s "$D/.claude/hooks/pt.py" "$PT" && echo OK)"
 check "ronde : commit du rattrapage" "par la ronde" "$(git -C "$D" log -1 --format=%s)"
 check "ronde : travail en cours non embarque" "?? en-cours.txt" "$(git -C "$D" status --porcelain)"
+# b16 : vieille mise a jour jamais commitee (copie = une version publiee) -> rattrapee ;
+# pt.py retouche a la main -> pas touche
+git -C "$(dirname "$0")/.." show "$(git -C "$(dirname "$0")/.." tag | head -1):.claude/hooks/pt.py" > "$D/.claude/hooks/pt.py"
+RONDE_REPOS="$R/repos" RONDE_DOCTOR=true r >/dev/null
+check "ronde : vieille mise a jour en suspens rattrapee" "OK" "$(cmp -s "$D/.claude/hooks/pt.py" "$PT" && echo OK)"
+check_not "ronde : vieille mise a jour commitee" "pt.py" "$(git -C "$D" status --porcelain)"
+echo "# retouche" >> "$D/.claude/hooks/pt.py"; cp "$D/.claude/hooks/pt.py" "$R/main"
+RONDE_REPOS="$R/repos" RONDE_DOCTOR=true r >/dev/null
+check "ronde : pt.py retouche a la main pas touche" "OK" "$(cmp -s "$D/.claude/hooks/pt.py" "$R/main" && echo OK)"
 rm -rf "$R"
 
 # pg3 (10/10) : le journal n'est analyse qu'une fois par processus, la queue ajoutee

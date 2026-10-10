@@ -16,14 +16,20 @@ COEUR="$ICI/.claude/hooks/pt.py"
 # fichiers que l'update a touches — jamais le travail en cours de quelqu'un d'autre.
 occupe() { for c in /proc/[0-9]*/cwd; do case "$(readlink "$c" 2>/dev/null)/" in "$1"/*) return 0;; esac; done; return 1; }
 sales() { git -C "$1" status --porcelain | cut -c4- | sort; }
+# pt.py modifie mais identique a une version publiee : vieille mise a jour jamais commitee (b16)
+publie() { for t in $(git -C "$ICI" tag); do git -C "$ICI" show "$t:.claude/hooks/pt.py" 2>/dev/null | cmp -s - "$1" && return 0; done; return 1; }
 while read -r d; do
   [ "$d" != "$ICI" ] && [ -f "$d/.claude/hooks/pt.py" ] || continue
   cmp -s "$d/.claude/hooks/pt.py" "$COEUR" && continue
   occupe "$d" && continue
   avant=$(sales "$d")
-  grep -qx '.claude/hooks/pt.py' <<<"$avant" && continue
+  if grep -qx '.claude/hooks/pt.py' <<<"$avant"; then
+    publie "$d/.claude/hooks/pt.py" || continue
+    avant=$(grep -vx '.claude/hooks/pt.py' <<<"$avant")
+  fi
   CLAUDE_PROJECT_DIR="$d" python3 "$COEUR" update >/dev/null 2>&1 || continue
   mapfile -t f < <(comm -13 <(printf '%s\n' "$avant") <(sales "$d") | sed '/^$/d')
+  [ ${#f[@]} -gt 0 ] || continue   # l'update a ramene la copie a l'etat commite : rien a commiter
   git -C "$d" add -- "${f[@]}" && git -C "$d" commit -q -m "chore(plantrack): coeur mis a jour par la ronde" -- "${f[@]}" ||
     { git -C "$d" reset -q -- "${f[@]}"; echo "ronde : commit refuse dans $d (coeur mis a jour, non commite)" >&2; }
 done < <(cat "$REPOS" 2>/dev/null)
