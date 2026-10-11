@@ -597,3 +597,25 @@
 {"ts": "2026-10-11T08:52:48+00:00", "kind": "commit", "sha": "41c73b7", "ctype": "chore", "thread": "t10"}
 {"ts": "2026-10-11T08:52:51+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t10"}
 {"ts": "2026-10-11T08:53:44+00:00", "kind": "decision", "id": "d38", "text": "Bilan de la semaine LIVRE (d37, plan valide par Mariella tel 11/10) : 'plantrack bilan [--all] [--jours N]' + bilan.sh (bulle via repondre.ts, rien si rien a dire) + minuteur plantrack-bilan.timer dimanche 18 h (Persistent). Tests verts. v1.9.6 publiee (GitHub tag + PyPI 1.9.6 verifie).", "par": "agent"}
+{"ts": "2026-10-11T08:53:45+00:00", "kind": "commit", "sha": "b72af62", "ctype": "chore", "thread": "t10"}
+{"ts": "2026-10-11T08:53:55+00:00", "kind": "file_touched", "text": "sortie/carte-suite-bilan.log", "thread": "t10"}
+{"ts": "2026-10-11T09:03:05+00:00", "kind": "file_touched", "text": "../../../tmp/_scn_out.txt", "thread": "t10"}
+{"ts": "2026-10-11T09:05:20+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-shiny-eich.md", "thread": "t10"}
+{"ts": "2026-10-11T09:05:46+00:00", "kind": "close", "id": "t10"}
+{"ts": "2026-10-11T09:05:46+00:00", "kind": "decision", "id": "d39", "text": "Mariella (tel, 11/10, carte brainstorm) : 'Regler les pieges connus (Recommande)' — verbe piege-clos, doctor compte par sha (pg4/pg8), garde du wrapper (pg14), message pre-commit (pg6), cloture des pieges deja regles ; puis v1.9.7.", "par": "agent"}
+{"ts": "2026-10-11T09:05:53+00:00", "kind": "thread_open", "id": "t11", "text": "pieges connus"}
+{"ts": "2026-10-11T09:06:20+00:00", "kind": "file_touched", "text": "plantrack", "thread": "t11"}
+{"ts": "2026-10-11T09:09:52+00:00", "kind": "file_touched", "text": "sortie/tests-pieges.log", "thread": "t11"}
+{"ts": "2026-10-11T09:18:51+00:00", "kind": "file_touched", "text": "sortie/tests-pieges.log", "thread": "t11"}
+{"ts": "2026-10-11T09:18:51+00:00", "kind": "file_touched", "text": "sortie/test30-x10.log", "thread": "t11"}
+{"ts": "2026-10-11T09:18:55+00:00", "kind": "commit", "sha": "175b669", "ctype": "fix", "thread": "t11"}
+{"ts": "2026-10-11T09:19:04+00:00", "kind": "piege_clos", "id": "pg1", "text": "11/10 : sorti de la fenetre de 30 jours, doctor --all ne signale plus d'ecart 'carnet' nulle part"}
+{"ts": "2026-10-11T09:19:04+00:00", "kind": "piege_clos", "id": "pg2", "text": "rattrape par le diagnostic de debut de session et la ronde automatique toutes les 4 h (d25)"}
+{"ts": "2026-10-11T09:19:05+00:00", "kind": "piege_clos", "id": "pg3", "text": "regle par le carnet accelere (d29, v1.9.1) : une seule analyse du journal par processus"}
+{"ts": "2026-10-11T09:19:05+00:00", "kind": "piege_clos", "id": "pg4", "text": "regle v1.9.7 : doctor compte les commits git retrouves au journal par sha, jamais plus de 100 %"}
+{"ts": "2026-10-11T09:19:05+00:00", "kind": "piege_clos", "id": "pg5", "text": "doctor affiche deja quels agents ont reellement injecte ('etat reellement injecte (claude le ...)')"}
+{"ts": "2026-10-11T09:19:05+00:00", "kind": "piege_clos", "id": "pg6", "text": "v1.9.7 : le garde-fou propose d'abord 'plantrack close <id>', --no-verify en dernier recours"}
+{"ts": "2026-10-11T09:19:05+00:00", "kind": "piege_clos", "id": "pg7", "text": "regle : ronde.sh saute tout depot ou un processus travaille (occupe) et ne commite que ses propres fichiers"}
+{"ts": "2026-10-11T09:19:05+00:00", "kind": "piege_clos", "id": "pg8", "text": "regle v1.9.7 : comptage par sha, un commit exclu par --since l'est des deux cotes ; suite verte 11 fois de suite le 11/10"}
+{"ts": "2026-10-11T09:19:05+00:00", "kind": "piege_clos", "id": "pg11", "text": "regle : jetable() exclut /tmp du vrai registre et doctor --all purge les depots disparus"}
+{"ts": "2026-10-11T09:19:05+00:00", "kind": "piege_clos", "id": "pg14", "text": "regle v1.9.7 : ./plantrack lance depuis un autre depot refuse et dit lequel utiliser"}
