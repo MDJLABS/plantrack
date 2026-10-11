@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t14 : travaux sur main [2 commits]
+FIL ACTIF — t14 : travaux sur main [3 commits]
   fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-sprightly-cascade.md, sortie/logos/piste-carnet.svg, sortie/logos/piste-fil.svg, sortie/logos/piste-boussole.svg
   (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
