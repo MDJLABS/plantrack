@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t14 : travaux sur main [12 commits]
-  fichiers recemment ecrits : .planning/session-state.md, .claude/hooks/pt.py, tests/scenario.sh, pyproject.toml, ../../../root/kvm-lourd/kvm_lourd.py, ../../../root/kvm-lourd/tests/test_types.py
+FIL ACTIF — t14 : travaux sur main [13 commits]
+  fichiers recemment ecrits : tests/scenario.sh, pyproject.toml, ../../../root/kvm-lourd/kvm_lourd.py, ../../../root/kvm-lourd/tests/test_types.py, ../../../tmp/kvm_watch.sh, ../../../tmp/kvm_watch.nohup.log
   (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -72,6 +72,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d47 : v1.9.10 publiee (11/10, GitHub + PyPI verifie) : garde-fou choisi par Mariella (tel, carte Securite : 'Ajouter un garde-fou (Recommande)') … (agent)
   d48 : Verification consigne kvm-lourd (11/10, choix Mariella tel 'Tester ./gradlew build (Recommande)') : en session reelle dans bcc, './gradlew … (agent)
   d49 : kvm-lourd corrige (choix Mariella tel 11/10 'Corriger kvm-lourd (Recommande)') : classe lit la commande comme le shell (shlex) — texte cite… (agent)
+  d50 : Mariella (tel, 12/10, via AskUserQuestion) : tri des bugs en attente -> 'Dans chaque projet (Recommande)' (respect d11/d42) : la carte de t… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
