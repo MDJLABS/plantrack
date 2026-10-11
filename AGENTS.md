@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t14 : travaux sur main [6 commits]
-  fichiers recemment ecrits : sortie/logos/piste-fil.svg, sortie/logos/piste-boussole.svg, ../../../root/.claude/plans/contexte-reconstruit-par-le-cryptic-shamir.md, tests/scenario.sh, pyproject.toml, .planning/session-state.md
+FIL ACTIF — t14 : travaux sur main [9 commits]
+  fichiers recemment ecrits : sortie/logos/piste-boussole.svg, ../../../root/.claude/plans/contexte-reconstruit-par-le-cryptic-shamir.md, .planning/session-state.md, .claude/hooks/pt.py, tests/scenario.sh, pyproject.toml
   (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -69,6 +69,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d44 : Mariella (tel, 11/10, via AskUserQuestion) : apres v1.9.8, choix 'Attendre le bilan de ce soir (Recommande)' — veille jusqu'au bilan du dim… (agent)
   d45 : Logo PlanTrack (choix Mariella tel 11/10, carte logo : 'Le carnet coche (Recommande)') : .bcc/logo.svg = carnet creme + coche verte sur fon… (agent)
   d46 : v1.9.9 publiee (11/10, GitHub + PyPI verifie) : hook PreToolUse kvm-lourd. Verifie en session reelle (claude -p --debug-file, stub kvm-lour… (agent)
+  d47 : v1.9.10 publiee (11/10, GitHub + PyPI verifie) : garde-fou choisi par Mariella (tel, carte Securite : 'Ajouter un garde-fou (Recommande)') … (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…

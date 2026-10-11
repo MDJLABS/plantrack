@@ -661,3 +661,11 @@
 {"ts": "2026-10-11T21:48:06+00:00", "kind": "decision", "id": "d46", "text": "v1.9.9 publiee (11/10, GitHub + PyPI verifie) : hook PreToolUse kvm-lourd. Verifie en session reelle (claude -p --debug-file, stub kvm-lourd, mouchard PostToolUse) : (a) updatedInput SANS permissionDecision est applique (commande executee = kvm-lourd run ... bash -c '<cmd>') ; (b) run_in_background force est honore (backgroundTaskId rendu). 4 cas de test de la consigne ajoutes. update fait dans les 11 depots du KVM. Limite signalee : une regle deny ne voit plus la commande enveloppee (aucune regle deny posee aujourd'hui).", "par": "agent"}
 {"ts": "2026-10-11T21:48:07+00:00", "kind": "precommit_block"}
 {"ts": "2026-10-11T21:48:07+00:00", "kind": "file_touched", "text": ".planning/session-state.md", "thread": "t14"}
+{"ts": "2026-10-11T21:48:10+00:00", "kind": "commit", "sha": "73a2257", "ctype": "chore", "thread": "t14"}
+{"ts": "2026-10-11T21:49:39+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t14"}
+{"ts": "2026-10-11T21:49:42+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t14"}
+{"ts": "2026-10-11T21:49:44+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t14"}
+{"ts": "2026-10-11T21:50:44+00:00", "kind": "commit", "sha": "95d0753", "ctype": "fix", "thread": "t14"}
+{"ts": "2026-10-11T21:50:44+00:00", "kind": "commit", "sha": "08fc6e5", "ctype": "chore", "thread": "t14"}
+{"ts": "2026-10-11T21:51:36+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t14"}
+{"ts": "2026-10-11T21:51:50+00:00", "kind": "decision", "id": "d47", "text": "v1.9.10 publiee (11/10, GitHub + PyPI verifie) : garde-fou choisi par Mariella (tel, carte Securite : 'Ajouter un garde-fou (Recommande)') — le hook kvm-lourd n'enveloppe pas la commande si une regle deny Bash(...) existe (utilisateur, managed, projet, local). Teste, update fait dans les 11 depots du KVM.", "par": "agent"}
