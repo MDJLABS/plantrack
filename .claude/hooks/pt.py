@@ -809,7 +809,8 @@ CLI humaine : plantrack status | bugs | inbox | verify <id> | reject <id> -m ...
               plantrack testcheck on|off | guide <titre>|<id> | step <id> <texte> | check <id> ok|ko [-m motif]
               plantrack init   installation vendoree (tous agents, + hooks git post-commit et pre-commit d'office)
               uvx plantrack@latest update   mise a jour d'une installation existante
-              plantrack doctor [--all]   verifie l'installation et l'usage reel | plantrack stats   usage sur 14 jours"""
+              plantrack doctor [--all]   verifie l'installation et l'usage reel | plantrack stats   usage sur 14 jours
+              plantrack bilan [--all] [--jours N]   ce qui a avance, ce qui attend ton avis"""
 
 
 # -------------------------------------------------------------------------- hooks
@@ -1660,6 +1661,45 @@ def cmd_stats():
         print(f"!! bugs rejetes plusieurs fois (signal de boucle) : {', '.join(loops)}")
 
 
+def bilan_ligne(st, jours=7):
+    """Une ligne en francais simple pour le depot courant, ou '' s'il ne s'est rien passe
+    et que rien n'attend l'humain. Des NOMBRES seulement : le texte d'une question d'un
+    autre projet n'a rien a faire dans le fil PlanTrack (d11)."""
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=jours)).isoformat(timespec="seconds")
+    fait = [(sum(e.get("kind") == "commit" and e.get("ts", "") >= cutoff for e in read_events()), ("commit", "commits")),
+            (sum(d["ts"] >= cutoff for d in st["decisions"]), ("décision", "décisions")),
+            (sum(b["status"] in BUG_TERMINAL and b.get("status_ts", "") >= cutoff
+                 for b in st["bugs"].values()), ("bug réglé", "bugs réglés"))]
+    avis = [(sum(b["status"] == "to_verify" for b in st["bugs"].values()), ("bug à vérifier", "bugs à vérifier")),
+            (sum(q["answer"] is None for q in st["questions"].values()), ("question", "questions")),
+            (sum(s["verdict"] is None for s in st["steps"].values()), ("point de test", "points de test"))]
+    dire = lambda l: ", ".join(f"{n} {m[n > 1]}" for n, m in l if n)
+    a, b = dire(fait), dire(avis)
+    if not (a or b):
+        return ""
+    return f"{os.path.basename(ROOT)} : {a or 'rien de neuf'}" + (f" — attend ton avis : {b}" if b else "")
+
+
+def cmd_bilan(args, st):
+    """Bilan de la semaine (d37) : ce qui a avance, ce qui attend l'humain. --all = toute la
+    flotte, chaque depot lu par CE coeur (un depot pas encore rattrape n'a pas `bilan`)."""
+    jours = int(args[args.index("--jours") + 1]) if "--jours" in args else 7
+    if "--all" not in args:
+        print(bilan_ligne(st, jours))
+        return
+    lignes = []
+    for r in registered_roots():
+        if not os.path.isfile(os.path.join(r, ".plantrack", "events.jsonl")) or jetable(r):
+            continue
+        env = dict(os.environ, PLANTRACK_ROOT=r, CLAUDE_PROJECT_DIR=r)
+        p = subprocess.run([sys.executable, os.path.abspath(__file__), "bilan", "--jours", str(jours)],
+                           capture_output=True, text=True, env=env)
+        if p.stdout.strip():
+            lignes.append("• " + p.stdout.strip())
+    if lignes:
+        print(f"Bilan PlanTrack des {jours} derniers jours :\n" + "\n".join(lignes))
+
+
 def arg_de(args):
     """Attestation d'un verdict humain relaye (d107) : extrait `--de <texte>`.
     Un seul argument, cite : --de "<canal> : <la reponse de l'humain>"."""
@@ -2133,6 +2173,8 @@ def cli(argv):
         cmd_doctor_all() if "--all" in args else cmd_doctor(st)
     elif cmd == "stats":
         cmd_stats()
+    elif cmd == "bilan":
+        cmd_bilan(args, st)
     elif cmd == "bugs":
         rows = [b for b in st["bugs"].values() if b["status"] not in BUG_TERMINAL]
         if not rows:

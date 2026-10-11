@@ -1143,6 +1143,23 @@ check_not "ronde : vieille mise a jour commitee" "pt.py" "$(git -C "$D" status -
 echo "# retouche" >> "$D/.claude/hooks/pt.py"; cp "$D/.claude/hooks/pt.py" "$R/main"
 RONDE_REPOS="$R/repos" RONDE_DOCTOR=true r >/dev/null
 check "ronde : pt.py retouche a la main pas touche" "OK" "$(cmp -s "$D/.claude/hooks/pt.py" "$R/main" && echo OK)"
+
+# Bilan de la semaine (d37) : des nombres seulement, un depot calme se tait
+B() { CLAUDE_PROJECT_DIR="$D" python3 "$PT" "$@" 2>/dev/null; }
+: > "$R/vide"
+check "bilan --all : rien a dire, rien d'ecrit" "VIDE" "$(PLANTRACK_REGISTRY="$R/vide" python3 "$PT" bilan --all | grep -q . || echo VIDE)"
+B decide "une decision" >/dev/null; B question "texte secret de la question" >/dev/null
+out=$(B bilan)
+check "bilan : ce qui a avance" "1 décision" "$out"
+check "bilan : ce qui attend l'humain" "attend ton avis : 1 question" "$out"
+check_not "bilan : jamais le texte d'une question" "texte secret" "$out"
+echo "$D" > "$R/reg"
+out=$(PLANTRACK_REGISTRY="$R/reg" python3 "$PT" bilan --all)
+check "bilan --all : une ligne par depot" "• depot : 1 décision" "$out"
+out=$(BILAN_CMD="echo coucou" BILAN_ENVOI=echo bash "$(dirname "$0")/../bilan.sh")
+check "bilan.sh : envoie le bilan" "coucou" "$out"
+out=$(BILAN_CMD=true BILAN_ENVOI="echo ENVOYE" bash "$(dirname "$0")/../bilan.sh")
+check_not "bilan.sh : rien a dire, rien d'envoye" "ENVOYE" "$out"
 rm -rf "$R"
 
 # pg3 (10/10) : le journal n'est analyse qu'une fois par processus, la queue ajoutee

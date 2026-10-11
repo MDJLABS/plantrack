@@ -575,3 +575,21 @@
 {"ts": "2026-10-10T18:46:03+00:00", "kind": "decision", "id": "d35", "text": "v1.9.5 publiee (10/10, GitHub + PyPI verifie) : moteur du guide de test dans .claude/hooks/plantrack_guide, recopie par init/update dans tout site qui a deja lib/guide/types.ts (racine ou src/), scenarios.ts jamais touche ; police en repli --font-sans puis --sans. La ronde propage (pt.py change). 382 tests verts, tsc propre sur copie francoviet.", "par": "agent"}
 {"ts": "2026-10-10T18:46:03+00:00", "kind": "commit", "sha": "1633cf3", "ctype": "chore", "thread": "t9"}
 {"ts": "2026-10-10T20:16:50+00:00", "kind": "decision", "id": "d36", "text": "Mariella (tel, 10/10 soir, via AskUserQuestion) : apres v1.9.5 (guide dans PlanTrack), choix 'Laisser la ronde faire (Recommande)' — propagation par la ronde, veille silencieuse (d23).", "par": "agent"}
+{"ts": "2026-10-10T20:16:50+00:00", "kind": "commit", "sha": "888700e", "ctype": "chore", "thread": "t9"}
+{"ts": "2026-10-10T23:52:14+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-validated-moonbeam.md", "thread": "t9"}
+{"ts": "2026-10-10T23:56:18+00:00", "kind": "decision", "id": "d37", "text": "Mariella (tel, 11/10, carte brainstorm) : 'Bilan de la semaine (Recommande)' — un message court par semaine dans le fil PlanTrack (repondre.ts, sans sonnerie) : par projet equipe, ce qui a avance (commits, decisions, bugs fermes) et ce qui attend son avis (nombres seulement, d11). Minuteur dimanche 18h.", "par": "agent"}
+{"ts": "2026-10-10T23:56:48+00:00", "kind": "close", "id": "t9"}
+{"ts": "2026-10-10T23:56:49+00:00", "kind": "thread_open", "id": "t10", "text": "bilan de la semaine"}
+{"ts": "2026-10-10T23:57:07+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t10"}
+{"ts": "2026-10-10T23:57:08+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t10"}
+{"ts": "2026-10-10T23:57:10+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t10"}
+{"ts": "2026-10-10T23:58:05+00:00", "kind": "file_touched", "text": "bilan.sh", "thread": "t10"}
+{"ts": "2026-10-10T23:58:21+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t10"}
+{"ts": "2026-10-10T23:58:27+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t10"}
+{"ts": "2026-10-10T23:58:28+00:00", "kind": "file_touched", "text": "sortie/tests-bilan.log", "thread": "t10"}
+{"ts": "2026-10-11T04:49:04+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-dynamic-chipmunk.md", "thread": "t10"}
+{"ts": "2026-10-11T08:35:23+00:00", "kind": "file_touched", "text": "sortie/tests-bilan.log", "thread": "t10"}
+{"ts": "2026-10-11T08:35:33+00:00", "kind": "file_touched", "text": "../../../etc/systemd/system/plantrack-bilan.service", "thread": "t10"}
+{"ts": "2026-10-11T08:35:33+00:00", "kind": "file_touched", "text": "../../../etc/systemd/system/plantrack-bilan.timer", "thread": "t10"}
+{"ts": "2026-10-11T08:35:37+00:00", "kind": "file_touched", "text": "../../../etc/systemd/system/plantrack-bilan.timer", "thread": "t10"}
+{"ts": "2026-10-11T08:51:07+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-enumerated-key.md", "thread": "t10"}
