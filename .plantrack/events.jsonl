@@ -651,3 +651,13 @@
 {"ts": "2026-10-11T14:11:02+00:00", "kind": "commit", "sha": "42d9433", "ctype": "chore", "thread": "t14"}
 {"ts": "2026-10-11T14:11:03+00:00", "kind": "decision", "id": "d45", "text": "Logo PlanTrack (choix Mariella tel 11/10, carte logo : 'Le carnet coche (Recommande)') : .bcc/logo.svg = carnet creme + coche verte sur fond bleu nuit, lu par le poste bcc pour la liste des fils.", "par": "agent"}
 {"ts": "2026-10-11T14:11:03+00:00", "kind": "commit", "sha": "0cd750e", "ctype": "chore", "thread": "t14"}
+{"ts": "2026-10-11T14:11:06+00:00", "kind": "commit", "sha": "af1293b", "ctype": "chore", "thread": "t14"}
+{"ts": "2026-10-11T21:35:11+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-cryptic-shamir.md", "thread": "t14"}
+{"ts": "2026-10-11T21:43:29+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t14"}
+{"ts": "2026-10-11T21:45:52+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t14"}
+{"ts": "2026-10-11T21:46:13+00:00", "kind": "commit", "sha": "1f84fad", "ctype": "feat", "thread": "t14"}
+{"ts": "2026-10-11T21:46:14+00:00", "kind": "commit", "sha": "b6e289e", "ctype": "chore", "thread": "t14"}
+{"ts": "2026-10-11T21:46:15+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t14"}
+{"ts": "2026-10-11T21:48:06+00:00", "kind": "decision", "id": "d46", "text": "v1.9.9 publiee (11/10, GitHub + PyPI verifie) : hook PreToolUse kvm-lourd. Verifie en session reelle (claude -p --debug-file, stub kvm-lourd, mouchard PostToolUse) : (a) updatedInput SANS permissionDecision est applique (commande executee = kvm-lourd run ... bash -c '<cmd>') ; (b) run_in_background force est honore (backgroundTaskId rendu). 4 cas de test de la consigne ajoutes. update fait dans les 11 depots du KVM. Limite signalee : une regle deny ne voit plus la commande enveloppee (aucune regle deny posee aujourd'hui).", "par": "agent"}
+{"ts": "2026-10-11T21:48:07+00:00", "kind": "precommit_block"}
+{"ts": "2026-10-11T21:48:07+00:00", "kind": "file_touched", "text": ".planning/session-state.md", "thread": "t14"}

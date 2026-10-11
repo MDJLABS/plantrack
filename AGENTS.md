@@ -8,14 +8,14 @@
 - Avant de corriger un bug : lis `./plantrack attempts <id>`, puis dépose ton hypothèse `./plantrack attempt <id> "..."` avant de coder ; une hypothèse refusée a déjà été tentée, change d'approche.
 - Une question posée à l'humain restée sans réponse : `./plantrack question "..."` — elle ressortira à chaque session jusqu'à la réponse.
 - Ouvre un fil AVANT de coder : `!focus <sujet>` (`!park <note>` pour changer de sujet, `!close` quand c'est fini). Chaque commit est journalisé sur le fil actif ; à défaut de fil, PlanTrack en ouvre un d'office au nom de la branche — nomme-le toi-même, c'est plus utile.
-- Si `!testcheck on` est actif, structure les recettes de test en guide/étapes (`./plantrack guide`, `./plantrack step`) ; tu ne poses JAMAIS le verdict toi-même, il est réservé à l'humain (`./plantrack check`).
+- Si `!testcheck on` est actif, structure les recettes de test en guide/étapes (`./plantrack guide`, `./plantrack step <g> "<un geste>" --attendu "<ce qu'on doit voir>"`) ; tu ne poses JAMAIS le verdict toi-même, il est réservé à l'humain (`./plantrack check`). Verdict donné par un canal relayé (téléphone) → `./plantrack check <s> ok|ko --de "<canal> : <sa réponse>"` — idem pour chaque point d'un compte-rendu du guide de test qu'il colle dans le chat.
 <!-- plantrack:end -->
 <!-- plantrack:state -->
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t14 : travaux sur main [3 commits]
-  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-sprightly-cascade.md, sortie/logos/piste-carnet.svg, sortie/logos/piste-fil.svg, sortie/logos/piste-boussole.svg
+FIL ACTIF — t14 : travaux sur main [6 commits]
+  fichiers recemment ecrits : sortie/logos/piste-fil.svg, sortie/logos/piste-boussole.svg, ../../../root/.claude/plans/contexte-reconstruit-par-le-cryptic-shamir.md, tests/scenario.sh, pyproject.toml, .planning/session-state.md
   (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -68,6 +68,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d43 : v1.9.8 publiee (11/10, GitHub + PyPI verifie) : tri groupe — le resume reinjecte propose UNE carte (liste / tout valider / plus tard) quand… (agent)
   d44 : Mariella (tel, 11/10, via AskUserQuestion) : apres v1.9.8, choix 'Attendre le bilan de ce soir (Recommande)' — veille jusqu'au bilan du dim… (agent)
   d45 : Logo PlanTrack (choix Mariella tel 11/10, carte logo : 'Le carnet coche (Recommande)') : .bcc/logo.svg = carnet creme + coche verte sur fon… (agent)
+  d46 : v1.9.9 publiee (11/10, GitHub + PyPI verifie) : hook PreToolUse kvm-lourd. Verifie en session reelle (claude -p --debug-file, stub kvm-lour… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
