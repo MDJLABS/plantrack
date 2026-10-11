@@ -599,6 +599,10 @@ check "le fil ferme ne recupere pas le commit" "commits : 1" "$out"
 check "un fil d office prend le relais, nomme d apres la branche" "travaux sur" "$out"
 out=$(CLAUDE_PROJECT_DIR="$TMP15" python3 "$PT" doctor 2>&1 || true)
 check "doctor mesure l usage : tous les commits sont arrives au carnet" "ok  commits arrives au carnet (2/2 depuis" "$out"
+# pg4 : un commit amende laisse l'ancien sha au journal, sans compter double
+(cd "$TMP15" && env -u CLAUDE_PROJECT_DIR git -c user.name=t -c user.email=t@t commit -q --amend -m "second commit amende") >/dev/null 2>&1
+out=$(CLAUDE_PROJECT_DIR="$TMP15" python3 "$PT" doctor 2>&1 || true)
+check "doctor apres amend : 2/2, jamais 3/2 (pg4)" "ok  commits arrives au carnet (2/2 depuis" "$out"
 rm -rf "$TMP15"
 
 # 30b. v1.7 — doctor voit un depot vert en configuration mais muet a l'usage
@@ -1180,6 +1184,24 @@ EOF
 )
 check "carnet : une seule analyse du journal par processus" "analyses True" "$out"
 check "carnet : la queue ajoutee est relue seule" "queue True True" "$out"
+
+# pieges : un piege regle se clot avec son motif et sort de l'etat
+R=$(mktemp -d)
+CLAUDE_PROJECT_DIR="$R" python3 "$PT" piege "ne pas faire ceci" >/dev/null 2>&1
+out=$(CLAUDE_PROJECT_DIR="$R" python3 "$PT" piege-clos pg1 2>&1)
+check "piege-clos exige un motif" "usage : plantrack piege-clos" "$out"
+out=$(CLAUDE_PROJECT_DIR="$R" python3 "$PT" piege-clos pg1 "regle par le test" 2>&1)
+check "piege-clos clot le piege" "piege pg1 clos" "$out"
+out=$(CLAUDE_PROJECT_DIR="$R" python3 "$PT" status 2>&1)
+check_not "le piege clos sort de l'etat" "ne pas faire ceci" "$out"
+
+# pg14 : le wrapper de ce depot refuse d'agir sur lui-meme depuis un autre depot
+git -C "$R" init -q
+W="$(cd "$(dirname "$0")/.." && pwd)/plantrack"
+out=$(cd "$R" && bash "$W" status 2>&1); rc=$?
+check_exit "wrapper lance depuis un autre depot : refus (pg14)" 2 "$rc"
+check "le refus dit ou l on est" "tu es dans $R" "$out"
+rm -rf "$R"
 
 echo
 [ "$fail" = 0 ] && echo "TOUS LES TESTS PASSENT" || { echo "DES TESTS ECHOUENT"; exit 1; }

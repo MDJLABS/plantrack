@@ -1,4 +1,12 @@
 #!/usr/bin/env bash
 # CLI humaine PlanTrack. A placer a la racine du projet.
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# pg14 : lance depuis un AUTRE depot, ce script agirait en silence sur le sien
+# (doctor vert, init « deja en place » sans rien poser la-bas). --all vise tout le registre.
+AUTRE="$(git rev-parse --show-toplevel 2>/dev/null)"
+if [ -n "$AUTRE" ] && [[ "$PWD/" != "$DIR/"* ]] && [[ " $* " != *" --all "* ]]; then
+  if [ -f "$AUTRE/plantrack" ]; then echo "PlanTrack : tu es dans $AUTRE — utilise $AUTRE/plantrack (ce script-ci agit sur $DIR)." >&2
+  else echo "PlanTrack : tu es dans $AUTRE, pas encore equipe — installe-le la-bas (uvx plantrack@latest init), ce script-ci agit sur $DIR." >&2; fi
+  exit 2
+fi
 CLAUDE_PROJECT_DIR="$DIR" python3 "$DIR/.claude/hooks/pt.py" "$@"

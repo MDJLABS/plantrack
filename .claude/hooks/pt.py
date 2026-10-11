@@ -234,6 +234,8 @@ def project():
             st["inbox"] = [n for n in st["inbox"] if n["id"] != ev["id"]]
         elif k == "piege":
             st["pieges"][ev["id"]] = {"id": ev["id"], "text": ev.get("text", ""), "ts": ev["ts"]}
+        elif k == "piege_clos":
+            st["pieges"].pop(ev["id"], None)
         elif k == "question":
             st["questions"][ev["id"]] = {"id": ev["id"], "text": ev.get("text", ""),
                                          "ts": ev["ts"], "answer": None,
@@ -579,6 +581,13 @@ def cmd_piege(text):
     return f"[PlanTrack] piege {pid} note : {trunc(text, 80)}"
 
 
+def cmd_piege_clos(pid, motif):
+    if pid not in project()["pieges"] or not motif:
+        return "usage : plantrack piege-clos <pg ouvert> <motif : ce qui l'a regle>"
+    append("piege_clos", id=pid, text=motif)
+    return f"[PlanTrack] piege {pid} clos : {trunc(motif, 80)}"
+
+
 def cmd_question(text, st=None):
     if not text:
         return "usage : !question <texte>"
@@ -804,7 +813,7 @@ CLI humaine : plantrack status | bugs | inbox | verify <id> | reject <id> -m ...
               plantrack phase add|start|done|next|cancel   (done/cancel : humain seul ; next : la porte decide)
               plantrack task add|start|verify|done|cancel|replace   (done/cancel/replace : humain seul)
               plantrack decide <texte> | bug <texte> [--low|--high|--blocker]   ecriture agent (marquee (agent))
-              plantrack piege <texte> | question <texte>   utilisables par l'agent
+              plantrack piege <texte> | piege-clos <id> <motif> | question <texte>   utilisables par l'agent
               plantrack answer <question_id> <texte>   toi seule, hors session
               plantrack testcheck on|off | guide <titre>|<id> | step <id> <texte> | check <id> ok|ko [-m motif]
               plantrack init   installation vendoree (tous agents, + hooks git post-commit et pre-commit d'office)
@@ -1361,7 +1370,8 @@ def cmd_precommit():
                 print(f"  note de reprise : {trunc(t['note'] or 'aucune', 100)}")
     if blocked:
         append("precommit_block")  # journalise pour `plantrack stats` (§15)
-        print("Contournement : git commit --no-verify")
+        print("Travail de ce fil livre ? Ferme-le : plantrack close <id> (ou !close), puis recommite.")
+        print("Dernier recours : git commit --no-verify")
         sys.exit(1)
     sys.exit(0)
 
@@ -1419,14 +1429,18 @@ def usage_gap(days=USAGE_DAYS):
         plancher = d
     since = max((datetime.now(timezone.utc) - timedelta(days=days)).isoformat(timespec="seconds"),
                 plancher)
-    jc = sum(1 for e in evs if e.get("kind") == "commit" and e["ts"] >= since)
     try:
-        r = subprocess.run(["git", "-C", ROOT, "log", f"--since={since}", "--pretty=%h"],
+        r = subprocess.run(["git", "-C", ROOT, "log", f"--since={since}", "--pretty=%H"],
                            capture_output=True, text=True, timeout=10)
     except (OSError, subprocess.SubprocessError) as e:
         trace("usage_gap : git log", e)
         return None
-    return jc, len(r.stdout.split()), since[:10]
+    # on compte les commits de GIT retrouves au journal, par sha : un commit amende
+    # laisse son ancien sha au journal (append-only) et comptait double (pg4, 107/105) ;
+    # un commit que `--since` exclut a la seconde pres l'est des deux cotes (pg8)
+    vus = {e["sha"][:7] for e in evs if e.get("kind") == "commit" and e.get("sha")}
+    shas = r.stdout.split()
+    return sum(1 for h in shas if h[:7] in vus), len(shas), since[:10]
 
 
 def diagnose(st):
@@ -2235,6 +2249,8 @@ def cli(argv):
         if not args:
             sys.exit("usage : plantrack piege <texte>")
         print(cmd_piege(" ".join(args)))
+    elif cmd == "piege-clos":
+        print(cmd_piege_clos(args[0] if args else "", " ".join(args[1:])))
     elif cmd == "question":
         if not args:
             sys.exit("usage : plantrack question <texte>")
