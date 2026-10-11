@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t10 : bilan de la semaine
+FIL ACTIF — t10 : bilan de la semaine [1 commits]
   fichiers recemment ecrits : tests/scenario.sh, ../../../root/.claude/plans/contexte-reconstruit-par-le-dynamic-chipmunk.md, sortie/tests-bilan.log, ../../../etc/systemd/system/plantrack-bilan.service, ../../../etc/systemd/system/plantrack-bilan.timer, ../../../root/.claude/plans/contexte-reconstruit-par-le-enumerated-key.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
