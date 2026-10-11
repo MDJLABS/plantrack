@@ -642,3 +642,11 @@
 {"ts": "2026-10-11T13:17:08+00:00", "kind": "commit", "sha": "0499d57", "ctype": "chore", "thread": "t13"}
 {"ts": "2026-10-11T13:17:08+00:00", "kind": "close", "id": "t13"}
 {"ts": "2026-10-11T13:19:08+00:00", "kind": "decision", "id": "d44", "text": "Mariella (tel, 11/10, via AskUserQuestion) : apres v1.9.8, choix 'Attendre le bilan de ce soir (Recommande)' — veille jusqu'au bilan du dimanche 18 h ; la ronde propage v1.9.8.", "par": "agent"}
+{"ts": "2026-10-11T13:19:08+00:00", "kind": "thread_open", "id": "t14", "text": "travaux sur main", "auto": 1}
+{"ts": "2026-10-11T13:19:08+00:00", "kind": "commit", "sha": "2072eef", "ctype": "chore", "thread": "t14"}
+{"ts": "2026-10-11T14:02:53+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-sprightly-cascade.md", "thread": "t14"}
+{"ts": "2026-10-11T14:09:47+00:00", "kind": "file_touched", "text": "sortie/logos/piste-carnet.svg", "thread": "t14"}
+{"ts": "2026-10-11T14:09:47+00:00", "kind": "file_touched", "text": "sortie/logos/piste-fil.svg", "thread": "t14"}
+{"ts": "2026-10-11T14:09:47+00:00", "kind": "file_touched", "text": "sortie/logos/piste-boussole.svg", "thread": "t14"}
+{"ts": "2026-10-11T14:11:02+00:00", "kind": "commit", "sha": "42d9433", "ctype": "chore", "thread": "t14"}
+{"ts": "2026-10-11T14:11:03+00:00", "kind": "decision", "id": "d45", "text": "Logo PlanTrack (choix Mariella tel 11/10, carte logo : 'Le carnet coche (Recommande)') : .bcc/logo.svg = carnet creme + coche verte sur fond bleu nuit, lu par le poste bcc pour la liste des fils.", "par": "agent"}
