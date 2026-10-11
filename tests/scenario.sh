@@ -1195,6 +1195,17 @@ check "piege-clos clot le piege" "piege pg1 clos" "$out"
 out=$(CLAUDE_PROJECT_DIR="$R" python3 "$PT" status 2>&1)
 check_not "le piege clos sort de l'etat" "ne pas faire ceci" "$out"
 
+# tri groupe (d39) : une attente de plus de 7 jours fait proposer UNE carte, plus-tard la tait
+mkdir -p "$R/.plantrack"
+echo '{"ts": "2026-01-01T00:00:00+00:00", "kind": "question", "id": "q1", "text": "vieille question"}' >> "$R/.plantrack/events.jsonl"
+out=$(printf '{"source":"startup"}' | CLAUDE_PROJECT_DIR="$R" python3 "$PT" hook-context 2>&1)
+check "le resume propose le tri groupe" "TRI GROUPE A PROPOSER : 0 bug(s) corrige(s) et 1 question(s)" "$out"
+out=$(CLAUDE_PROJECT_DIR="$R" python3 "$PT" attentes 2>&1)
+check "attentes liste la question" "q1 : vieille question" "$out"
+CLAUDE_PROJECT_DIR="$R" python3 "$PT" attentes plus-tard >/dev/null 2>&1
+out=$(printf '{"source":"startup"}' | CLAUDE_PROJECT_DIR="$R" python3 "$PT" hook-context 2>&1)
+check_not "plus-tard tait le tri groupe" "TRI GROUPE" "$out"
+
 # pg14 : le wrapper de ce depot refuse d'agir sur lui-meme depuis un autre depot
 git -C "$R" init -q
 W="$(cd "$(dirname "$0")/.." && pwd)/plantrack"

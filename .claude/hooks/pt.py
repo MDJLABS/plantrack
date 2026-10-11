@@ -159,14 +159,14 @@ def project():
     """Rejoue le journal et renvoie l'etat courant."""
     st = {"threads": {}, "bugs": {}, "decisions": [], "inbox": [], "active": None,
           "phases": {}, "tasks": {}, "pieges": {}, "questions": {}, "testcheck": False,
-          "guides": {}, "steps": {}, "parcours": {}}
+          "guides": {}, "steps": {}, "parcours": {}, "tri_plus_tard": ""}
     for ev in read_events():
         k = ev.get("kind") if isinstance(ev, dict) else None
         if k is None:
             continue
         # un evenement incomplet (JSON valide mais champs manquants) ne doit
         # jamais casser le rejeu — meme regle qu'une ligne corrompue
-        if k not in ("file_touched", "precommit_block", "commit", "testcheck") and not ("id" in ev and "ts" in ev):
+        if k not in ("file_touched", "precommit_block", "commit", "testcheck", "tri_plus_tard") and not ("id" in ev and "ts" in ev):
             continue
         if k == "thread_open":
             st["threads"][ev["id"]] = {
@@ -234,6 +234,8 @@ def project():
             st["inbox"] = [n for n in st["inbox"] if n["id"] != ev["id"]]
         elif k == "piege":
             st["pieges"][ev["id"]] = {"id": ev["id"], "text": ev.get("text", ""), "ts": ev["ts"]}
+        elif k == "tri_plus_tard":
+            st["tri_plus_tard"] = ev["ts"]
         elif k == "piege_clos":
             st["pieges"].pop(ev["id"], None)
         elif k == "question":
@@ -525,6 +527,12 @@ def context_block(st, header=True, rules=True, full=True):
              f"{len(pending_q)} question(s) sans reponse" if pending_q else ""]
         if any(n):
             sec("\nDANS LA FICHE D'ETAT : " + " ; ".join(x for x in n if x) + ".")
+        bugs_v, qs_v, old = attentes(st)
+        if (bugs_v or qs_v) and st["tri_plus_tard"] < old:
+            sec(f"\nTRI GROUPE A PROPOSER : {len(bugs_v)} bug(s) corrige(s) et {len(qs_v)} question(s) "
+                f"attendent l'humain depuis +{STALE_DAYS} j (`plantrack attentes`). UNE carte : Me montrer "
+                "la liste (Recommande) / Tout valider (verify --de chaque bug) / Plus tard (`plantrack "
+                "attentes plus-tard`, 7 j).")
         sec("Lis l'etat COMPLET avant de coder : AGENTS.md, section « instantane de l'etat » (ou `plantrack status`).")
 
     if st.get("testcheck"):
@@ -586,6 +594,25 @@ def cmd_piege_clos(pid, motif):
         return "usage : plantrack piege-clos <pg ouvert> <motif : ce qui l'a regle>"
     append("piege_clos", id=pid, text=motif)
     return f"[PlanTrack] piege {pid} clos : {trunc(motif, 80)}"
+
+
+def attentes(st):
+    """Ce qui attend l'humain depuis plus de STALE_DAYS : bugs sans verdict, questions muettes."""
+    old = (datetime.now(timezone.utc) - timedelta(days=STALE_DAYS)).isoformat(timespec="seconds")
+    return ([b for b in st["bugs"].values()
+             if b["status"] == "to_verify" and b.get("status_ts", b["ts"]) < old],
+            [q for q in st["questions"].values() if not q.get("answer") and q["ts"] < old], old)
+
+
+def cmd_attentes(args, st):
+    if args[:1] == ["plus-tard"]:
+        append("tri_plus_tard")
+        return f"[PlanTrack] tri groupe reporte : silence {STALE_DAYS} jours."
+    bugs, qs, _ = attentes(st)
+    return "\n".join([f"Bugs corriges en attente de verdict ({len(bugs)}) :"]
+                     + [f"  {b['id']} : {trunc(b['text'], 100)}" for b in bugs]
+                     + [f"Questions sans reponse ({len(qs)}) :"]
+                     + [f"  {q['id']} : {trunc(q['text'], 100)}" for q in qs])
 
 
 def cmd_question(text, st=None):
@@ -819,7 +846,8 @@ CLI humaine : plantrack status | bugs | inbox | verify <id> | reject <id> -m ...
               plantrack init   installation vendoree (tous agents, + hooks git post-commit et pre-commit d'office)
               uvx plantrack@latest update   mise a jour d'une installation existante
               plantrack doctor [--all]   verifie l'installation et l'usage reel | plantrack stats   usage sur 14 jours
-              plantrack bilan [--all] [--jours N]   ce qui a avance, ce qui attend ton avis"""
+              plantrack bilan [--all] [--jours N]   ce qui a avance, ce qui attend ton avis
+              plantrack attentes [plus-tard]   ce qui attend ton avis depuis plus de 7 jours (tri groupe)"""
 
 
 # -------------------------------------------------------------------------- hooks
@@ -1528,12 +1556,10 @@ def diagnose(st):
     chk(not inc, f"pannes avalees par les hooks ({len(inc)} tracee(s))",
         f"derniere : {trunc(inc[-1], 120)} — tout est dans .plantrack/incidents.log "
         "(efface le fichier une fois la panne traitee)" if inc else "")
-    stale = [b for b in st["bugs"].values()
-             if b["status"] == "to_verify" and b.get("status_ts", b["ts"]) < old]
+    stale, muettes, _ = attentes(st)
     chk(not stale, f"bugs en attente de verdict humain ({len(stale)} depuis plus de {STALE_DAYS} jours)",
         "l'agent a fini, personne n'a tranche : `!verify <id>` ou `!reject <id> motif` dans la session — "
         + ", ".join(b["id"] for b in stale[:6]))
-    muettes = [q for q in st["questions"].values() if not q.get("answer") and q["ts"] < old]
     chk(not muettes, f"questions sans reponse ({len(muettes)} depuis plus de {STALE_DAYS} jours)",
         "l'agent attend, la question ressort a chaque session : `!answer <id> <texte>` — "
         + ", ".join(f"!answer {q['id']}" for q in muettes[:6]))
@@ -2189,6 +2215,8 @@ def cli(argv):
         cmd_stats()
     elif cmd == "bilan":
         cmd_bilan(args, st)
+    elif cmd == "attentes":
+        print(cmd_attentes(args, st))
     elif cmd == "bugs":
         rows = [b for b in st["bugs"].values() if b["status"] not in BUG_TERMINAL]
         if not rows:
