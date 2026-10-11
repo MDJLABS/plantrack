@@ -1242,6 +1242,10 @@ print(a[:5] == ["kvm-lourd", "run", "--qui=agent", "--type=gradle", "--"], a[5:7
       "permissionDecision" in u, "3,0 Go" in u["additionalContext"])')
 check_exit "commande lourde : reecrite, quotee, en fond, champs recopies, sans permissionDecision" \
   "True True True True essai 5000 False True" "$r"
+mkdir -p "$TMP/.claude"; echo '{"permissions":{"deny":["Bash(rm:*)"]}}' > "$TMP/.claude/settings.local.json"
+out=$(pre lourd "$KB:/usr/bin:/bin")
+check_exit "regle deny Bash presente : pas d'enveloppe" "" "$out"
+rm "$TMP/.claude/settings.local.json"
 in='{"tool_input":{"command":"kvm-lourd run --qui=agent -- make"}}'
 out=$(pre lourd "$KB:/usr/bin:/bin")
 check_exit "commande deja enveloppee : aucune sortie" "" "$out"

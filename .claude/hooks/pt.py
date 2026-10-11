@@ -920,6 +920,24 @@ def hook_filelog():
     sys.exit(0)
 
 
+def bash_deny(cwd):
+    """Une regle deny Bash(...) ne reconnaitrait plus la commande une fois
+    enveloppee dans kvm-lourd : s'il en existe une, on n'enveloppe pas."""
+    proj = os.environ.get("CLAUDE_PROJECT_DIR") or cwd or ROOT
+    for p in (os.path.expanduser("~/.claude/settings.json"),
+              "/etc/claude-code/managed-settings.json",
+              os.path.join(proj, ".claude", "settings.json"),
+              os.path.join(proj, ".claude", "settings.local.json")):
+        try:
+            with open(p, encoding="utf-8") as f:
+                deny = (json.load(f).get("permissions") or {}).get("deny") or []
+        except Exception:
+            continue
+        if any(str(r).startswith("Bash") for r in deny):
+            return True
+    return False
+
+
 def hook_pretool():
     """PreToolUse sur Bash : une commande lourde (build, gradle...) part dans la
     file kvm-lourd du KVM, en arriere-plan, pour ne plus saturer la RAM a
@@ -931,7 +949,7 @@ def hook_pretool():
         data = read_hook_input()
         ti = data.get("tool_input") or {}
         cmd = ti.get("command") or ""
-        if not cmd or not shutil.which("kvm-lourd"):
+        if not cmd or not shutil.which("kvm-lourd") or bash_deny(data.get("cwd")):
             return
         try:
             out = subprocess.run(["kvm-lourd", "classe", cmd], cwd=data.get("cwd") or None,
