@@ -639,3 +639,6 @@
 {"ts": "2026-10-11T13:17:02+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t13"}
 {"ts": "2026-10-11T13:17:05+00:00", "kind": "file_touched", "text": ".planning/session-state.md", "thread": "t13"}
 {"ts": "2026-10-11T13:17:08+00:00", "kind": "decision", "id": "d43", "text": "v1.9.8 publiee (11/10, GitHub + PyPI verifie) : tri groupe — le resume reinjecte propose UNE carte (liste / tout valider / plus tard) quand des attentes ont +7 j ; plantrack attentes [plus-tard]. Propagation par la ronde.", "par": "agent"}
+{"ts": "2026-10-11T13:17:08+00:00", "kind": "commit", "sha": "0499d57", "ctype": "chore", "thread": "t13"}
+{"ts": "2026-10-11T13:17:08+00:00", "kind": "close", "id": "t13"}
+{"ts": "2026-10-11T13:19:08+00:00", "kind": "decision", "id": "d44", "text": "Mariella (tel, 11/10, via AskUserQuestion) : apres v1.9.8, choix 'Attendre le bilan de ce soir (Recommande)' — veille jusqu'au bilan du dimanche 18 h ; la ronde propage v1.9.8.", "par": "agent"}
