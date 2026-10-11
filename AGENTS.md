@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t14 : travaux sur main [10 commits]
-  fichiers recemment ecrits : sortie/logos/piste-boussole.svg, ../../../root/.claude/plans/contexte-reconstruit-par-le-cryptic-shamir.md, .planning/session-state.md, .claude/hooks/pt.py, tests/scenario.sh, pyproject.toml
+FIL ACTIF — t14 : travaux sur main [11 commits]
+  fichiers recemment ecrits : .planning/session-state.md, .claude/hooks/pt.py, tests/scenario.sh, pyproject.toml, ../../../root/kvm-lourd/kvm_lourd.py, ../../../root/kvm-lourd/tests/test_types.py
   (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -71,6 +71,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d46 : v1.9.9 publiee (11/10, GitHub + PyPI verifie) : hook PreToolUse kvm-lourd. Verifie en session reelle (claude -p --debug-file, stub kvm-lour… (agent)
   d47 : v1.9.10 publiee (11/10, GitHub + PyPI verifie) : garde-fou choisi par Mariella (tel, carte Securite : 'Ajouter un garde-fou (Recommande)') … (agent)
   d48 : Verification consigne kvm-lourd (11/10, choix Mariella tel 'Tester ./gradlew build (Recommande)') : en session reelle dans bcc, './gradlew … (agent)
+  d49 : kvm-lourd corrige (choix Mariella tel 11/10 'Corriger kvm-lourd (Recommande)') : classe lit la commande comme le shell (shlex) — texte cite… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
