@@ -202,7 +202,7 @@ tout le reste — hooks, lignes d'import, skill — n'est qu'un chemin pour y me
 
 | Agent | Mécanisme | Réinjection automatique |
 |---|---|---|
-| Claude Code | 4 hooks + import dans `CLAUDE.md` | ✅ |
+| Claude Code | 5 hooks (dont la file `kvm-lourd`) + import dans `CLAUDE.md` | ✅ |
 | Codex CLI | 4 hooks (`.codex/hooks.json`, approuver via `/hooks`) | ✅ |
 | Gemini CLI | ligne d'import dans `GEMINI.md` | — (lit `AGENTS.md`, utilise la CLI) |
 | ZCode, Grok Build, Kimi Code CLI, Mistral Vibe | lisent `AGENTS.md` nativement | — |

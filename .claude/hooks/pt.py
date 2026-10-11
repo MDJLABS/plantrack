@@ -19,6 +19,7 @@ import difflib
 import json
 import os
 import re
+import shlex
 import shutil
 import subprocess
 import sys
@@ -919,6 +920,42 @@ def hook_filelog():
     sys.exit(0)
 
 
+def hook_pretool():
+    """PreToolUse sur Bash : une commande lourde (build, gradle...) part dans la
+    file kvm-lourd du KVM, en arriere-plan, pour ne plus saturer la RAM a
+    plusieurs agents. Toute la logique (quoi est lourd, combien) reste dans
+    kvm-lourd ; ici on ne fait que reecrire. Fail-open : kvm-lourd absent, lent
+    ou en erreur = la commande passe telle quelle. Jamais de permissionDecision :
+    la reecriture ne doit pas faire sauter une demande d'autorisation."""
+    try:
+        data = read_hook_input()
+        ti = data.get("tool_input") or {}
+        cmd = ti.get("command") or ""
+        if not cmd or not shutil.which("kvm-lourd"):
+            return
+        try:
+            out = subprocess.run(["kvm-lourd", "classe", cmd], cwd=data.get("cwd") or None,
+                                 capture_output=True, text=True, timeout=2).stdout.strip()
+        except Exception as e:
+            trace("hook-pretool : kvm-lourd classe", e)
+            return
+        if not out:
+            return
+        type_, est = out.split("\t")
+        go = f"{int(est) / 2**30:.1f}".replace(".", ",")
+        print(json.dumps({"hookSpecificOutput": {
+            "hookEventName": "PreToolUse",
+            "updatedInput": {**ti, "run_in_background": True,
+                             "command": f"kvm-lourd run --qui=agent --type={type_} -- "
+                                        f"bash -c {shlex.quote(cmd)}"},
+            "additionalContext": f"⏳ Commande passée par la file kvm-lourd ({type_}, ~{go} Go "
+                                 "estimés), en arrière-plan : tu seras notifié à la fin. Ne la "
+                                 "relance pas ; `kvm-lourd status` montre la file."}},
+            ensure_ascii=False))
+    except Exception as e:
+        trace("hook-pretool", e)
+
+
 def note_injection():
     """Un hook declare mais jamais approuve (Codex : /hooks) est indiscernable
     d'un hook qui tourne. Cette trace, par agent, rend la difference visible."""
@@ -1028,6 +1065,8 @@ SETTINGS = {"hooks": {
         {"type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/pt.py\" hook-prompt"}]}],
     "PostToolUse": [{"matcher": "Edit|Write|MultiEdit|NotebookEdit|Bash", "hooks": [
         {"type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/pt.py\" hook-filelog"}]}],
+    "PreToolUse": [{"matcher": "Bash", "hooks": [
+        {"type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/pt.py\" hook-pretool"}]}],
     "SessionStart": [{"hooks": [
         {"type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/pt.py\" hook-context"}]}],
     "PreCompact": [{"hooks": [
@@ -1185,7 +1224,7 @@ def write_hooks_file(path, obj, label, hint=""):
         with open(path, "w", encoding="utf-8") as f:
             json.dump(obj, f, ensure_ascii=False, indent=2)
             f.write("\n")
-        print(f"{label} ecrit (4 hooks).{hint}")
+        print(f"{label} ecrit ({len(obj["hooks"])} hooks).{hint}")
         return True
     with open(path, encoding="utf-8") as f:
         content = f.read()
@@ -1489,7 +1528,7 @@ def diagnose(st):
     chk(os.path.exists(os.path.join(ROOT, ".claude", "hooks", "pt.py")),
         "coeur vendorise (.claude/hooks/pt.py)", "lance `plantrack init`")
     txt = slurp(".claude", "settings.json")
-    for h in ("hook-prompt", "hook-filelog", "hook-context", "hook-precompact"):
+    for h in ("hook-prompt", "hook-filelog", "hook-pretool", "hook-context", "hook-precompact"):
         chk(h in txt, f"hook {h} declare dans settings.json", "lance `plantrack init`")
     ctxt = slurp(".codex", "hooks.json")
     for h in ("hook-prompt", "hook-filelog", "hook-context", "hook-precompact"):
@@ -2356,6 +2395,8 @@ def main():
         hook_prompt()
     elif entry == "hook-filelog":
         hook_filelog()
+    elif entry == "hook-pretool":
+        hook_pretool()
     elif entry == "hook-context":
         hook_context()
     elif entry == "hook-precompact":

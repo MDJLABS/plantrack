@@ -245,7 +245,7 @@ n=$(grep -c "plantrack:start" "$TMP2/CLAUDE.md")
 check_exit "un seul jeu de marqueurs dans CLAUDE.md" 1 "$n"
 printf '{"hooks":{}}' > "$TMP2/.claude/settings.json"
 out=$(CLAUDE_PROJECT_DIR="$TMP2" python3 "$PT" init 2>&1)
-check "settings existant : les hooks sont fusionnes" "4 hooks PlanTrack fusionnes" "$out"
+check "settings existant : les hooks sont fusionnes" "5 hooks PlanTrack fusionnes" "$out"
 check "settings fusionne : les 4 hooks presents" "hook-precompact" "$(cat "$TMP2/.claude/settings.json")"
 
 # 16. v1.1 — doctor et stats
@@ -389,7 +389,7 @@ mkdir -p "$TMP7/.claude"
 printf '{ "enabledPlugins": { "cloudflare@claude-plugins-official": true } }\n' > "$TMP7/.claude/settings.json"
 git -C "$TMP7" init -q
 out=$(CLAUDE_PROJECT_DIR="$TMP7" python3 "$PT" init --git-hook 2>&1)
-check "init fusionne dans un settings.json existant" "4 hooks PlanTrack fusionnes" "$out"
+check "init fusionne dans un settings.json existant" "5 hooks PlanTrack fusionnes" "$out"
 check "init --git-hook fait AUSSI l installation complete" "insere dans AGENTS.md" "$out"
 check "init --git-hook pose le garde-fou git" "hook pre-commit installe" "$out"
 check "et annonce une installation terminee" "installation terminee" "$out"
@@ -1213,6 +1213,38 @@ out=$(cd "$R" && bash "$W" status 2>&1); rc=$?
 check_exit "wrapper lance depuis un autre depot : refus (pg14)" 2 "$rc"
 check "le refus dit ou l on est" "tu es dans $R" "$out"
 rm -rf "$R"
+
+# kvm-lourd : le hook PreToolUse envoie une commande lourde dans la file, en fond
+KB="$TMP/kvmbin"; mkdir -p "$KB"
+cat > "$KB/kvm-lourd" <<'EOF'
+#!/bin/bash
+case "$KL_MODE" in
+  vide) ;; erreur) exit 3 ;; lent) sleep 3 ;;
+  lourd) case "$2" in kvm-lourd*) ;; *) printf 'gradle\t3221225472\n' ;; esac ;;
+esac
+EOF
+chmod +x "$KB/kvm-lourd"
+in='{"cwd":"/tmp","tool_input":{"command":"echo \"a b\" && echo $HOME","description":"essai","timeout":5000}}'
+pre() { echo "$in" | KL_MODE="$1" PATH="$2" python3 "$PT" hook-pretool; }
+out=$(pre lourd /usr/bin:/bin); rc=$?
+check_exit "kvm-lourd absent : code 0" 0 "$rc"; check_exit "kvm-lourd absent : aucune sortie" "" "$out"
+for m in vide erreur lent; do
+  out=$(pre $m "$KB:/usr/bin:/bin"); rc=$?
+  check_exit "classe $m : code 0" 0 "$rc"; check_exit "classe $m : aucune sortie" "" "$out"
+done
+out=$(pre lourd "$KB:/usr/bin:/bin")
+r=$(echo "$out" | python3 -c '
+import json, shlex, sys
+u = json.load(sys.stdin)["hookSpecificOutput"]
+i = u["updatedInput"]; a = shlex.split(i["command"])
+print(a[:5] == ["kvm-lourd", "run", "--qui=agent", "--type=gradle", "--"], a[5:7] == ["bash", "-c"],
+      a[7] == "echo \"a b\" && echo $HOME", i["run_in_background"], i["description"], i["timeout"],
+      "permissionDecision" in u, "3,0 Go" in u["additionalContext"])')
+check_exit "commande lourde : reecrite, quotee, en fond, champs recopies, sans permissionDecision" \
+  "True True True True essai 5000 False True" "$r"
+in='{"tool_input":{"command":"kvm-lourd run --qui=agent -- make"}}'
+out=$(pre lourd "$KB:/usr/bin:/bin")
+check_exit "commande deja enveloppee : aucune sortie" "" "$out"
 
 echo
 [ "$fail" = 0 ] && echo "TOUS LES TESTS PASSENT" || { echo "DES TESTS ECHOUENT"; exit 1; }
