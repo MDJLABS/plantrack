@@ -619,3 +619,10 @@
 {"ts": "2026-10-11T09:19:05+00:00", "kind": "piege_clos", "id": "pg8", "text": "regle v1.9.7 : comptage par sha, un commit exclu par --since l'est des deux cotes ; suite verte 11 fois de suite le 11/10"}
 {"ts": "2026-10-11T09:19:05+00:00", "kind": "piege_clos", "id": "pg11", "text": "regle : jetable() exclut /tmp du vrai registre et doctor --all purge les depots disparus"}
 {"ts": "2026-10-11T09:19:05+00:00", "kind": "piege_clos", "id": "pg14", "text": "regle v1.9.7 : ./plantrack lance depuis un autre depot refuse et dit lequel utiliser"}
+{"ts": "2026-10-11T09:19:17+00:00", "kind": "commit", "sha": "8cd3876", "ctype": "chore", "thread": "t11"}
+{"ts": "2026-10-11T09:19:25+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t11"}
+{"ts": "2026-10-11T09:20:11+00:00", "kind": "decision", "id": "d40", "text": "v1.9.7 publiee (11/10, GitHub + PyPI verifie) : piege-clos, doctor par sha (pg4/pg8), garde wrapper (pg14), message pre-commit (pg6). Pieges clos : pg1-8, pg11, pg14 ; restent pg9, pg10, pg12 (expire 24/10), pg13, pg15. La ronde propage.", "par": "agent"}
+{"ts": "2026-10-11T09:20:11+00:00", "kind": "close", "id": "t11"}
+{"ts": "2026-10-11T09:20:11+00:00", "kind": "precommit_block"}
+{"ts": "2026-10-11T09:20:18+00:00", "kind": "thread_open", "id": "t12", "text": "journal de session"}
+{"ts": "2026-10-11T09:20:22+00:00", "kind": "file_touched", "text": ".planning/session-state.md", "thread": "t12"}

@@ -454,3 +454,6 @@ fil t2 actif. À faire par Mariella : tag v1.9.0 + publication PyPI.
 
 ## v1.9.1 — 2026-10-10 : carnet accéléré (pg3)
 read_events analyse le journal une fois par processus puis lit la queue ; post-commit sans double régénération. 372 -> 194 ms à 19 000 év. Publié GitHub + PyPI. Fils t3 et t4 fermés.
+
+## v1.9.7 — 2026-10-11 : pièges connus réglés (d39)
+Choix Mariella (tél, brainstorm). Nouveau verbe `piege-clos` ; doctor compte les commits par sha (pg4/pg8) ; wrapper refuse depuis un autre dépôt (pg14) ; message pre-commit propose `close` (pg6). 10 pièges clos, restent pg9, pg10, pg12 (expire 24/10), pg13, pg15. Suite verte 11 fois. GitHub + PyPI vérifiés.

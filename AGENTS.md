@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t11 : pieges connus [1 commits]
-  fichiers recemment ecrits : plantrack, sortie/tests-pieges.log, sortie/test30-x10.log
+FIL ACTIF — t12 : journal de session
+  fichiers recemment ecrits : .planning/session-state.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -61,6 +61,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d37 : Mariella (tel, 11/10, carte brainstorm) : 'Bilan de la semaine (Recommande)' — un message court par semaine dans le fil PlanTrack (repondre… (agent)
   d38 : Bilan de la semaine LIVRE (d37, plan valide par Mariella tel 11/10) : 'plantrack bilan [--all] [--jours N]' + bilan.sh (bulle via repondre.… (agent)
   d39 : Mariella (tel, 11/10, carte brainstorm) : 'Regler les pieges connus (Recommande)' — verbe piege-clos, doctor compte par sha (pg4/pg8), gard… (agent)
+  d40 : v1.9.7 publiee (11/10, GitHub + PyPI verifie) : piege-clos, doctor par sha (pg4/pg8), garde wrapper (pg14), message pre-commit (pg6). Piege… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
