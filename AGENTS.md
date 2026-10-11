@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t14 : travaux sur main [9 commits]
+FIL ACTIF — t14 : travaux sur main [10 commits]
   fichiers recemment ecrits : sortie/logos/piste-boussole.svg, ../../../root/.claude/plans/contexte-reconstruit-par-le-cryptic-shamir.md, .planning/session-state.md, .claude/hooks/pt.py, tests/scenario.sh, pyproject.toml
   (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
@@ -70,6 +70,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d45 : Logo PlanTrack (choix Mariella tel 11/10, carte logo : 'Le carnet coche (Recommande)') : .bcc/logo.svg = carnet creme + coche verte sur fon… (agent)
   d46 : v1.9.9 publiee (11/10, GitHub + PyPI verifie) : hook PreToolUse kvm-lourd. Verifie en session reelle (claude -p --debug-file, stub kvm-lour… (agent)
   d47 : v1.9.10 publiee (11/10, GitHub + PyPI verifie) : garde-fou choisi par Mariella (tel, carte Securite : 'Ajouter un garde-fou (Recommande)') … (agent)
+  d48 : Verification consigne kvm-lourd (11/10, choix Mariella tel 'Tester ./gradlew build (Recommande)') : en session reelle dans bcc, './gradlew … (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
@@ -77,6 +78,7 @@ Pieges connus :
   pg12 : Le defaut doctor 'commits rattaches a un fil' est RETROACTIF comme pg1 : sur pr…
   pg13 : Gabarit de parcours : la phase de construction est a 'questions: false', mais u…
   pg15 : Le Stop hook bcc (hook/index.ts, regle 'projet ne s'endort jamais' du 03/10) EX…
+  pg16 : kvm-lourd classe ne renvoie vide que si la commande COMMENCE par kvm-lourd : un…
 
 Questions en attente (reponds via !answer qN ...) :
   q1 : Propager le correctif b14 (worktree) vers bcc, prorent et cvslim des que leurs …
