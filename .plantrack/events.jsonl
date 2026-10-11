@@ -594,3 +594,6 @@
 {"ts": "2026-10-11T08:35:37+00:00", "kind": "file_touched", "text": "../../../etc/systemd/system/plantrack-bilan.timer", "thread": "t10"}
 {"ts": "2026-10-11T08:51:07+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-enumerated-key.md", "thread": "t10"}
 {"ts": "2026-10-11T08:52:34+00:00", "kind": "commit", "sha": "d8cee3e", "ctype": "feat", "thread": "t10"}
+{"ts": "2026-10-11T08:52:48+00:00", "kind": "commit", "sha": "41c73b7", "ctype": "chore", "thread": "t10"}
+{"ts": "2026-10-11T08:52:51+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t10"}
+{"ts": "2026-10-11T08:53:44+00:00", "kind": "decision", "id": "d38", "text": "Bilan de la semaine LIVRE (d37, plan valide par Mariella tel 11/10) : 'plantrack bilan [--all] [--jours N]' + bilan.sh (bulle via repondre.ts, rien si rien a dire) + minuteur plantrack-bilan.timer dimanche 18 h (Persistent). Tests verts. v1.9.6 publiee (GitHub tag + PyPI 1.9.6 verifie).", "par": "agent"}

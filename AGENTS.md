@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t10 : bilan de la semaine [1 commits]
-  fichiers recemment ecrits : tests/scenario.sh, ../../../root/.claude/plans/contexte-reconstruit-par-le-dynamic-chipmunk.md, sortie/tests-bilan.log, ../../../etc/systemd/system/plantrack-bilan.service, ../../../etc/systemd/system/plantrack-bilan.timer, ../../../root/.claude/plans/contexte-reconstruit-par-le-enumerated-key.md
+FIL ACTIF — t10 : bilan de la semaine [2 commits]
+  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-dynamic-chipmunk.md, sortie/tests-bilan.log, ../../../etc/systemd/system/plantrack-bilan.service, ../../../etc/systemd/system/plantrack-bilan.timer, ../../../root/.claude/plans/contexte-reconstruit-par-le-enumerated-key.md, pyproject.toml
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -59,6 +59,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d35 : v1.9.5 publiee (10/10, GitHub + PyPI verifie) : moteur du guide de test dans .claude/hooks/plantrack_guide, recopie par init/update dans to… (agent)
   d36 : Mariella (tel, 10/10 soir, via AskUserQuestion) : apres v1.9.5 (guide dans PlanTrack), choix 'Laisser la ronde faire (Recommande)' — propag… (agent)
   d37 : Mariella (tel, 11/10, carte brainstorm) : 'Bilan de la semaine (Recommande)' — un message court par semaine dans le fil PlanTrack (repondre… (agent)
+  d38 : Bilan de la semaine LIVRE (d37, plan valide par Mariella tel 11/10) : 'plantrack bilan [--all] [--jours N]' + bilan.sh (bulle via repondre.… (agent)
 
 Pieges connus :
   pg1 : L'ecart 'commits arrives au carnet' du doctor remonte jusqu'a l'installation (U…
