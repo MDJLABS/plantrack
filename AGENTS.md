@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t14 : travaux sur main [11 commits]
+FIL ACTIF — t14 : travaux sur main [12 commits]
   fichiers recemment ecrits : .planning/session-state.md, .claude/hooks/pt.py, tests/scenario.sh, pyproject.toml, ../../../root/kvm-lourd/kvm_lourd.py, ../../../root/kvm-lourd/tests/test_types.py
   (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
@@ -79,7 +79,6 @@ Pieges connus :
   pg12 : Le defaut doctor 'commits rattaches a un fil' est RETROACTIF comme pg1 : sur pr…
   pg13 : Gabarit de parcours : la phase de construction est a 'questions: false', mais u…
   pg15 : Le Stop hook bcc (hook/index.ts, regle 'projet ne s'endort jamais' du 03/10) EX…
-  pg16 : kvm-lourd classe ne renvoie vide que si la commande COMMENCE par kvm-lourd : un…
 
 Questions en attente (reponds via !answer qN ...) :
   q1 : Propager le correctif b14 (worktree) vers bcc, prorent et cvslim des que leurs …

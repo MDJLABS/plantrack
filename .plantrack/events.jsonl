@@ -678,3 +678,5 @@
 {"ts": "2026-10-11T21:58:52+00:00", "kind": "file_touched", "text": "../../../root/kvm-lourd/kvm_lourd.py", "thread": "t14"}
 {"ts": "2026-10-11T21:58:56+00:00", "kind": "file_touched", "text": "../../../root/kvm-lourd/tests/test_types.py", "thread": "t14"}
 {"ts": "2026-10-11T21:59:14+00:00", "kind": "decision", "id": "d49", "text": "kvm-lourd corrige (choix Mariella tel 11/10 'Corriger kvm-lourd (Recommande)') : classe lit la commande comme le shell (shlex) — texte cite ignore, setsid/nohup traites en prefixes, bash -c classe son script. 73 tests verts, installe dans /usr/local/bin, commit be108ad dans /root/kvm-lourd.", "par": "agent"}
+{"ts": "2026-10-11T21:59:14+00:00", "kind": "commit", "sha": "adb14e8", "ctype": "chore", "thread": "t14"}
+{"ts": "2026-10-11T21:59:19+00:00", "kind": "piege_clos", "id": "pg16", "text": "kvm-lourd classe lit la commande comme le shell (commit be108ad dans /root/kvm-lourd)"}
