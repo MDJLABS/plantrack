@@ -626,3 +626,16 @@
 {"ts": "2026-10-11T09:20:11+00:00", "kind": "precommit_block"}
 {"ts": "2026-10-11T09:20:18+00:00", "kind": "thread_open", "id": "t12", "text": "journal de session"}
 {"ts": "2026-10-11T09:20:22+00:00", "kind": "file_touched", "text": ".planning/session-state.md", "thread": "t12"}
+{"ts": "2026-10-11T09:20:24+00:00", "kind": "commit", "sha": "b3dffca", "ctype": "chore", "thread": "t12"}
+{"ts": "2026-10-11T09:20:24+00:00", "kind": "close", "id": "t12"}
+{"ts": "2026-10-11T12:12:59+00:00", "kind": "decision", "id": "d41", "text": "Mariella (tel, 11/10, carte brainstorm apres v1.9.7) : 'Tri groupe des attentes (Recommande)' — une seule carte par projet, dans le fil de CE projet (d11), regroupant bugs to_verify et questions en attente depuis plus de 7 jours : tout valider / voir un par un / laisser.", "par": "agent"}
+{"ts": "2026-10-11T13:03:51+00:00", "kind": "decision", "id": "d42", "text": "Mariella (tel, 11/10) : tri groupe -> 'Quand je rouvre le projet (Recommande)' : la carte part de la session du projet (resume reinjecte), 'plus tard' la fait taire 7 jours ; aucun appel d'office, rien a changer dans bcc.", "par": "agent"}
+{"ts": "2026-10-11T13:03:52+00:00", "kind": "thread_open", "id": "t13", "text": "tri groupe des attentes"}
+{"ts": "2026-10-11T13:07:08+00:00", "kind": "file_touched", "text": "sortie/tests-tri.log", "thread": "t13"}
+{"ts": "2026-10-11T13:16:00+00:00", "kind": "file_touched", "text": "sortie/tests-tri.log", "thread": "t13"}
+{"ts": "2026-10-11T13:16:00+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t13"}
+{"ts": "2026-10-11T13:16:07+00:00", "kind": "commit", "sha": "c1d3a47", "ctype": "feat", "thread": "t13"}
+{"ts": "2026-10-11T13:16:08+00:00", "kind": "commit", "sha": "f32d8f5", "ctype": "chore", "thread": "t13"}
+{"ts": "2026-10-11T13:17:02+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t13"}
+{"ts": "2026-10-11T13:17:05+00:00", "kind": "file_touched", "text": ".planning/session-state.md", "thread": "t13"}
+{"ts": "2026-10-11T13:17:08+00:00", "kind": "decision", "id": "d43", "text": "v1.9.8 publiee (11/10, GitHub + PyPI verifie) : tri groupe — le resume reinjecte propose UNE carte (liste / tout valider / plus tard) quand des attentes ont +7 j ; plantrack attentes [plus-tard]. Propagation par la ronde.", "par": "agent"}

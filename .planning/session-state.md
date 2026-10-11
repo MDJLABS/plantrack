@@ -457,3 +457,6 @@ read_events analyse le journal une fois par processus puis lit la queue ; post-c
 
 ## v1.9.7 — 2026-10-11 : pièges connus réglés (d39)
 Choix Mariella (tél, brainstorm). Nouveau verbe `piege-clos` ; doctor compte les commits par sha (pg4/pg8) ; wrapper refuse depuis un autre dépôt (pg14) ; message pre-commit propose `close` (pg6). 10 pièges clos, restent pg9, pg10, pg12 (expire 24/10), pg13, pg15. Suite verte 11 fois. GitHub + PyPI vérifiés.
+
+## v1.9.8 — 2026-10-11 : tri groupé des attentes
+Choix Mariella (tél) : tri groupé, carte « quand je rouvre le projet ». Le résumé réinjecté propose UNE carte quand bugs à vérifier / questions ont plus de 7 jours ; `plantrack attentes [plus-tard]`. Aucun appel d'office, bcc inchangé. La ronde propage.
