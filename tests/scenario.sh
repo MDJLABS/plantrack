@@ -1116,37 +1116,29 @@ CLAUDE_PROJECT_DIR="$W/copie" python3 "$PT" decide "prise dans la copie" >/dev/n
 check "b14 : decision d'une copie dans le carnet principal" "prise dans la copie" "$(cat "$W/m/.plantrack/events.jsonl")"
 rm -rf "$W"
 
-# Ronde automatique (09/10) : seule une panne hors reference et pas deja signalee part
-R=$(mktemp -d)
-printf '!!  /x/a — 1 probleme(s)\n      !!  questions sans reponse (2) — q1\n!!  /x/b — 1 probleme(s)\n      !!  garde-fou git pre-commit — lance init\n' > "$R/doc"
-printf '!!  * — questions sans reponse : produit (d11)\n' > "$R/ref"
-r() { RONDE_REPOS=${RONDE_REPOS:-/dev/null} RONDE_DOCTOR=${RONDE_DOCTOR:-"cat $R/doc"} RONDE_REF="$R/ref" RONDE_ETAT="$R/etat" RONDE_ENVOI=echo bash "$(dirname "$0")/../ronde.sh"; }
-out=$(r); check "ronde : panne nouvelle signalee" "/x/b — garde-fou git pre-commit" "$out"
-check_not "ronde : panne de la reference muette" "questions sans reponse" "$out"
-out=$(r); check_not "ronde : une seule alerte par panne" "garde-fou" "$out"
-
-# Rattrapage du coeur par la ronde (10/10) : depot en retard mis a jour et commite seul,
-# sans embarquer le travail en cours ; depot ou un processus travaille : pas touche
+# Ronde dans chaque projet (d51) : le coeur est rattrape et commite seul, sans embarquer
+# le travail en cours ; pt.py retouche a la main -> pas touche. uvx simule par un faux.
+R=$(mktemp -d); mkdir "$R/bin"
+printf '#!/bin/sh\nshift; exec python3 "%s" "$@"\n' "$PT" > "$R/bin/uvx"; chmod +x "$R/bin/uvx"
+r() { (cd "$D" && PATH="$R/bin:$PATH" CLAUDE_PROJECT_DIR="$D" python3 "$PT" ronde); }
 D="$R/depot"; git init -q "$D" && CLAUDE_PROJECT_DIR="$D" python3 "$PT" init >/dev/null 2>&1
 git -C "$D" add -A && git -C "$D" commit -qm init
 echo "# ancienne version" >> "$D/.claude/hooks/pt.py" && git -C "$D" commit -qam vieux
-echo travail > "$D/en-cours.txt"; echo "$D" > "$R/repos"
-(cd "$D" && exec sleep 30) & occ=$!; sleep 0.3
-RONDE_REPOS="$R/repos" RONDE_DOCTOR=true r >/dev/null; kill $occ
-check_not "ronde : depot occupe pas touche" "OK" "$(cmp -s "$D/.claude/hooks/pt.py" "$PT" && echo OK)"
-RONDE_REPOS="$R/repos" RONDE_DOCTOR=true r >/dev/null
-check "ronde : coeur rattrape" "OK" "$(cmp -s "$D/.claude/hooks/pt.py" "$PT" && echo OK)"
+echo travail > "$D/en-cours.txt"
+out=$(r); check "ronde : coeur rattrape" "OK" "$(cmp -s "$D/.claude/hooks/pt.py" "$PT" && echo OK)"
 check "ronde : commit du rattrapage" "par la ronde" "$(git -C "$D" log -1 --format=%s)"
 check "ronde : travail en cours non embarque" "?? en-cours.txt" "$(git -C "$D" status --porcelain)"
-# b16 : vieille mise a jour jamais commitee (copie = une version publiee) -> rattrapee ;
-# pt.py retouche a la main -> pas touche
-git -C "$(dirname "$0")/.." show "$(git -C "$(dirname "$0")/.." tag | head -1):.claude/hooks/pt.py" > "$D/.claude/hooks/pt.py"
-RONDE_REPOS="$R/repos" RONDE_DOCTOR=true r >/dev/null
-check "ronde : vieille mise a jour en suspens rattrapee" "OK" "$(cmp -s "$D/.claude/hooks/pt.py" "$PT" && echo OK)"
-check_not "ronde : vieille mise a jour commitee" "pt.py" "$(git -C "$D" status --porcelain)"
+check "ronde : deja a jour" "deja a jour" "$(r)"
 echo "# retouche" >> "$D/.claude/hooks/pt.py"; cp "$D/.claude/hooks/pt.py" "$R/main"
-RONDE_REPOS="$R/repos" RONDE_DOCTOR=true r >/dev/null
+r >/dev/null
 check "ronde : pt.py retouche a la main pas touche" "OK" "$(cmp -s "$D/.claude/hooks/pt.py" "$R/main" && echo OK)"
+git -C "$D" checkout -q -- .claude/hooks/pt.py
+# a l'ouverture : une ronde au plus toutes les 4 h, jamais dans un bac a sable (/tmp)
+echo '{}' | CLAUDE_PROJECT_DIR="$D" python3 "$PT" hook-context >/dev/null 2>&1
+check_not "ronde : pas de ronde dans /tmp" "lancee" "$(cat "$D/.plantrack/ronde.log" 2>/dev/null)"
+for i in 1 2; do echo '{}' | TMPDIR="$R/bin" PATH="$R/bin:$PATH" CLAUDE_PROJECT_DIR="$D" python3 "$PT" hook-context >/dev/null 2>&1; done
+check "ronde : lancee a l'ouverture, une seule fois en 4 h" "1" "$(grep -c lancee "$D/.plantrack/ronde.log")"
+sleep 1
 
 # Bilan de la semaine (d37) : des nombres seulement, un depot calme se tait
 B() { CLAUDE_PROJECT_DIR="$D" python3 "$PT" "$@" 2>/dev/null; }
@@ -1159,7 +1151,7 @@ check "bilan : ce qui attend l'humain" "attend ton avis : 1 question" "$out"
 check_not "bilan : jamais le texte d'une question" "texte secret" "$out"
 echo "$D" > "$R/reg"
 out=$(PLANTRACK_REGISTRY="$R/reg" python3 "$PT" bilan --all)
-check "bilan --all : une ligne par depot" "• depot : 1 décision" "$out"
+check "bilan --all : une ligne par depot" "• depot : 1 commit, 1 décision" "$out"
 out=$(BILAN_CMD="echo coucou" BILAN_ENVOI=echo bash "$(dirname "$0")/../bilan.sh")
 check "bilan.sh : envoie le bilan" "coucou" "$out"
 out=$(BILAN_CMD=true BILAN_ENVOI="echo ENVOYE" bash "$(dirname "$0")/../bilan.sh")

@@ -24,6 +24,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 from datetime import datetime, timedelta, timezone
 
 # ---------------------------------------------------------------- configuration
@@ -80,6 +81,8 @@ ARCHIVE = os.path.join(PT_DIR, "transcripts")
 REGISTRY = os.environ.get("PLANTRACK_REGISTRY") or os.path.expanduser("~/.plantrack-repos")
 INJECTIONS = os.path.join(PT_DIR, "injections.json")
 INCIDENTS = os.path.join(PT_DIR, "incidents.log")
+RONDE = os.path.join(PT_DIR, "ronde.log")   # horodatage + trace de la ronde, propre a la machine
+RONDE_PERIODE = 4 * 3600
 MAX_INCIDENTS = 50            # une panne qui se repete se lit sur ses dernieres traces
 
 
@@ -847,6 +850,7 @@ CLI humaine : plantrack status | bugs | inbox | verify <id> | reject <id> -m ...
               plantrack init   installation vendoree (tous agents, + hooks git post-commit et pre-commit d'office)
               uvx plantrack@latest update   mise a jour d'une installation existante
               plantrack doctor [--all]   verifie l'installation et l'usage reel | plantrack stats   usage sur 14 jours
+              plantrack ronde   met le coeur du projet a niveau (lancee seule a l'ouverture, toutes les 4 h au plus)
               plantrack bilan [--all] [--jours N]   ce qui a avance, ce qui attend ton avis
               plantrack attentes [plus-tard]   ce qui attend ton avis depuis plus de 7 jours (tri groupe)"""
 
@@ -953,7 +957,7 @@ def hook_pretool():
             return
         try:
             out = subprocess.run(["kvm-lourd", "classe", cmd], cwd=data.get("cwd") or None,
-                                 capture_output=True, text=True, timeout=2).stdout.strip()
+                                 capture_output=True, text=True, timeout=5).stdout.strip()
         except Exception as e:
             trace("hook-pretool : kvm-lourd classe", e)
             return
@@ -993,6 +997,7 @@ def hook_context():
     """SessionStart. stdout est injecte comme contexte visible par l'agent."""
     data = read_hook_input()
     note_injection()
+    lancer_ronde()
     src = data.get("source", "startup")
     st = project()
     if not any([st["threads"], st["bugs"], st["decisions"], st["inbox"],
@@ -1014,6 +1019,62 @@ def hook_context():
               + (f" ; +{len(ko) - 3} autre(s)" if len(ko) > 3 else ""))
     print(context_block(st, full=False))
     sys.exit(0)
+
+
+def lancer_ronde():
+    """d51 : chaque projet fait sa propre ronde, a l'ouverture, au plus toutes les 4 h.
+    Detachee : l'agent n'attend pas le reseau. Jamais dans un bac a sable (/tmp)."""
+    try:
+        if os.path.realpath(ROOT).startswith(os.path.realpath(tempfile.gettempdir()) + os.sep):
+            return
+        if os.path.exists(RONDE) and time.time() - os.path.getmtime(RONDE) < RONDE_PERIODE:
+            return
+        os.makedirs(PT_DIR, exist_ok=True)
+        with open(RONDE, "a", encoding="utf-8") as log:
+            log.write(f"{datetime.now().isoformat(timespec='seconds')} ronde lancee\n")
+            subprocess.Popen([sys.executable, os.path.abspath(__file__), "ronde"], cwd=ROOT,
+                             stdin=subprocess.DEVNULL, stdout=log, stderr=log, start_new_session=True,
+                             env=dict(os.environ, PLANTRACK_ROOT=ROOT, CLAUDE_PROJECT_DIR=ROOT))
+    except OSError as e:
+        trace("lancer_ronde", e)
+
+
+def cmd_ronde():
+    """Remet le coeur du projet a niveau depuis PyPI (`uvx plantrack@latest update`) et
+    commite uniquement les fichiers que l'update a touches — jamais le travail en cours.
+    Le diagnostic, lui, est deja affiche a chaque ouverture (hook-context)."""
+    def sales():
+        git = lambda *a: subprocess.run(["git", *a], cwd=ROOT, capture_output=True, text=True,
+                                         check=True).stdout.split()
+        try:
+            return set(git("ls-files", "-m", "-o", "--exclude-standard")) | set(
+                git("diff", "--cached", "--name-only", "--relative"))
+        except (OSError, subprocess.CalledProcessError):
+            return None
+    pyproject = os.path.join(ROOT, "pyproject.toml")
+    if os.path.exists(pyproject) and 'name = "plantrack"' in open(pyproject, encoding="utf-8").read():
+        return print("ronde : depot source de PlanTrack, pas de mise a jour depuis PyPI")
+    avant = sales()
+    if avant is None:
+        return print("ronde : pas de git exploitable")
+    if ".claude/hooks/pt.py" in avant:
+        return print("ronde : pt.py modifie a la main, mise a jour laissee de cote")
+    try:
+        p = subprocess.run(["uvx", "plantrack@latest", "update"], cwd=ROOT, capture_output=True,
+                           text=True, timeout=300)
+    except (OSError, subprocess.TimeoutExpired) as e:
+        return print(f"ronde : update impossible ({e})")
+    if p.returncode:
+        return print(f"ronde : update en echec : {p.stderr.strip()[-300:]}")
+    nouveaux = sorted((sales() or set()) - avant)
+    if not nouveaux:
+        return print("ronde : coeur deja a jour")
+    git = lambda *a: subprocess.run(["git", *a], cwd=ROOT, capture_output=True, text=True)
+    if git("add", "--", *nouveaux).returncode or git(
+            "commit", "-q", "-m", "chore(plantrack): coeur mis a jour par la ronde", "--", *nouveaux).returncode:
+        git("reset", "-q", "--", *nouveaux)
+        return print(f"ronde : coeur mis a jour, commit refuse : {' '.join(nouveaux)}")
+    print(f"ronde : coeur mis a jour et commite ({len(nouveaux)} fichier(s))")
 
 
 def hook_commit():
@@ -1344,7 +1405,7 @@ def cmd_init(args):
             content = f.read()
     # transcripts : trop lourds ; injections et incidents : propres a la machine
     missing = [l for l in (".plantrack/transcripts/", ".plantrack/injections.json",
-                           ".plantrack/incidents.log") if l not in content]
+                           ".plantrack/incidents.log", ".plantrack/ronde.log") if l not in content]
     if missing:
         with open(gi, "a", encoding="utf-8") as f:
             f.write(("\n" if content and not content.endswith("\n") else "")
@@ -2272,6 +2333,8 @@ def cli(argv):
         cmd_stats()
     elif cmd == "bilan":
         cmd_bilan(args, st)
+    elif cmd == "ronde":
+        cmd_ronde()
     elif cmd == "attentes":
         print(cmd_attentes(args, st))
     elif cmd == "bugs":
