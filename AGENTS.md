@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t14 : travaux sur main [17 commits]
-  fichiers recemment ecrits : sortie/essai-ronde/p/.claude/hooks/pt.py, ../../../root/.claude/plans/contexte-reconstruit-par-le-piped-graham.md, .claude/hooks/pt.py, tests/scenario.sh, pyproject.toml, ../../../root/kvm-lourd/tests/test_estimation.py
+FIL ACTIF — t14 : travaux sur main [18 commits]
+  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-piped-graham.md, .claude/hooks/pt.py, tests/scenario.sh, pyproject.toml, ../../../root/kvm-lourd/tests/test_estimation.py, .plantrack/incidents.log
   (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -83,7 +83,6 @@ Pieges connus :
   pg12 : Le defaut doctor 'commits rattaches a un fil' est RETROACTIF comme pg1 : sur pr…
   pg13 : Gabarit de parcours : la phase de construction est a 'questions: false', mais u…
   pg15 : Le Stop hook bcc (hook/index.ts, regle 'projet ne s'endort jamais' du 03/10) EX…
-  pg17 : kvm-lourd estimer() regroupe par (type, projet) et ne redescend jamais : un seu…
 
 Questions en attente (reponds via !answer qN ...) :
   q1 : Propager le correctif b14 (worktree) vers bcc, prorent et cvslim des que leurs …
