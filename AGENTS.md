@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t14 : travaux sur main [15 commits]
-  fichiers recemment ecrits : sortie/carte-memoire.log, sortie/essai-ronde/p/encours.txt, sortie/essai-ronde/p/.claude/hooks/pt.py, ../../../root/.claude/plans/contexte-reconstruit-par-le-piped-graham.md, .claude/hooks/pt.py, tests/scenario.sh
+FIL ACTIF — t14 : travaux sur main [17 commits]
+  fichiers recemment ecrits : sortie/essai-ronde/p/.claude/hooks/pt.py, ../../../root/.claude/plans/contexte-reconstruit-par-le-piped-graham.md, .claude/hooks/pt.py, tests/scenario.sh, pyproject.toml, ../../../root/kvm-lourd/tests/test_estimation.py
   (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -74,6 +74,8 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d49 : kvm-lourd corrige (choix Mariella tel 11/10 'Corriger kvm-lourd (Recommande)') : classe lit la commande comme le shell (shlex) — texte cite… (agent)
   d50 : Mariella (tel, 12/10, via AskUserQuestion) : tri des bugs en attente -> 'Dans chaque projet (Recommande)' (respect d11/d42) : la carte de t… (agent)
   d51 : Mariella (tel, 12/10) : la ronde PlanTrack s'execute dans chaque projet, a l'ouverture (choix 'A l'ouverture du projet (Recommande)'), Plan… (agent)
+  d52 : v1.9.11 publiee (12/10, GitHub + PyPI verifie) : ronde dans chaque projet (d51) — SessionStart lance 'plantrack ronde' en fond si la dernie… (agent)
+  d53 : kvm-lourd estimation corrigee (choix Mariella tel 12/10 'Estimation + alerte (Recommande)') : 1,2 x MEDIANE des 10 derniers pics (au lieu d… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…

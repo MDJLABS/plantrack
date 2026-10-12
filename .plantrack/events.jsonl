@@ -712,3 +712,9 @@
 {"ts": "2026-10-12T20:48:45+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t14"}
 {"ts": "2026-10-12T20:52:10+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t14"}
 {"ts": "2026-10-12T20:52:24+00:00", "kind": "commit", "sha": "2fea3c1", "ctype": "feat", "thread": "t14"}
+{"ts": "2026-10-12T20:52:24+00:00", "kind": "commit", "sha": "8248543", "ctype": "chore", "thread": "t14"}
+{"ts": "2026-10-12T20:52:24+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t14"}
+{"ts": "2026-10-12T20:54:52+00:00", "kind": "file_touched", "text": "../../../root/kvm-lourd/tests/test_estimation.py", "thread": "t14"}
+{"ts": "2026-10-12T20:56:21+00:00", "kind": "commit", "sha": "7f53cd1", "ctype": "chore", "thread": "t14"}
+{"ts": "2026-10-12T20:56:29+00:00", "kind": "decision", "id": "d52", "text": "v1.9.11 publiee (12/10, GitHub + PyPI verifie) : ronde dans chaque projet (d51) — SessionStart lance 'plantrack ronde' en fond si la derniere a plus de 4 h (jamais sous /tmp), rattrapage du coeur via uvx plantrack@latest update, commit des seuls fichiers touches. Minuteur central plantrack-ronde.timer + ronde.sh + ronde-reference RETIRES (remplace d25/d28 ; plus d'e-mail central, la panne s'affiche a l'ouverture du projet). Les 12 depots du registre a jour. Tri kvm-lourd : delai 2 s -> 5 s (panne du 12/10 7h, machine chargee).", "par": "agent"}
+{"ts": "2026-10-12T20:56:29+00:00", "kind": "decision", "id": "d53", "text": "kvm-lourd estimation corrigee (choix Mariella tel 12/10 'Estimation + alerte (Recommande)') : 1,2 x MEDIANE des 10 derniers pics (au lieu du max), plancher = depart ; avertissement 'pic hors norme' quand un run depasse 1,5 x la mediane. Installe dans /usr/local/bin ; bcc gradle redescend de 4,7 a 3,0 Go.", "par": "agent"}
