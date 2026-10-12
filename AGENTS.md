@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t14 : travaux sur main [13 commits]
-  fichiers recemment ecrits : tests/scenario.sh, pyproject.toml, ../../../root/kvm-lourd/kvm_lourd.py, ../../../root/kvm-lourd/tests/test_types.py, ../../../tmp/kvm_watch.sh, ../../../tmp/kvm_watch.nohup.log
+FIL ACTIF — t14 : travaux sur main [15 commits]
+  fichiers recemment ecrits : sortie/carte-memoire.log, sortie/essai-ronde/p/encours.txt, sortie/essai-ronde/p/.claude/hooks/pt.py, ../../../root/.claude/plans/contexte-reconstruit-par-le-piped-graham.md, .claude/hooks/pt.py, tests/scenario.sh
   (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -73,6 +73,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d48 : Verification consigne kvm-lourd (11/10, choix Mariella tel 'Tester ./gradlew build (Recommande)') : en session reelle dans bcc, './gradlew … (agent)
   d49 : kvm-lourd corrige (choix Mariella tel 11/10 'Corriger kvm-lourd (Recommande)') : classe lit la commande comme le shell (shlex) — texte cite… (agent)
   d50 : Mariella (tel, 12/10, via AskUserQuestion) : tri des bugs en attente -> 'Dans chaque projet (Recommande)' (respect d11/d42) : la carte de t… (agent)
+  d51 : Mariella (tel, 12/10) : la ronde PlanTrack s'execute dans chaque projet, a l'ouverture (choix 'A l'ouverture du projet (Recommande)'), Plan… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
@@ -80,6 +81,7 @@ Pieges connus :
   pg12 : Le defaut doctor 'commits rattaches a un fil' est RETROACTIF comme pg1 : sur pr…
   pg13 : Gabarit de parcours : la phase de construction est a 'questions: false', mais u…
   pg15 : Le Stop hook bcc (hook/index.ts, regle 'projet ne s'endort jamais' du 03/10) EX…
+  pg17 : kvm-lourd estimer() regroupe par (type, projet) et ne redescend jamais : un seu…
 
 Questions en attente (reponds via !answer qN ...) :
   q1 : Propager le correctif b14 (worktree) vers bcc, prorent et cvslim des que leurs …

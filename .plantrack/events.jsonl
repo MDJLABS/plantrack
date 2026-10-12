@@ -684,3 +684,31 @@
 {"ts": "2026-10-11T22:02:37+00:00", "kind": "file_touched", "text": "../../../tmp/kvm_watch.sh", "thread": "t14"}
 {"ts": "2026-10-11T22:02:41+00:00", "kind": "file_touched", "text": "../../../tmp/kvm_watch.nohup.log", "thread": "t14"}
 {"ts": "2026-10-11T22:09:10+00:00", "kind": "decision", "id": "d50", "text": "Mariella (tel, 12/10, via AskUserQuestion) : tri des bugs en attente -> 'Dans chaque projet (Recommande)' (respect d11/d42) : la carte de tri groupe apparait a l'ouverture de bcc (10 bugs + 1 question de +7 j) et de miamboost (8 bugs). Un sous-agent surveille la file kvm-lourd ~2 h (lecture seule).", "par": "agent"}
+{"ts": "2026-10-11T22:09:10+00:00", "kind": "commit", "sha": "5ea8435", "ctype": "chore", "thread": "t14"}
+{"ts": "2026-10-11T22:09:59+00:00", "kind": "file_touched", "text": "../../../tmp/kvm_watch.sh", "thread": "t14"}
+{"ts": "2026-10-11T22:10:04+00:00", "kind": "file_touched", "text": "../../../tmp/kvm_watch.nohup.log", "thread": "t14"}
+{"ts": "2026-10-12T04:14:25+00:00", "kind": "file_touched", "text": "sortie/file-bcc-0412.log", "thread": "t14"}
+{"ts": "2026-10-12T04:26:54+00:00", "kind": "file_touched", "text": "sortie/schemas-plantrack/gen.py", "thread": "t14"}
+{"ts": "2026-10-12T04:26:57+00:00", "kind": "file_touched", "text": "sortie/schemas-plantrack/gen.py", "thread": "t14"}
+{"ts": "2026-10-12T04:27:02+00:00", "kind": "file_touched", "text": "sortie/schemas-plantrack/gen.py", "thread": "t14"}
+{"ts": "2026-10-12T04:27:05+00:00", "kind": "file_touched", "text": "sortie/schemas-plantrack/gen.py", "thread": "t14"}
+{"ts": "2026-10-12T04:27:15+00:00", "kind": "file_touched", "text": "sortie/schemas-plantrack/serveur.log", "thread": "t14"}
+{"ts": "2026-10-12T04:28:28+00:00", "kind": "file_touched", "text": "sortie/carte-schemas.log", "thread": "t14"}
+{"ts": "2026-10-12T04:34:20+00:00", "kind": "file_touched", "text": "sortie/carte-ronde.log", "thread": "t14"}
+{"ts": "2026-10-12T04:34:22+00:00", "kind": "question", "id": "q2", "text": "Ronde par projet (demande Mariella 12/10 : chaque installation fait sa ronde dans son propre projet, PlanTrack = composant) : declenchement a l'ouverture du projet (reco), minuteur par projet, ou les deux ?"}
+{"ts": "2026-10-12T04:41:20+00:00", "kind": "file_touched", "text": "sortie/carte-memoire.log", "thread": "t14"}
+{"ts": "2026-10-12T04:41:23+00:00", "kind": "piege", "id": "pg17", "text": "kvm-lourd estimer() regroupe par (type, projet) et ne redescend jamais : un seul run atypique (bcc lint Vraie+Essai+compileKotlin, pic 4,19 Go, 12/10 00:31) fixe 4,7 Go pour TOUTE commande gradle/bcc (assemble jamais > 2,9 Go) -> file bloquee des que < 4,7 Go libres. Correctif propose a Mariella (carte 12/10)."}
+{"ts": "2026-10-12T04:41:47+00:00", "kind": "answer", "id": "q2", "text": "A l'ouverture du projet", "canal": "telephone : Ronde dans chaque projet : quand doit-elle se déclencher ? → À l’ouverture du projet (Recommandé)"}
+{"ts": "2026-10-12T04:41:47+00:00", "kind": "decision", "id": "d51", "text": "Mariella (tel, 12/10) : la ronde PlanTrack s'execute dans chaque projet, a l'ouverture (choix 'A l'ouverture du projet (Recommande)'), PlanTrack etant un composant installable. Remplace le minuteur central ronde.sh/plantrack-ronde.timer (d25/d28) : verbe 'plantrack ronde' (doctor du projet + rattrapage du coeur depuis PyPI), lance en fond par SessionStart si la derniere ronde a plus de 4 h ; panne nouvelle notee au carnet du projet.", "par": "agent"}
+{"ts": "2026-10-12T04:42:34+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t14"}
+{"ts": "2026-10-12T04:42:36+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t14"}
+{"ts": "2026-10-12T04:42:46+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t14"}
+{"ts": "2026-10-12T04:42:47+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t14"}
+{"ts": "2026-10-12T04:42:48+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t14"}
+{"ts": "2026-10-12T04:42:49+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t14"}
+{"ts": "2026-10-12T06:59:16+00:00", "kind": "file_touched", "text": "sortie/essai-ronde/p/encours.txt", "thread": "t14"}
+{"ts": "2026-10-12T06:59:16+00:00", "kind": "file_touched", "text": "sortie/essai-ronde/p/.claude/hooks/pt.py", "thread": "t14"}
+{"ts": "2026-10-12T14:43:53+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-piped-graham.md", "thread": "t14"}
+{"ts": "2026-10-12T20:48:45+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t14"}
+{"ts": "2026-10-12T20:52:10+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t14"}
+{"ts": "2026-10-12T20:52:24+00:00", "kind": "commit", "sha": "2fea3c1", "ctype": "feat", "thread": "t14"}
