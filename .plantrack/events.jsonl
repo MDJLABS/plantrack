@@ -730,3 +730,19 @@
 {"ts": "2026-10-13T02:08:05+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t15"}
 {"ts": "2026-10-13T02:36:58+00:00", "kind": "bug", "id": "b17", "text": "kvm-lourd fail-open sous pression memoire : 'kvm-lourd classe' expire (5 s) quand bcc.service est a son memory.high -> tsc/next build passent HORS file, lourd.slice vide pendant une saturation (13/10 02:35 : load 53, swap 100 %, PSI mem full 67 %, 56 timeouts dans les incidents.log). Budget calcule sur la RAM globale, aveugle au cgroup appelant et a la swap. Rapport : .planning/2026-10-13-rapport-charge-serveur.md", "thread": "t15", "severity": "high", "par": "agent"}
 {"ts": "2026-10-13T02:36:58+00:00", "kind": "commit", "sha": "5238793", "ctype": "docs", "thread": "t15"}
+{"ts": "2026-10-13T02:38:22+00:00", "kind": "commit", "sha": "e8951da", "ctype": "docs", "thread": "t15"}
+{"ts": "2026-10-13T02:43:01+00:00", "kind": "attempt", "id": "a24", "bug": "b17", "hypothesis": "Charger kvm-lourd DANS le processus du hook (importlib) au lieu de lancer 'kvm-lourd classe' en sous-processus : sous pression memoire c'est le demarrage d'un 2e Python dans le cgroup sature qui depassait 5 s. Projet = nom de CLAUDE_PROJECT_DIR (evite le git de projet_par_defaut). Fail-open conserve. + types.conf : tsc reconnu par chemin (./node_modules/.bin/tsc).", "actor": "claude-code"}
+{"ts": "2026-10-13T02:46:10+00:00", "kind": "precommit_block"}
+{"ts": "2026-10-13T02:46:16+00:00", "kind": "commit", "sha": "dd502dd", "ctype": "fix", "thread": "t15"}
+{"ts": "2026-10-13T02:46:16+00:00", "kind": "bug_status", "id": "b17", "status": "to_verify"}
+{"ts": "2026-10-13T02:48:14+00:00", "kind": "file_touched", "text": "sortie/repro.sh", "thread": "t15"}
+{"ts": "2026-10-13T02:48:14+00:00", "kind": "file_touched", "text": "sortie/repro.sh", "thread": "t15"}
+{"ts": "2026-10-13T02:48:21+00:00", "kind": "file_touched", "text": "sortie/repro.sh", "thread": "t15"}
+{"ts": "2026-10-13T02:48:21+00:00", "kind": "file_touched", "text": "sortie/repro.sh", "thread": "t15"}
+{"ts": "2026-10-13T02:48:34+00:00", "kind": "file_touched", "text": "sortie/r2.sh", "thread": "t15"}
+{"ts": "2026-10-13T02:48:34+00:00", "kind": "file_touched", "text": "sortie/r2.sh", "thread": "t15"}
+{"ts": "2026-10-13T02:48:40+00:00", "kind": "file_touched", "text": "sortie/tests.log", "thread": "t15"}
+{"ts": "2026-10-13T03:01:54+00:00", "kind": "commit", "sha": "eadfb4b", "ctype": "release", "thread": "t15"}
+{"ts": "2026-10-13T03:01:54+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t15"}
+{"ts": "2026-10-13T03:02:42+00:00", "kind": "decision", "id": "d54", "text": "v1.9.12 publiee (13/10, GitHub + PyPI verifie, plan valide par Mariella tel 'Vu') : le bilan du dimanche fait le controle de sante (diagnose) de chaque projet — ligne prefixee '⚠ en panne (N defauts)', un projet en panne parle meme s'il est calme — et signale 'pas ouvert depuis N jours' (mtime ronde.log/events.jsonl >= periode). Nombres seulement (d11). Code embarque par erreur dans le commit dd502dd (b17) d'une session parallele. Propagation par la ronde. 410 tests verts.", "par": "agent"}
+{"ts": "2026-10-13T03:02:42+00:00", "kind": "close", "id": "t15"}
