@@ -14,13 +14,15 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t14 : travaux sur main [18 commits]
-  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-piped-graham.md, .claude/hooks/pt.py, tests/scenario.sh, pyproject.toml, ../../../root/kvm-lourd/tests/test_estimation.py, .plantrack/incidents.log
-  (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
+FIL ACTIF — t15 : pannes-dans-bilan [1 commits]
+  fichiers recemment ecrits : .claude/hooks/pt.py, tests/scenario.sh
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
   t5 : travaux sur main — reprise : retour au travail courant apres la faille
+
+BUGS NON CORRIGES (personne ne s'en est occupe) :
+  b17 (open) [t15] kvm-lourd fail-open sous pression memoire : 'kvm-lourd classe' expire (5 s) quand bcc.service est a son memory.high -> tsc/next build passe… (agent)
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)

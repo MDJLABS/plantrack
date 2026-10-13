@@ -39,3 +39,8 @@
 - `bcc.service` : plafond 4 Go trop bas pour 7 sessions + MCP + builds, ou limiter le nombre de
   sessions/Playwright simultanés.
 - Swap pleine : `swapoff -a && swapon -a` une fois la pression retombée (geste humain).
+
+## Action du 13/10 02:37 (choix Mariella : « Soulager le serveur »)
+39 processus arrêtés (tsc s69, next/opennext build miamboost, git remote-https bloqués > 5 min).
+Une minute après : bcc.service 4,5 → 2,35 Go, PSI mémoire avg10 99 % → 3 %, 0 processus en D,
+load 53 → 30 et en baisse. Swap toujours pleine (vidage = geste humain).

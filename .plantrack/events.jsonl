@@ -721,3 +721,12 @@
 {"ts": "2026-10-12T20:56:29+00:00", "kind": "commit", "sha": "826506f", "ctype": "chore", "thread": "t14"}
 {"ts": "2026-10-12T20:56:31+00:00", "kind": "file_touched", "text": ".plantrack/incidents.log", "thread": "t14"}
 {"ts": "2026-10-12T20:56:34+00:00", "kind": "piege_clos", "id": "pg17", "text": "estimer() prend la mediane des 10 derniers pics + alerte pic hors norme (kvm-lourd 069964a)"}
+{"ts": "2026-10-12T20:56:34+00:00", "kind": "commit", "sha": "e281005", "ctype": "chore", "thread": "t14"}
+{"ts": "2026-10-12T20:56:44+00:00", "kind": "file_touched", "text": "sortie/carte-suite-ronde.log", "thread": "t14"}
+{"ts": "2026-10-12T20:59:57+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-goofy-scott.md", "thread": "t14"}
+{"ts": "2026-10-13T02:07:47+00:00", "kind": "close", "id": "t14"}
+{"ts": "2026-10-13T02:07:47+00:00", "kind": "thread_open", "id": "t15", "text": "pannes-dans-bilan"}
+{"ts": "2026-10-13T02:08:04+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t15"}
+{"ts": "2026-10-13T02:08:05+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t15"}
+{"ts": "2026-10-13T02:36:58+00:00", "kind": "bug", "id": "b17", "text": "kvm-lourd fail-open sous pression memoire : 'kvm-lourd classe' expire (5 s) quand bcc.service est a son memory.high -> tsc/next build passent HORS file, lourd.slice vide pendant une saturation (13/10 02:35 : load 53, swap 100 %, PSI mem full 67 %, 56 timeouts dans les incidents.log). Budget calcule sur la RAM globale, aveugle au cgroup appelant et a la swap. Rapport : .planning/2026-10-13-rapport-charge-serveur.md", "thread": "t15", "severity": "high", "par": "agent"}
+{"ts": "2026-10-13T02:36:58+00:00", "kind": "commit", "sha": "5238793", "ctype": "docs", "thread": "t15"}

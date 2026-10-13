@@ -1152,6 +1152,11 @@ check_not "bilan : jamais le texte d'une question" "texte secret" "$out"
 echo "$D" > "$R/reg"
 out=$(PLANTRACK_REGISTRY="$R/reg" python3 "$PT" bilan --all)
 check "bilan --all : une ligne par depot" "• depot : 1 commit, 1 décision" "$out"
+check_not "bilan : depot sain sans alerte" "en panne" "$out"
+touch -d '10 days ago' "$D/.plantrack/ronde.log" "$D/.plantrack/events.jsonl"
+check "bilan : depot oublie signale" "pas ouvert depuis 10 jours" "$(B bilan)"
+sed -i 's/hook-precompact//' "$D/.claude/settings.json"
+check "bilan : depot en panne en tete" "⚠ en panne (1 défaut) — depot" "$(B bilan --jours 30)"
 out=$(BILAN_CMD="echo coucou" BILAN_ENVOI=echo bash "$(dirname "$0")/../bilan.sh")
 check "bilan.sh : envoie le bilan" "coucou" "$out"
 out=$(BILAN_CMD=true BILAN_ENVOI="echo ENVOYE" bash "$(dirname "$0")/../bilan.sh")

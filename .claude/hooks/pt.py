@@ -1833,9 +1833,17 @@ def bilan_ligne(st, jours=7):
             (sum(s["verdict"] is None for s in st["steps"].values()), ("point de test", "points de test"))]
     dire = lambda l: ", ".join(f"{n} {m[n > 1]}" for n, m in l if n)
     a, b = dire(fait), dire(avis)
-    if not (a or b):
+    # sans minuteur central (d51), un depot jamais rouvert peut etre en panne sans que
+    # rien ne le dise : le bilan, qui passe partout, fait le controle a sa place
+    pannes = sum(g is False for g, *_ in diagnose(st))
+    vu = max((os.path.getmtime(p) for p in (RONDE, LOG) if os.path.exists(p)), default=0)
+    age = int((datetime.now().timestamp() - vu) // 86400) if vu else None
+    if not (a or b or pannes):
         return ""
-    return f"{os.path.basename(ROOT)} : {a or 'rien de neuf'}" + (f" — attend ton avis : {b}" if b else "")
+    tete = f"⚠ en panne ({pannes} défaut{'s' * (pannes > 1)}) — " if pannes else ""
+    oubli = f" — pas ouvert depuis {age} jours" if age is not None and age >= jours else ""
+    return (f"{tete}{os.path.basename(ROOT)} : {a or 'rien de neuf'}"
+            + (f" — attend ton avis : {b}" if b else "") + oubli)
 
 
 def cmd_bilan(args, st):
