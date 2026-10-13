@@ -1585,12 +1585,17 @@ def usage_gap(days=USAGE_DAYS):
     # par construction ; une marge en secondes ne l'aurait reglee qu'en moyenne.
     firsts = [e for e in evs if e.get("kind") == "commit" and e.get("ts")]
     plancher = min(firsts, key=lambda e: e["ts"])["ts"] if firsts else min(stamps)
-    if firsts and (d := git_commit_date(min(firsts, key=lambda e: e["ts"]).get("sha"))):
+    avant = []
+    if firsts and (d := git_commit_date(sha := min(firsts, key=lambda e: e["ts"]).get("sha"))):
         plancher = d
+        # b18 : --since est inclusif a la seconde ; les commits d'AVANT le premier
+        # journalise tombes dans la meme seconde comptaient. Ses parents s'excluent
+        # par ascendance, pas par l'horloge.
+        avant = ["HEAD", "--not", f"{sha}^@"]
     since = max((datetime.now(timezone.utc) - timedelta(days=days)).isoformat(timespec="seconds"),
                 plancher)
     try:
-        r = subprocess.run(["git", "-C", ROOT, "log", f"--since={since}", "--pretty=%H"],
+        r = subprocess.run(["git", "-C", ROOT, "log", f"--since={since}", "--pretty=%H", *avant],
                            capture_output=True, text=True, timeout=10)
     except (OSError, subprocess.SubprocessError) as e:
         trace("usage_gap : git log", e)
@@ -1685,9 +1690,21 @@ def diagnose(st):
     if os.path.exists(INCIDENTS):
         with open(INCIDENTS, encoding="utf-8") as f:
             inc = [l for l in f.read().splitlines() if l.strip()]
-    chk(not inc, f"pannes avalees par les hooks ({len(inc)} tracee(s))",
-        f"derniere : {trunc(inc[-1], 120)} — tout est dans .plantrack/incidents.log "
-        "(efface le fichier une fois la panne traitee)" if inc else "")
+    # Une panne tracee AVANT le dernier correctif declare (bug passe to_verify)
+    # est traitee : le voyant s'eteint seul, sans effacer le fichier (d9). Si
+    # elle revient apres, elle est neuve et le voyant se rallume.
+    # ponytail: un correctif sans rapport acquitte aussi une panne anterieure ;
+    # acceptable car une vraie panne de hook se repete. Lier panne<->bug si ca gene.
+    fixes = [b for b in st["bugs"].values() if b["status"] in ("to_verify", "validated")]
+    fix = max(fixes, key=lambda b: b.get("status_ts", b["ts"]), default=None)
+    seuil = fix.get("status_ts", fix["ts"]) if fix else ""
+    neuves = [l for l in inc if l.split(" ", 1)[0] > seuil]
+    if len(neuves) < len(inc):
+        out.append((None, f"{len(inc) - len(neuves)} panne(s) passee(s), traitee(s) par "
+                    f"{fix['id']} — traces gardees dans .plantrack/incidents.log", ""))
+    chk(not neuves, f"pannes avalees par les hooks ({len(neuves)} tracee(s) depuis le dernier correctif)",
+        f"derniere : {trunc(neuves[-1], 120)} — tout est dans .plantrack/incidents.log ; "
+        "corrige puis passe le bug en to_verify, le voyant s'eteint seul" if neuves else "")
     stale, muettes, _ = attentes(st)
     chk(not stale, f"bugs en attente de verdict humain ({len(stale)} depuis plus de {STALE_DAYS} jours)",
         "l'agent a fini, personne n'a tranche : `!verify <id>` ou `!reject <id> motif` dans la session — "

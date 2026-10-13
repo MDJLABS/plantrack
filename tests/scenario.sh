@@ -1024,6 +1024,17 @@ check "la panne est tracee, avec son origine" "note_injection" "$(cat "$TMP25/.p
 out=$(CLAUDE_PROJECT_DIR="$TMP25" python3 "$PT" doctor 2>&1)
 check "le doctor annonce la panne avalee" "!!  pannes avalees par les hooks (1" "$out"
 check "et donne la derniere trace" "JSONDecodeError" "$out"
+# Le voyant s'eteint seul : la panne d'avant le correctif est traitee, gardee.
+sleep 1
+CLAUDE_PROJECT_DIR="$TMP25" python3 "$PT" bug b1 to_verify >/dev/null 2>&1
+out=$(CLAUDE_PROJECT_DIR="$TMP25" python3 "$PT" doctor 2>&1)
+check "apres correctif, la panne passee ne rougit plus" "ok  pannes avalees par les hooks (0" "$out"
+check "et elle reste annoncee comme traitee" "traitee(s) par b1" "$out"
+check "sans effacer la trace" "note_injection" "$(cat "$TMP25/.plantrack/incidents.log")"
+sleep 1
+printf '{"source":"startup"}' | CLAUDE_PROJECT_DIR="$TMP25" python3 "$PT" hook-context >/dev/null 2>&1
+out=$(CLAUDE_PROJECT_DIR="$TMP25" python3 "$PT" doctor 2>&1)
+check "si elle revient apres le correctif, le voyant se rallume" "!!  pannes avalees par les hooks (1" "$out"
 rm -rf "$TMP25"
 
 # 26. b6 — hook-filelog n'ecoutait que Edit|Write|MultiEdit|NotebookEdit : une
