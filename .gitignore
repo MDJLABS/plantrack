@@ -7,3 +7,4 @@ __pycache__/
 .plantrack/injections.json
 .plantrack/incidents.log
 .planning/scenario.log
+.plantrack/sante.jsonl

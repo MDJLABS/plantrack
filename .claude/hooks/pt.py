@@ -85,6 +85,8 @@ INJECTIONS = os.path.join(PT_DIR, "injections.json")
 INCIDENTS = os.path.join(PT_DIR, "incidents.log")
 RONDE = os.path.join(PT_DIR, "ronde.log")   # horodatage + trace de la ronde, propre a la machine
 RONDE_PERIODE = 4 * 3600
+SANTE = os.path.join(PT_DIR, "sante.jsonl")   # releve de sante quotidien de la flotte (d57)
+ATTENTES = ("bugs en attente de verdict", "questions sans reponse")   # defauts doctor cote humain
 MAX_INCIDENTS = 50            # une panne qui se repete se lit sur ses dernieres traces
 
 
@@ -854,6 +856,7 @@ CLI humaine : plantrack status | bugs | inbox | verify <id> | reject <id> -m ...
               plantrack doctor [--all]   verifie l'installation et l'usage reel | plantrack stats   usage sur 14 jours
               plantrack ronde   met le coeur du projet a niveau (lancee seule a l'ouverture, toutes les 4 h au plus)
               plantrack bilan [--all] [--jours N]   ce qui a avance, ce qui attend ton avis
+              plantrack releve [--rapport]   releve de sante de la flotte (bulle sur panne neuve) | rapport final
               plantrack attentes [plus-tard]   ce qui attend ton avis depuis plus de 7 jours (tri groupe)"""
 
 
@@ -1798,28 +1801,37 @@ def register_root():
         pass
 
 
+def flotte(roots):
+    """{depot: defauts du doctor (liste vide = sain, None = installation absente)}, et
+    les depots effaces ou bacs a sable, dont l'entree au registre n'a plus de sens."""
+    etat, gone = {}, []
+    for r in roots:
+        core = os.path.join(r, ".claude", "hooks", "pt.py")
+        if not os.path.isdir(r) or jetable(r):
+            gone.append(r)
+        elif not os.path.exists(core):
+            etat[r] = None
+        else:
+            env = dict(os.environ, PLANTRACK_ROOT=r, CLAUDE_PROJECT_DIR=r)
+            p = subprocess.run([sys.executable, core, "doctor"], capture_output=True, text=True, env=env)
+            etat[r] = [l.strip()[4:] for l in p.stdout.splitlines() if l.startswith("  !!")]
+    return etat, gone
+
+
 def cmd_doctor_all():
     """Un ecran pour toute la flotte : ou ca deraille, sans entrer dans les depots."""
     roots = registered_roots()
     if not roots:
         sys.exit("[PlanTrack] aucun depot enregistre — lance `plantrack init` dans chacun.")
-    bad, gone = 0, []
-    for r in roots:
-        core = os.path.join(r, ".claude", "hooks", "pt.py")
-        if not os.path.isdir(r) or jetable(r):
-            gone.append(r)  # depot efface ou bac a sable : l'entree n'a plus de sens, on la retire
-            continue
-        if not os.path.exists(core):
-            bad += 1
+    etat, gone = flotte(roots)
+    bad = sum(ko != [] for ko in etat.values())
+    for r, ko in etat.items():
+        if ko is None:
             print(f"!!  {r} — installation absente — relance `plantrack init` ici")
             continue
-        env = dict(os.environ, PLANTRACK_ROOT=r, CLAUDE_PROJECT_DIR=r)
-        p = subprocess.run([sys.executable, core, "doctor"], capture_output=True, text=True, env=env)
-        ko = [l.strip() for l in p.stdout.splitlines() if l.startswith("  !!")]
-        bad += bool(ko)
         print(f"{'!!' if ko else 'ok'}  {r}" + (f" — {len(ko)} probleme(s)" if ko else ""))
         for l in ko:
-            print("      " + l)
+            print("      !!  " + l)
     if gone:
         with open(REGISTRY, "w", encoding="utf-8") as f:
             f.write("".join(x + "\n" for x in roots if x not in gone))
@@ -1893,8 +1905,95 @@ def cmd_bilan(args, st):
                            capture_output=True, text=True, env=env)
         if p.stdout.strip():
             lignes.append("• " + p.stdout.strip())
+    if s := sante_resume(jours):
+        lignes.append(s)
     if lignes:
         print(f"Bilan PlanTrack des {jours} derniers jours :\n" + "\n".join(lignes))
+
+
+def sante(jours=None):
+    """Le releve de sante (d57), les `jours` derniers jours seulement si demande."""
+    if not os.path.exists(SANTE):
+        return []
+    debut = (datetime.now().date() - timedelta(days=jours)).isoformat() if jours else ""
+    out = []
+    with open(SANTE, encoding="utf-8") as f:
+        for l in f:
+            try:
+                e = json.loads(l)
+            except ValueError:
+                continue
+            if e.get("jour", "") > debut:
+                out.append(e)
+    return out
+
+
+def cle(defaut):
+    """Un defaut sans ses nombres : '3 pannes' puis '4 pannes', c'est la meme panne."""
+    return re.sub(r"\d+", "#", defaut.split(" — ")[0])
+
+
+def par_jour(lignes):
+    """{jour: {depot: defauts}} — un releve relance le meme jour remplace le precedent."""
+    out = {}
+    for e in lignes:
+        out.setdefault(e["jour"], {})[e["depot"]] = e["ko"]
+    return out
+
+
+def sante_resume(jours=None):
+    """'Santé : 6 jours verts sur 7' + les projets qui ont eu un souci ; '' sans releve."""
+    jrs = par_jour(sante(jours))
+    if not jrs:
+        return ""
+    verts = sum(not any(d.values()) for d in jrs.values())
+    soucis = {}
+    for d in jrs.values():
+        for r, ko in d.items():
+            if ko:
+                soucis[os.path.basename(r)] = soucis.get(os.path.basename(r), 0) + 1
+    s = "s" * (verts > 1)
+    return (f"Santé : {verts} jour{s} vert{s} sur {len(jrs)}"
+            + (" — souci : " + ", ".join(f"{p} ({n} j)" for p, n in soucis.items()) if soucis else ""))
+
+
+def cmd_releve(args):
+    """Releve de sante quotidien (d57, 4 semaines) : une ligne par depot dans sante.jsonl.
+    N'imprime que les pannes NEUVES, absentes du releve precedent du meme depot : releve.sh
+    en fait une bulle, et un defaut qui dure ne reecrit pas chaque matin (d23).
+    --rapport : le bilan de toute la surveillance, envoye a la fin."""
+    if "--rapport" in args:
+        jrs = par_jour(sante())
+        if not jrs:
+            print("Rapport de surveillance PlanTrack : aucun relevé n'a été fait.")
+            return
+        vus = {}
+        for jour, d in jrs.items():
+            for r, ko in d.items():
+                for x in ko:
+                    vus.setdefault((os.path.basename(r), trunc(cle(x), 100)), set()).add(jour)
+        print(f"Rapport de la surveillance PlanTrack ({min(jrs)} → {max(jrs)}) : "
+              + ("l'outil a tenu, aucune panne." if not vus else f"{len(vus)} panne(s) vue(s), à regarder ensemble.")
+              + "\n" + sante_resume()
+              + "".join(f"\n• {p} : {k} ({len(j)} j)" for (p, k), j in sorted(vus.items())))
+        return
+    avant = {r: {cle(x) for x in ko} for d in par_jour(sante()).values() for r, ko in d.items()}
+    etat, _ = flotte(registered_roots())
+    hier = (datetime.now(timezone.utc) - timedelta(days=1)).isoformat(timespec="seconds")
+    # une panne avalee compte le jour ou elle se produit : un correctif pose dans un AUTRE
+    # depot n'eteint pas le voyant de celui-ci (d55), le rouge durerait des semaines
+    vieille = lambda x: x.startswith("pannes avalees") and x.split("derniere : ", 1)[-1][:25] < hier
+    jour, neuves = datetime.now().date().isoformat(), []
+    with open(SANTE, "a", encoding="utf-8") as f:
+        for r, ko in etat.items():
+            # ce qui attend l'humain n'est pas une panne de l'outil : le bilan le dit deja,
+            # et le compter ici mettrait la flotte entiere au rouge tous les jours
+            ko = ["installation absente"] if ko is None else [x for x in ko if not x.startswith(ATTENTES) and not vieille(x)]
+            f.write(json.dumps({"jour": jour, "depot": r, "ko": ko}, ensure_ascii=False) + "\n")
+            neuves += [f"• {os.path.basename(r)} : {trunc(x, 140)}" for x in ko
+                       if cle(x) not in avant.get(r, set())]
+    if neuves:
+        print("Relevé santé PlanTrack — nouvelle panne :\n" + "\n".join(neuves))
 
 
 def arg_de(args):
@@ -2372,6 +2471,8 @@ def cli(argv):
         cmd_stats()
     elif cmd == "bilan":
         cmd_bilan(args, st)
+    elif cmd == "releve":
+        cmd_releve(args)
     elif cmd == "ronde":
         cmd_ronde()
     elif cmd == "attentes":

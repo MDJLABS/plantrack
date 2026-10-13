@@ -1172,6 +1172,25 @@ out=$(BILAN_CMD="echo coucou" BILAN_ENVOI=echo bash "$(dirname "$0")/../bilan.sh
 check "bilan.sh : envoie le bilan" "coucou" "$out"
 out=$(BILAN_CMD=true BILAN_ENVOI="echo ENVOYE" bash "$(dirname "$0")/../bilan.sh")
 check_not "bilan.sh : rien a dire, rien d'envoye" "ENVOYE" "$out"
+
+# Releve de sante quotidien (d57) : une ligne par depot, bulle sur panne NEUVE seulement
+RV() { PLANTRACK_REGISTRY="$R/reg" python3 "$PT" releve "$@" 2>/dev/null; }
+out=$(RV)
+check "releve : panne neuve signalee" "nouvelle panne :" "$out"
+check "releve : une ligne par depot" "1" "$(grep -c '"depot"' "$TMP/.plantrack/sante.jsonl")"
+check_exit "releve : panne qui dure, rien de neuf" "" "$(RV)"
+check "bilan --all : tendance de sante" "Santé : 0 jour vert sur 1 — souci : depot (1 j)" \
+  "$(PLANTRACK_REGISTRY="$R/reg" python3 "$PT" bilan --all)"
+python3 - "$TMP/.plantrack/sante.jsonl" <<'PY'
+import sys; open(sys.argv[1], "a").write('{"jour": "2026-01-01", "depot": "/x/vert", "ko": []}\n')
+PY
+out=$(RV --rapport)
+check "releve --rapport : periode et pannes" "(2026-01-01 →" "$out"
+check "releve --rapport : detail par projet" "• depot : hook hook-precompact" "$out"
+out=$(RELEVE_CMD="echo panne" RELEVE_ENVOI=echo RELEVE_FIN=2999-01-01 bash "$(dirname "$0")/../releve.sh")
+check "releve.sh : bulle sur panne neuve" "panne --ton probleme" "$out"
+out=$(RELEVE_CMD="echo" RELEVE_ENVOI=echo RELEVE_FIN=2000-01-01 RELEVE_ARRET="echo ARRET" bash "$(dirname "$0")/../releve.sh")
+check "releve.sh : fin -> rapport puis arret du minuteur" "ARRET" "$out"
 rm -rf "$R"
 
 # pg3 (10/10) : le journal n'est analyse qu'une fois par processus, la queue ajoutee
