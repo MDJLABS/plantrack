@@ -746,3 +746,22 @@
 {"ts": "2026-10-13T03:01:54+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t15"}
 {"ts": "2026-10-13T03:02:42+00:00", "kind": "decision", "id": "d54", "text": "v1.9.12 publiee (13/10, GitHub + PyPI verifie, plan valide par Mariella tel 'Vu') : le bilan du dimanche fait le controle de sante (diagnose) de chaque projet — ligne prefixee '⚠ en panne (N defauts)', un projet en panne parle meme s'il est calme — et signale 'pas ouvert depuis N jours' (mtime ronde.log/events.jsonl >= periode). Nombres seulement (d11). Code embarque par erreur dans le commit dd502dd (b17) d'une session parallele. Propagation par la ronde. 410 tests verts.", "par": "agent"}
 {"ts": "2026-10-13T03:02:42+00:00", "kind": "close", "id": "t15"}
+{"ts": "2026-10-13T03:02:43+00:00", "kind": "thread_open", "id": "t16", "text": "travaux sur main", "auto": 1}
+{"ts": "2026-10-13T03:02:43+00:00", "kind": "commit", "sha": "e23b51a", "ctype": "chore", "thread": "t16"}
+{"ts": "2026-10-13T03:02:54+00:00", "kind": "file_touched", "text": "sortie/carte-suite-bilan.log", "thread": "t16"}
+{"ts": "2026-10-13T03:03:05+00:00", "kind": "file_touched", "text": "sortie/carte-suite-bilan.log", "thread": "t16"}
+{"ts": "2026-10-13T03:03:31+00:00", "kind": "file_touched", "text": "sortie/carte-suite-bilan.log", "thread": "t16"}
+{"ts": "2026-10-13T10:01:17+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-resilient-cake.md", "thread": "t16"}
+{"ts": "2026-10-13T10:04:02+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t16"}
+{"ts": "2026-10-13T10:04:16+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t16"}
+{"ts": "2026-10-13T10:07:44+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t16"}
+{"ts": "2026-10-13T10:08:54+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t16"}
+{"ts": "2026-10-13T10:09:44+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t16"}
+{"ts": "2026-10-13T10:09:55+00:00", "kind": "bug", "id": "b18", "text": "usage_gap compte des commits d'AVANT le premier commit journalise quand ils tombent dans la meme seconde (git log --since inclusif a la seconde) -> doctor rouge 1/3 a tort, tests bilan instables", "thread": "t16", "severity": "normal", "par": "agent"}
+{"ts": "2026-10-13T10:09:59+00:00", "kind": "attempt", "id": "a25", "bug": "b18", "hypothesis": "usage_gap : exclure par ascendance git (--not <premier sha>^@) les commits anterieurs au premier commit journalise, au lieu de se fier a --since a la seconde", "actor": "claude-code"}
+{"ts": "2026-10-13T10:10:05+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t16"}
+{"ts": "2026-10-13T10:11:04+00:00", "kind": "commit", "sha": "bcc13ed", "ctype": "fix", "thread": "t16"}
+{"ts": "2026-10-13T10:11:04+00:00", "kind": "bug_status", "id": "b18", "status": "to_verify"}
+{"ts": "2026-10-13T10:11:04+00:00", "kind": "commit", "sha": "2083c64", "ctype": "release", "thread": "t16"}
+{"ts": "2026-10-13T10:11:04+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t16"}
+{"ts": "2026-10-13T10:12:08+00:00", "kind": "decision", "id": "d55", "text": "v1.9.13 publiee (13/10, GitHub + PyPI verifie, choix Mariella tel carte brainstorm 'Voyant qui s'eteint seul (Recommande)', plan valide) : doctor ne compte comme pannes que les traces d'incidents.log posterieures au dernier correctif declare (bug to_verify/validated) ; les anciennes s'affichent 'traitee(s) par <id>', jamais effacees (d9). Au passage b18 corrige (usage_gap par ascendance git).", "par": "agent"}

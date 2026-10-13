@@ -14,7 +14,9 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF : aucun. Ouvre un fil avec `!focus <sujet>` avant de coder — sans fil, aucun de tes commits n'est rattache.
+FIL ACTIF — t16 : travaux sur main [3 commits]
+  fichiers recemment ecrits : sortie/carte-suite-bilan.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-resilient-cake.md, tests/scenario.sh, .claude/hooks/pt.py, pyproject.toml
+  (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -22,6 +24,7 @@ FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
 
 BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b17 (to_verify) [t15] kvm-lourd fail-open sous pression memoire : 'kvm-lourd classe' expire (5 s) quand bcc.service est a son memory.high -> tsc/next build passe… (agent) [1 tentatives, derniere: Charger kvm-lourd DANS le processus du hook (importlib) au …]
+  b18 (to_verify) [t16] usage_gap compte des commits d'AVANT le premier commit journalise quand ils tombent dans la meme seconde (git log --since inclusif a la sec… (agent) [1 tentatives, derniere: usage_gap : exclure par ascendance git (--not <premier sha>…]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
@@ -78,6 +81,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d52 : v1.9.11 publiee (12/10, GitHub + PyPI verifie) : ronde dans chaque projet (d51) — SessionStart lance 'plantrack ronde' en fond si la dernie… (agent)
   d53 : kvm-lourd estimation corrigee (choix Mariella tel 12/10 'Estimation + alerte (Recommande)') : 1,2 x MEDIANE des 10 derniers pics (au lieu d… (agent)
   d54 : v1.9.12 publiee (13/10, GitHub + PyPI verifie, plan valide par Mariella tel 'Vu') : le bilan du dimanche fait le controle de sante (diagnos… (agent)
+  d55 : v1.9.13 publiee (13/10, GitHub + PyPI verifie, choix Mariella tel carte brainstorm 'Voyant qui s'eteint seul (Recommande)', plan valide) : … (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
