@@ -14,9 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t16 : travaux sur main [3 commits]
-  fichiers recemment ecrits : sortie/carte-suite-bilan.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-resilient-cake.md, tests/scenario.sh, .claude/hooks/pt.py, pyproject.toml
-  (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
+FIL ACTIF — t17 : presentation + surveillance 4 semaines [1 commits]
+  fichiers recemment ecrits : .claude/hooks/pt.py, sortie/tests.log, ../../../etc/systemd/system/plantrack-releve.service, ../../../etc/systemd/system/plantrack-releve.timer, .gitignore, sortie/schemas-plantrack/serveur.log
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -82,6 +81,9 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d53 : kvm-lourd estimation corrigee (choix Mariella tel 12/10 'Estimation + alerte (Recommande)') : 1,2 x MEDIANE des 10 derniers pics (au lieu d… (agent)
   d54 : v1.9.12 publiee (13/10, GitHub + PyPI verifie, plan valide par Mariella tel 'Vu') : le bilan du dimanche fait le controle de sante (diagnos… (agent)
   d55 : v1.9.13 publiee (13/10, GitHub + PyPI verifie, choix Mariella tel carte brainstorm 'Voyant qui s'eteint seul (Recommande)', plan valide) : … (agent)
+  d56 : Mariella (tel, 13/10, carte brainstorm BMAD nom) : 'Garder PlanTrack (Recommande)' — pas de renommage en Plan Manager ; la gestion des prio… (agent)
+  d57 : Mariella (tel, 13/10) : on garde le nom PlanTrack ; la gestion des priorites (kvm-lourd) est une partie de PlanTrack. Surveillance : 4 sema… (agent)
+  d58 : Presentation + surveillance LIVREES (d57, 13/10) : page https://plantrack-schemas.pages.dev completee (schema 0 'de bout en bout', section … (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…

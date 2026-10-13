@@ -765,3 +765,29 @@
 {"ts": "2026-10-13T10:11:04+00:00", "kind": "commit", "sha": "2083c64", "ctype": "release", "thread": "t16"}
 {"ts": "2026-10-13T10:11:04+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t16"}
 {"ts": "2026-10-13T10:12:08+00:00", "kind": "decision", "id": "d55", "text": "v1.9.13 publiee (13/10, GitHub + PyPI verifie, choix Mariella tel carte brainstorm 'Voyant qui s'eteint seul (Recommande)', plan valide) : doctor ne compte comme pannes que les traces d'incidents.log posterieures au dernier correctif declare (bug to_verify/validated) ; les anciennes s'affichent 'traitee(s) par <id>', jamais effacees (d9). Au passage b18 corrige (usage_gap par ascendance git).", "par": "agent"}
+{"ts": "2026-10-13T10:12:08+00:00", "kind": "commit", "sha": "4ac517c", "ctype": "chore", "thread": "t16"}
+{"ts": "2026-10-13T17:05:02+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-shimmering-fiddle.md", "thread": "t16"}
+{"ts": "2026-10-13T17:05:26+00:00", "kind": "decision", "id": "d56", "text": "Mariella (tel, 13/10, carte brainstorm BMAD nom) : 'Garder PlanTrack (Recommande)' — pas de renommage en Plan Manager ; la gestion des priorites (kvm-lourd) est une partie de PlanTrack. Surveillance continue : '4 semaines (Recommande)' — releve quotidien, tendance dans le bilan du dimanche, rapport final vers le 10/11.", "par": "agent"}
+{"ts": "2026-10-13T17:20:58+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-polished-hearth.md", "thread": "t16"}
+{"ts": "2026-10-13T21:47:41+00:00", "kind": "decision", "id": "d57", "text": "Mariella (tel, 13/10) : on garde le nom PlanTrack ; la gestion des priorites (kvm-lourd) est une partie de PlanTrack. Surveillance : 4 semaines (jusqu'au 10/11) — releve de sante quotidien, tendance dans le bilan, rapport final. Plan valide par tel ('On y va').", "par": "agent"}
+{"ts": "2026-10-13T21:48:32+00:00", "kind": "close", "id": "t16"}
+{"ts": "2026-10-13T21:48:32+00:00", "kind": "thread_open", "id": "t17", "text": "presentation + surveillance 4 semaines"}
+{"ts": "2026-10-13T21:48:43+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t17"}
+{"ts": "2026-10-13T21:49:26+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t17"}
+{"ts": "2026-10-13T21:49:44+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t17"}
+{"ts": "2026-10-13T21:49:49+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t17"}
+{"ts": "2026-10-13T21:50:05+00:00", "kind": "file_touched", "text": "releve.sh", "thread": "t17"}
+{"ts": "2026-10-13T21:50:14+00:00", "kind": "file_touched", "text": "releve.sh", "thread": "t17"}
+{"ts": "2026-10-13T21:50:22+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t17"}
+{"ts": "2026-10-13T21:51:15+00:00", "kind": "file_touched", "text": "sortie/tests.log", "thread": "t17"}
+{"ts": "2026-10-13T21:51:35+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t17"}
+{"ts": "2026-10-13T21:51:36+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t17"}
+{"ts": "2026-10-13T21:52:03+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t17"}
+{"ts": "2026-10-13T21:52:03+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t17"}
+{"ts": "2026-10-13T21:53:06+00:00", "kind": "file_touched", "text": "sortie/tests.log", "thread": "t17"}
+{"ts": "2026-10-13T21:53:06+00:00", "kind": "file_touched", "text": "../../../etc/systemd/system/plantrack-releve.service", "thread": "t17"}
+{"ts": "2026-10-13T21:53:06+00:00", "kind": "file_touched", "text": "../../../etc/systemd/system/plantrack-releve.timer", "thread": "t17"}
+{"ts": "2026-10-13T21:53:10+00:00", "kind": "commit", "sha": "3cd934c", "ctype": "feat", "thread": "t17"}
+{"ts": "2026-10-13T21:53:10+00:00", "kind": "file_touched", "text": ".gitignore", "thread": "t17"}
+{"ts": "2026-10-13T21:55:05+00:00", "kind": "file_touched", "text": "sortie/schemas-plantrack/serveur.log", "thread": "t17"}
+{"ts": "2026-10-13T21:56:05+00:00", "kind": "decision", "id": "d58", "text": "Presentation + surveillance LIVREES (d57, 13/10) : page https://plantrack-schemas.pages.dev completee (schema 0 'de bout en bout', section 6 renommee 'gestion des priorites, dans PlanTrack', section 7 'sante de l'outil'). Releve quotidien 'plantrack releve' + releve.sh + plantrack-releve.timer (07:00, arret seul apres 2026-11-10 avec rapport final) ; .plantrack/sante.jsonl (ignore git) ; ligne 'Sante : X jours verts sur Y' dans bilan --all. Ne compte PAS comme panne : bugs/questions en attente (deja dans le bilan) ni une panne avalee de plus de 24 h. Pas de publication PyPI : rien ne change pour les autres projets.", "par": "agent"}
