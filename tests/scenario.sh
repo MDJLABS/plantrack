@@ -1213,22 +1213,45 @@ rm -rf "$R"
 
 # kvm-lourd : le hook PreToolUse envoie une commande lourde dans la file, en fond
 KB="$TMP/kvmbin"; mkdir -p "$KB"
+# b17 : le hook charge kvm-lourd comme module Python -> le faux en expose l'API
 cat > "$KB/kvm-lourd" <<'EOF'
-#!/bin/bash
-case "$KL_MODE" in
-  vide) ;; erreur) exit 3 ;; lent) sleep 3 ;;
-  lourd) case "$2" in kvm-lourd*) ;; *) printf 'gradle\t3221225472\n' ;; esac ;;
-esac
+#!/usr/bin/env python3
+import os
+from pathlib import Path
+class T: nom = "gradle"
+class Config:
+    types = etat = Path("/inexistant")
+    @classmethod
+    def depuis_env(cls): return cls()
+def charger_types(chemin): return []
+def lire_historique(chemin): return []
+def estimer(t, projet, historique): return 3221225472
+def classe(cmd, types):
+    mode = os.environ.get("KL_MODE")
+    if mode == "erreur": raise RuntimeError("panne")
+    if mode == "lourd" and not cmd.startswith("kvm-lourd"): return T
 EOF
 chmod +x "$KB/kvm-lourd"
+mkdir -p "$TMP/kvmshell"; printf '#!/bin/bash\nexit 0\n' > "$TMP/kvmshell/kvm-lourd"; chmod +x "$TMP/kvmshell/kvm-lourd"
 in='{"cwd":"/tmp","tool_input":{"command":"echo \"a b\" && echo $HOME","description":"essai","timeout":5000}}'
 pre() { echo "$in" | KL_MODE="$1" PATH="$2" python3 "$PT" hook-pretool; }
 out=$(pre lourd /usr/bin:/bin); rc=$?
 check_exit "kvm-lourd absent : code 0" 0 "$rc"; check_exit "kvm-lourd absent : aucune sortie" "" "$out"
-for m in vide erreur lent; do
+for m in vide erreur; do
   out=$(pre $m "$KB:/usr/bin:/bin"); rc=$?
   check_exit "classe $m : code 0" 0 "$rc"; check_exit "classe $m : aucune sortie" "" "$out"
 done
+out=$(pre lourd "$TMP/kvmshell:/usr/bin:/bin"); rc=$?
+check_exit "kvm-lourd pas en Python : code 0 (fail-open)" 0 "$rc"
+check_exit "kvm-lourd pas en Python : aucune sortie" "" "$out"
+# b17 : la classification ne lance plus aucun sous-processus (cgroup sature = delai depasse)
+r=$(echo "$in" | KL_MODE=lourd PATH="$KB:/usr/bin:/bin" python3 -c '
+import runpy, subprocess, sys
+def interdit(*a, **k): raise SystemExit("sous-processus lance")
+subprocess.run = subprocess.Popen = interdit
+sys.argv = [sys.argv[1], "hook-pretool"]
+runpy.run_path(sys.argv[0], run_name="__main__")' "$PT" | grep -c kvm-lourd)
+check_exit "classe en processus : aucun sous-processus, commande quand meme enveloppee" 1 "$r"
 out=$(pre lourd "$KB:/usr/bin:/bin")
 r=$(echo "$out" | python3 -c '
 import json, shlex, sys

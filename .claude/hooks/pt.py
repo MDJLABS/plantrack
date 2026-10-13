@@ -16,6 +16,8 @@ Points d'entree :
 
 import atexit
 import difflib
+import importlib.machinery
+import importlib.util
 import json
 import os
 import re
@@ -953,18 +955,30 @@ def hook_pretool():
         data = read_hook_input()
         ti = data.get("tool_input") or {}
         cmd = ti.get("command") or ""
-        if not cmd or not shutil.which("kvm-lourd") or bash_deny(data.get("cwd")):
+        chemin = shutil.which("kvm-lourd")
+        if not cmd or not chemin or bash_deny(data.get("cwd")):
             return
+        # b17 : kvm-lourd est charge dans CE processus. Lance a part (`kvm-lourd classe`),
+        # un second Python demarrait dans un cgroup sature, depassait le delai, et la
+        # commande lourde passait hors file pile quand la machine etouffait.
         try:
-            out = subprocess.run(["kvm-lourd", "classe", cmd], cwd=data.get("cwd") or None,
-                                 capture_output=True, text=True, timeout=5).stdout.strip()
+            spec = importlib.util.spec_from_loader(
+                "kvm_lourd", importlib.machinery.SourceFileLoader("kvm_lourd", chemin))
+            kl = importlib.util.module_from_spec(spec)
+            sys.modules["kvm_lourd"] = kl   # requis par @dataclass
+            spec.loader.exec_module(kl)
+            cfg = kl.Config.depuis_env()
+            t = kl.classe(cmd, kl.charger_types(cfg.types))
+            if not t:
+                return
+            # nom du projet sans `git rev-parse` (projet_par_defaut) : pas de sous-processus
+            projet = os.path.basename(os.environ.get("CLAUDE_PROJECT_DIR") or data.get("cwd") or ROOT)
+            est = kl.estimer(t, projet, kl.lire_historique(cfg.etat / "historique.jsonl"))
         except Exception as e:
             trace("hook-pretool : kvm-lourd classe", e)
             return
-        if not out:
-            return
-        type_, est = out.split("\t")
-        go = f"{int(est) / 2**30:.1f}".replace(".", ",")
+        type_ = t.nom
+        go = f"{est / 2**30:.1f}".replace(".", ",")
         print(json.dumps({"hookSpecificOutput": {
             "hookEventName": "PreToolUse",
             "updatedInput": {**ti, "run_in_background": True,
