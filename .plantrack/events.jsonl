@@ -864,3 +864,14 @@
 {"ts": "2026-10-14T11:21:00+00:00", "kind": "bug_status", "id": "b20", "status": "validated", "canal": "telephone 14/10 (AskUserQuestion) : Je valide (Recommande)"}
 {"ts": "2026-10-14T11:21:01+00:00", "kind": "commit", "sha": "2d329ce", "ctype": "chore", "thread": "t19"}
 {"ts": "2026-10-14T11:21:06+00:00", "kind": "close", "id": "t19"}
+{"ts": "2026-10-14T11:21:08+00:00", "kind": "thread_open", "id": "t20", "text": "travaux sur main", "auto": 1}
+{"ts": "2026-10-14T11:21:08+00:00", "kind": "commit", "sha": "2e26185", "ctype": "chore", "thread": "t20"}
+{"ts": "2026-10-14T22:30:25+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-sunny-cosmos.md", "thread": "t20"}
+{"ts": "2026-10-14T23:24:19+00:00", "kind": "decision", "id": "d63", "text": "Mariella (tel, 15/10, carte brainstorm de la suite) : 'Eteindre les fausses alertes (Recommande)' — les 4 rouges recurrents du releve analyses : prorent/Myview/s69-soirees deja corriges (releve passe avant la propagation du 14/10) ; profil (commits sans fil, pg12) resterait rouge a vie car le controle n'a pas de fenetre -> le borner sur USAGE_DAYS. Plan valide par tel.", "par": "agent"}
+{"ts": "2026-10-14T23:24:22+00:00", "kind": "close", "id": "t20"}
+{"ts": "2026-10-14T23:25:48+00:00", "kind": "thread_open", "id": "t21", "text": "travaux sur main", "auto": 1}
+{"ts": "2026-10-14T23:25:48+00:00", "kind": "commit", "sha": "15e4a8b", "ctype": "fix", "thread": "t21"}
+{"ts": "2026-10-14T23:26:41+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t21"}
+{"ts": "2026-10-14T23:26:47+00:00", "kind": "commit", "sha": "47ded37", "ctype": "release", "thread": "t21"}
+{"ts": "2026-10-14T23:27:58+00:00", "kind": "piege_clos", "id": "pg12", "text": "v1.9.18 : le controle 'commits rattaches a un fil' n'avait en fait AUCUNE fenetre (rouge a vie) ; il est desormais borne a USAGE_DAYS=30 — sur profil, les 4 commits du 23-24/09 sortent de la fenetre vers le 24/10."}
+{"ts": "2026-10-14T23:27:58+00:00", "kind": "decision", "id": "d64", "text": "v1.9.18 publiee (15/10, GitHub + PyPI verifie) : d63 livre — controle 'commits sans fil' borne a USAGE_DAYS (pg12 clos). Les rouges prorent/Myview/s69-soirees du 14/10 etaient une course releve 07:00 / propagation 07:00-07:06 : deja verts au doctor, aucun correctif. Ecarte : forcer update avant releve (course rare, jours de publication seulement).", "par": "agent"}

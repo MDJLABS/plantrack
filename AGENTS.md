@@ -14,7 +14,9 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF : aucun. Ouvre un fil avec `!focus <sujet>` avant de coder — sans fil, aucun de tes commits n'est rattache.
+FIL ACTIF — t21 : travaux sur main [2 commits]
+  fichiers recemment ecrits : pyproject.toml
+  (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -83,11 +85,12 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d60 : 5 defauts du releve regles (14/10, plan valide tel) : v1.9.14-1.9.16 publiees (GitHub + PyPI verifie) — questions de prerequis humain permi… (agent)
   d61 : Mariella (tel, 14/10, via AskUserQuestion) : apres reglage des 5 defauts (v1.9.16), choix 'Rester en veille (Recommande)' — veille silencie… (agent)
   d62 : v1.9.17 publiee (14/10, plan valide tel) : correctif b20 — la ronde de chaque projet rattrape un pt.py non commite identique a une version … (agent)
+  d63 : Mariella (tel, 15/10, carte brainstorm de la suite) : 'Eteindre les fausses alertes (Recommande)' — les 4 rouges recurrents du releve analy… (agent)
+  d64 : v1.9.18 publiee (15/10, GitHub + PyPI verifie) : d63 livre — controle 'commits sans fil' borne a USAGE_DAYS (pg12 clos). Les rouges prorent… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
   pg10 : Le post-commit journalise le commit lui-meme (events.jsonl) et regenere l'insta…
-  pg12 : Le defaut doctor 'commits rattaches a un fil' est RETROACTIF comme pg1 : sur pr…
   pg13 : Gabarit de parcours : la phase de construction est a 'questions: false', mais u…
   pg15 : Le Stop hook bcc (hook/index.ts, regle 'projet ne s'endort jamais' du 03/10) EX…
 
