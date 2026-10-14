@@ -14,9 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t19 : travaux sur main [5 commits]
-  fichiers recemment ecrits : .claude/hooks/pt.py, tests/scenario.sh, pyproject.toml, ../../../root/.claude/plans/contexte-reconstruit-par-le-crispy-catmull.md, sortie/essai-b20-105232/.claude/hooks/pt.py, ../../../root/.claude/plans/contexte-reconstruit-par-le-glimmering-wren.md
-  (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
+FIL ACTIF : aucun. Ouvre un fil avec `!focus <sujet>` avant de coder — sans fil, aucun de tes commits n'est rattache.
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
