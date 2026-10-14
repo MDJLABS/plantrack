@@ -856,3 +856,9 @@
 {"ts": "2026-10-14T08:52:33+00:00", "kind": "file_touched", "text": "sortie/essai-b20-105232/.claude/hooks/pt.py", "thread": "t19"}
 {"ts": "2026-10-14T08:54:29+00:00", "kind": "bug_status", "id": "b20", "status": "to_verify"}
 {"ts": "2026-10-14T08:54:30+00:00", "kind": "decision", "id": "d62", "text": "v1.9.17 publiee (14/10, plan valide tel) : correctif b20 — la ronde de chaque projet rattrape un pt.py non commite identique a une version publiee (empreintes embarquees, update --si-publie) ; vraie retouche toujours protegee. Essai sur la version PyPI dans sortie/essai-b20-105232 : les 2 cas OK. Suppression rm -rf du dossier d'essai abandonnee (Mariella a demande pourquoi) : chaque essai prend un dossier neuf horodate.", "par": "agent"}
+{"ts": "2026-10-14T08:54:30+00:00", "kind": "commit", "sha": "ec2c9a7", "ctype": "chore", "thread": "t19"}
+{"ts": "2026-10-14T11:18:25+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-glimmering-wren.md", "thread": "t19"}
+{"ts": "2026-10-14T11:21:00+00:00", "kind": "bug_status", "id": "b17", "status": "validated", "canal": "telephone 14/10 (AskUserQuestion) : Je valide (Recommande)"}
+{"ts": "2026-10-14T11:21:00+00:00", "kind": "bug_status", "id": "b18", "status": "validated", "canal": "telephone 14/10 (AskUserQuestion) : Je valide (Recommande)"}
+{"ts": "2026-10-14T11:21:00+00:00", "kind": "bug_status", "id": "b19", "status": "validated", "canal": "telephone 14/10 (AskUserQuestion) : Je valide (Recommande)"}
+{"ts": "2026-10-14T11:21:00+00:00", "kind": "bug_status", "id": "b20", "status": "validated", "canal": "telephone 14/10 (AskUserQuestion) : Je valide (Recommande)"}

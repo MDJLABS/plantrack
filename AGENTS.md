@@ -14,19 +14,13 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t19 : travaux sur main [4 commits]
-  fichiers recemment ecrits : .claude/hooks/pt_publies.py, .claude/hooks/pt.py, tests/scenario.sh, pyproject.toml, ../../../root/.claude/plans/contexte-reconstruit-par-le-crispy-catmull.md, sortie/essai-b20-105232/.claude/hooks/pt.py
+FIL ACTIF — t19 : travaux sur main [5 commits]
+  fichiers recemment ecrits : .claude/hooks/pt.py, tests/scenario.sh, pyproject.toml, ../../../root/.claude/plans/contexte-reconstruit-par-le-crispy-catmull.md, sortie/essai-b20-105232/.claude/hooks/pt.py, ../../../root/.claude/plans/contexte-reconstruit-par-le-glimmering-wren.md
   (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
   t5 : travaux sur main — reprise : retour au travail courant apres la faille
-
-BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
-  b17 (to_verify) [t15] kvm-lourd fail-open sous pression memoire : 'kvm-lourd classe' expire (5 s) quand bcc.service est a son memory.high -> tsc/next build passe… (agent) [1 tentatives, derniere: Charger kvm-lourd DANS le processus du hook (importlib) au …]
-  b18 (to_verify) [t16] usage_gap compte des commits d'AVANT le premier commit journalise quand ils tombent dans la meme seconde (git log --since inclusif a la sec… (agent) [1 tentatives, derniere: usage_gap : exclure par ascendance git (--not <premier sha>…]
-  b19 (to_verify) [t18] ronde dans le projet : un pt.py jamais commite (.claude non suivi, Myview) est pris pour 'modifie a la main' -> le coeur n'est jamais mis a… (agent) [1 tentatives, derniere: cmd_ronde : ne refuser que si pt.py est SUIVI par git (ls-f…]
-  b20 (to_verify) [t18] Regression b16 depuis d51 : la ronde par projet ne rattrape plus un pt.py modifie non commite identique a une version publiee (la logique v… (agent) [1 tentatives, derniere: Liste des sha256 des pt.py publies embarquee dans le paquet…]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
