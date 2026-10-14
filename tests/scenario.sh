@@ -1166,6 +1166,11 @@ echo "# retouche" >> "$D/.claude/hooks/pt.py"; cp "$D/.claude/hooks/pt.py" "$R/m
 r >/dev/null
 check "ronde : pt.py retouche a la main pas touche" "OK" "$(cmp -s "$D/.claude/hooks/pt.py" "$R/main" && echo OK)"
 git -C "$D" checkout -q -- .claude/hooks/pt.py
+# .claude jamais commite (Myview) : le pt.py non suivi n'est pas « retouche », il se met a jour
+D2="$R/libre"; git init -q "$D2" && CLAUDE_PROJECT_DIR="$D2" python3 "$PT" init >/dev/null 2>&1
+git -C "$D2" commit -q --allow-empty -m init; echo "# ancienne version" >> "$D2/.claude/hooks/pt.py"
+(cd "$D2" && PATH="$R/bin:$PATH" CLAUDE_PROJECT_DIR="$D2" python3 "$PT" ronde >/dev/null)
+check "ronde : pt.py jamais commite mis a jour" "OK" "$(cmp -s "$D2/.claude/hooks/pt.py" "$PT" && echo OK)"
 # a l'ouverture : une ronde au plus toutes les 4 h, jamais dans un bac a sable (/tmp)
 echo '{}' | CLAUDE_PROJECT_DIR="$D" python3 "$PT" hook-context >/dev/null 2>&1
 check_not "ronde : pas de ronde dans /tmp" "lancee" "$(cat "$D/.plantrack/ronde.log" 2>/dev/null)"

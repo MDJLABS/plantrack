@@ -1082,7 +1082,11 @@ def cmd_ronde():
     avant = sales()
     if avant is None:
         return print("ronde : pas de git exploitable")
-    if ".claude/hooks/pt.py" in avant:
+    # un pt.py jamais commite (.claude non suivi, Myview) n'est pas modifie a la main :
+    # seul un pt.py SUIVI et modifie l'est
+    suivi = subprocess.run(["git", "ls-files", "--error-unmatch", ".claude/hooks/pt.py"], cwd=ROOT,
+                           capture_output=True).returncode == 0
+    if suivi and ".claude/hooks/pt.py" in avant:
         return print("ronde : pt.py modifie a la main, mise a jour laissee de cote")
     try:
         p = subprocess.run(["uvx", "plantrack@latest", "update"], cwd=ROOT, capture_output=True,
