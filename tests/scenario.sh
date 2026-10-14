@@ -1145,8 +1145,13 @@ rm -rf "$TMP31"
 # b14 : un commit fait dans une copie git worktree arrive dans le carnet du depot principal
 W=$(mktemp -d); git -C "$W" init -q m && cd "$W/m" && git commit -q --allow-empty -m init
 mkdir .plantrack && : > .plantrack/events.jsonl && git worktree add -q "$W/copie" 2>/dev/null; cd - >/dev/null
+: > "$W/m/AGENTS.md"; : > "$W/copie/AGENTS.md"
 CLAUDE_PROJECT_DIR="$W/copie" python3 "$PT" decide "prise dans la copie" >/dev/null 2>&1
 check "b14 : decision d'une copie dans le carnet principal" "prise dans la copie" "$(cat "$W/m/.plantrack/events.jsonl")"
+check "worktree : la fiche de la copie suit" "prise dans la copie" "$(cat "$W/copie/AGENTS.md")"
+check "worktree : celle du principal aussi" "prise dans la copie" "$(cat "$W/m/AGENTS.md")"
+CLAUDE_PROJECT_DIR="$W/m" python3 "$PT" decide "prise dans le principal" >/dev/null 2>&1
+check "worktree : une ecriture du principal met la copie a jour" "prise dans le principal" "$(cat "$W/copie/AGENTS.md")"
 rm -rf "$W"
 
 # Ronde dans chaque projet (d51) : le coeur est rattrape et commite seul, sans embarquer

@@ -1022,9 +1022,6 @@ def hook_context():
     if not any([st["threads"], st["bugs"], st["decisions"], st["inbox"],
                 st["phases"], st["tasks"], st["pieges"], st["questions"], st["guides"]]):
         sys.exit(0)
-    # une copie `git worktree` partage le carnet du depot principal (b14) : ce qui
-    # s'y ecrit ne regenere que la fiche du principal. A l'ouverture, la sienne suit.
-    write_state_block(st)
     if src == "compact":
         print("(contexte compacte — etat du projet reinjecte depuis PlanTrack)")
     # le diagnostic sort AVANT le bloc et hors de son budget : c'est la seule
@@ -1269,11 +1266,28 @@ def write_state_block(st, quiet=True):
     session renvoie lire, et le seul canal qu'un agent sans hooks (Deep Code) lit
     de toute facon. Regeneree a chaque ecriture au journal (b9) et au post-commit
     git : peu importe quel agent a ecrit, l'etat suit."""
-    if not os.path.exists(os.path.join(ROOT, "AGENTS.md")):
-        return
     body = (f"{STATE_START}\n<!-- genere par plantrack a chaque commit — ne pas editer a la main -->\n"
             f"```\n{context_block(st, header=False, rules=False)}\n```\n{STATE_END}\n")
-    write_md_block("AGENTS.md", body, STATE_START, STATE_END, "instantane de l'etat", quiet)
+    for r in copies_du_carnet():
+        if os.path.exists(os.path.join(r, "AGENTS.md")):
+            write_md_block(os.path.join(r, "AGENTS.md"), body, STATE_START, STATE_END,
+                           "instantane de l'etat", quiet)
+
+
+def copies_du_carnet():
+    """ROOT et toutes les copies `git worktree` qui partagent son carnet (b14) : la
+    fiche de chacune suit l'etat, quelle que soit la copie qui a ecrit."""
+    main = journal_root(ROOT)
+    copies = {os.path.realpath(ROOT), os.path.realpath(main)}
+    wt = os.path.join(main, ".git", "worktrees")
+    if main != ROOT or os.path.isdir(os.path.join(main, ".plantrack")):
+        for n in (os.listdir(wt) if os.path.isdir(wt) else []):
+            try:
+                g = open(os.path.join(wt, n, "gitdir"), encoding="utf-8").read().strip()
+            except OSError:
+                continue
+            copies.add(os.path.realpath(os.path.dirname(g)))
+    return sorted(copies)
 
 
 def chain_hook(hook, script, call, label, marker):
