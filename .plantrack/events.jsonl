@@ -838,3 +838,21 @@
 {"ts": "2026-10-14T05:07:27+00:00", "kind": "thread_open", "id": "t19", "text": "travaux sur main", "auto": 1}
 {"ts": "2026-10-14T05:07:27+00:00", "kind": "commit", "sha": "a4c3ecf", "ctype": "chore", "thread": "t19"}
 {"ts": "2026-10-14T05:13:59+00:00", "kind": "decision", "id": "d61", "text": "Mariella (tel, 14/10, via AskUserQuestion) : apres reglage des 5 defauts (v1.9.16), choix 'Rester en veille (Recommande)' — veille silencieuse, releve de 7 h, ne la deranger que sur vraie panne. b20 (regression rattrapage) reste ouvert.", "par": "agent"}
+{"ts": "2026-10-14T05:13:59+00:00", "kind": "commit", "sha": "f4135e9", "ctype": "chore", "thread": "t19"}
+{"ts": "2026-10-14T06:41:23+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-precious-tower.md", "thread": "t19"}
+{"ts": "2026-10-14T07:13:29+00:00", "kind": "attempt", "id": "a27", "bug": "b20", "hypothesis": "Liste des sha256 des pt.py publies embarquee dans le paquet (plantrack_guide/publies.txt) ; cmd_ronde ne refuse plus un pt.py suivi modifie mais appelle update --si-publie, qui ne remplace que si la copie locale est une version publiee intacte", "actor": "claude-code"}
+{"ts": "2026-10-14T07:13:54+00:00", "kind": "file_touched", "text": ".claude/hooks/pt_publies.py", "thread": "t19"}
+{"ts": "2026-10-14T07:14:02+00:00", "kind": "file_touched", "text": ".claude/hooks/pt_publies.py", "thread": "t19"}
+{"ts": "2026-10-14T07:14:05+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t19"}
+{"ts": "2026-10-14T07:14:07+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t19"}
+{"ts": "2026-10-14T07:14:16+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t19"}
+{"ts": "2026-10-14T07:14:27+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t19"}
+{"ts": "2026-10-14T07:14:34+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t19"}
+{"ts": "2026-10-14T07:16:43+00:00", "kind": "commit", "sha": "1f5423f", "ctype": "fix", "thread": "t19"}
+{"ts": "2026-10-14T07:16:46+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t19"}
+{"ts": "2026-10-14T07:16:52+00:00", "kind": "commit", "sha": "f99857f", "ctype": "release", "thread": "t19"}
+{"ts": "2026-10-14T08:48:49+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-crispy-catmull.md", "thread": "t19"}
+{"ts": "2026-10-14T08:52:33+00:00", "kind": "file_touched", "text": "sortie/essai-b20-105232/.claude/hooks/pt.py", "thread": "t19"}
+{"ts": "2026-10-14T08:52:33+00:00", "kind": "file_touched", "text": "sortie/essai-b20-105232/.claude/hooks/pt.py", "thread": "t19"}
+{"ts": "2026-10-14T08:54:29+00:00", "kind": "bug_status", "id": "b20", "status": "to_verify"}
+{"ts": "2026-10-14T08:54:30+00:00", "kind": "decision", "id": "d62", "text": "v1.9.17 publiee (14/10, plan valide tel) : correctif b20 — la ronde de chaque projet rattrape un pt.py non commite identique a une version publiee (empreintes embarquees, update --si-publie) ; vraie retouche toujours protegee. Essai sur la version PyPI dans sortie/essai-b20-105232 : les 2 cas OK. Suppression rm -rf du dossier d'essai abandonnee (Mariella a demande pourquoi) : chaque essai prend un dossier neuf horodate.", "par": "agent"}
