@@ -834,3 +834,7 @@
 {"ts": "2026-10-14T05:07:08+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t18"}
 {"ts": "2026-10-14T05:07:24+00:00", "kind": "decision", "id": "d60", "text": "5 defauts du releve regles (14/10, plan valide tel) : v1.9.14-1.9.16 publiees (GitHub + PyPI verifie) — questions de prerequis humain permises (d59), projet au repos sans fausse alerte, pannes eteintes par la mise a jour du coeur (_coeur), fiche a jour dans toutes les copies worktree, ronde met a jour un pt.py jamais commite (b19). Propage sur prorent, Myview, profil, s69-francoviet, s69-soirees, miamboost, bcc : tous verts sauf profil pg12 (4 vieux commits, expire seul le 24/10).", "par": "agent"}
 {"ts": "2026-10-14T05:07:24+00:00", "kind": "close", "id": "t18"}
+{"ts": "2026-10-14T05:07:24+00:00", "kind": "precommit_block"}
+{"ts": "2026-10-14T05:07:27+00:00", "kind": "thread_open", "id": "t19", "text": "travaux sur main", "auto": 1}
+{"ts": "2026-10-14T05:07:27+00:00", "kind": "commit", "sha": "a4c3ecf", "ctype": "chore", "thread": "t19"}
+{"ts": "2026-10-14T05:13:59+00:00", "kind": "decision", "id": "d61", "text": "Mariella (tel, 14/10, via AskUserQuestion) : apres reglage des 5 defauts (v1.9.16), choix 'Rester en veille (Recommande)' — veille silencieuse, releve de 7 h, ne la deranger que sur vraie panne. b20 (regression rattrapage) reste ouvert.", "par": "agent"}

@@ -14,7 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF : aucun. Ouvre un fil avec `!focus <sujet>` avant de coder — sans fil, aucun de tes commits n'est rattache.
+FIL ACTIF — t19 : travaux sur main [1 commits]
+  (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -89,6 +90,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d58 : Presentation + surveillance LIVREES (d57, 13/10) : page https://plantrack-schemas.pages.dev completee (schema 0 'de bout en bout', section … (agent)
   d59 : Mariella (tel, 14/10, via AskUserQuestion) : prorent questions hors porte -> 'Autoriser ces questions (Recommande)' : en construction, une … (agent)
   d60 : 5 defauts du releve regles (14/10, plan valide tel) : v1.9.14-1.9.16 publiees (GitHub + PyPI verifie) — questions de prerequis humain permi… (agent)
+  d61 : Mariella (tel, 14/10, via AskUserQuestion) : apres reglage des 5 defauts (v1.9.16), choix 'Rester en veille (Recommande)' — veille silencie… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
