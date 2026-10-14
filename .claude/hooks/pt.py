@@ -1817,7 +1817,11 @@ def diagnose(st):
             out.append((None, f"phase {ph['id']} : {bloc}", ""))
     # un commit journalise sans fil : le plafond de fils a empeche d'en ouvrir un.
     # Le commit n'est plus perdu, encore faut-il que quelqu'un le rattache.
-    orph = [e for e in read_events() if e.get("kind") == "commit" and not e.get("thread")]
+    # Fenetre USAGE_DAYS comme le controle d'usage : sinon un orphelin d'une cause
+    # reglee depuis longtemps garde le voyant rouge a vie (pg12).
+    fenetre = (datetime.now(timezone.utc) - timedelta(days=USAGE_DAYS)).isoformat(timespec="seconds")
+    orph = [e for e in read_events() if e.get("kind") == "commit" and not e.get("thread")
+            and e.get("ts", "") >= fenetre]
     chk(not orph, f"commits rattaches a un fil ({len(orph)} sans fil)",
         "plafond de fils ouverts atteint au moment du commit — `!close` un fil, "
         "puis `!focus <sujet>` : " + ", ".join(e.get("sha", "?") for e in orph[:6]))
