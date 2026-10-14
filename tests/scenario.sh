@@ -1171,6 +1171,12 @@ echo "# retouche" >> "$D/.claude/hooks/pt.py"; cp "$D/.claude/hooks/pt.py" "$R/m
 r >/dev/null
 check "ronde : pt.py retouche a la main pas touche" "OK" "$(cmp -s "$D/.claude/hooks/pt.py" "$R/main" && echo OK)"
 git -C "$D" checkout -q -- .claude/hooks/pt.py
+# b20 : pt.py suivi, modifie mais identique a une version publiee (vieille mise a jour
+# jamais commitee) -> rattrape et commite
+git -C "$(dirname "$PT")" show v1.9.12:.claude/hooks/pt.py > "$D/.claude/hooks/pt.py"
+r >/dev/null
+check "b20 : version publiee non commitee rattrapee" "OK" "$(cmp -s "$D/.claude/hooks/pt.py" "$PT" && echo OK)"
+check "b20 : et commitee" "propre" "$(git -C "$D" status --porcelain .claude/hooks/pt.py | grep -q . || echo propre)"
 # .claude jamais commite (Myview) : le pt.py non suivi n'est pas « retouche », il se met a jour
 D2="$R/libre"; git init -q "$D2" && CLAUDE_PROJECT_DIR="$D2" python3 "$PT" init >/dev/null 2>&1
 git -C "$D2" commit -q --allow-empty -m init; echo "# ancienne version" >> "$D2/.claude/hooks/pt.py"

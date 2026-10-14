@@ -16,6 +16,7 @@ Points d'entree :
 
 import atexit
 import difflib
+import hashlib
 import importlib.machinery
 import importlib.util
 import json
@@ -1083,11 +1084,14 @@ def cmd_ronde():
     # seul un pt.py SUIVI et modifie l'est
     suivi = subprocess.run(["git", "ls-files", "--error-unmatch", ".claude/hooks/pt.py"], cwd=ROOT,
                            capture_output=True).returncode == 0
-    if suivi and ".claude/hooks/pt.py" in avant:
-        return print("ronde : pt.py modifie a la main, mise a jour laissee de cote")
+    # un pt.py suivi et modifie n'est remplace que s'il est une version publiee intacte :
+    # vieille mise a jour jamais commitee (b16/b20) ; update --si-publie refuse une retouche
+    si_publie = suivi and ".claude/hooks/pt.py" in avant
+    if si_publie:
+        avant.discard(".claude/hooks/pt.py")
     try:
-        p = subprocess.run(["uvx", "plantrack@latest", "update"], cwd=ROOT, capture_output=True,
-                           text=True, timeout=300)
+        p = subprocess.run(["uvx", "plantrack@latest", "update", *(["--si-publie"] if si_publie else [])],
+                           cwd=ROOT, capture_output=True, text=True, timeout=300)
     except (OSError, subprocess.TimeoutExpired) as e:
         return print(f"ronde : update impossible ({e})")
     if p.returncode:
@@ -1507,6 +1511,13 @@ def cmd_update(args):
                  "lance `uvx plantrack@latest update`.")
     if not os.path.exists(dst):
         sys.exit("[PlanTrack] aucune installation ici — lance `plantrack init`.")
+    if "--si-publie" in args:
+        try:
+            from pt_publies import PUBLIES
+        except ImportError:
+            PUBLIES = set()
+        if hashlib.sha256(open(dst, "rb").read()).hexdigest() not in PUBLIES:
+            sys.exit("[PlanTrack] pt.py modifie a la main, mise a jour laissee de cote.")
     if open(dst, encoding="utf-8").read() == open(src, encoding="utf-8").read():
         print("pt.py deja a jour.")
     else:

@@ -20,7 +20,7 @@ Issues = "https://github.com/MDJLABS/plantrack/issues"
 plantrack = "pt:main"
 
 [tool.setuptools]
-py-modules = ["pt"]
+py-modules = ["pt", "pt_publies"]
 packages = ["plantrack_guide"]
 include-package-data = false
 package-dir = {"" = ".claude/hooks"}
