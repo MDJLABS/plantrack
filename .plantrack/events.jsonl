@@ -791,3 +791,46 @@
 {"ts": "2026-10-13T21:53:10+00:00", "kind": "file_touched", "text": ".gitignore", "thread": "t17"}
 {"ts": "2026-10-13T21:55:05+00:00", "kind": "file_touched", "text": "sortie/schemas-plantrack/serveur.log", "thread": "t17"}
 {"ts": "2026-10-13T21:56:05+00:00", "kind": "decision", "id": "d58", "text": "Presentation + surveillance LIVREES (d57, 13/10) : page https://plantrack-schemas.pages.dev completee (schema 0 'de bout en bout', section 6 renommee 'gestion des priorites, dans PlanTrack', section 7 'sante de l'outil'). Releve quotidien 'plantrack releve' + releve.sh + plantrack-releve.timer (07:00, arret seul apres 2026-11-10 avec rapport final) ; .plantrack/sante.jsonl (ignore git) ; ligne 'Sante : X jours verts sur Y' dans bilan --all. Ne compte PAS comme panne : bugs/questions en attente (deja dans le bilan) ni une panne avalee de plus de 24 h. Pas de publication PyPI : rien ne change pour les autres projets.", "par": "agent"}
+{"ts": "2026-10-13T21:56:05+00:00", "kind": "commit", "sha": "ab8cc5b", "ctype": "chore", "thread": "t17"}
+{"ts": "2026-10-13T21:56:24+00:00", "kind": "file_touched", "text": "sortie/carte-suite-releve.log", "thread": "t17"}
+{"ts": "2026-10-14T04:52:22+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-snug-sutherland.md", "thread": "t17"}
+{"ts": "2026-10-14T04:55:42+00:00", "kind": "decision", "id": "d59", "text": "Mariella (tel, 14/10, via AskUserQuestion) : prorent questions hors porte -> 'Autoriser ces questions (Recommande)' : en construction, une question qui demande ce que seul l'humain peut faire (compte, cles) est permise, pour tous les projets. Plan '5 defauts du releve' valide (tel).", "par": "agent"}
+{"ts": "2026-10-14T04:55:45+00:00", "kind": "close", "id": "t17"}
+{"ts": "2026-10-14T04:55:45+00:00", "kind": "thread_open", "id": "t18", "text": "regler les 5 defauts du releve de sante"}
+{"ts": "2026-10-14T04:56:39+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t18"}
+{"ts": "2026-10-14T04:56:41+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t18"}
+{"ts": "2026-10-14T04:56:44+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t18"}
+{"ts": "2026-10-14T04:56:49+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t18"}
+{"ts": "2026-10-14T04:56:53+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t18"}
+{"ts": "2026-10-14T04:56:58+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t18"}
+{"ts": "2026-10-14T04:56:59+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t18"}
+{"ts": "2026-10-14T04:57:01+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t18"}
+{"ts": "2026-10-14T04:57:03+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t18"}
+{"ts": "2026-10-14T04:57:14+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t18"}
+{"ts": "2026-10-14T04:57:17+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t18"}
+{"ts": "2026-10-14T04:57:23+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t18"}
+{"ts": "2026-10-14T04:57:35+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t18"}
+{"ts": "2026-10-14T04:58:22+00:00", "kind": "file_touched", "text": "sortie/tests.log", "thread": "t18"}
+{"ts": "2026-10-14T04:59:11+00:00", "kind": "file_touched", "text": "sortie/tests.log", "thread": "t18"}
+{"ts": "2026-10-14T04:59:15+00:00", "kind": "commit", "sha": "6806eec", "ctype": "fix", "thread": "t18"}
+{"ts": "2026-10-14T04:59:30+00:00", "kind": "commit", "sha": "8f87420", "ctype": "release", "thread": "t18"}
+{"ts": "2026-10-14T04:59:34+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t18"}
+{"ts": "2026-10-14T05:01:04+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t18"}
+{"ts": "2026-10-14T05:01:12+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t18"}
+{"ts": "2026-10-14T05:01:57+00:00", "kind": "file_touched", "text": "sortie/tests.log", "thread": "t18"}
+{"ts": "2026-10-14T05:02:03+00:00", "kind": "bug", "id": "b19", "text": "ronde dans le projet : un pt.py jamais commite (.claude non suivi, Myview) est pris pour 'modifie a la main' -> le coeur n'est jamais mis a jour", "thread": "t18", "severity": "normal", "par": "agent"}
+{"ts": "2026-10-14T05:02:04+00:00", "kind": "attempt", "id": "a26", "bug": "b19", "hypothesis": "cmd_ronde : ne refuser que si pt.py est SUIVI par git (ls-files --error-unmatch) et modifie ; non suivi -> mise a jour sans commit", "actor": "claude-code"}
+{"ts": "2026-10-14T05:02:04+00:00", "kind": "bug_status", "id": "b19", "status": "to_verify"}
+{"ts": "2026-10-14T05:02:04+00:00", "kind": "bug", "id": "b20", "text": "Regression b16 depuis d51 : la ronde par projet ne rattrape plus un pt.py modifie non commite identique a une version publiee (la logique vivait dans ronde.sh, retire). Constate sur bcc (copie = v1.9.12) le 14/10, rattrape a la main.", "thread": "t18", "severity": "normal", "par": "agent"}
+{"ts": "2026-10-14T05:02:10+00:00", "kind": "commit", "sha": "4dcbafb", "ctype": "fix", "thread": "t18"}
+{"ts": "2026-10-14T05:02:10+00:00", "kind": "commit", "sha": "15a296a", "ctype": "release", "thread": "t18"}
+{"ts": "2026-10-14T05:02:54+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t18"}
+{"ts": "2026-10-14T05:04:22+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t18"}
+{"ts": "2026-10-14T05:04:23+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t18"}
+{"ts": "2026-10-14T05:04:32+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t18"}
+{"ts": "2026-10-14T05:05:21+00:00", "kind": "file_touched", "text": "sortie/tests.log", "thread": "t18"}
+{"ts": "2026-10-14T05:05:27+00:00", "kind": "commit", "sha": "9c43954", "ctype": "fix", "thread": "t18"}
+{"ts": "2026-10-14T05:05:27+00:00", "kind": "commit", "sha": "a6b827a", "ctype": "release", "thread": "t18"}
+{"ts": "2026-10-14T05:07:08+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t18"}
+{"ts": "2026-10-14T05:07:24+00:00", "kind": "decision", "id": "d60", "text": "5 defauts du releve regles (14/10, plan valide tel) : v1.9.14-1.9.16 publiees (GitHub + PyPI verifie) — questions de prerequis humain permises (d59), projet au repos sans fausse alerte, pannes eteintes par la mise a jour du coeur (_coeur), fiche a jour dans toutes les copies worktree, ronde met a jour un pt.py jamais commite (b19). Propage sur prorent, Myview, profil, s69-francoviet, s69-soirees, miamboost, bcc : tous verts sauf profil pg12 (4 vieux commits, expire seul le 24/10).", "par": "agent"}
+{"ts": "2026-10-14T05:07:24+00:00", "kind": "close", "id": "t18"}

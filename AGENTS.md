@@ -14,16 +14,19 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t17 : presentation + surveillance 4 semaines [1 commits]
-  fichiers recemment ecrits : .claude/hooks/pt.py, sortie/tests.log, ../../../etc/systemd/system/plantrack-releve.service, ../../../etc/systemd/system/plantrack-releve.timer, .gitignore, sortie/schemas-plantrack/serveur.log
+FIL ACTIF : aucun. Ouvre un fil avec `!focus <sujet>` avant de coder — sans fil, aucun de tes commits n'est rattache.
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
   t5 : travaux sur main — reprise : retour au travail courant apres la faille
 
+BUGS NON CORRIGES (personne ne s'en est occupe) :
+  b20 (open) [t18] Regression b16 depuis d51 : la ronde par projet ne rattrape plus un pt.py modifie non commite identique a une version publiee (la logique v… (agent)
+
 BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b17 (to_verify) [t15] kvm-lourd fail-open sous pression memoire : 'kvm-lourd classe' expire (5 s) quand bcc.service est a son memory.high -> tsc/next build passe… (agent) [1 tentatives, derniere: Charger kvm-lourd DANS le processus du hook (importlib) au …]
   b18 (to_verify) [t16] usage_gap compte des commits d'AVANT le premier commit journalise quand ils tombent dans la meme seconde (git log --since inclusif a la sec… (agent) [1 tentatives, derniere: usage_gap : exclure par ascendance git (--not <premier sha>…]
+  b19 (to_verify) [t18] ronde dans le projet : un pt.py jamais commite (.claude non suivi, Myview) est pris pour 'modifie a la main' -> le coeur n'est jamais mis a… (agent) [1 tentatives, derniere: cmd_ronde : ne refuser que si pt.py est SUIVI par git (ls-f…]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
@@ -84,6 +87,8 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d56 : Mariella (tel, 13/10, carte brainstorm BMAD nom) : 'Garder PlanTrack (Recommande)' — pas de renommage en Plan Manager ; la gestion des prio… (agent)
   d57 : Mariella (tel, 13/10) : on garde le nom PlanTrack ; la gestion des priorites (kvm-lourd) est une partie de PlanTrack. Surveillance : 4 sema… (agent)
   d58 : Presentation + surveillance LIVREES (d57, 13/10) : page https://plantrack-schemas.pages.dev completee (schema 0 'de bout en bout', section … (agent)
+  d59 : Mariella (tel, 14/10, via AskUserQuestion) : prorent questions hors porte -> 'Autoriser ces questions (Recommande)' : en construction, une … (agent)
+  d60 : 5 defauts du releve regles (14/10, plan valide tel) : v1.9.14-1.9.16 publiees (GitHub + PyPI verifie) — questions de prerequis humain permi… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
