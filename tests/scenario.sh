@@ -652,6 +652,17 @@ check "hook-context laisse une trace horodatee de l injection" "claude" "$out"
 out=$(CLAUDE_PROJECT_DIR="$TMP19" python3 "$PT" doctor 2>&1 || true)
 check "doctor rend compte de l injection reelle" "etat injecte (claude le" "$out"
 rm -rf "$TMP19"
+# projet au repos : derniere injection vieille, seul le robot de la ronde a commite -> pas de panne
+TMP19=$(mktemp -d); git -C "$TMP19" init -q
+CLAUDE_PROJECT_DIR="$TMP19" python3 "$PT" init >/dev/null 2>&1
+printf '{"_depuis":"2020-01-01T00:00:00+00:00","claude":"2020-01-02T00:00:00+00:00"}' > "$TMP19/.plantrack/injections.json"
+(cd "$TMP19" && env -u CLAUDE_PROJECT_DIR git -c user.name=t -c user.email=t@t commit -q --allow-empty --no-verify -m "chore(plantrack): coeur mis a jour par la ronde")
+out=$(CLAUDE_PROJECT_DIR="$TMP19" python3 "$PT" doctor 2>&1 || true)
+check "projet au repos (seul le robot a commite) : pas de panne d injection" "aucun travail depuis" "$out"
+(cd "$TMP19" && env -u CLAUDE_PROJECT_DIR git -c user.name=t -c user.email=t@t commit -q --allow-empty --no-verify -m "feat: du vrai travail")
+out=$(CLAUDE_PROJECT_DIR="$TMP19" python3 "$PT" doctor 2>&1 || true)
+check "du travail sans etat recu : la panne se voit" "!!  etat reellement injecte" "$out"
+rm -rf "$TMP19"
 
 # 30e. v1.7 — les regles sont injectees hors budget, jamais tronquees
 out=$(ctx compact)
@@ -878,9 +889,9 @@ check "porte humaine : la reponse ouvre la porte" "phase 3/5" "$out"
 A20 question "on valide ?" >/dev/null; H20 answer q2 "oui" >/dev/null
 A20 phase next >/dev/null
 out=$(A20 question "je fais quoi pour la couleur ?")
-check "question dans une phase sans question : avertie sur le champ" "n'admet pas de question" "$out"
+check "question dans une phase sans question : avertie sur le champ" "seul l'humain peut faire" "$out"
 out=$(A20 doctor)
-check "doctor : question posee hors porte" "questions posees hors porte (1)" "$out"
+check_not "d59 : une question de prerequis humain n est plus un defaut" "hors porte" "$out"
 check_not "doctor n interdit rien, il avertit" "refuse" "$out"
 
 # fin de parcours : pas de phase 6 inventee
@@ -1035,6 +1046,17 @@ sleep 1
 printf '{"source":"startup"}' | CLAUDE_PROJECT_DIR="$TMP25" python3 "$PT" hook-context >/dev/null 2>&1
 out=$(CLAUDE_PROJECT_DIR="$TMP25" python3 "$PT" doctor 2>&1)
 check "si elle revient apres le correctif, le voyant se rallume" "!!  pannes avalees par les hooks (1" "$out"
+# une panne du coeur se corrige dans le depot PlanTrack : c'est la mise a jour qui l'apporte
+sleep 1
+python3 - "$TMP25/.plantrack/injections.json" <<'E'
+import json, sys, datetime
+p = sys.argv[1]; d = {}  # le fichier a ete corrompu plus haut pour provoquer la panne
+d["_coeur"] = datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds")
+json.dump(d, open(p, "w"))
+E
+out=$(CLAUDE_PROJECT_DIR="$TMP25" python3 "$PT" doctor 2>&1)
+check "la mise a jour du coeur eteint les pannes d avant" "traitee(s) par la mise a jour du coeur" "$out"
+check "et le voyant repasse au vert" "ok  pannes avalees par les hooks (0" "$out"
 rm -rf "$TMP25"
 
 # 26. b6 — hook-filelog n'ecoutait que Edit|Write|MultiEdit|NotebookEdit : une

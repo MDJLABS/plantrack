@@ -634,7 +634,9 @@ def cmd_question(text, st=None):
     append("question", id=qid, text=text, phase=ph["id"] if ph else None)
     hors = ""
     if ph and not ph.get("questions", True):
-        hors = f"\n!! la phase {ph['id']} ({ph['title']}) n'admet pas de question — {ph.get('regle', '')}"
+        # d59 : ce que seul l'humain peut faire (un compte, une cle) reste permis
+        hors = (f"\n!! la phase {ph['id']} ({ph['title']}) n'admet de question que pour ce que seul "
+                f"l'humain peut faire (un compte, une cle, un acces) — {ph.get('regle', '')}")
     return (f"[PlanTrack] question {qid} enregistree : {trunc(text, 80)}\n"
             "(sans reponse, elle sera rappelee a chaque session)" + hors)
 
@@ -1020,6 +1022,9 @@ def hook_context():
     if not any([st["threads"], st["bugs"], st["decisions"], st["inbox"],
                 st["phases"], st["tasks"], st["pieges"], st["questions"], st["guides"]]):
         sys.exit(0)
+    # une copie `git worktree` partage le carnet du depot principal (b14) : ce qui
+    # s'y ecrit ne regenere que la fiche du principal. A l'ouverture, la sienne suit.
+    write_state_block(st)
     if src == "compact":
         print("(contexte compacte — etat du projet reinjecte depuis PlanTrack)")
     # le diagnostic sort AVANT le bloc et hors de son budget : c'est la seule
@@ -1056,6 +1061,9 @@ def lancer_ronde():
         trace("lancer_ronde", e)
 
 
+COMMIT_RONDE = "chore(plantrack): coeur mis a jour par la ronde"
+
+
 def cmd_ronde():
     """Remet le coeur du projet a niveau depuis PyPI (`uvx plantrack@latest update`) et
     commite uniquement les fichiers que l'update a touches — jamais le travail en cours.
@@ -1088,7 +1096,7 @@ def cmd_ronde():
         return print("ronde : coeur deja a jour")
     git = lambda *a: subprocess.run(["git", *a], cwd=ROOT, capture_output=True, text=True)
     if git("add", "--", *nouveaux).returncode or git(
-            "commit", "-q", "-m", "chore(plantrack): coeur mis a jour par la ronde", "--", *nouveaux).returncode:
+            "commit", "-q", "-m", COMMIT_RONDE, "--", *nouveaux).returncode:
         git("reset", "-q", "--", *nouveaux)
         return print(f"ronde : coeur mis a jour, commit refuse : {' '.join(nouveaux)}")
     print(f"ronde : coeur mis a jour et commite ({len(nouveaux)} fichier(s))")
@@ -1487,6 +1495,15 @@ def cmd_update(args):
         shutil.copy(src, dst)
         os.chmod(dst, 0o755)
         print("pt.py mis a jour (nouvelle version vendoree).")
+        # doctor : les pannes tracees avant cette date sont traitees par la mise a jour
+        try:
+            d = json.load(open(INJECTIONS, encoding="utf-8")) if os.path.exists(INJECTIONS) else {}
+            d["_coeur"] = now()
+            os.makedirs(PT_DIR, exist_ok=True)
+            with open(INJECTIONS, "w", encoding="utf-8") as f:
+                json.dump(d, f, indent=1, sort_keys=True)
+        except (OSError, ValueError) as e:
+            trace("update : _coeur", e)
     cmd_init(args)
 
 
@@ -1563,6 +1580,20 @@ def git_commit_date(sha):
             timezone.utc).isoformat(timespec="seconds")
     except ValueError:
         return None
+
+
+def travail_depuis(ts):
+    """Un commit fait apres ts, hors ceux de la ronde (le robot ne travaille pas).
+    En cas de doute (git muet), on repond oui : mieux vaut juger que se taire."""
+    try:
+        r = subprocess.run(["git", "-C", ROOT, "log", f"--since={ts}", "--pretty=%s"],
+                           capture_output=True, text=True, timeout=10)
+    except (OSError, subprocess.SubprocessError) as e:
+        trace("travail_depuis : git log", e)
+        return True
+    if r.returncode:
+        return True
+    return any(s != COMMIT_RONDE for s in r.stdout.splitlines())
 
 
 def usage_gap(days=USAGE_DAYS):
@@ -1650,8 +1681,13 @@ def diagnose(st):
     detail = ", ".join(f"{k} le {v[:10]}" for k, v in sorted(seen.items())) or "jamais"
     # la fenetre part de la pose de la trace : un depot mis a niveau hier n'a pas
     # encore eu l'occasion de prouver quoi que ce soit
-    if inj.get("_depuis", "9") < old:
-        chk(max(seen.values(), default="") >= old, f"etat reellement injecte ({detail})",
+    dernier = max(seen.values(), default="")
+    if inj.get("_depuis", "9") < old and dernier < old and not travail_depuis(dernier or old):
+        # projet au repos : personne n'a ouvert de session, personne n'a commite.
+        # Rien n'a pu se faire sans l'etat — ce n'est pas une panne.
+        out.append((None, f"etat injecte ({detail}) — aucun travail depuis, rien a juger", ""))
+    elif inj.get("_depuis", "9") < old:
+        chk(dernier >= old, f"etat reellement injecte ({detail})",
             f"aucun agent n'a recu l'etat depuis {STALE_DAYS} jours — hooks declares mais "
             "jamais approuves ? (Codex : lance `/hooks`)")
     else:
@@ -1700,11 +1736,15 @@ def diagnose(st):
     # acceptable car une vraie panne de hook se repete. Lier panne<->bug si ca gene.
     fixes = [b for b in st["bugs"].values() if b["status"] in ("to_verify", "validated")]
     fix = max(fixes, key=lambda b: b.get("status_ts", b["ts"]), default=None)
-    seuil = fix.get("status_ts", fix["ts"]) if fix else ""
+    seuil, par = (fix.get("status_ts", fix["ts"]), fix["id"]) if fix else ("", "")
+    # le correctif d'une panne du coeur se declare dans le depot PlanTrack, pas ici :
+    # c'est la mise a jour du coeur (update) qui l'apporte, elle vaut correctif
+    if inj.get("_coeur", "") > seuil:
+        seuil, par = inj["_coeur"], "la mise a jour du coeur"
     neuves = [l for l in inc if l.split(" ", 1)[0] > seuil]
     if len(neuves) < len(inc):
         out.append((None, f"{len(inc) - len(neuves)} panne(s) passee(s), traitee(s) par "
-                    f"{fix['id']} — traces gardees dans .plantrack/incidents.log", ""))
+                    f"{par} — traces gardees dans .plantrack/incidents.log", ""))
     chk(not neuves, f"pannes avalees par les hooks ({len(neuves)} tracee(s) depuis le dernier correctif)",
         f"derniere : {trunc(neuves[-1], 120)} — tout est dans .plantrack/incidents.log ; "
         "corrige puis passe le bug en to_verify, le voyant s'eteint seul" if neuves else "")
@@ -1729,13 +1769,9 @@ def diagnose(st):
             "elle se regenere a chaque ecriture au journal — n'importe quelle "
             "commande plantrack qui ecrit la remet d'aplomb")
     # --- parcours : avertir, jamais bloquer (meme regle que les bugs sans verdict)
-    hors = [q for q in st["questions"].values()
-            if q.get("phase") and (p := st["phases"].get(q["phase"]))
-            and not p.get("questions", True)]
-    if any(p.get("questions") is False for p in st["phases"].values()):
-        chk(not hors, f"questions posees hors porte ({len(hors)})",
-            "la regle de la phase interdit les questions — corrige la regle ou "
-            "retire la question : " + ", ".join(q["id"] for q in hors[:6]))
+    # d59 : plus de controle « questions hors porte » — une question dans une phase
+    # « sans question » est celle d'un prerequis humain (compte, cle), permise ;
+    # l'agent est prevenu au moment de la poser (cmd_question), ca suffit.
     if (ph := active_phase(st)) and ph.get("parcours"):
         depuis = ph.get("status_ts", ph["ts"])
         # "sans livrable" ne se mesure pas : PlanTrack ne sait pas ouvrir un PDF.
