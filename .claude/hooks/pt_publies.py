@@ -2,6 +2,7 @@
 copie modifiee seulement si c'est une version publiee intacte, jamais une retouche.
 A regenerer avant chaque release : `python3 .claude/hooks/pt_publies.py` (tags + pt.py courant)."""
 PUBLIES = {
+    "06eabcfb239749efc4907f6486bf3a5a0b3c6ed43efe989c61bbc80de7cb8b67",
     "07c1a40fb95d951619ce49b7509c42eac955cdf145c74e745dd8a0313e279d17",
     "0c4b30299a99c59db59032c163ee905aac7c50192b2e068cdb1f8374e0fe5a80",
     "104cedbe556197acf34789c0222fd7e006e13468c2de3a9f1c650e7323bf9b12",
