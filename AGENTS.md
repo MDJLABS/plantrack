@@ -14,13 +14,16 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t21 : travaux sur main [2 commits]
-  fichiers recemment ecrits : pyproject.toml
+FIL ACTIF — t21 : travaux sur main [5 commits]
+  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-drifting-quiche.md, ../../../usr/local/bin/kvm-lourd, .claude/hooks/pt.py, sortie/scenario-1610.log, tests/scenario.sh, pyproject.toml
   (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
   t5 : travaux sur main — reprise : retour au travail courant apres la faille
+
+BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
+  b21 (to_verify) [t21] kvm-lourd ne voyait pas l'interieur des scripts : le 16/10 a 14h32 la session profil a range 'gradle assembleDebug' dans sortie/build-mt-pc… (agent) [1 tentatives, derniere: kvm-lourd classe() lit le contenu d'un script local lance (…]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
@@ -87,6 +90,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d62 : v1.9.17 publiee (14/10, plan valide tel) : correctif b20 — la ronde de chaque projet rattrape un pt.py non commite identique a une version … (agent)
   d63 : Mariella (tel, 15/10, carte brainstorm de la suite) : 'Eteindre les fausses alertes (Recommande)' — les 4 rouges recurrents du releve analy… (agent)
   d64 : v1.9.18 publiee (15/10, GitHub + PyPI verifie) : d63 livre — controle 'commits sans fil' borne a USAGE_DAYS (pg12 clos). Les rouges prorent… (agent)
+  d65 : Serveur sature 16/10 14h35-15h25 (demande Mariella tel) : cause = build gradle de profil range dans sortie/build-mt-pc.sh, invisible pour k… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
