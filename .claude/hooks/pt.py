@@ -974,7 +974,10 @@ def hook_pretool():
             sys.modules["kvm_lourd"] = kl   # requis par @dataclass
             spec.loader.exec_module(kl)
             cfg = kl.Config.depuis_env()
-            t = kl.classe(cmd, kl.charger_types(cfg.types))
+            try:    # le dossier de l'agent : un `sortie/build.sh` s'y lit (16/10)
+                t = kl.classe(cmd, kl.charger_types(cfg.types), data.get("cwd"))
+            except TypeError:   # kvm-lourd d'avant le 16/10
+                t = kl.classe(cmd, kl.charger_types(cfg.types))
             if not t:
                 return
             # nom du projet sans `git rev-parse` (projet_par_defaut) : pas de sous-processus

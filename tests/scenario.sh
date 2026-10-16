@@ -1337,6 +1337,17 @@ rm "$TMP/.claude/settings.local.json"
 in='{"tool_input":{"command":"kvm-lourd run --qui=agent -- make"}}'
 out=$(pre lourd "$KB:/usr/bin:/bin")
 check_exit "commande deja enveloppee : aucune sortie" "" "$out"
+# 16/10 : un build range dans un script (lu depuis le dossier de l'agent) va en file ;
+# le heredoc qui ecrit ce script, lui, ne lance rien. Vrai kvm-lourd, s'il est installe.
+if KR=$(command -v kvm-lourd); then
+  mkdir -p "$TMP/kvmagent/sortie"; printf '#!/bin/bash\ncd android && gradle assembleDebug\n' > "$TMP/kvmagent/sortie/b.sh"
+  in="{\"cwd\":\"$TMP/kvmagent\",\"tool_input\":{\"command\":\"sortie/b.sh 2>&1 | tail -3\"}}"
+  out=$(cd /tmp && pre "" "$(dirname "$KR"):/usr/bin:/bin")
+  check "script local contenant gradle : envoye en file" "--type=gradle" "$out"
+  in='{"cwd":"/tmp","tool_input":{"command":"cat > b.sh <<'"'"'EOF'"'"'\ngradle build\nEOF\nchmod +x b.sh"}}'
+  out=$(pre "" "$(dirname "$KR"):/usr/bin:/bin")
+  check_exit "heredoc qui ecrit un script : pas d'enveloppe" "" "$out"
+fi
 
 echo
 [ "$fail" = 0 ] && echo "TOUS LES TESTS PASSENT" || { echo "DES TESTS ECHOUENT"; exit 1; }
