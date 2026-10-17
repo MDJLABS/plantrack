@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t21 : travaux sur main [5 commits]
-  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-drifting-quiche.md, ../../../usr/local/bin/kvm-lourd, .claude/hooks/pt.py, sortie/scenario-1610.log, tests/scenario.sh, pyproject.toml
+FIL ACTIF — t21 : travaux sur main [6 commits]
+  fichiers recemment ecrits : .claude/hooks/pt.py, sortie/scenario-1610.log, tests/scenario.sh, pyproject.toml, ../../../root/.claude/plans/contexte-reconstruit-par-le-transient-treehouse.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-binary-koala.md
   (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -99,6 +99,6 @@ Pieges connus :
   pg15 : Le Stop hook bcc (hook/index.ts, regle 'projet ne s'endort jamais' du 03/10) EX…
 
 Questions en attente (reponds via !answer qN ...) :
-  q1 : Propager le correctif b14 (worktree) vers bcc, prorent et cvslim des que leurs …
+  q3 : Menage automatique du serveur (16/10) : eteindre sessions et serveurs de test i…
 ```
 <!-- plantrack:state-end -->

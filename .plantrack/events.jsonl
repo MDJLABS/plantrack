@@ -892,3 +892,8 @@
 {"ts": "2026-10-16T14:26:24+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t21"}
 {"ts": "2026-10-16T14:27:18+00:00", "kind": "bug_status", "id": "b21", "status": "to_verify"}
 {"ts": "2026-10-16T14:27:18+00:00", "kind": "decision", "id": "d65", "text": "Serveur sature 16/10 14h35-15h25 (demande Mariella tel) : cause = build gradle de profil range dans sortie/build-mt-pc.sh, invisible pour kvm-lourd. Corrige : kvm-lourd lit les scripts locaux + ignore les heredocs (/usr/local/bin, hors depot, sauvegarde backup/code/usr-local-bin), pt.py passe le cwd (v1.9.19 GitHub + PyPI verifie). vps-charge-alerte.sh : un motif nouveau passe outre l'anti-spam 6 h. Fond : swap plein depuis le 15/10 (9 sessions Claude dont une de 14 j, wrangler dev miamboost 1,5 j) -> question posee a Mariella.", "par": "agent"}
+{"ts": "2026-10-16T14:27:19+00:00", "kind": "commit", "sha": "b121ed5", "ctype": "chore", "thread": "t21"}
+{"ts": "2026-10-16T14:27:44+00:00", "kind": "question", "id": "q3", "text": "Menage automatique du serveur (16/10) : eteindre sessions et serveurs de test inactifs depuis 24 h ? (carte envoyee, reco : eteindre ce qui dort)"}
+{"ts": "2026-10-16T17:33:42+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-transient-treehouse.md", "thread": "t21"}
+{"ts": "2026-10-17T12:11:55+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-binary-koala.md", "thread": "t21"}
+{"ts": "2026-10-17T12:13:41+00:00", "kind": "answer", "id": "q1", "text": "Clore : la ronde automatique propage deja le correctif (bcc, prorent a jour ; cvslim a sa prochaine ouverture)", "canal": "telephone : Clore la question (Recommandé)"}
