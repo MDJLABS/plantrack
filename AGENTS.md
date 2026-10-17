@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t21 : travaux sur main [8 commits]
+FIL ACTIF — t21 : travaux sur main [9 commits]
   fichiers recemment ecrits : sortie/essai-menage/essai.sh, ../../../etc/systemd/system/menage-serveur.service, ../../../etc/systemd/system/menage-serveur.timer, sortie/carte-suite.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-partitioned-wind.md, ../../../usr/local/bin/menage-serveur.sh
   (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
@@ -93,6 +93,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d65 : Serveur sature 16/10 14h35-15h25 (demande Mariella tel) : cause = build gradle de profil range dans sortie/build-mt-pc.sh, invisible pour k… (agent)
   d66 : Menage prudent LIVRE (choix Mariella tel 17/10 q3, plan valide) : /usr/local/bin/menage-serveur.sh + menage-serveur.timer (horaire). Eteint… (agent)
   d67 : Alerte avant saturation LIVREE (choix Mariella tel 17/10, carte brainstorm 'Alerte avant saturation (Recommande)', plan valide) : menage-se… (agent)
+  d68 : Mariella (tel, 17/10, via AskUserQuestion) : message d'essai de l'alerte memoire RECU ; choix 'Recu, retour en veille (Recommande)' — veill… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
