@@ -897,3 +897,16 @@
 {"ts": "2026-10-16T17:33:42+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-transient-treehouse.md", "thread": "t21"}
 {"ts": "2026-10-17T12:11:55+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-binary-koala.md", "thread": "t21"}
 {"ts": "2026-10-17T12:13:41+00:00", "kind": "answer", "id": "q1", "text": "Clore : la ronde automatique propage deja le correctif (bcc, prorent a jour ; cvslim a sa prochaine ouverture)", "canal": "telephone : Clore la question (Recommandé)"}
+{"ts": "2026-10-17T12:13:44+00:00", "kind": "commit", "sha": "f7411eb", "ctype": "chore", "thread": "t21"}
+{"ts": "2026-10-17T12:14:03+00:00", "kind": "file_touched", "text": "sortie/carte-q3.log", "thread": "t21"}
+{"ts": "2026-10-17T12:19:30+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-declarative-charm.md", "thread": "t21"}
+{"ts": "2026-10-17T13:12:51+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-scalable-swan.md", "thread": "t21"}
+{"ts": "2026-10-17T13:36:04+00:00", "kind": "file_touched", "text": "../../../usr/local/bin/menage-serveur.sh", "thread": "t21"}
+{"ts": "2026-10-17T13:36:43+00:00", "kind": "file_touched", "text": "../../../usr/local/bin/menage-serveur.sh", "thread": "t21"}
+{"ts": "2026-10-17T13:36:45+00:00", "kind": "file_touched", "text": "../../../usr/local/bin/menage-serveur.sh", "thread": "t21"}
+{"ts": "2026-10-17T13:36:48+00:00", "kind": "file_touched", "text": "../../../usr/local/bin/menage-serveur.sh", "thread": "t21"}
+{"ts": "2026-10-17T13:37:10+00:00", "kind": "file_touched", "text": "sortie/essai-menage/essai.sh", "thread": "t21"}
+{"ts": "2026-10-17T13:38:00+00:00", "kind": "file_touched", "text": "../../../etc/systemd/system/menage-serveur.service", "thread": "t21"}
+{"ts": "2026-10-17T13:38:00+00:00", "kind": "file_touched", "text": "../../../etc/systemd/system/menage-serveur.timer", "thread": "t21"}
+{"ts": "2026-10-17T13:54:50+00:00", "kind": "answer", "id": "q3", "text": "Ménage prudent (Recommandé)", "canal": "tel : Ménage prudent (Recommandé)"}
+{"ts": "2026-10-17T13:54:50+00:00", "kind": "decision", "id": "d66", "text": "Menage prudent LIVRE (choix Mariella tel 17/10 q3, plan valide) : /usr/local/bin/menage-serveur.sh + menage-serveur.timer (horaire). Eteint seulement une session Claude AVEC terminal sans frappe depuis 24 h et sans commande en cours, ou un serveur de test lance a la main (next dev/wrangler dev/vite) qui ECOUTE, age > 24 h, sans connexion exterieure. Jamais un *.service ni les sessions bcc sans terminal. Arbre du processus seulement (pas le groupe). Une bulle --ton info si arret. Copie dans backup/code/.", "par": "agent"}

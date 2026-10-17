@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t21 : travaux sur main [6 commits]
-  fichiers recemment ecrits : .claude/hooks/pt.py, sortie/scenario-1610.log, tests/scenario.sh, pyproject.toml, ../../../root/.claude/plans/contexte-reconstruit-par-le-transient-treehouse.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-binary-koala.md
+FIL ACTIF — t21 : travaux sur main [7 commits]
+  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-declarative-charm.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-scalable-swan.md, ../../../usr/local/bin/menage-serveur.sh, sortie/essai-menage/essai.sh, ../../../etc/systemd/system/menage-serveur.service, ../../../etc/systemd/system/menage-serveur.timer
   (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -91,14 +91,12 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d63 : Mariella (tel, 15/10, carte brainstorm de la suite) : 'Eteindre les fausses alertes (Recommande)' — les 4 rouges recurrents du releve analy… (agent)
   d64 : v1.9.18 publiee (15/10, GitHub + PyPI verifie) : d63 livre — controle 'commits sans fil' borne a USAGE_DAYS (pg12 clos). Les rouges prorent… (agent)
   d65 : Serveur sature 16/10 14h35-15h25 (demande Mariella tel) : cause = build gradle de profil range dans sortie/build-mt-pc.sh, invisible pour k… (agent)
+  d66 : Menage prudent LIVRE (choix Mariella tel 17/10 q3, plan valide) : /usr/local/bin/menage-serveur.sh + menage-serveur.timer (horaire). Eteint… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
   pg10 : Le post-commit journalise le commit lui-meme (events.jsonl) et regenere l'insta…
   pg13 : Gabarit de parcours : la phase de construction est a 'questions: false', mais u…
   pg15 : Le Stop hook bcc (hook/index.ts, regle 'projet ne s'endort jamais' du 03/10) EX…
-
-Questions en attente (reponds via !answer qN ...) :
-  q3 : Menage automatique du serveur (16/10) : eteindre sessions et serveurs de test i…
 ```
 <!-- plantrack:state-end -->
