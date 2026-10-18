@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t21 : travaux sur main [12 commits]
-  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-generic-cocke.md, ../cvslim/sortie/carte-suite.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-magical-clock.md, .claude/hooks/pt.py, sortie/scenario.log, pyproject.toml
+FIL ACTIF — t21 : travaux sur main [13 commits]
+  fichiers recemment ecrits : .claude/hooks/pt.py, sortie/scenario.log, pyproject.toml, sortie/carte-suite.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-snappy-wreath.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-woolly-feigenbaum.md
   (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -95,6 +95,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d67 : Alerte avant saturation LIVREE (choix Mariella tel 17/10, carte brainstorm 'Alerte avant saturation (Recommande)', plan valide) : menage-se… (agent)
   d68 : Mariella (tel, 17/10, via AskUserQuestion) : message d'essai de l'alerte memoire RECU ; choix 'Recu, retour en veille (Recommande)' — veill… (agent)
   d69 : v1.9.20 publiee (18/10, accord Mariella tel 'Vu' sur la carte cvslim) : flotte() lance le doctor de chaque depot avec le pt.py de l'appelan… (agent)
+  d70 : Mariella (tel, 18/10, via AskUserQuestion) : apres v1.9.20 (fausse alerte cvslim eteinte), choix 'Rester en veille (Recommande)' — veille s… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…

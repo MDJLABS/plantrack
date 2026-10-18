@@ -928,3 +928,8 @@
 {"ts": "2026-10-18T11:14:08+00:00", "kind": "commit", "sha": "91a63ad", "ctype": "release", "thread": "t21"}
 {"ts": "2026-10-18T11:14:10+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t21"}
 {"ts": "2026-10-18T11:15:08+00:00", "kind": "decision", "id": "d69", "text": "v1.9.20 publiee (18/10, accord Mariella tel 'Vu' sur la carte cvslim) : flotte() lance le doctor de chaque depot avec le pt.py de l'appelant (PLANTRACK_ROOT) au lieu de la copie vendorisee — un projet au repos ne garde plus les fausses alertes de sa vieille copie. Releve : cvslim et promovie passent au vert.", "par": "agent"}
+{"ts": "2026-10-18T11:15:08+00:00", "kind": "commit", "sha": "6987d13", "ctype": "chore", "thread": "t21"}
+{"ts": "2026-10-18T11:15:36+00:00", "kind": "file_touched", "text": "sortie/carte-suite.log", "thread": "t21"}
+{"ts": "2026-10-18T11:17:41+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-snappy-wreath.md", "thread": "t21"}
+{"ts": "2026-10-18T14:08:14+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-woolly-feigenbaum.md", "thread": "t21"}
+{"ts": "2026-10-18T14:16:18+00:00", "kind": "decision", "id": "d70", "text": "Mariella (tel, 18/10, via AskUserQuestion) : apres v1.9.20 (fausse alerte cvslim eteinte), choix 'Rester en veille (Recommande)' — veille silencieuse (d23), ne la deranger que sur panne.", "par": "agent"}
