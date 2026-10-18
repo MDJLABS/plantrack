@@ -917,3 +917,14 @@
 {"ts": "2026-10-17T14:05:59+00:00", "kind": "decision", "id": "d67", "text": "Alerte avant saturation LIVREE (choix Mariella tel 17/10, carte brainstorm 'Alerte avant saturation (Recommande)', plan valide) : menage-serveur.sh (timer horaire) envoie UNE bulle --ton probleme si RAM ou swap >= 80 % (SEUIL_PCT), avec les 3 plus gros programmes ; temoin /var/lib/menage-serveur/alerte anti-repetition, efface sous le seuil. N'eteint rien. Essai reel SEUIL_PCT=10 : bulle envoyee, 2e passage muet.", "par": "agent"}
 {"ts": "2026-10-17T14:05:59+00:00", "kind": "commit", "sha": "584735a", "ctype": "chore", "thread": "t21"}
 {"ts": "2026-10-17T14:06:29+00:00", "kind": "decision", "id": "d68", "text": "Mariella (tel, 17/10, via AskUserQuestion) : message d'essai de l'alerte memoire RECU ; choix 'Recu, retour en veille (Recommande)' — veille silencieuse (d23), ne la deranger que sur panne.", "par": "agent"}
+{"ts": "2026-10-17T14:06:30+00:00", "kind": "commit", "sha": "06a1c8d", "ctype": "chore", "thread": "t21"}
+{"ts": "2026-10-18T06:14:12+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-generic-cocke.md", "thread": "t21"}
+{"ts": "2026-10-18T10:14:35+00:00", "kind": "file_touched", "text": "../cvslim/sortie/carte-suite.log", "thread": "t21"}
+{"ts": "2026-10-18T10:14:47+00:00", "kind": "file_touched", "text": "../cvslim/sortie/carte-suite.log", "thread": "t21"}
+{"ts": "2026-10-18T11:09:47+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-magical-clock.md", "thread": "t21"}
+{"ts": "2026-10-18T11:10:16+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t21"}
+{"ts": "2026-10-18T11:11:44+00:00", "kind": "file_touched", "text": "sortie/scenario.log", "thread": "t21"}
+{"ts": "2026-10-18T11:11:53+00:00", "kind": "commit", "sha": "5a9a1bd", "ctype": "fix", "thread": "t21"}
+{"ts": "2026-10-18T11:14:08+00:00", "kind": "commit", "sha": "91a63ad", "ctype": "release", "thread": "t21"}
+{"ts": "2026-10-18T11:14:10+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t21"}
+{"ts": "2026-10-18T11:15:08+00:00", "kind": "decision", "id": "d69", "text": "v1.9.20 publiee (18/10, accord Mariella tel 'Vu' sur la carte cvslim) : flotte() lance le doctor de chaque depot avec le pt.py de l'appelant (PLANTRACK_ROOT) au lieu de la copie vendorisee — un projet au repos ne garde plus les fausses alertes de sa vieille copie. Releve : cvslim et promovie passent au vert.", "par": "agent"}
