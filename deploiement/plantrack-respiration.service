@@ -1,0 +1,6 @@
+[Unit]
+Description=PlanTrack - ronde de respiration (expiration des piles inutilisees)
+
+[Service]
+Type=oneshot
+ExecStart=/home/mariella/plantrack/plantrack respirer

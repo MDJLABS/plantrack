@@ -1349,5 +1349,69 @@ if KR=$(command -v kvm-lourd); then
   check_exit "heredoc qui ecrit un script : pas d'enveloppe" "" "$out"
 fi
 
+# Respiration (spec 2026-10-18) : battement des hooks, expiration par `respirer`
+SR="$TMP/souffle"; SB="$TMP/souffle-bin"; SL="$TMP/souffle-appels"; SA="$TMP/souffle-actifs"
+mkdir -p "$SR/.plantrack" "$SR/sub" "$SB"
+cat > "$SB/systemctl" <<FAUX
+#!/bin/bash
+echo "\$*" >> "$SL"
+[ -n "\${SC_ECHEC:-}" ] && exit 1
+if [ "\$1" = is-active ]; then grep -qx "\$2" "$SA" 2>/dev/null && echo active || echo inactive; fi
+exit 0
+FAUX
+chmod +x "$SB/systemctl"
+printf 'a.service\nb.service\ngarde g.service\n' > "$SR/.plantrack/souffle.conf"
+echo "$SR" > "$TMP/souffle-reg"
+bat() { echo '{}' | CLAUDE_PROJECT_DIR="$SR" SOUFFLE_SYSTEMCTL="${SC:-$SB/systemctl}" python3 "$PT" hook-prompt; }
+resp() { CLAUDE_PROJECT_DIR="$SR" PLANTRACK_REGISTRY="$TMP/souffle-reg" SOUFFLE_SYSTEMCTL="$SB/systemctl" python3 "$PT" respirer "$@"; }
+attend() { for _ in $(seq 20); do grep -q "$1" "$SL" 2>/dev/null && return; sleep 0.25; done; }
+appels() { sleep 0.5; cat "$SL" 2>/dev/null; }
+# 1. sans souffle.conf : rien
+mv "$SR/.plantrack/souffle.conf" "$SR/.plantrack/souffle.conf.off"
+bat; rc=$?
+check_exit "respiration 1 : sans souffle.conf, hook code 0" 0 "$rc"
+[ ! -e "$SR/.plantrack/battement" ] && [ -z "$(appels)" ]; check_exit "respiration 1 : ni battement ni systemctl" 0 "$?"
+mv "$SR/.plantrack/souffle.conf.off" "$SR/.plantrack/souffle.conf"
+# 2. premier hook : start des non-garde seulement
+bat; attend start
+out=$(appels)
+check "respiration 2 : start --no-block des services non-garde" "start --no-block a.service b.service" "$out"
+check_not "respiration 2 : pas de start du service garde" "g.service" "$out"
+# 3. deuxieme hook < 30 min : pas de nouveau start
+: > "$SL"; bat; out=$(appels)
+check_exit "respiration 3 : deuxieme hook rapproche, aucun start" "" "$out"
+# 4. battement vieilli : nouveau start
+touch -d '2 hours ago' "$SR/.plantrack/battement"; bat; attend start
+check "respiration 4 : battement vieux, nouveau start" "start --no-block a.service" "$(appels)"
+# 5. respirer, battement frais : aucun stop
+printf 'a.service\nb.service\n' > "$SA"; : > "$SL"
+bat; attend start; : > "$SL"
+resp; out=$(cat "$SL"); check_not "respiration 5 : battement frais, aucun stop" "stop" "$out"
+out=$(resp --etat); check "respiration 5 : --etat dit vivant" "vivant" "$out"
+# 6. battement vieux + garde active : aucun stop
+touch -d '2 hours ago' "$SR/.plantrack/battement"; printf 'a.service\ng.service\n' > "$SA"; : > "$SL"
+resp; out=$(cat "$SL"); check_not "respiration 6 : garde active, aucun stop" "stop" "$out"
+# 7. battement vieux, aucune garde : stop des actifs + souffle.log
+printf 'a.service\n' > "$SA"; : > "$SL"
+resp; out=$(cat "$SL")
+check "respiration 7 : stop du service actif" "stop a.service" "$out"
+check_not "respiration 7 : pas de stop du service inactif" "stop b.service" "$out"
+check "respiration 7 : ligne dans souffle.log" "expire a.service" "$(cat "$SR/.plantrack/souffle.log" 2>/dev/null)"
+out=$(resp --etat); check "respiration 7 : --etat dit endormi" "endormi" "$out"
+# 8. commande en cours (session claude + descendant shell-snapshots) : aucun stop
+mkdir -p "$TMP/souffle-claude"
+printf '#!/bin/bash\nbash -c "sleep 30; :" shell-snapshots\n' > "$TMP/souffle-claude/claude"; chmod +x "$TMP/souffle-claude/claude"
+(cd "$SR/sub" && "$TMP/souffle-claude/claude" >/dev/null 2>&1 &)
+sleep 1; : > "$SL"
+resp; out=$(cat "$SL"); check_not "respiration 8 : commande en cours, aucun stop" "stop" "$out"
+for c in $(pgrep -f "$TMP/souffle-claude/claude"); do for e in $(pgrep -P "$c"); do pkill -P "$e"; kill "$e"; done; kill "$c"; done; sleep 0.5
+: > "$SL"; resp; check "respiration 8 : commande finie, stop" "stop a.service" "$(cat "$SL")"
+# 9. systemctl en echec ou introuvable : le hook sort en 0
+touch -d '2 hours ago' "$SR/.plantrack/battement"
+SC_ECHEC=1 bat; check_exit "respiration 9 : systemctl en echec, hook code 0" 0 "$?"
+touch -d '2 hours ago' "$SR/.plantrack/battement"
+SC=/inexistant/systemctl bat; check_exit "respiration 9 : systemctl introuvable, hook code 0" 0 "$?"
+check "respiration 9 : l'erreur est tracee" "battre" "$(cat "$SR/.plantrack/incidents.log" 2>/dev/null)"
+
 echo
 [ "$fail" = 0 ] && echo "TOUS LES TESTS PASSENT" || { echo "DES TESTS ECHOUENT"; exit 1; }

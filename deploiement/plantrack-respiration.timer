@@ -1,0 +1,9 @@
+[Unit]
+Description=PlanTrack - ronde de respiration toutes les 5 min
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=5min
+
+[Install]
+WantedBy=timers.target

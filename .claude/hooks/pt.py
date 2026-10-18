@@ -86,6 +86,8 @@ INJECTIONS = os.path.join(PT_DIR, "injections.json")
 INCIDENTS = os.path.join(PT_DIR, "incidents.log")
 RONDE = os.path.join(PT_DIR, "ronde.log")   # horodatage + trace de la ronde, propre a la machine
 RONDE_PERIODE = 4 * 3600
+SOUFFLE_DELAI = int(os.environ.get("SOUFFLE_DELAI") or 1800)       # sans battement depuis ce delai : endormi
+SOUFFLE_PERIODE = int(os.environ.get("SOUFFLE_PERIODE") or 300)    # documentaire : plantrack-respiration.timer fait foi
 SANTE = os.path.join(PT_DIR, "sante.jsonl")   # releve de sante quotidien de la flotte (d57)
 ATTENTES = ("bugs en attente de verdict", "questions sans reponse")   # defauts doctor cote humain
 MAX_INCIDENTS = 50            # une panne qui se repete se lit sur ses dernieres traces
@@ -873,10 +875,144 @@ def read_hook_input():
         return {}
 
 
+def souffle_conf(racine):
+    return os.path.join(racine, ".plantrack", "souffle.conf")
+
+
+def souffle(racine):
+    """Lit souffle.conf : (reveil, garde). Une ligne = un service ; 'garde X' empeche
+    l'expiration sans etre reveille. Pas de fichier = ([], []) : le projet ne respire pas."""
+    reveil, garde = [], []
+    try:
+        with open(souffle_conf(racine), encoding="utf-8") as f:
+            for l in f:
+                l = l.split("#", 1)[0].split()
+                if len(l) == 1:
+                    reveil.append(l[0])
+                elif len(l) == 2 and l[0] == "garde":
+                    garde.append(l[1])
+    except OSError:
+        pass
+    return reveil, garde
+
+
+def systemctl(args, detache=False):
+    """Seul point d'appel a systemctl, surchargeable par SOUFFLE_SYSTEMCTL (tests).
+    detache : le reveil ne fait jamais attendre la session. Sinon, renvoie stdout."""
+    cmd = shlex.split(os.environ.get("SOUFFLE_SYSTEMCTL") or "systemctl") + list(args)
+    if detache:
+        subprocess.Popen(cmd, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
+                         stderr=subprocess.DEVNULL, start_new_session=True)
+        return ""
+    return subprocess.run(cmd, capture_output=True, text=True, timeout=60).stdout.strip()
+
+
+def battre(racine):
+    """Battement (4.1) : touche .plantrack/battement ; si le precedent datait de plus de
+    SOUFFLE_DELAI (ou n'existait pas), reveille les services du souffle. Fail-open.
+    Renvoie True si un reveil a ete lance."""
+    try:
+        reveil, _ = souffle(racine)
+        if not os.path.exists(souffle_conf(racine)):
+            return False
+        bat = os.path.join(racine, ".plantrack", "battement")
+        try:
+            vieux = time.time() - os.path.getmtime(bat) > SOUFFLE_DELAI
+        except OSError:
+            vieux = True
+        with open(bat, "a"):
+            pass
+        os.utime(bat)
+        if vieux and reveil:
+            systemctl(["start", "--no-block"] + reveil, detache=True)
+            return True
+    except Exception as e:
+        trace("battre", e)
+    return False
+
+
+def commande_en_cours(racine):
+    """4.3 : une session claude dont le cwd est sous la racine a un descendant dont la
+    cmdline contient shell-snapshots (meme signal que menage-serveur.sh)."""
+    racine = os.path.realpath(racine)
+    pere, comm = {}, {}
+    for pid in filter(str.isdigit, os.listdir("/proc")):
+        try:
+            with open(f"/proc/{pid}/stat", "rb") as f:
+                st = f.read().decode(errors="replace")
+            pere[pid] = st.rsplit(")", 1)[1].split()[1]
+            comm[pid] = st[st.index("(") + 1:st.rindex(")")]
+        except (OSError, ValueError, IndexError):
+            continue
+    for pid in [p for p, c in comm.items() if c == "claude"]:
+        try:
+            cwd = os.path.realpath(f"/proc/{pid}/cwd")
+        except OSError:
+            continue
+        if cwd != racine and not cwd.startswith(racine + os.sep):
+            continue
+        vus, pile = set(), [pid]
+        while pile:
+            cur = pile.pop()
+            for p, pp in pere.items():
+                if pp == cur and p not in vus:
+                    vus.add(p)
+                    pile.append(p)
+        for d in vus:
+            try:
+                with open(f"/proc/{d}/cmdline", "rb") as f:
+                    if b"shell-snapshots" in f.read():
+                        return True
+            except OSError:
+                pass
+    return False
+
+
+def vivant(racine, maintenant):
+    """Battement recent, ou commande Bash de session en cours (4.3)."""
+    try:
+        if maintenant - os.path.getmtime(os.path.join(racine, ".plantrack", "battement")) < SOUFFLE_DELAI:
+            return True
+    except OSError:
+        pass
+    return commande_en_cours(racine)
+
+
+def cmd_respirer(args):
+    """Ronde d'expiration (4.2), lancee par plantrack-respiration.timer. --etat : diagnostic."""
+    maintenant = time.time()
+    for racine in registered_roots():
+        if not os.path.exists(souffle_conf(racine)):
+            continue
+        try:
+            reveil, garde = souffle(racine)
+            actifs = [s for s in reveil + garde if systemctl(["is-active", s]) == "active"]
+            try:
+                age = int(maintenant - os.path.getmtime(os.path.join(racine, ".plantrack", "battement")))
+            except OSError:
+                age = -1
+            if "--etat" in args:
+                print(f"{racine} : {'vivant' if vivant(racine, maintenant) else 'endormi'}, "
+                      f"battement {age if age >= 0 else 'absent'}s, actifs : {' '.join(actifs) or 'aucun'}")
+                continue
+            if vivant(racine, maintenant) or any(g in actifs for g in garde):
+                continue
+            arret = [s for s in reveil if s in actifs]
+            for s in arret:
+                systemctl(["stop", s])
+            if arret:
+                with open(os.path.join(racine, ".plantrack", "souffle.log"), "a", encoding="utf-8") as f:
+                    f.write(f"{datetime.now().isoformat(timespec='seconds')} expire "
+                            f"{' '.join(arret)} battement={age}s\n")
+        except Exception as e:
+            trace(f"respirer {racine}", e)
+
+
 def hook_prompt():
     """UserPromptSubmit. Les commandes '!' sont capturees puis le prompt est
     rejete (exit 2) : l'agent ne les voit jamais, son contexte reste propre."""
     data = read_hook_input()
+    battre(journal_root(ROOT))
     prompt = (data.get("prompt") or "").strip()
     if not prompt.startswith("!"):
         sys.exit(0)
@@ -904,6 +1040,7 @@ def hook_filelog():
     Codex n'a pas de champ file_path : apply_patch livre le patch entier dans
     tool_input.command, les chemins sont sur les lignes '*** Update File: ...'."""
     data = read_hook_input()
+    battre(journal_root(ROOT))
     ti = data.get("tool_input") or {}
     p = ti.get("file_path") or ti.get("path") or ti.get("notebook_path")
     bash = data.get("tool_name") == "Bash"
@@ -959,6 +1096,7 @@ def hook_pretool():
     la reecriture ne doit pas faire sauter une demande d'autorisation."""
     try:
         data = read_hook_input()
+        battre(journal_root(ROOT))
         ti = data.get("tool_input") or {}
         cmd = ti.get("command") or ""
         chemin = shutil.which("kvm-lourd")
@@ -1021,6 +1159,8 @@ def hook_context():
     data = read_hook_input()
     note_injection()
     lancer_ronde()
+    if battre(journal_root(ROOT)):
+        print("(pile en cours de reveil : une commande qui interroge la base dans la minute peut echouer une fois)")
     src = data.get("source", "startup")
     st = project()
     if not any([st["threads"], st["bugs"], st["decisions"], st["inbox"],
@@ -1455,7 +1595,8 @@ def cmd_init(args):
             content = f.read()
     # transcripts : trop lourds ; injections et incidents : propres a la machine
     missing = [l for l in (".plantrack/transcripts/", ".plantrack/injections.json",
-                           ".plantrack/incidents.log", ".plantrack/ronde.log") if l not in content]
+                           ".plantrack/incidents.log", ".plantrack/ronde.log",
+                           ".plantrack/battement", ".plantrack/souffle.log") if l not in content]
     if missing:
         with open(gi, "a", encoding="utf-8") as f:
             f.write(("\n" if content and not content.endswith("\n") else "")
@@ -2550,6 +2691,8 @@ def cli(argv):
         cmd_releve(args)
     elif cmd == "ronde":
         cmd_ronde()
+    elif cmd == "respirer":
+        cmd_respirer(args)
     elif cmd == "attentes":
         print(cmd_attentes(args, st))
     elif cmd == "bugs":
