@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t21 : travaux sur main [17 commits]
+FIL ACTIF — t21 : travaux sur main [20 commits]
   fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-woolly-feigenbaum.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-witty-quail.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-snappy-catmull.md, ../../../usr/local/bin/vps-charge-alerte.sh, sortie/carte-suite.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-zazzy-sun.md
   (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 

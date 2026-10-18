@@ -946,3 +946,6 @@
 {"ts": "2026-10-18T15:52:39+00:00", "kind": "commit", "sha": "8a39bd7", "ctype": "chore", "thread": "t21"}
 {"ts": "2026-10-18T16:21:37+00:00", "kind": "commit", "sha": "cab651c", "ctype": "docs", "thread": "t21"}
 {"ts": "2026-10-18T16:21:44+00:00", "kind": "decision", "id": "d73", "text": "Respiration des ressources (Mariella, 18/10, via AskUserQuestion) : PlanTrack gere la charge comme un poumon — battement a chaque hook (.plantrack/battement), reveil systemctl start --no-block si battement > 30 min, ronde 'plantrack respirer' toutes les 5 min qui arrete les services du souffle.conf d'un projet sans battement ni commande en cours (signal shell-snapshots de d66) ni garde active. Spec : .planning/2026-10-18-spec-respiration.md (cab651c).", "par": "agent"}
+{"ts": "2026-10-18T16:21:50+00:00", "kind": "commit", "sha": "5b22225", "ctype": "chore", "thread": "t21"}
+{"ts": "2026-10-18T16:25:39+00:00", "kind": "commit", "sha": "c927246", "ctype": "feat", "thread": "t21"}
+{"ts": "2026-10-18T16:29:18+00:00", "kind": "commit", "sha": "b0cb594", "ctype": "fix", "thread": "t21"}
