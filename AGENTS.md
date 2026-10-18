@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t21 : travaux sur main [14 commits]
-  fichiers recemment ecrits : sortie/carte-suite.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-snappy-wreath.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-woolly-feigenbaum.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-witty-quail.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-snappy-catmull.md, ../../../usr/local/bin/vps-charge-alerte.sh
+FIL ACTIF — t21 : travaux sur main [15 commits]
+  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-woolly-feigenbaum.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-witty-quail.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-snappy-catmull.md, ../../../usr/local/bin/vps-charge-alerte.sh, sortie/carte-suite.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-zazzy-sun.md
   (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -94,6 +94,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d69 : v1.9.20 publiee (18/10, accord Mariella tel 'Vu' sur la carte cvslim) : flotte() lance le doctor de chaque depot avec le pt.py de l'appelan… (agent)
   d70 : Mariella (tel, 18/10, via AskUserQuestion) : apres v1.9.20 (fausse alerte cvslim eteinte), choix 'Rester en veille (Recommande)' — veille s… (agent)
   d71 : Verification des chiffres de l'alerte 15h02 (demande Mariella tel 18/10 'verifie si les datas sont bonnes', plan valide) : RAM/swap 99 % re… (agent)
+  d72 : Mariella (tel, 18/10 15h49) : apres verification des chiffres de l'alerte 15h02, choix 'Rester en veille (Recommande)' — veille silencieuse… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…

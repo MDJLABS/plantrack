@@ -939,3 +939,7 @@
 {"ts": "2026-10-18T15:34:20+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-snappy-catmull.md", "thread": "t21"}
 {"ts": "2026-10-18T15:35:19+00:00", "kind": "file_touched", "text": "../../../usr/local/bin/vps-charge-alerte.sh", "thread": "t21"}
 {"ts": "2026-10-18T15:35:23+00:00", "kind": "decision", "id": "d71", "text": "Verification des chiffres de l'alerte 15h02 (demande Mariella tel 18/10 'verifie si les datas sont bonnes', plan valide) : RAM/swap 99 % reels ; 'seuil 0' = essai d'envoi force (SEUIL_LOAD=0), vrai seuil 6 ; 'ps 500 %' = artefact de mesure -> retire de la liste Top dans vps-charge-alerte.sh (sauvegarde backup/code/usr-local-bin). CPUS=2 pose a 17h26 par une autre session : non touche.", "par": "agent"}
+{"ts": "2026-10-18T15:35:23+00:00", "kind": "commit", "sha": "8c477d6", "ctype": "chore", "thread": "t21"}
+{"ts": "2026-10-18T15:35:39+00:00", "kind": "file_touched", "text": "sortie/carte-suite.log", "thread": "t21"}
+{"ts": "2026-10-18T15:49:53+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-zazzy-sun.md", "thread": "t21"}
+{"ts": "2026-10-18T15:52:39+00:00", "kind": "decision", "id": "d72", "text": "Mariella (tel, 18/10 15h49) : apres verification des chiffres de l'alerte 15h02, choix 'Rester en veille (Recommande)' — veille silencieuse (d23).", "par": "agent"}
