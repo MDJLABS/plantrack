@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t21 : travaux sur main [30 commits]
+FIL ACTIF — t21 : travaux sur main [31 commits]
   fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-declarative-newell.md, sortie/carte-suite.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-tranquil-acorn.md, .claude/hooks/pt.py, tests/scenario.sh, pyproject.toml
   (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
@@ -102,14 +102,12 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d74 : Respiration EN SERVICE (18/10, choix Mariella 'Tout mettre en service') : v1.9.21 publiee (PyPI ok) ; init dans prolearn, openstyle, proren… (agent)
   d75 : v1.9.22 publiee (18/10, GitHub + PyPI verifie, plan valide par Mariella) : correctif b22 — hooks Codex sans repli sur le cwd (exit 0 hors d… (agent)
   d76 : v1.9.23 publiee (18/10, GitHub + PyPI verifie, choix Mariella tel carte brainstorm 'Empecher le travail en double (Recommande)', plan valid… (agent)
+  d77 : Mariella (tel, 18/10, via AskUserQuestion) : apres v1.9.23 (pas de travail en double), choix 'Rester en veille (Recommande)' — veille silen… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
   pg10 : Le post-commit journalise le commit lui-meme (events.jsonl) et regenere l'insta…
   pg13 : Gabarit de parcours : la phase de construction est a 'questions: false', mais u…
   pg15 : Le Stop hook bcc (hook/index.ts, regle 'projet ne s'endort jamais' du 03/10) EX…
-
-Questions en attente (reponds via !answer qN ...) :
-  q4 : 3 sessions PlanTrack tournent en meme temps sur ce projet et corrigent toutes b…
 ```
 <!-- plantrack:state-end -->

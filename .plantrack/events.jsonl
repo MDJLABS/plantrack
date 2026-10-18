@@ -980,3 +980,6 @@
 {"ts": "2026-10-18T20:49:52+00:00", "kind": "commit", "sha": "bf2f0e1", "ctype": "chore", "thread": "t21"}
 {"ts": "2026-10-18T20:49:54+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t21"}
 {"ts": "2026-10-18T20:50:42+00:00", "kind": "decision", "id": "d76", "text": "v1.9.23 publiee (18/10, GitHub + PyPI verifie, choix Mariella tel carte brainstorm 'Empecher le travail en double (Recommande)', plan valide) : attempt retient la session (CLAUDE_CODE_SESSION_ID/CODEX_THREAD_ID) et refuse si une autre session a tente le meme bug il y a moins de 3 h ; --reprendre pour reprendre volontairement (trace repris_de). 5 tests ajoutes.", "par": "agent"}
+{"ts": "2026-10-18T20:50:42+00:00", "kind": "commit", "sha": "1695be5", "ctype": "chore", "thread": "t21"}
+{"ts": "2026-10-18T20:50:46+00:00", "kind": "answer", "id": "q4", "text": "Une seule session finit b22", "canal": "tel : Une seule finit b22 (Recommandé)"}
+{"ts": "2026-10-18T20:54:14+00:00", "kind": "decision", "id": "d77", "text": "Mariella (tel, 18/10, via AskUserQuestion) : apres v1.9.23 (pas de travail en double), choix 'Rester en veille (Recommande)' — veille silencieuse (d23), ne la deranger que sur vraie panne.", "par": "agent"}
