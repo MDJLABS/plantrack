@@ -1884,8 +1884,11 @@ def flotte(roots):
         elif not os.path.exists(core):
             etat[r] = None
         else:
+            # juge avec CE moteur, pas la copie du depot : un projet au repos garde une vieille
+            # copie (la ronde ne passe qu'a l'ouverture) et ses vieilles fausses alertes.
             env = dict(os.environ, PLANTRACK_ROOT=r, CLAUDE_PROJECT_DIR=r)
-            p = subprocess.run([sys.executable, core, "doctor"], capture_output=True, text=True, env=env)
+            p = subprocess.run([sys.executable, os.path.abspath(__file__), "doctor"],
+                               capture_output=True, text=True, env=env)
             etat[r] = [l.strip()[4:] for l in p.stdout.splitlines() if l.startswith("  !!")]
     return etat, gone
 
