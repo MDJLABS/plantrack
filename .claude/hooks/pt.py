@@ -234,7 +234,7 @@ def project():
                 b["attempts"].append({
                     # "text" : nom du champ avant la mise en conformite §9
                     "id": ev["id"], "hypothesis": ev.get("hypothesis") or ev.get("text", ""),
-                    "ts": ev["ts"], "rejected": None,
+                    "ts": ev["ts"], "rejected": None, "session": ev.get("session"),
                 })
         elif k == "decision":
             st["decisions"].append({"id": ev["id"], "text": ev.get("text", ""), "ts": ev["ts"],
@@ -2566,7 +2566,18 @@ def cmd_attempt(args, st):
     b = get_bug(st, args[0])
     if b["status"] in BUG_TERMINAL:
         sys.exit(f"refuse : {b['id']} est {b['status']} — plus rien a tenter dessus.")
-    hyp = " ".join(args[1:])
+    reprendre = "--reprendre" in args
+    hyp = " ".join(x for x in args[1:] if x != "--reprendre")
+    session = os.environ.get("CLAUDE_CODE_SESSION_ID") or os.environ.get("CODEX_THREAD_ID")
+    # q4 : une autre session a travaille ce bug il y a moins de 3 h -> elle est dessus.
+    autre = next((a for a in reversed(b["attempts"]) if a.get("session")), None)
+    if (session and autre and autre["session"] != session and not reprendre
+            and datetime.now(timezone.utc) - datetime.fromisoformat(autre["ts"])
+            < timedelta(hours=3)):
+        sys.exit(f"[PlanTrack] refuse : une autre session travaille deja sur {b['id']} "
+                 f"({autre['id']}, {autre['ts'][11:16]} UTC) : {trunc(autre['hypothesis'], 80)}\n"
+                 "Laisse-la finir et passe a autre chose. Si elle est morte en route : "
+                 f"plantrack attempt {b['id']} --reprendre \"...\"")
     for a in b["attempts"]:
         ratio = difflib.SequenceMatcher(None, _norm(hyp), _norm(a["hypothesis"])).ratio()
         if ratio > SIMILAR:
@@ -2576,7 +2587,8 @@ def cmd_attempt(args, st):
                      f"({a['id']}, similarite {ratio:.2f}) : {trunc(a['hypothesis'], 80)}{rej}\n"
                      "Change d'angle au lieu de retenter la meme piste.")
     aid = next_id("a")
-    append("attempt", id=aid, bug=b["id"], hypothesis=hyp,
+    extra = {"repris_de": autre["session"]} if reprendre and autre else {}
+    append("attempt", id=aid, bug=b["id"], hypothesis=hyp, session=session, **extra,
            actor="claude-code" if any(os.environ.get(v) for v in AGENT_ENV) else "human")
     print(f"tentative {aid} consignee sur {b['id']} : {trunc(hyp, 80)}")
 

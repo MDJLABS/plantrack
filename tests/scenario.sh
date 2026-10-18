@@ -10,6 +10,7 @@ export CLAUDE_PROJECT_DIR="$TMP"
 # Le scenario doit rendre le meme verdict partout (CI, cron, poste nu) :
 # l'environnement agent est pose explicitement, jamais herite de la session.
 export CLAUDECODE=1
+unset CLAUDE_CODE_SESSION_ID CODEX_THREAD_ID
 export PLANTRACK_REGISTRY="$TMP/registry"
 fail=0
 
@@ -1438,6 +1439,19 @@ SC_ECHEC=1 bat; check_exit "respiration 9 : systemctl en echec, hook code 0" 0 "
 touch -d '2 hours ago' "$SR/.plantrack/battement"
 SC=/inexistant/systemctl bat; check_exit "respiration 9 : systemctl introuvable, hook code 0" 0 "$?"
 check "respiration 9 : l'erreur est tracee" "battre" "$(cat "$SR/.plantrack/incidents.log" 2>/dev/null)"
+
+# q4 : deux sessions sur le meme bug — la seconde est arretee
+TMPS=$(mktemp -d)
+CLAUDE_PROJECT_DIR="$TMPS" python3 "$PT" bug "le panier se vide" >/dev/null 2>&1
+S() { CLAUDE_PROJECT_DIR="$TMPS" CLAUDE_CODE_SESSION_ID="$1" python3 "$PT" attempt b1 "${@:2}" 2>&1; }
+S aaa "le cookie expire trop tot" >/dev/null
+out=$(S bbb "le stockage local est purge"); rc=$?
+check "double session : la seconde est refusee" "une autre session" "$out"
+check_exit "double session : code de refus" 1 "$rc"
+out=$(S aaa "le stockage local est purge"); check "double session : la meme session continue" "consignee" "$out"
+out=$(S bbb --reprendre "le service worker vide le cache"); check "double session : --reprendre passe" "consignee" "$out"
+check "double session : la reprise est tracee" '"repris_de": "aaa"' "$(tail -1 "$TMPS/.plantrack/events.jsonl")"
+rm -rf "$TMPS"
 
 echo
 [ "$fail" = 0 ] && echo "TOUS LES TESTS PASSENT" || { echo "DES TESTS ECHOUENT"; exit 1; }
