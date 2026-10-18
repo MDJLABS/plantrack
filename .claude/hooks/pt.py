@@ -1332,7 +1332,9 @@ SETTINGS = {"hooks": {
 def _codex_cmd(entry):
     # les hooks Codex tournent dans le cwd de session (parfois un sous-repertoire)
     # sans variable d'environnement projet : la racine se resout dans la commande.
-    return ('r="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"; '
+    # jamais de repli sur le cwd (b22) : hors d'un depot equipe, on ne lance rien
+    return ('r="$(git rev-parse --show-toplevel 2>/dev/null)" && [ -f "$r/.codex/hooks.json" ] '
+            '&& [ -f "$r/.claude/hooks/pt.py" ] || exit 0; '
             f'PLANTRACK_ROOT="$r" exec python3 "$r/.claude/hooks/pt.py" {entry}')
 
 
@@ -1510,6 +1512,14 @@ def write_hooks_file(path, obj, label, hint=""):
         return False
     hooks = data.setdefault("hooks", {})
     added = 0
+    # ancienne commande Codex avec repli sur le cwd (b22) : retiree, la neuve la remplace
+    for cur in hooks.values():
+        for e in cur:
+            keep = [h for h in e.get("hooks", []) if not ("|| pwd)" in h.get("command", "")
+                                                          and ".claude/hooks/pt.py" in h.get("command", ""))]
+            added += len(e.get("hooks", [])) - len(keep)
+            e["hooks"] = keep
+        cur[:] = [e for e in cur if e.get("hooks")]
     for evt, entries in obj["hooks"].items():
         cur = hooks.setdefault(evt, [])
         have = {h.get("command") for e in cur for h in e.get("hooks", [])}

@@ -380,6 +380,25 @@ check "init idempotent sur les hooks codex" ".codex/hooks.json deja en place" "$
 check "init idempotent sur les blocs md" "a jour dans AGENTS.md" "$out"
 out=$(CLAUDE_PROJECT_DIR="$TMP6" python3 "$PT" doctor 2>&1 || true)
 check "doctor verifie les hooks codex" "declare dans .codex/hooks.json" "$out"
+# b22 : hors d'un depot equipe, la commande codex ne lance rien (pas de repli sur le cwd)
+cmd=$(python3 -c "import json,sys; print(json.load(open(sys.argv[1]))['hooks']['SessionStart'][0]['hooks'][0]['command'])" "$TMP6/.codex/hooks.json")
+check "hooks.json sans repli sur le cwd (b22)" absent "$(grep -q '|| pwd' "$TMP6/.codex/hooks.json" && echo present || echo absent)"
+TMP6b=$(mktemp -d); mkdir -p "$TMP6b/.claude/hooks"
+printf 'import sys\nprint("PIEGE")\n' > "$TMP6b/.claude/hooks/pt.py"
+out=$(cd "$TMP6b" && GIT_CEILING_DIRECTORIES="$TMP6b" sh -c "$cmd" 2>&1); rc=$?
+check "hors depot : rien ne s execute (b22)" absent "$(echo "$out" | grep -q PIEGE && echo present || echo absent)"
+check_exit "hors depot : sortie propre (b22)" 0 "$rc"
+rm -rf "$TMP6b"
+# b22 : un hooks.json avec l'ancienne commande est assaini par init/update
+python3 - "$TMP6/.codex/hooks.json" <<'PYEOF'
+import json, sys
+d = json.load(open(sys.argv[1]))
+d["hooks"]["SessionStart"].append({"hooks": [{"type": "command", "command":
+  'r="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"; PLANTRACK_ROOT="$r" exec python3 "$r/.claude/hooks/pt.py" hook-context'}]})
+json.dump(d, open(sys.argv[1], "w"))
+PYEOF
+CLAUDE_PROJECT_DIR="$TMP6" python3 "$PT" init >/dev/null 2>&1
+check "init retire l ancienne commande codex (b22)" absent "$(grep -q '|| pwd' "$TMP6/.codex/hooks.json" && echo present || echo absent)"
 rm -rf "$TMP6"
 
 # 22. rapport miamboost 2026-08-29 — fusion dans un settings.json existant,
