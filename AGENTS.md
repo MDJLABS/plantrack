@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t21 : travaux sur main [27 commits]
-  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-zazzy-sun.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-indexed-squid.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-steady-mitten.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-declarative-newell.md, pyproject.toml, sortie/carte-suite.log
+FIL ACTIF — t21 : travaux sur main [30 commits]
+  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-declarative-newell.md, sortie/carte-suite.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-tranquil-acorn.md, .claude/hooks/pt.py, tests/scenario.sh, pyproject.toml
   (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -101,6 +101,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d73 : Respiration des ressources (Mariella, 18/10, via AskUserQuestion) : PlanTrack gere la charge comme un poumon — battement a chaque hook (.pl… (agent)
   d74 : Respiration EN SERVICE (18/10, choix Mariella 'Tout mettre en service') : v1.9.21 publiee (PyPI ok) ; init dans prolearn, openstyle, proren… (agent)
   d75 : v1.9.22 publiee (18/10, GitHub + PyPI verifie, plan valide par Mariella) : correctif b22 — hooks Codex sans repli sur le cwd (exit 0 hors d… (agent)
+  d76 : v1.9.23 publiee (18/10, GitHub + PyPI verifie, choix Mariella tel carte brainstorm 'Empecher le travail en double (Recommande)', plan valid… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
