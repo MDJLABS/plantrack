@@ -14,13 +14,16 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t21 : travaux sur main [22 commits]
+FIL ACTIF — t21 : travaux sur main [23 commits]
   fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-witty-quail.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-snappy-catmull.md, ../../../usr/local/bin/vps-charge-alerte.sh, sortie/carte-suite.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-zazzy-sun.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-indexed-squid.md
   (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
   t5 : travaux sur main — reprise : retour au travail courant apres la faille
+
+BUGS NON CORRIGES (personne ne s'en est occupe) :
+  b22 (open) [t21] Hooks Codex generes par init (.codex/hooks.json) : la racine est resolue par 'git rev-parse || pwd' puis python3 $r/.claude/hooks/pt.py est… (agent)
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
@@ -96,6 +99,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d71 : Verification des chiffres de l'alerte 15h02 (demande Mariella tel 18/10 'verifie si les datas sont bonnes', plan valide) : RAM/swap 99 % re… (agent)
   d72 : Mariella (tel, 18/10 15h49) : apres verification des chiffres de l'alerte 15h02, choix 'Rester en veille (Recommande)' — veille silencieuse… (agent)
   d73 : Respiration des ressources (Mariella, 18/10, via AskUserQuestion) : PlanTrack gere la charge comme un poumon — battement a chaque hook (.pl… (agent)
+  d74 : Respiration EN SERVICE (18/10, choix Mariella 'Tout mettre en service') : v1.9.21 publiee (PyPI ok) ; init dans prolearn, openstyle, proren… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
