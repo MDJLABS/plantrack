@@ -14,16 +14,13 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t21 : travaux sur main [13 commits]
-  fichiers recemment ecrits : .claude/hooks/pt.py, sortie/scenario.log, pyproject.toml, sortie/carte-suite.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-snappy-wreath.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-woolly-feigenbaum.md
+FIL ACTIF — t21 : travaux sur main [14 commits]
+  fichiers recemment ecrits : sortie/carte-suite.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-snappy-wreath.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-woolly-feigenbaum.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-witty-quail.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-snappy-catmull.md, ../../../usr/local/bin/vps-charge-alerte.sh
   (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
   t5 : travaux sur main — reprise : retour au travail courant apres la faille
-
-BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
-  b21 (to_verify) [t21] kvm-lourd ne voyait pas l'interieur des scripts : le 16/10 a 14h32 la session profil a range 'gradle assembleDebug' dans sortie/build-mt-pc… (agent) [1 tentatives, derniere: kvm-lourd classe() lit le contenu d'un script local lance (…]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
@@ -96,6 +93,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d68 : Mariella (tel, 17/10, via AskUserQuestion) : message d'essai de l'alerte memoire RECU ; choix 'Recu, retour en veille (Recommande)' — veill… (agent)
   d69 : v1.9.20 publiee (18/10, accord Mariella tel 'Vu' sur la carte cvslim) : flotte() lance le doctor de chaque depot avec le pt.py de l'appelan… (agent)
   d70 : Mariella (tel, 18/10, via AskUserQuestion) : apres v1.9.20 (fausse alerte cvslim eteinte), choix 'Rester en veille (Recommande)' — veille s… (agent)
+  d71 : Verification des chiffres de l'alerte 15h02 (demande Mariella tel 18/10 'verifie si les datas sont bonnes', plan valide) : RAM/swap 99 % re… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
