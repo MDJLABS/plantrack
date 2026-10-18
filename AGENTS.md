@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t21 : travaux sur main [26 commits]
-  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-zazzy-sun.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-indexed-squid.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-steady-mitten.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-declarative-newell.md, sortie/carte-suite.log, pyproject.toml
+FIL ACTIF — t21 : travaux sur main [27 commits]
+  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-zazzy-sun.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-indexed-squid.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-steady-mitten.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-declarative-newell.md, pyproject.toml, sortie/carte-suite.log
   (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
