@@ -1356,7 +1356,7 @@ cat > "$SB/systemctl" <<FAUX
 #!/bin/bash
 echo "\$*" >> "$SL"
 [ -n "\${SC_ECHEC:-}" ] && exit 1
-if [ "\$1" = is-active ]; then grep -qx "\$2" "$SA" 2>/dev/null && echo active || echo inactive; fi
+if [ "\$1" = is-active ]; then grep -qx "\$3" "$SA" 2>/dev/null && echo active || echo inactive; fi
 exit 0
 FAUX
 chmod +x "$SB/systemctl"
@@ -1375,14 +1375,21 @@ mv "$SR/.plantrack/souffle.conf.off" "$SR/.plantrack/souffle.conf"
 # 2. premier hook : start des non-garde seulement
 bat; attend start
 out=$(appels)
-check "respiration 2 : start --no-block des services non-garde" "start --no-block a.service b.service" "$out"
+check "respiration 2 : start --no-block des services non-garde" "start --no-block -- a.service b.service" "$out"
 check_not "respiration 2 : pas de start du service garde" "g.service" "$out"
+# 2b. souffle.conf hostile : option deguisee ou nom invalide ignores (revue securite 18/10)
+cp "$SR/.plantrack/souffle.conf" "$TMP/souffle.conf.bak"; : > "$SL"; rm -f "$SR/.plantrack/battement"
+printf -- '--force\n-x.service\nmauvais;y.service\nok.service\ngarde --now\n' > "$SR/.plantrack/souffle.conf"
+bat; attend start
+check "respiration 2b : seul le nom valide part, apres --" "start --no-block -- ok.service" "$(appels)"
+check_not "respiration 2b : aucune option deguisee" "force" "$(appels)"
+mv "$TMP/souffle.conf.bak" "$SR/.plantrack/souffle.conf"
 # 3. deuxieme hook < 30 min : pas de nouveau start
 : > "$SL"; bat; out=$(appels)
 check_exit "respiration 3 : deuxieme hook rapproche, aucun start" "" "$out"
 # 4. battement vieilli : nouveau start
 touch -d '2 hours ago' "$SR/.plantrack/battement"; bat; attend start
-check "respiration 4 : battement vieux, nouveau start" "start --no-block a.service" "$(appels)"
+check "respiration 4 : battement vieux, nouveau start" "start --no-block -- a.service" "$(appels)"
 # 5. respirer, battement frais : aucun stop
 printf 'a.service\nb.service\n' > "$SA"; : > "$SL"
 bat; attend start; : > "$SL"
@@ -1394,8 +1401,8 @@ resp; out=$(cat "$SL"); check_not "respiration 6 : garde active, aucun stop" "st
 # 7. battement vieux, aucune garde : stop des actifs + souffle.log
 printf 'a.service\n' > "$SA"; : > "$SL"
 resp; out=$(cat "$SL")
-check "respiration 7 : stop du service actif" "stop a.service" "$out"
-check_not "respiration 7 : pas de stop du service inactif" "stop b.service" "$out"
+check "respiration 7 : stop du service actif" "stop -- a.service" "$out"
+check_not "respiration 7 : pas de stop du service inactif" "stop -- b.service" "$out"
 check "respiration 7 : ligne dans souffle.log" "expire a.service" "$(cat "$SR/.plantrack/souffle.log" 2>/dev/null)"
 out=$(resp --etat); check "respiration 7 : --etat dit endormi" "endormi" "$out"
 # 8. commande en cours (session claude + descendant shell-snapshots) : aucun stop
@@ -1405,7 +1412,7 @@ printf '#!/bin/bash\nbash -c "sleep 30; :" shell-snapshots\n' > "$TMP/souffle-cl
 sleep 1; : > "$SL"
 resp; out=$(cat "$SL"); check_not "respiration 8 : commande en cours, aucun stop" "stop" "$out"
 for c in $(pgrep -f "$TMP/souffle-claude/claude"); do for e in $(pgrep -P "$c"); do pkill -P "$e"; kill "$e"; done; kill "$c"; done; sleep 0.5
-: > "$SL"; resp; check "respiration 8 : commande finie, stop" "stop a.service" "$(cat "$SL")"
+: > "$SL"; resp; check "respiration 8 : commande finie, stop" "stop -- a.service" "$(cat "$SL")"
 # 9. systemctl en echec ou introuvable : le hook sort en 0
 touch -d '2 hours ago' "$SR/.plantrack/battement"
 SC_ECHEC=1 bat; check_exit "respiration 9 : systemctl en echec, hook code 0" 0 "$?"

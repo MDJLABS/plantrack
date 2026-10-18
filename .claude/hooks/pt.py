@@ -883,13 +883,14 @@ def souffle(racine):
     """Lit souffle.conf : (reveil, garde). Une ligne = un service ; 'garde X' empeche
     l'expiration sans etre reveille. Pas de fichier = ([], []) : le projet ne respire pas."""
     reveil, garde = [], []
+    nom_ok = re.compile(r"[A-Za-z0-9][A-Za-z0-9@_.:-]*\.(service|target|socket)").fullmatch  # pas d'option deguisee
     try:
         with open(souffle_conf(racine), encoding="utf-8") as f:
             for l in f:
                 l = l.split("#", 1)[0].split()
-                if len(l) == 1:
+                if len(l) == 1 and nom_ok(l[0]):
                     reveil.append(l[0])
-                elif len(l) == 2 and l[0] == "garde":
+                elif len(l) == 2 and l[0] == "garde" and nom_ok(l[1]):
                     garde.append(l[1])
     except OSError:
         pass
@@ -924,7 +925,7 @@ def battre(racine):
             pass
         os.utime(bat)
         if vieux and reveil:
-            systemctl(["start", "--no-block"] + reveil, detache=True)
+            systemctl(["start", "--no-block", "--"] + reveil, detache=True)
             return True
     except Exception as e:
         trace("battre", e)
@@ -986,7 +987,7 @@ def cmd_respirer(args):
             continue
         try:
             reveil, garde = souffle(racine)
-            actifs = [s for s in reveil + garde if systemctl(["is-active", s]) == "active"]
+            actifs = [s for s in reveil + garde if systemctl(["is-active", "--", s]) == "active"]
             try:
                 age = int(maintenant - os.path.getmtime(os.path.join(racine, ".plantrack", "battement")))
             except OSError:
@@ -999,9 +1000,11 @@ def cmd_respirer(args):
                 continue
             arret = [s for s in reveil if s in actifs]
             for s in arret:
-                systemctl(["stop", s])
+                systemctl(["stop", "--", s])
             if arret:
-                with open(os.path.join(racine, ".plantrack", "souffle.log"), "a", encoding="utf-8") as f:
+                with os.fdopen(os.open(os.path.join(racine, ".plantrack", "souffle.log"),
+                                       os.O_WRONLY | os.O_APPEND | os.O_CREAT | os.O_NOFOLLOW, 0o644),
+                               "a", encoding="utf-8") as f:
                     f.write(f"{datetime.now().isoformat(timespec='seconds')} expire "
                             f"{' '.join(arret)} battement={age}s\n")
         except Exception as e:
