@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t21 : travaux sur main [32 commits]
-  fichiers recemment ecrits : sortie/carte-suite.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-tranquil-acorn.md, .claude/hooks/pt.py, tests/scenario.sh, pyproject.toml, ../../../root/.claude/plans/contexte-reconstruit-par-le-quizzical-church.md
+FIL ACTIF — t21 : travaux sur main [33 commits]
+  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-tranquil-acorn.md, .claude/hooks/pt.py, tests/scenario.sh, pyproject.toml, ../../../root/.claude/plans/contexte-reconstruit-par-le-quizzical-church.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-abstract-piglet.md
   (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
