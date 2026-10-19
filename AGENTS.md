@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t21 : travaux sur main [33 commits]
-  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-tranquil-acorn.md, .claude/hooks/pt.py, tests/scenario.sh, pyproject.toml, ../../../root/.claude/plans/contexte-reconstruit-par-le-quizzical-church.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-abstract-piglet.md
+FIL ACTIF — t21 : travaux sur main [34 commits]
+  fichiers recemment ecrits : tests/scenario.sh, pyproject.toml, ../../../root/.claude/plans/contexte-reconstruit-par-le-quizzical-church.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-abstract-piglet.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-compressed-hickey.md, ../../../usr/local/bin/vps-charge-alerte.sh
   (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -104,6 +104,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d76 : v1.9.23 publiee (18/10, GitHub + PyPI verifie, choix Mariella tel carte brainstorm 'Empecher le travail en double (Recommande)', plan valid… (agent)
   d77 : Mariella (tel, 18/10, via AskUserQuestion) : apres v1.9.23 (pas de travail en double), choix 'Rester en veille (Recommande)' — veille silen… (agent)
   d78 : Mariella (tel, 19/10, via AskUserQuestion) : alerte charge 21h55 du 18/10 retombee seule (load 0.85, 9,8 Go dispo), choix 'Rester en veille… (agent)
+  d79 : Mariella (tel, 19/10, carte brainstorm apres 2 fausses alertes de charge 21h55/06h02) : 'Alerte qui attend (Recommande)' — /usr/local/bin/v… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…

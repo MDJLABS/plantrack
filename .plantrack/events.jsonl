@@ -988,3 +988,10 @@
 {"ts": "2026-10-19T05:40:20+00:00", "kind": "decision", "id": "d78", "text": "Mariella (tel, 19/10, via AskUserQuestion) : alerte charge 21h55 du 18/10 retombee seule (load 0.85, 9,8 Go dispo), choix 'Rester en veille (Recommande)' — veille silencieuse (d23).", "par": "agent"}
 {"ts": "2026-10-19T05:40:20+00:00", "kind": "commit", "sha": "0a3b624", "ctype": "chore", "thread": "t21"}
 {"ts": "2026-10-19T05:52:11+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-abstract-piglet.md", "thread": "t21"}
+{"ts": "2026-10-19T05:52:34+00:00", "kind": "commit", "sha": "90b67d6", "ctype": "chore", "thread": "t21"}
+{"ts": "2026-10-19T06:10:41+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-compressed-hickey.md", "thread": "t21"}
+{"ts": "2026-10-19T06:13:19+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-compressed-hickey.md", "thread": "t21"}
+{"ts": "2026-10-19T06:19:09+00:00", "kind": "file_touched", "text": "../../../usr/local/bin/vps-charge-alerte.sh", "thread": "t21"}
+{"ts": "2026-10-19T06:19:09+00:00", "kind": "file_touched", "text": "../../../usr/local/bin/vps-charge-alerte.sh", "thread": "t21"}
+{"ts": "2026-10-19T06:19:10+00:00", "kind": "file_touched", "text": "../../../usr/local/bin/vps-charge-alerte.sh", "thread": "t21"}
+{"ts": "2026-10-19T06:19:16+00:00", "kind": "decision", "id": "d79", "text": "Mariella (tel, 19/10, carte brainstorm apres 2 fausses alertes de charge 21h55/06h02) : 'Alerte qui attend (Recommande)' — /usr/local/bin/vps-charge-alerte.sh lit la charge moyenne 5 min (loadavg $2) au lieu de 1 min ; un pic de build court ne sonne plus. Seuil, cooldown 6 h et canal inchanges. Copie avant modif dans backup/code/usr/local/bin.", "par": "agent"}
