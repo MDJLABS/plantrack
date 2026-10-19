@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t21 : travaux sur main [37 commits]
-  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-compressed-hickey.md, ../../../usr/local/bin/vps-charge-alerte.sh, sortie/carte-alerte-5min.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-immutable-hickey.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-linked-moth.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-eager-breeze.md
+FIL ACTIF — t21 : travaux sur main [38 commits]
+  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-immutable-hickey.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-linked-moth.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-eager-breeze.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-abundant-kite.md, ../bcc/tests/factotum.test.ts, ../bcc/sortie/relances-vide.patch
   (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -106,6 +106,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d78 : Mariella (tel, 19/10, via AskUserQuestion) : alerte charge 21h55 du 18/10 retombee seule (load 0.85, 9,8 Go dispo), choix 'Rester en veille… (agent)
   d79 : Mariella (tel, 19/10, carte brainstorm apres 2 fausses alertes de charge 21h55/06h02) : 'Alerte qui attend (Recommande)' — /usr/local/bin/v… (agent)
   d80 : Mariella (tel, 19/10, via AskUserQuestion) : apres reglage de l'alerte de charge sur moyenne 5 min (d79), choix 'Rester en veille (Recomman… (agent)
+  d81 : Moins de relances a vide LIVRE (choix Mariella tel 19/10, carte brainstorm 'Moins de relances a vide (Recommande)', plan valide) : bcc serv… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…

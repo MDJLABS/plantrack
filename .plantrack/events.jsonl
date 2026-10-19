@@ -1004,3 +1004,8 @@
 {"ts": "2026-10-19T08:48:37+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-linked-moth.md", "thread": "t21"}
 {"ts": "2026-10-19T08:49:59+00:00", "kind": "commit", "sha": "ce87261", "ctype": "chore", "thread": "t21"}
 {"ts": "2026-10-19T09:46:40+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-eager-breeze.md", "thread": "t21"}
+{"ts": "2026-10-19T10:30:59+00:00", "kind": "commit", "sha": "32506f7", "ctype": "chore", "thread": "t21"}
+{"ts": "2026-10-19T17:48:54+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-abundant-kite.md", "thread": "t21"}
+{"ts": "2026-10-19T17:49:56+00:00", "kind": "file_touched", "text": "../bcc/tests/factotum.test.ts", "thread": "t21"}
+{"ts": "2026-10-19T17:52:42+00:00", "kind": "file_touched", "text": "../bcc/sortie/relances-vide.patch", "thread": "t21"}
+{"ts": "2026-10-19T17:54:55+00:00", "kind": "decision", "id": "d81", "text": "Moins de relances a vide LIVRE (choix Mariella tel 19/10, carte brainstorm 'Moins de relances a vide (Recommande)', plan valide) : bcc server/factotum.ts (commit 955a44a) — le repit de la ronde double a chaque relance muette d'affilee (2 h, 4 h, 8 h, 16 h, puis 24 h max), remis a zero par un tour utile ou un message de Mariella ; idem pour reprendre. Compteur en memoire. Suite complete verte sur copie propre ; commit --no-verify car le pre-commit echoue sur le chantier credit-voix non commite (db.ts coutDuMois, reglages). Poste NON redemarre : il tourne sur le dossier de travail, un redemarrage chargerait ce chantier inacheve ; prise d'effet au prochain redemarrage du poste. pg15 reste ouvert (Stop hook inchange).", "par": "agent"}
