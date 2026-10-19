@@ -1000,3 +1000,5 @@
 {"ts": "2026-10-19T06:19:39+00:00", "kind": "file_touched", "text": "sortie/carte-alerte-5min.log", "thread": "t21"}
 {"ts": "2026-10-19T08:22:02+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-immutable-hickey.md", "thread": "t21"}
 {"ts": "2026-10-19T08:23:08+00:00", "kind": "decision", "id": "d80", "text": "Mariella (tel, 19/10, via AskUserQuestion) : apres reglage de l'alerte de charge sur moyenne 5 min (d79), choix 'Rester en veille (Recommande)' — veille silencieuse (d23), ne la deranger que sur panne.", "par": "agent"}
+{"ts": "2026-10-19T08:23:08+00:00", "kind": "commit", "sha": "d2a3078", "ctype": "chore", "thread": "t21"}
+{"ts": "2026-10-19T08:48:37+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-linked-moth.md", "thread": "t21"}

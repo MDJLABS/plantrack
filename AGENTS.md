@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t21 : travaux sur main [35 commits]
-  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-quizzical-church.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-abstract-piglet.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-compressed-hickey.md, ../../../usr/local/bin/vps-charge-alerte.sh, sortie/carte-alerte-5min.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-immutable-hickey.md
+FIL ACTIF — t21 : travaux sur main [36 commits]
+  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-abstract-piglet.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-compressed-hickey.md, ../../../usr/local/bin/vps-charge-alerte.sh, sortie/carte-alerte-5min.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-immutable-hickey.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-linked-moth.md
   (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
