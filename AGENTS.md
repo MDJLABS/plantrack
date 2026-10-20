@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t21 : travaux sur main [39 commits]
-  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-linked-moth.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-eager-breeze.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-abundant-kite.md, ../bcc/tests/factotum.test.ts, ../bcc/sortie/relances-vide.patch, ../../../root/.claude/plans/contexte-reconstruit-par-le-eager-owl.md
+FIL ACTIF — t21 : travaux sur main [40 commits]
+  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-abundant-kite.md, ../bcc/tests/factotum.test.ts, ../bcc/sortie/relances-vide.patch, ../../../root/.claude/plans/contexte-reconstruit-par-le-eager-owl.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-jolly-fox.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-sorted-thunder.md
   (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
