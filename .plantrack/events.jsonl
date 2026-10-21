@@ -1031,3 +1031,27 @@
 {"ts": "2026-10-21T09:57:11+00:00", "kind": "commit", "sha": "3e35ea1", "ctype": "fix", "thread": "t21"}
 {"ts": "2026-10-21T09:57:11+00:00", "kind": "commit", "sha": "9c41de5", "ctype": "chore", "thread": "t21"}
 {"ts": "2026-10-21T09:58:34+00:00", "kind": "decision", "id": "d83", "text": "v1.9.24 publiee (21/10, GitHub + PyPI verifie, plan valide par Mariella) : licence MIT -> Apache-2.0 (choix Mariella) ; le bilan ne compte plus en panne les attentes cote humain (ATTENTES : bugs a verifier, questions sans reponse) — elles restent dites dans 'attend ton avis'. Propagation du coeur par la ronde (d28/d52).", "par": "agent"}
+{"ts": "2026-10-21T09:58:34+00:00", "kind": "commit", "sha": "66cd7ba", "ctype": "chore", "thread": "t21"}
+{"ts": "2026-10-21T11:30:20+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-streamed-anchor.md", "thread": "t21"}
+{"ts": "2026-10-21T12:56:21+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t21"}
+{"ts": "2026-10-21T12:56:22+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t21"}
+{"ts": "2026-10-21T12:56:24+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t21"}
+{"ts": "2026-10-21T12:56:27+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t21"}
+{"ts": "2026-10-21T12:56:28+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t21"}
+{"ts": "2026-10-21T12:56:29+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t21"}
+{"ts": "2026-10-21T12:56:35+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t21"}
+{"ts": "2026-10-21T12:56:37+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t21"}
+{"ts": "2026-10-21T12:56:39+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t21"}
+{"ts": "2026-10-21T12:56:40+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t21"}
+{"ts": "2026-10-21T12:56:52+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t21"}
+{"ts": "2026-10-21T12:56:53+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t21"}
+{"ts": "2026-10-21T12:56:55+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t21"}
+{"ts": "2026-10-21T12:57:00+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t21"}
+{"ts": "2026-10-21T12:57:02+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t21"}
+{"ts": "2026-10-21T12:57:04+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t21"}
+{"ts": "2026-10-21T13:03:25+00:00", "kind": "file_touched", "text": "sortie/scenario-lot2.log", "thread": "t21"}
+{"ts": "2026-10-21T13:05:07+00:00", "kind": "file_touched", "text": "sortie/scenario-lot2.log", "thread": "t21"}
+{"ts": "2026-10-21T13:05:16+00:00", "kind": "commit", "sha": "c5db192", "ctype": "fix", "thread": "t21"}
+{"ts": "2026-10-21T13:05:16+00:00", "kind": "commit", "sha": "caf5678", "ctype": "chore", "thread": "t21"}
+{"ts": "2026-10-21T13:05:16+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t21"}
+{"ts": "2026-10-21T13:06:36+00:00", "kind": "decision", "id": "d84", "text": "v1.9.25 publiee (21/10, GitHub + PyPI verifie, plan valide par Mariella tel 'On y va') : lot 2 bcc — wont_fix accepte --de ; decide/bug/piege/question refusent --help, options et simples identifiants (rien d'ecrit, pg -> piege-clos) ; question presque identique a une ouverte refusee + verbe questions-doublons [--fusionner] (evenement question_doublon, la plus ancienne reste ouverte) ; garde-fou pre-commit ne donne plus --no-verify ; verbe echecs [--json] par bug et par tache. 482 tests verts. bcc mis a jour (non commite cote bcc, son travail en cours).", "par": "agent"}

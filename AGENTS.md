@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t21 : travaux sur main [43 commits]
-  fichiers recemment ecrits : tests/scenario.sh, .plantrack/events.jsonl, sortie/scenario-2110.log, LICENSE, pyproject.toml, README.md
+FIL ACTIF — t21 : travaux sur main [46 commits]
+  fichiers recemment ecrits : LICENSE, README.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-streamed-anchor.md, .claude/hooks/pt.py, sortie/scenario-lot2.log, pyproject.toml
   (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -109,6 +109,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d81 : Moins de relances a vide LIVRE (choix Mariella tel 19/10, carte brainstorm 'Moins de relances a vide (Recommande)', plan valide) : bcc serv… (agent)
   d82 : Mariella (tel, 19/10 18h39) : relances espacees (d81) -> 'Au prochain redemarrage (Recommande)' ; pas de redemarrage force, veille silencie… (agent)
   d83 : v1.9.24 publiee (21/10, GitHub + PyPI verifie, plan valide par Mariella) : licence MIT -> Apache-2.0 (choix Mariella) ; le bilan ne compte … (agent)
+  d84 : v1.9.25 publiee (21/10, GitHub + PyPI verifie, plan valide par Mariella tel 'On y va') : lot 2 bcc — wont_fix accepte --de ; decide/bug/pie… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
