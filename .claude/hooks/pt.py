@@ -2107,7 +2107,8 @@ def bilan_ligne(st, jours=7):
     a, b = dire(fait), dire(avis)
     # sans minuteur central (d51), un depot jamais rouvert peut etre en panne sans que
     # rien ne le dise : le bilan, qui passe partout, fait le controle a sa place
-    pannes = sum(g is False for g, *_ in diagnose(st))
+    # les attentes cote humain sont dites dans « attend ton avis », pas comptees en panne
+    pannes = sum(g is False and not l.startswith(ATTENTES) for g, l, _ in diagnose(st))
     vu = max((os.path.getmtime(p) for p in (RONDE, LOG) if os.path.exists(p)), default=0)
     age = int((datetime.now().timestamp() - vu) // 86400) if vu else None
     if not (a or b or pannes):

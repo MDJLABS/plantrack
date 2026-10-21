@@ -1224,6 +1224,11 @@ check "bilan --all : une ligne par depot" "• depot : 1 commit, 1 décision" "$
 check_not "bilan : depot sain sans alerte" "en panne" "$out"
 touch -d '10 days ago' "$D/.plantrack/ronde.log" "$D/.plantrack/events.jsonl"
 check "bilan : depot oublie signale" "pas ouvert depuis 10 jours" "$(B bilan)"
+echo '{"ts": "2026-01-01T00:00:00+00:00", "kind": "question", "id": "q99", "text": "vieille question"}' >> "$D/.plantrack/events.jsonl"
+B piege "regenere la fiche" >/dev/null
+out=$(B bilan --jours 30)
+check_not "bilan : une attente n'est pas une panne" "en panne" "$out"
+check "bilan : l'attente reste dite" "attend ton avis : 2 questions" "$out"
 sed -i 's/hook-precompact//' "$D/.claude/settings.json"
 check "bilan : depot en panne en tete" "⚠ en panne (1 défaut) — depot" "$(B bilan --jours 30)"
 out=$(BILAN_CMD="echo coucou" BILAN_ENVOI=echo bash "$(dirname "$0")/../bilan.sh")
