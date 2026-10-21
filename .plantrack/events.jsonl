@@ -1015,3 +1015,19 @@
 {"ts": "2026-10-19T18:52:38+00:00", "kind": "commit", "sha": "44cd8f0", "ctype": "chore", "thread": "t21"}
 {"ts": "2026-10-19T20:01:52+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-jolly-fox.md", "thread": "t21"}
 {"ts": "2026-10-20T07:17:03+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-sorted-thunder.md", "thread": "t21"}
+{"ts": "2026-10-20T07:21:23+00:00", "kind": "commit", "sha": "fa78723", "ctype": "chore", "thread": "t21"}
+{"ts": "2026-10-20T07:21:26+00:00", "kind": "file_touched", "text": "sortie/carte-suite.json", "thread": "t21"}
+{"ts": "2026-10-20T07:21:26+00:00", "kind": "file_touched", "text": "sortie/carte-suite.log", "thread": "t21"}
+{"ts": "2026-10-20T19:41:49+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-quizzical-simon.md", "thread": "t21"}
+{"ts": "2026-10-20T20:18:15+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-nifty-whistle.md", "thread": "t21"}
+{"ts": "2026-10-21T09:53:35+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t21"}
+{"ts": "2026-10-21T09:53:37+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t21"}
+{"ts": "2026-10-21T09:54:59+00:00", "kind": "file_touched", "text": "sortie/scenario-2110.log", "thread": "t21"}
+{"ts": "2026-10-21T09:55:10+00:00", "kind": "file_touched", "text": ".plantrack/events.jsonl", "thread": "t21"}
+{"ts": "2026-10-21T09:56:49+00:00", "kind": "file_touched", "text": "sortie/scenario-2110.log", "thread": "t21"}
+{"ts": "2026-10-21T09:56:59+00:00", "kind": "file_touched", "text": "LICENSE", "thread": "t21"}
+{"ts": "2026-10-21T09:56:59+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t21"}
+{"ts": "2026-10-21T09:56:59+00:00", "kind": "file_touched", "text": "README.md", "thread": "t21"}
+{"ts": "2026-10-21T09:57:11+00:00", "kind": "commit", "sha": "3e35ea1", "ctype": "fix", "thread": "t21"}
+{"ts": "2026-10-21T09:57:11+00:00", "kind": "commit", "sha": "9c41de5", "ctype": "chore", "thread": "t21"}
+{"ts": "2026-10-21T09:58:34+00:00", "kind": "decision", "id": "d83", "text": "v1.9.24 publiee (21/10, GitHub + PyPI verifie, plan valide par Mariella) : licence MIT -> Apache-2.0 (choix Mariella) ; le bilan ne compte plus en panne les attentes cote humain (ATTENTES : bugs a verifier, questions sans reponse) — elles restent dites dans 'attend ton avis'. Propagation du coeur par la ronde (d28/d52).", "par": "agent"}
