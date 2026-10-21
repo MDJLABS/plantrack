@@ -4,7 +4,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/plantrack)](https://pypi.org/project/plantrack/)
 [![Python](https://img.shields.io/badge/python-3.11+-blue)](https://pypi.org/project/plantrack/)
-[![Licence](https://img.shields.io/badge/licence-MIT-green)](https://github.com/MDJLABS/plantrack/blob/main/LICENSE)
+[![Licence](https://img.shields.io/badge/licence-Apache--2.0-blue)](https://github.com/MDJLABS/plantrack/blob/main/LICENSE)
 [![Dépendances](https://img.shields.io/badge/d%C3%A9pendances-0-brightgreen)](https://github.com/MDJLABS/plantrack)
 
 Un agent de codage oublie. Quand la conversation devient trop longue, elle est
@@ -258,4 +258,4 @@ une décision, parker, ouvrir un autre fil, revenir — est rejoué par
 
 ## Licence
 
-MIT. Référence hooks : https://code.claude.com/docs/en/hooks
+Apache 2.0 (voir `LICENSE`). Référence hooks : https://code.claude.com/docs/en/hooks
