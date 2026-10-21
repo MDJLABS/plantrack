@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t21 : travaux sur main [46 commits]
-  fichiers recemment ecrits : LICENSE, README.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-streamed-anchor.md, .claude/hooks/pt.py, sortie/scenario-lot2.log, pyproject.toml
+FIL ACTIF — t21 : travaux sur main [47 commits]
+  fichiers recemment ecrits : .claude/hooks/pt.py, sortie/scenario-lot2.log, pyproject.toml, sortie/carte-suite.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-noble-hummingbird.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-glimmering-fountain.md
   (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -110,6 +110,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d82 : Mariella (tel, 19/10 18h39) : relances espacees (d81) -> 'Au prochain redemarrage (Recommande)' ; pas de redemarrage force, veille silencie… (agent)
   d83 : v1.9.24 publiee (21/10, GitHub + PyPI verifie, plan valide par Mariella) : licence MIT -> Apache-2.0 (choix Mariella) ; le bilan ne compte … (agent)
   d84 : v1.9.25 publiee (21/10, GitHub + PyPI verifie, plan valide par Mariella tel 'On y va') : lot 2 bcc — wont_fix accepte --de ; decide/bug/pie… (agent)
+  d85 : Mariella (tel, 21/10, carte Suite) : reponse 'Vu' sans option -> veille silencieuse (d23), aucune carte de suite ; brainstorm seulement si … (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
