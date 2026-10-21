@@ -259,6 +259,12 @@ def project():
             q = st["questions"].get(ev["id"])
             if q:
                 q["answer"] = ev.get("text", "")
+        elif k == "question_doublon":
+            # rattachee a une question plus ancienne : rien n'est perdu, mais la copie
+            # ne revient plus a chaque session (la reponse reste a l'humain)
+            q = st["questions"].get(ev["id"])
+            if q:
+                q["doublon_de"] = ev.get("de")
         elif k == "commit":
             if (t := st["threads"].get(ev.get("thread"))):
                 t["commits"].append({"sha": ev.get("sha", ""), "ctype": ev.get("ctype", "")})
@@ -507,7 +513,7 @@ def context_block(st, header=True, rules=True, full=True):
     bugs = list(st["bugs"].values())
     troues = [b for b in bugs if b["status"] in ("open", "in_progress")]
     verdict = [b for b in bugs if b["status"] == "to_verify"]
-    pending_q = [q for q in st["questions"].values() if not q.get("answer")]
+    pending_q = [q for q in st["questions"].values() if q_ouverte(q)]
 
     if full:
         # b12 : la fiche promet l'etat COMPLET (d6) — aucun plafond CTX_MAX_* ici,
@@ -564,16 +570,37 @@ def context_block(st, header=True, rules=True, full=True):
 
 # ---------------------------------------------------------------------- commandes
 
+def q_ouverte(q):
+    """Une question attend l'humain : sans reponse et pas rattachee a une plus ancienne."""
+    return not q.get("answer") and not q.get("doublon_de")
+
+
+def texte_invalide(text, usage):
+    """Une demande d'aide, une option ou un simple identifiant n'est pas un texte :
+    rien ne s'ecrit (des --help et des pg9 tapes par erreur ont cree de faux
+    pieges, decisions et bugs). Renvoie le message de refus, ou None."""
+    t = (text or "").strip()
+    if t.startswith("-"):
+        return usage
+    m = re.fullmatch(r"(b|d|pg|q|t|g|s|a)\d+", t)
+    if m:
+        if m.group(1) == "pg":
+            return f"{usage}\n(pour clore le piege {t} : plantrack piege-clos {t} <motif : ce qui l'a regle>)"
+        return f"{usage}\n({t} est un identifiant, pas un texte : rien n'a ete enregistre)"
+    return None
+
+
 def cmd_bug(text, st, par="humain"):
+    usage = "usage : !bug <description> [--low|--high|--blocker]"
     if not text:
-        return "usage : !bug <description> [--low|--high|--blocker]"
+        return usage
     severity = "normal"
     m = re.search(r"\s*--(low|high|blocker)\b", text)
     if m:
         severity = m.group(1)
         text = (text[:m.start()] + text[m.end():]).strip()
-    if not text:
-        return "usage : !bug <description> [--low|--high|--blocker]"
+    if not text or texte_invalide(text, usage):
+        return texte_invalide(text, usage) or usage
     bid = next_id("b")
     active = st["threads"].get(st["active"]) if st["active"] else None
     append("bug", id=bid, text=text, thread=st["active"],
@@ -585,16 +612,18 @@ def cmd_bug(text, st, par="humain"):
 
 
 def cmd_decide(text, par="humain"):
-    if not text:
-        return "usage : !decide <ce qui est decide> — <motif>"
+    usage = "usage : !decide <ce qui est decide> — <motif>"
+    if not text or texte_invalide(text, usage):
+        return texte_invalide(text, usage) or usage
     did = next_id("d")
     append("decision", id=did, text=text, par=par if par == "agent" else None)
     return f"[PlanTrack] decision {did} actee : {trunc(text, 80)}"
 
 
 def cmd_piege(text):
-    if not text:
-        return "usage : !piege <ce qu'il ne faut pas refaire>"
+    usage = "usage : !piege <ce qu'il ne faut pas refaire>"
+    if not text or texte_invalide(text, usage):
+        return texte_invalide(text, usage) or usage
     pid = next_id("pg")
     append("piege", id=pid, text=text)
     return f"[PlanTrack] piege {pid} note : {trunc(text, 80)}"
@@ -612,7 +641,7 @@ def attentes(st):
     old = (datetime.now(timezone.utc) - timedelta(days=STALE_DAYS)).isoformat(timespec="seconds")
     return ([b for b in st["bugs"].values()
              if b["status"] == "to_verify" and b.get("status_ts", b["ts"]) < old],
-            [q for q in st["questions"].values() if not q.get("answer") and q["ts"] < old], old)
+            [q for q in st["questions"].values() if q_ouverte(q) and q["ts"] < old], old)
 
 
 def cmd_attentes(args, st):
@@ -627,8 +656,15 @@ def cmd_attentes(args, st):
 
 
 def cmd_question(text, st=None):
-    if not text:
-        return "usage : !question <texte>"
+    usage = "usage : !question <texte>"
+    if not text or texte_invalide(text, usage):
+        return texte_invalide(text, usage) or usage
+    if st:
+        for q in st["questions"].values():
+            if q_ouverte(q) and question_proche(text, q["text"]):
+                return (f"[PlanTrack] refuse : question deja posee et toujours ouverte — "
+                        f"{q['id']} : {trunc(q['text'], 80)}\n"
+                        "(elle est deja rappelee a chaque session : rien n'a ete enregistre)")
     qid = next_id("q")
     # la phase d'origine est stockee a l'emission : c'est elle qui ouvrira (ou non)
     # la porte au moment du `phase next`, et le doctor s'en sert pour reperer une
@@ -846,8 +882,9 @@ HELP = """[PlanTrack] commandes (dans le prompt de l'agent, jamais transmises au
   !state              affiche l'etat persistant courant
   !<texte libre>      capture dans l'inbox, a classer plus tard
 CLI humaine : plantrack status | bugs | inbox | verify <id> | reject <id> -m ... | close <id>
-              plantrack attempt <bug_id> <hypothese> | attempts <bug_id>
-              plantrack bug <id> open|in_progress|to_verify|wont_fix   (wont_fix : humain seul)
+              plantrack attempt <bug_id> <hypothese> | attempts <bug_id> | echecs [--json]   tentatives ratees par bug et par tache
+              plantrack bug <id> open|in_progress|to_verify|wont_fix   (wont_fix : humain seul, ou relaye avec --de)
+              plantrack questions-doublons [--fusionner]   rattache les questions en double a la plus ancienne
               plantrack plan [import <f.md>] | decisions
               plantrack parcours list | import <f.json> (humain seul) | start <nom> | json
               plantrack phase add|start|done|next|cancel   (done/cancel : humain seul ; next : la porte decide)
@@ -1476,7 +1513,6 @@ def install_git_hook():
         sys.exit("[PlanTrack] pas de depot git ici — lance `git init` d'abord.")
     chain_hook(os.path.join(git_hooks_dir(), "pre-commit"),
                GIT_HOOK, GIT_HOOK_CALL, "pre-commit", "pt.py precommit")
-    print("[PlanTrack] contournement du garde-fou : git commit --no-verify.")
 
 
 def install_post_commit_hook():
@@ -1737,7 +1773,6 @@ def cmd_precommit():
     if blocked:
         append("precommit_block")  # journalise pour `plantrack stats` (§15)
         print("Travail de ce fil livre ? Ferme-le : plantrack close <id> (ou !close), puis recommite.")
-        print("Dernier recours : git commit --no-verify")
         sys.exit(1)
     sys.exit(0)
 
@@ -2101,7 +2136,7 @@ def bilan_ligne(st, jours=7):
             (sum(b["status"] in BUG_TERMINAL and b.get("status_ts", "") >= cutoff
                  for b in st["bugs"].values()), ("bug réglé", "bugs réglés"))]
     avis = [(sum(b["status"] == "to_verify" for b in st["bugs"].values()), ("bug à vérifier", "bugs à vérifier")),
-            (sum(q["answer"] is None for q in st["questions"].values()), ("question", "questions")),
+            (sum(q_ouverte(q) for q in st["questions"].values()), ("question", "questions")),
             (sum(s["verdict"] is None for s in st["steps"].values()), ("point de test", "points de test"))]
     dire = lambda l: ", ".join(f"{n} {m[n > 1]}" for n, m in l if n)
     a, b = dire(fait), dire(avis)
@@ -2552,6 +2587,63 @@ def _norm(s):
     return " ".join(re.sub(r"[^a-z0-9]+", " ", s.lower()).split())
 
 
+def question_proche(a, b):
+    return difflib.SequenceMatcher(None, _norm(a), _norm(b)).ratio() > SIMILAR
+
+
+def cmd_questions_doublons(args, st):
+    """Regroupe les questions ouvertes presque identiques : la plus ancienne reste
+    ouverte, les copies y sont rattachees (--fusionner). Rien ne s'efface et
+    aucune reponse n'est ecrite : trancher reste a l'humain."""
+    ouvertes = sorted((q for q in st["questions"].values() if q_ouverte(q)), key=lambda q: q["ts"])
+    groupes, pris = [], set()
+    for i, q in enumerate(ouvertes):
+        if q["id"] in pris:
+            continue
+        copies = [c for c in ouvertes[i + 1:] if c["id"] not in pris and question_proche(q["text"], c["text"])]
+        if copies:
+            pris.update(c["id"] for c in copies)
+            groupes.append((q, copies))
+    if not groupes:
+        print("aucune question en double.")
+        return
+    fusion = "--fusionner" in args
+    for q, copies in groupes:
+        print(f"{q['id']} : {trunc(q['text'], 90)}")
+        for c in copies:
+            if fusion:
+                append("question_doublon", id=c["id"], de=q["id"])
+            print(f"   {'rattachee' if fusion else 'copie'} : {c['id']}")
+    if not fusion:
+        print("`plantrack questions-doublons --fusionner` pour rattacher les copies.")
+
+
+def cmd_echecs(args, st):
+    """Combien de tentatives ont rate, par bug puis par tache (pour qu'un
+    orchestrateur change de modele apres plusieurs echecs). Echec = tentative
+    rejetee par l'humain ou retiree (bug repasse en open avec motif)."""
+    bugs, tasks = {}, {}
+    for b in st["bugs"].values():
+        if not b["attempts"]:
+            continue
+        ech = sum(1 for a in b["attempts"] if a.get("rejected"))
+        bugs[b["id"]] = {"task": b.get("task"), "status": b["status"],
+                         "tentatives": len(b["attempts"]), "echecs": ech}
+        if b.get("task"):
+            tasks.setdefault(b["task"], {"echecs": 0})["echecs"] += ech
+    if "--json" in args:
+        print(json.dumps({"bugs": bugs, "tasks": tasks}, ensure_ascii=False))
+        return
+    if not bugs:
+        print("aucune tentative consignee.")
+        return
+    for bid, v in bugs.items():
+        tk = f"  [{v['task']}]" if v["task"] else ""
+        print(f"{bid:>4}  {v['status']:<11} {v['tentatives']} tentative(s), {v['echecs']} echec(s){tk}")
+    for tid, v in tasks.items():
+        print(f"tache {tid} : {v['echecs']} echec(s)")
+
+
 def get_bug(st, bid):
     b = st["bugs"].get(bid or "")
     if not b:
@@ -2607,6 +2699,7 @@ def cmd_attempts(args, st):
 def cmd_bug_status(args, st):
     """§9 : machine a etats. L'agent ecrit open/in_progress/to_verify ;
     validated passe par `verify` (humain), wont_fix est humain seul."""
+    de, args = arg_de(args)
     if len(args) < 2:
         sys.exit("usage : plantrack bug <id> open|in_progress|to_verify|wont_fix [-m motif]")
     b, target = get_bug(st, args[0]), args[1]
@@ -2616,10 +2709,11 @@ def cmd_bug_status(args, st):
         sys.exit("[PlanTrack] \"validated\" est reserve a l'humain, via `plantrack verify`. "
                  "Passe le bug en \"to_verify\" et signale-le dans ta reponse.")
     if target == "wont_fix":
-        require_human("bug wont_fix")
+        require_human("bug wont_fix", de)
         motif = arg_motif(args, 2)
-        append("bug_status", id=b["id"], status="wont_fix", text="wont_fix : " + motif)
-        print(f"{b['id']} classe wont_fix (motif conserve).")
+        append("bug_status", id=b["id"], status="wont_fix", text="wont_fix : " + motif, canal=de)
+        print(f"{b['id']} classe wont_fix (motif conserve)."
+              + (f" (canal : {trunc(de, 60)})" if de else ""))
     elif target in ("open", "in_progress", "to_verify"):
         motif = None
         if target == "open" and b["status"] == "to_verify":
@@ -2669,6 +2763,13 @@ def require_human(cmd, de=None):
             "Il a DEJA tranche par un canal relaye (telephone, carnet web) ? Rejoue la commande avec "
             "--de \"<canal> : <sa reponse, citee>\" — l'attestation est journalisee avec le verdict."
         )
+
+
+def ecrit(msg):
+    """Sortie CLI des commandes d'ecriture : un refus (rien d'ecrit) sort en code 1."""
+    if msg.startswith(("usage", "[PlanTrack] refuse")):
+        sys.exit(msg)
+    print(msg)
 
 
 def cli(argv):
@@ -2772,21 +2873,25 @@ def cli(argv):
                      + (f" (ou `plantrack {args[0]} {args[1]}`)"
                         if args[0] in ("verify", "reject") else ""))
         else:
-            print(cmd_bug(" ".join(args), st, par="agent"))
+            ecrit(cmd_bug(" ".join(args), st, par="agent"))
     elif cmd == "decide":
         if not args:
             sys.exit("usage : plantrack decide <texte>")
-        print(cmd_decide(" ".join(args), par="agent"))
+        ecrit(cmd_decide(" ".join(args), par="agent"))
     elif cmd == "piege":
         if not args:
             sys.exit("usage : plantrack piege <texte>")
-        print(cmd_piege(" ".join(args)))
+        ecrit(cmd_piege(" ".join(args)))
     elif cmd == "piege-clos":
         print(cmd_piege_clos(args[0] if args else "", " ".join(args[1:])))
     elif cmd == "question":
         if not args:
             sys.exit("usage : plantrack question <texte>")
-        print(cmd_question(" ".join(args), st))
+        ecrit(cmd_question(" ".join(args), st))
+    elif cmd == "questions-doublons":
+        cmd_questions_doublons(args, st)
+    elif cmd == "echecs":
+        cmd_echecs(args, st)
     elif cmd == "answer":
         de, args = arg_de(args)
         require_human("answer", de)

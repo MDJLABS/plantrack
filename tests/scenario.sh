@@ -119,7 +119,7 @@ check "init --git-hook installe le hook" "pre-commit installe" "$out"
 out=$(cd "$TMP" && git -c user.name=t -c user.email=t@t commit -m x 2>&1); rc=$?
 check_exit "commit d un fichier parque bloque (exit 1)" 1 "$rc"
 check "le message nomme le fil fautif" "appartient au fil t1" "$out"
-check "le contournement est documente" "no-verify" "$out"
+check_not "le garde-fou ne donne pas son contournement" "no-verify" "$out"
 out=$(cd "$TMP" && git -c user.name=t -c user.email=t@t commit -q --no-verify -m x 2>&1); rc=$?
 check_exit "contournement --no-verify passe" 0 "$rc"
 echo v2 > "$TMP/libre.txt"
@@ -789,7 +789,7 @@ done
 for i in 1 2 3 4 5 6; do
   CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" decide "DECISIONCONSERVEE$i $L" >/dev/null
   CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" piege "PIEGECONSERVE$i $L" >/dev/null
-  CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" question "QUESTIONCONSERVEE$i $L" >/dev/null
+  CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" question "QUESTIONCONSERVEE$i $(head -c 2000 /dev/urandom | tr -dc 'a-z ' | head -c ${#L})" >/dev/null  # textes distincts : un doublon serait refuse
 done
 blk=$(CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" status 2>&1)
 for i in 1 8; do
@@ -1457,6 +1457,44 @@ out=$(S aaa "le stockage local est purge"); check "double session : la meme sess
 out=$(S bbb --reprendre "le service worker vide le cache"); check "double session : --reprendre passe" "consignee" "$out"
 check "double session : la reprise est tracee" '"repris_de": "aaa"' "$(tail -1 "$TMPS/.plantrack/events.jsonl")"
 rm -rf "$TMPS"
+
+# lot 2 bcc (21/10)
+TMPL=$(mktemp -d)
+L() { CLAUDE_PROJECT_DIR="$TMPL" python3 "$PT" "$@" 2>&1; }
+L bug "le panier se vide" >/dev/null
+# 1. wont_fix relaye par telephone
+out=$(L bug b1 wont_fix -m "on laisse tomber" --de "telephone : on laisse tomber ce bug"); rc=$?
+check_exit "lot2-1 : wont_fix relaye avec --de passe" 0 "$rc"
+check "lot2-1 : l'attestation est journalisee" '"canal": "telephone : on laisse tomber ce bug"' "$(tail -1 "$TMPL/.plantrack/events.jsonl")"
+# 2. aide, option, identifiant : rien ne s'ecrit
+avant=$(wc -l < "$TMPL/.plantrack/events.jsonl")
+out=$(L decide --help); rc=$?; check_exit "lot2-2 : decide --help sort en erreur" 1 "$rc"
+check "lot2-2 : decide --help affiche l'usage" "usage" "$out"
+out=$(L piege pg9); check "lot2-2 : piege pg9 indique piege-clos" "piege-clos pg9" "$out"
+out=$(L bug -h); rc=$?; check_exit "lot2-2 : bug -h sort en erreur" 1 "$rc"
+out=$(L question q3); rc=$?; check_exit "lot2-2 : question q3 sort en erreur" 1 "$rc"
+check_exit "lot2-2 : rien n'a ete ecrit" "$avant" "$(wc -l < "$TMPL/.plantrack/events.jsonl")"
+out=$(printf '{"prompt":"!decide --help"}' | CLAUDE_PROJECT_DIR="$TMPL" python3 "$PT" hook-prompt 2>&1)
+check_exit "lot2-2 : !decide --help n'ecrit rien non plus" "$avant" "$(wc -l < "$TMPL/.plantrack/events.jsonl")"
+# 3. questions en double
+L question "Faut-il publier la version sur PyPI ?" >/dev/null
+out=$(L question "Faut-il publier la version sur PyPI"); rc=$?
+check "lot2-3 : la copie est refusee avec le numero existant" "q1" "$out"
+check_exit "lot2-3 : code de refus" 1 "$rc"
+printf '{"ts":"2026-01-01T00:00:00+00:00","kind":"question","id":"q2","text":"Faut-il publier la version sur PyPI ?"}\n' >> "$TMPL/.plantrack/events.jsonl"
+out=$(L questions-doublons); check "lot2-3 : les doublons sont listes" "copie : q1" "$out"
+out=$(L questions-doublons --fusionner); check "lot2-3 : fusion rattache la copie" "rattachee : q1" "$out"
+out=$(L status); check_not "lot2-3 : la copie ne revient plus" "q1 :" "$out"
+check "lot2-3 : la plus ancienne reste ouverte" "q2" "$out"
+# 5. echecs
+L bug "le cookie expire" >/dev/null
+L attempt b2 "le serveur renvoie une date fausse" >/dev/null
+L bug b2 to_verify >/dev/null
+H reject b2 -m "toujours la" >/dev/null 2>&1 || CLAUDE_PROJECT_DIR="$TMPL" env -u CLAUDECODE -u CLAUDE_CODE_ENTRYPOINT python3 "$PT" reject b2 -m "toujours la" >/dev/null
+L attempt b2 "le navigateur bloque le cookie tiers" >/dev/null
+out=$(L echecs); check "lot2-5 : echecs compte tentatives et echecs" "2 tentative(s), 1 echec(s)" "$out"
+out=$(L echecs --json); check "lot2-5 : version machine" '"b2": {"task": null, "status": "open", "tentatives": 2, "echecs": 1}' "$out"
+rm -rf "$TMPL"
 
 echo
 [ "$fail" = 0 ] && echo "TOUS LES TESTS PASSENT" || { echo "DES TESTS ECHOUENT"; exit 1; }
