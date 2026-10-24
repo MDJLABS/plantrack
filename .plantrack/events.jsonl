@@ -1070,3 +1070,27 @@
 {"ts": "2026-10-24T02:32:51+00:00", "kind": "close", "id": "t21"}
 {"ts": "2026-10-24T10:33:38+00:00", "kind": "decision", "id": "d86", "text": "Mariella (tel, 24/10, plan approuve) : alerte charge 10h13 (3.77/2 vCPU) passagere — pic du aux demarrages de sessions Claude, 6,2 Go dispo a 12h32. Pas une panne PlanTrack ; veille silencieuse maintenue (d23, d85), aucune carte de suite.", "par": "agent"}
 {"ts": "2026-10-24T11:14:52+00:00", "kind": "decision", "id": "d87", "text": "Mariella (tel, 24/10, via AskUserQuestion) : alerte memoire 11h = fausse alerte (ram 42 %, swap 96 %) -> 'Vider le secours + regler l'alerte (Recommande)'. Swap vide (swapoff/swapon, marge verifiee : 7,7 Go dispo pour 3,8 Go). menage-serveur.sh : le swap ne declenche plus l'alerte que si la ram est >= SEUIL_RAM_SWAP (60 %) ; ram >= 80 % alerte toujours. Teste a blanc (3 cas).", "par": "agent"}
+{"ts": "2026-10-24T11:15:57+00:00", "kind": "thread_open", "id": "t22", "text": "travaux sur main", "auto": 1}
+{"ts": "2026-10-24T11:15:57+00:00", "kind": "commit", "sha": "49b1dcc", "ctype": "chore", "thread": "t22"}
+{"ts": "2026-10-24T11:16:16+00:00", "kind": "file_touched", "text": "sortie/carte-suite.json", "thread": "t22"}
+{"ts": "2026-10-24T11:16:16+00:00", "kind": "file_touched", "text": "sortie/carte-suite.log", "thread": "t22"}
+{"ts": "2026-10-24T14:06:07+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-merry-gem.md", "thread": "t22"}
+{"ts": "2026-10-24T14:12:26+00:00", "kind": "decision", "id": "d88", "text": "Mariella (tel, 24/10, carte brainstorm) : 'Finir ce travail (Recommande)' — terminer, tester et publier le chantier import d'un projet existant laisse non commite dans pt.py (session bcc, 24/10 04h34, d263/d264 bcc). Puis carte Verrou : 'Le retirer (Recommande)' — l'option init --sans-verrou (et l'evenement reglage + branche doctor associes) est mise de cote dans .planning/pt-sans-verrou.patch, conforme a 'Garder le verrou' du 23/10.", "par": "agent"}
+{"ts": "2026-10-24T14:12:26+00:00", "kind": "file_touched", "text": ".planning/pt-sans-verrou.patch", "thread": "t22"}
+{"ts": "2026-10-24T14:12:34+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t22"}
+{"ts": "2026-10-24T14:12:38+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t22"}
+{"ts": "2026-10-24T14:12:41+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t22"}
+{"ts": "2026-10-24T14:12:42+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t22"}
+{"ts": "2026-10-24T14:12:43+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t22"}
+{"ts": "2026-10-24T14:12:44+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t22"}
+{"ts": "2026-10-24T14:14:06+00:00", "kind": "file_touched", "text": "sortie/scenario-import.log", "thread": "t22"}
+{"ts": "2026-10-24T14:20:21+00:00", "kind": "file_touched", "text": "sortie/essai-import/todo.md", "thread": "t22"}
+{"ts": "2026-10-24T14:20:21+00:00", "kind": "file_touched", "text": "sortie/essai-import/t.json", "thread": "t22"}
+{"ts": "2026-10-24T14:20:21+00:00", "kind": "file_touched", "text": "sortie/essai-import/v.md", "thread": "t22"}
+{"ts": "2026-10-24T14:20:28+00:00", "kind": "file_touched", "text": "sortie/essai-import/pc.json", "thread": "t22"}
+{"ts": "2026-10-24T14:20:57+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t22"}
+{"ts": "2026-10-24T14:22:37+00:00", "kind": "file_touched", "text": "sortie/scenario-import.log", "thread": "t22"}
+{"ts": "2026-10-24T14:22:45+00:00", "kind": "commit", "sha": "cfe6631", "ctype": "feat", "thread": "t22"}
+{"ts": "2026-10-24T14:22:45+00:00", "kind": "commit", "sha": "3076823", "ctype": "chore", "thread": "t22"}
+{"ts": "2026-10-24T14:22:47+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t22"}
+{"ts": "2026-10-24T14:23:26+00:00", "kind": "decision", "id": "d89", "text": "v1.9.26 publiee (24/10, GitHub + PyPI verifie, plan valide par Mariella tel) : import d'un projet existant — 'plantrack import <f.md|f.json> [--source] [--apercu] [--de]' (coche = fait, provenance gardee, phase toute faite close), 'parcours start --depuis <phase> --de', 'task done --de'. Option init --sans-verrou retiree (choix Mariella 'Le retirer'), mise de cote dans .planning/pt-sans-verrou.patch. 488 tests verts. La ronde propage.", "par": "agent"}

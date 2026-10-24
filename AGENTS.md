@@ -14,7 +14,9 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF : aucun. Ouvre un fil avec `!focus <sujet>` avant de coder — sans fil, aucun de tes commits n'est rattache.
+FIL ACTIF — t22 : travaux sur main [3 commits]
+  fichiers recemment ecrits : sortie/essai-import/t.json, sortie/essai-import/v.md, sortie/essai-import/pc.json, tests/scenario.sh, sortie/scenario-import.log, pyproject.toml
+  (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -111,6 +113,8 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d85 : Mariella (tel, 21/10, carte Suite) : reponse 'Vu' sans option -> veille silencieuse (d23), aucune carte de suite ; brainstorm seulement si … (agent)
   d86 : Mariella (tel, 24/10, plan approuve) : alerte charge 10h13 (3.77/2 vCPU) passagere — pic du aux demarrages de sessions Claude, 6,2 Go dispo… (agent)
   d87 : Mariella (tel, 24/10, via AskUserQuestion) : alerte memoire 11h = fausse alerte (ram 42 %, swap 96 %) -> 'Vider le secours + regler l'alert… (agent)
+  d88 : Mariella (tel, 24/10, carte brainstorm) : 'Finir ce travail (Recommande)' — terminer, tester et publier le chantier import d'un projet exis… (agent)
+  d89 : v1.9.26 publiee (24/10, GitHub + PyPI verifie, plan valide par Mariella tel) : import d'un projet existant — 'plantrack import <f.md|f.json… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
