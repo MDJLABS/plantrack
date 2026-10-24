@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t22 : travaux sur main [6 commits]
-  fichiers recemment ecrits : pyproject.toml, ../../../root/.claude/plans/contexte-reconstruit-par-le-vivid-platypus.md, ../projob/sortie/build-android.log, sortie/carte-b23.json, sortie/carte-b23.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-floofy-glacier.md
+FIL ACTIF — t22 : travaux sur main [7 commits]
+  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-vivid-platypus.md, ../projob/sortie/build-android.log, sortie/carte-b23.json, sortie/carte-b23.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-floofy-glacier.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-joyful-goblet.md
   (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
