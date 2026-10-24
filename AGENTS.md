@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t22 : travaux sur main [4 commits]
-  fichiers recemment ecrits : sortie/essai-import/t.json, sortie/essai-import/v.md, sortie/essai-import/pc.json, tests/scenario.sh, sortie/scenario-import.log, pyproject.toml
+FIL ACTIF — t22 : travaux sur main [5 commits]
+  fichiers recemment ecrits : sortie/essai-import/pc.json, tests/scenario.sh, sortie/scenario-import.log, pyproject.toml, ../../../root/.claude/plans/contexte-reconstruit-par-le-vivid-platypus.md, ../projob/sortie/build-android.log
   (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -24,6 +24,7 @@ FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
 
 BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b22 (to_verify) [t21] Hooks Codex generes par init (.codex/hooks.json) : la racine est resolue par 'git rev-parse || pwd' puis python3 $r/.claude/hooks/pt.py est… (agent) [2 tentatives, derniere: _codex_cmd : plus de repli sur pwd ; sortie silencieuse si …]
+  b23 (to_verify) [t22] kvm-lourd laisse passer un build lance par 'cat > /tmp/x.sh <<EOF ... EOF ; setsid nohup bash /tmp/x.sh &' : le corps du heredoc est jete a… (agent) [1 tentatives, derniere: classe() memorise le corps des heredocs 'cat/tee > cible <<…]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
@@ -116,6 +117,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d88 : Mariella (tel, 24/10, carte brainstorm) : 'Finir ce travail (Recommande)' — terminer, tester et publier le chantier import d'un projet exis… (agent)
   d89 : v1.9.26 publiee (24/10, GitHub + PyPI verifie, plan valide par Mariella tel) : import d'un projet existant — 'plantrack import <f.md|f.json… (agent)
   d90 : Mariella (tel, 24/10) : 'Vu' apres v1.9.26 (import d'un projet existant) -> veille silencieuse (d23, d85), aucune carte de suite. (agent)
+  d91 : b23 corrige (24/10, plan valide par Mariella) : kvm-lourd (/usr/local/bin, hors depot, sauvegarde backup/code/usr-local-bin) lit un script … (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
