@@ -1496,5 +1496,19 @@ out=$(L echecs); check "lot2-5 : echecs compte tentatives et echecs" "2 tentativ
 out=$(L echecs --json); check "lot2-5 : version machine" '"b2": {"task": null, "status": "open", "tentatives": 2, "echecs": 1}' "$out"
 rm -rf "$TMPL"
 
+echo "== import d'un projet existant (d88) =="
+TMPI=$(mktemp -d)
+I() { CLAUDE_PROJECT_DIR="$TMPI" python3 "$PT" "$@" 2>&1; }
+printf '## Maquette\n- [x] accueil\n- [x] couleurs\n## Site\n- [x] contact\n- [ ] tarifs\n- devis\n' > "$TMPI/todo.md"
+out=$(I import "$TMPI/todo.md" --apercu); check "import : apercu sans ecrire" "rien n'a ete ecrit" "$out"
+out=$(I import "$TMPI/todo.md"); check "import : agent sans accord refuse" "reserve a l'humain" "$out"
+out=$(I import "$TMPI/todo.md" --de "telephone : Oui")
+check "import : coche = fait" "3 tache(s) deja faite(s)" "$out"
+out=$(I plan); check "import : phase toute faite close" "done       Maquette" "$out"
+check "import : provenance gardee" "(repris de todo.md)" "$out"
+printf 'rien\n' > "$TMPI/v.md"
+out=$(I import "$TMPI/v.md" --de "x : y"); check "import : fichier sans phase refuse" "aucune phase" "$out"
+rm -rf "$TMPI"
+
 echo
 [ "$fail" = 0 ] && echo "TOUS LES TESTS PASSENT" || { echo "DES TESTS ECHOUENT"; exit 1; }

@@ -303,10 +303,12 @@ def project():
                 p["status_ts"] = ev["ts"]
                 if ev.get("text"):
                     p["motif"] = ev["text"]
+                if ev.get("canal"):
+                    p["canal"] = ev["canal"]
         elif k == "task_open":
             st["tasks"][ev["id"]] = {
                 "id": ev["id"], "phase": ev.get("phase"), "text": ev.get("text", ""),
-                "status": "todo", "ts": ev["ts"],
+                "status": "todo", "ts": ev["ts"], "source": ev.get("source"),
             }
         elif k == "task_status":
             t = st["tasks"].get(ev["id"])
@@ -317,6 +319,8 @@ def project():
                     t["motif"] = ev["text"]
                 if ev.get("replaced_by"):
                     t["replaced_by"] = ev["replaced_by"]
+                if ev.get("canal"):
+                    t["canal"] = ev["canal"]
     return st
 
 
@@ -886,9 +890,10 @@ CLI humaine : plantrack status | bugs | inbox | verify <id> | reject <id> -m ...
               plantrack bug <id> open|in_progress|to_verify|wont_fix   (wont_fix : humain seul, ou relaye avec --de)
               plantrack questions-doublons [--fusionner]   rattache les questions en double a la plus ancienne
               plantrack plan [import <f.md>] | decisions
-              plantrack parcours list | import <f.json> (humain seul) | start <nom> | json
+              plantrack import <f.json|f.md> [--source <nom>] [--apercu] [--de ...]   reprend les taches d'un projet existant ([x] = fait, avec la source)
+              plantrack parcours list | import <f.json> (humain seul) | start <nom> [--depuis <phase> --de ...] | json
               plantrack phase add|start|done|next|cancel   (done/cancel : humain seul ; next : la porte decide)
-              plantrack task add|start|verify|done|cancel|replace   (done/cancel/replace : humain seul)
+              plantrack task add|start|verify|done|cancel|replace   (done/cancel/replace : humain seul, done relaye avec --de)
               plantrack decide <texte> | bug <texte> [--low|--high|--blocker]   ecriture agent (marquee (agent))
               plantrack piege <texte> | piege-clos <id> <motif> | question <texte>   utilisables par l'agent
               plantrack answer <question_id> <texte>   toi seule, hors session
@@ -2315,6 +2320,89 @@ def cmd_plan_import(args, st):
     print(f"{len(phases)} phase(s) importee(s). `plantrack plan` pour l'arbre.")
 
 
+def lire_import(chemin, source):
+    """Taches d'un projet existant : JSON {"source", "phases":[{"titre","objectif",
+    "taches":[{"texte","fait","source"}]}]} ou Markdown (`## phase`, `- [x]` fait,
+    `- [ ]` / `- ` ouvert). Rend (source, [(titre, objectif, [(texte, fait, source)])])."""
+    try:
+        with open(chemin, encoding="utf-8") as f:
+            brut = f.read()
+    except OSError as e:
+        sys.exit(f"[PlanTrack] illisible : {e}")
+    phases = []
+    if chemin.endswith(".json"):
+        try:
+            doc = json.loads(brut)
+        except ValueError as e:
+            sys.exit(f"[PlanTrack] JSON invalide : {e}")
+        source = source or doc.get("source")
+        for ph in doc.get("phases") or []:
+            taches = []
+            for t in ph.get("taches") or []:
+                t = {"texte": t} if isinstance(t, str) else t
+                if str(t.get("texte", "")).strip():
+                    taches.append((t["texte"].strip(), bool(t.get("fait")), t.get("source")))
+            if str(ph.get("titre", "")).strip():
+                phases.append((ph["titre"].strip(), ph.get("objectif") or "", taches))
+    else:
+        for line in brut.splitlines():
+            if line.startswith("## "):
+                phases.append((line[3:].strip(), "", []))
+            elif (m := re.match(r"^\s*[-*] (\[([ xX])\] )?(.+)$", line)) and phases:
+                phases[-1][2].append((m.group(3).strip(), (m.group(2) or " ").lower() == "x", None))
+    source = source or os.path.basename(chemin)
+    if not phases:
+        sys.exit("[PlanTrack] aucune phase trouvee — rien a importer.")
+    return source, phases
+
+
+def cmd_import(args, st):
+    """Projet existant (demande bcc, choix Mariella 23/10 'Fait, avec la source') :
+    recopie en une fois les phases et taches notees ailleurs. Ce qui etait deja
+    coche arrive termine, la provenance journalisee. Ecrire est un geste humain :
+    l'agent passe par --de (l'accord cite) ; --apercu reste libre, il n'ecrit rien."""
+    de, args = arg_de(args)
+    apercu = "--apercu" in args
+    args = [a for a in args if a != "--apercu"]
+    source = None
+    if "--source" in args:
+        i = args.index("--source")
+        if i + 1 >= len(args):
+            sys.exit("usage : plantrack import <f.json|f.md> [--source <nom>] [--apercu] [--de ...]")
+        source, args = args[i + 1], args[:i] + args[i + 2:]
+    if len(args) != 1:
+        sys.exit("usage : plantrack import <f.json|f.md> [--source <nom>] [--apercu] [--de ...]")
+    source, phases = lire_import(args[0], source)
+    if not apercu:
+        require_human("import", de)
+    n_t = sum(len(t) for _, _, t in phases)
+    n_f = sum(1 for _, _, ts in phases for _, fait, _ in ts if fait)
+    print(f"Import depuis {source} : {len(phases)} phase(s), {n_t} tache(s) dont {n_f} deja faite(s)")
+    for titre, _, taches in phases:
+        print(f"  {titre}")
+        for texte, fait, _ in taches:
+            print(f"    [{'x' if fait else ' '}] {trunc(texte, 70)}")
+    if apercu:
+        print("(apercu : rien n'a ete ecrit)")
+        return
+    if not de and input("Ecrire ces taches dans le journal ? [y/N] ").strip().lower() not in ("y", "yes", "o", "oui"):
+        sys.exit("abandon — rien n'a ete ecrit.")
+    for titre, objectif, taches in phases:
+        pid = next_id("p")
+        append("phase_open", id=pid, text=titre, goal=objectif or None, source=source)
+        for texte, fait, src in taches:
+            kid = next_id("k")
+            src = src or source
+            append("task_open", id=kid, phase=pid, text=texte, source=src)
+            if fait:
+                append("task_status", id=kid, status="done",
+                       canal=f"import depuis {src}" + (f" — {de}" if de else ""))
+        if taches and all(f for _, f, _ in taches):
+            append("phase_status", id=pid, status="done", canal=f"import depuis {source}")
+    print(f"{len(phases)} phase(s) importee(s), {n_f} tache(s) deja faite(s) marquee(s) "
+          f"terminee(s) (source : {source}). `plantrack plan` pour l'arbre.")
+
+
 def cmd_phase(args, st):
     sub = args[0] if args else ""
     if sub == "add":
@@ -2462,9 +2550,18 @@ def cmd_parcours(args, st):
                 print(f"  {i}. {p['nom']} [porte {p['porte']}] : {trunc(p['regle'], 90)}")
         return
     if sub == "start":
+        de, args = arg_de(args)
+        depuis = None
+        if "--depuis" in args:
+            i = args.index("--depuis")
+            if i + 1 >= len(args):
+                sys.exit("usage : plantrack parcours start <nom> --depuis <phase> --de \"<canal> : <reponse>\"")
+            depuis, args = args[i + 1], args[:i] + args[i + 2:]
+            # sauter des phases, c'est franchir des portes qui attendent l'humain
+            require_human("parcours start --depuis", de)
         if len(args) < 2:
-            sys.exit("usage : plantrack parcours start <nom>")
-        ok, msg = parcours_start(st, args[1])
+            sys.exit("usage : plantrack parcours start <nom> [--depuis <phase> --de \"<canal> : <reponse>\"]")
+        ok, msg = parcours_start(st, args[1], depuis, de)
         print(msg)
         if not ok:
             sys.exit(1)
@@ -2475,14 +2572,22 @@ def cmd_parcours(args, st):
     sys.exit("usage : plantrack parcours list|import <f.json>|start <nom>|json")
 
 
-def parcours_start(st, nom):
+def parcours_start(st, nom, depuis=None, de=None):
     """Instancie les phases d'un parcours declare et active la premiere.
     Partage entre la CLI et `!parcours <nom>` : un hook ne doit jamais sys.exit,
-    d'ou le couple (ok, message) plutot qu'une sortie de processus."""
+    d'ou le couple (ok, message) plutot qu'une sortie de processus.
+    `depuis` (projet existant) : les phases d'avant sont closes avec l'accord cite."""
     pc = st["parcours"].get(nom)
     if not pc:
         dispo = ", ".join(sorted(st["parcours"])) or "aucun"
         return False, f"[PlanTrack] parcours {nom} inconnu — declares : {dispo}."
+    noms = [p["nom"] for p in pc["phases"]]
+    debut = 0
+    if depuis is not None:
+        if depuis not in noms:
+            return False, (f"[PlanTrack] phase {depuis} absente du parcours {nom} — "
+                           f"phases : {', '.join(noms)}.")
+        debut = noms.index(depuis)
     if phases_du_parcours(st, nom):
         return False, (f"[PlanTrack] le parcours {nom} tourne deja — `plantrack phase next` "
                        "pour avancer, `plantrack plan` pour l'arbre.")
@@ -2496,10 +2601,13 @@ def parcours_start(st, nom):
                livrable=p.get("livrable") or None, parcours=nom, ordre=i,
                questions=p.get("questions", True))
         ids.append(pid)
-    append("phase_status", id=ids[0], status="active")
-    p0 = pc["phases"][0]
-    return True, (f"[PlanTrack] parcours {nom} lance — phase 1/{len(ids)} ({ids[0]}) : "
-                  f"{p0['nom']}\nregle : {p0['regle']}")
+    for pid in ids[:debut]:
+        append("phase_status", id=pid, status="done", canal=f"projet existant : {de}")
+    append("phase_status", id=ids[debut], status="active")
+    p0 = pc["phases"][debut]
+    saut = f" ({debut} phase(s) deja passee(s), source citee)" if debut else ""
+    return True, (f"[PlanTrack] parcours {nom} lance — phase {debut + 1}/{len(ids)} ({ids[debut]}) : "
+                  f"{p0['nom']}{saut}\nregle : {p0['regle']}")
 
 
 def parcours_json(st):
@@ -2543,6 +2651,7 @@ def cmd_task(args, st):
         append("task_open", id=kid, phase=pid, text=" ".join(args[2:]))
         print(f"tache {kid} creee dans {pid}.")
         return
+    de, args = arg_de(args)
     if len(args) < 2 or args[1] not in st["tasks"]:
         sys.exit("usage : plantrack task add|start|verify|done|cancel|replace <id> ...")
     kid = args[1]
@@ -2553,8 +2662,8 @@ def cmd_task(args, st):
         append("task_status", id=kid, status="to_verify")
         print(f"tache {kid} a verifier.")
     elif sub == "done":
-        require_human("task done")
-        append("task_status", id=kid, status="done")
+        require_human("task done", de)
+        append("task_status", id=kid, status="done", canal=de)
         print(f"tache {kid} terminee.")
     elif sub == "cancel":
         require_human("task cancel")
@@ -2794,7 +2903,10 @@ def cli(argv):
                 print(f"{p['id']:>4}  {p['status']:<10} {trunc(p['title'], 50)}{extra}")
                 for t in (t for t in st["tasks"].values() if t["phase"] == p["id"]):
                     rb = f" -> {t['replaced_by']}" if t.get("replaced_by") else ""
+                    rb += f"  (repris de {t['source']})" if t.get("source") else ""
                     print(f"   {t['id']:>4}  {t['status']:<12} {trunc(t['text'], 60)}{rb}")
+    elif cmd == "import":
+        cmd_import(args, st)
     elif cmd == "parcours":
         cmd_parcours(args, st)
     elif cmd == "phase":
