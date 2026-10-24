@@ -1094,3 +1094,5 @@
 {"ts": "2026-10-24T14:22:45+00:00", "kind": "commit", "sha": "3076823", "ctype": "chore", "thread": "t22"}
 {"ts": "2026-10-24T14:22:47+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t22"}
 {"ts": "2026-10-24T14:23:26+00:00", "kind": "decision", "id": "d89", "text": "v1.9.26 publiee (24/10, GitHub + PyPI verifie, plan valide par Mariella tel) : import d'un projet existant — 'plantrack import <f.md|f.json> [--source] [--apercu] [--de]' (coche = fait, provenance gardee, phase toute faite close), 'parcours start --depuis <phase> --de', 'task done --de'. Option init --sans-verrou retiree (choix Mariella 'Le retirer'), mise de cote dans .planning/pt-sans-verrou.patch. 488 tests verts. La ronde propage.", "par": "agent"}
+{"ts": "2026-10-24T14:23:26+00:00", "kind": "commit", "sha": "aef9ae8", "ctype": "chore", "thread": "t22"}
+{"ts": "2026-10-24T14:23:41+00:00", "kind": "decision", "id": "d90", "text": "Mariella (tel, 24/10) : 'Vu' apres v1.9.26 (import d'un projet existant) -> veille silencieuse (d23, d85), aucune carte de suite.", "par": "agent"}
