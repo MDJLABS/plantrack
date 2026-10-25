@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t22 : travaux sur main [7 commits]
+FIL ACTIF — t22 : travaux sur main [8 commits]
   fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-vivid-platypus.md, ../projob/sortie/build-android.log, sortie/carte-b23.json, sortie/carte-b23.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-floofy-glacier.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-joyful-goblet.md
   (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
@@ -117,6 +117,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d89 : v1.9.26 publiee (24/10, GitHub + PyPI verifie, plan valide par Mariella tel) : import d'un projet existant — 'plantrack import <f.md|f.json… (agent)
   d90 : Mariella (tel, 24/10) : 'Vu' apres v1.9.26 (import d'un projet existant) -> veille silencieuse (d23, d85), aucune carte de suite. (agent)
   d91 : b23 corrige (24/10, plan valide par Mariella) : kvm-lourd (/usr/local/bin, hors depot, sauvegarde backup/code/usr-local-bin) lit un script … (agent)
+  d92 : Mariella (tel, 25/10 20h39) : 'Vu' sur la carte veille -> veille silencieuse maintenue (d23, d85, d90), aucune carte de suite. (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
