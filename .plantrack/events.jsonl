@@ -1112,3 +1112,7 @@
 {"ts": "2026-10-24T18:38:09+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-joyful-goblet.md", "thread": "t22"}
 {"ts": "2026-10-24T18:45:26+00:00", "kind": "commit", "sha": "00da8a8", "ctype": "chore", "thread": "t22"}
 {"ts": "2026-10-25T20:40:23+00:00", "kind": "decision", "id": "d92", "text": "Mariella (tel, 25/10 20h39) : 'Vu' sur la carte veille -> veille silencieuse maintenue (d23, d85, d90), aucune carte de suite.", "par": "agent"}
+{"ts": "2026-10-25T20:40:42+00:00", "kind": "commit", "sha": "c7ec741", "ctype": "chore", "thread": "t22"}
+{"ts": "2026-10-25T20:41:06+00:00", "kind": "file_touched", "text": "sortie/carte-b22.log", "thread": "t22"}
+{"ts": "2026-10-25T20:41:21+00:00", "kind": "file_touched", "text": "sortie/carte-b22.log", "thread": "t22"}
+{"ts": "2026-10-25T20:42:13+00:00", "kind": "bug_status", "id": "b22", "status": "validated", "canal": "telephone (carte 25/10 20h41) : Valider b22 (Recommandé)"}

@@ -14,16 +14,13 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t22 : travaux sur main [8 commits]
-  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-vivid-platypus.md, ../projob/sortie/build-android.log, sortie/carte-b23.json, sortie/carte-b23.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-floofy-glacier.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-joyful-goblet.md
+FIL ACTIF — t22 : travaux sur main [9 commits]
+  fichiers recemment ecrits : ../projob/sortie/build-android.log, sortie/carte-b23.json, sortie/carte-b23.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-floofy-glacier.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-joyful-goblet.md, sortie/carte-b22.log
   (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
   t5 : travaux sur main — reprise : retour au travail courant apres la faille
-
-BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
-  b22 (to_verify) [t21] Hooks Codex generes par init (.codex/hooks.json) : la racine est resolue par 'git rev-parse || pwd' puis python3 $r/.claude/hooks/pt.py est… (agent) [2 tentatives, derniere: _codex_cmd : plus de repli sur pwd ; sortie silencieuse si …]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
