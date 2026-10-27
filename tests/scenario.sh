@@ -1510,5 +1510,21 @@ printf 'rien\n' > "$TMPI/v.md"
 out=$(I import "$TMPI/v.md" --de "x : y"); check "import : fichier sans phase refuse" "aucune phase" "$out"
 rm -rf "$TMPI"
 
+# d96 — cartes laissees de cote (b174 bcc) : question --carte / answer --carte
+TMPK=$(mktemp -d)
+K() { CLAUDE_PROJECT_DIR="$TMPK" python3 "$PT" "$@" 2>&1; }
+out=$(K question --carte c-41 "Autoriser Bash : npm test"); check "carte : question liee a la carte" "(carte c-41)" "$out"
+out=$(K question --carte c-42 "Autoriser Bash : npm test"); check "carte : meme texte, autre carte acceptee" "question q2 enregistree" "$out"
+out=$(K question --carte c-41 "Autoriser Bash : npm test"); check "carte : meme carte refusee" "deja posee" "$out"
+out=$(printf '{"source":"startup"}' | CLAUDE_PROJECT_DIR="$TMPK" python3 "$PT" hook-context 2>&1)
+check "carte : section a part dans le resume" "CARTES LAISSEES DE COTE (2)" "$out"
+check_not "carte : pas comptee en question ordinaire" "question(s) sans reponse" "$out"
+out=$(K answer --carte c-41 "oui"); check "carte : answer par carte refuse sans --de" "reserve" "$out"
+out=$(K answer --carte c-41 --de "telephone : Autoriser"); check "carte : answer --carte --de" "q1 repondue" "$out"
+out=$(K answer --carte c-99 --de "telephone : x"); check "carte : carte inconnue" "aucune question ouverte" "$out"
+out=$(K status); check "carte : fiche montre la carte restante" "q2 (carte c-42)" "$out"
+check_not "carte : carte repondue sortie de la fiche" "q1 (carte c-41)" "$out"
+rm -rf "$TMPK"
+
 echo
 [ "$fail" = 0 ] && echo "TOUS LES TESTS PASSENT" || { echo "DES TESTS ECHOUENT"; exit 1; }

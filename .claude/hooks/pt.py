@@ -254,7 +254,10 @@ def project():
                                          "ts": ev["ts"], "answer": None,
                                          # la phase d'ou part la question : c'est elle
                                          # qui decide si la porte peut s'ouvrir (§parcours)
-                                         "phase": ev.get("phase")}
+                                         "phase": ev.get("phase"),
+                                         # carte laissee de cote (b174 bcc) : l'id de la
+                                         # carte du poste, pour reprendre l'action a la reponse
+                                         "carte": ev.get("carte")}
         elif k == "answer":
             q = st["questions"].get(ev["id"])
             if q:
@@ -517,7 +520,11 @@ def context_block(st, header=True, rules=True, full=True):
     bugs = list(st["bugs"].values())
     troues = [b for b in bugs if b["status"] in ("open", "in_progress")]
     verdict = [b for b in bugs if b["status"] == "to_verify"]
-    pending_q = [q for q in st["questions"].values() if q_ouverte(q)]
+    pending_q = [q for q in st["questions"].values() if q_ouverte(q) and not q.get("carte")]
+    # d96 : une carte laissee de cote est une action suspendue, pas une question
+    # ordinaire — elle se montre a part, avec son id, pour etre reprise a la reponse
+    cartes = [q for q in st["questions"].values() if q_ouverte(q) and q.get("carte")]
+    carte_line = lambda q: f"  {q['id']} (carte {q['carte']}) : {trunc(q['text'], 80)}"
 
     if full:
         # b12 : la fiche promet l'etat COMPLET (d6) — aucun plafond CTX_MAX_* ici,
@@ -537,6 +544,8 @@ def context_block(st, header=True, rules=True, full=True):
 
         sec("\nQuestions en attente (reponds via !answer qN ...) :",
             [f"  {q['id']} : {trunc(q['text'], 80)}" for q in pending_q])
+        sec("\nCartes laissees de cote (action a reprendre a la reponse : answer --carte <id>) :",
+            [carte_line(q) for q in cartes])
     else:
         # resume : des compteurs, jamais le detail — l'etat entier est dans la
         # fiche AGENTS.md que chaque agent charge d'office. Rien a elider, donc
@@ -546,6 +555,11 @@ def context_block(st, header=True, rules=True, full=True):
              f"{len(st['decisions'])} decision(s) actee(s)" if st["decisions"] else "",
              f"{len(st['pieges'])} piege(s) connu(s)" if st["pieges"] else "",
              f"{len(pending_q)} question(s) sans reponse" if pending_q else ""]
+        if cartes:
+            sec(f"\nCARTES LAISSEES DE COTE ({len(cartes)}) — l'humain n'a pas encore repondu, "
+                "ne pas les reposer ; reprendre l'action quand la reponse arrive :",
+                [carte_line(q) for q in cartes[-5:]]
+                + ([f"  (+{len(cartes) - 5} autres dans la fiche)"] if len(cartes) > 5 else []))
         if any(n):
             sec("\nDANS LA FICHE D'ETAT : " + " ; ".join(x for x in n if x) + ".")
         bugs_v, qs_v, old = attentes(st)
@@ -659,13 +673,16 @@ def cmd_attentes(args, st):
                      + [f"  {q['id']} : {trunc(q['text'], 100)}" for q in qs])
 
 
-def cmd_question(text, st=None):
+def cmd_question(text, st=None, carte=None):
     usage = "usage : !question <texte>"
     if not text or texte_invalide(text, usage):
         return texte_invalide(text, usage) or usage
     if st:
         for q in st["questions"].values():
-            if q_ouverte(q) and question_proche(text, q["text"]):
+            # une carte se reconnait a son id, pas a son texte : deux autorisations
+            # au libelle voisin sont deux cartes distinctes (d96)
+            meme = (q.get("carte") == carte) if carte else (not q.get("carte") and question_proche(text, q["text"]))
+            if q_ouverte(q) and meme:
                 return (f"[PlanTrack] refuse : question deja posee et toujours ouverte — "
                         f"{q['id']} : {trunc(q['text'], 80)}\n"
                         "(elle est deja rappelee a chaque session : rien n'a ete enregistre)")
@@ -674,13 +691,14 @@ def cmd_question(text, st=None):
     # la porte au moment du `phase next`, et le doctor s'en sert pour reperer une
     # question posee dans une phase qui n'en veut pas
     ph = active_phase(st) if st else None
-    append("question", id=qid, text=text, phase=ph["id"] if ph else None)
+    append("question", id=qid, text=text, phase=ph["id"] if ph else None, carte=carte)
     hors = ""
     if ph and not ph.get("questions", True):
         # d59 : ce que seul l'humain peut faire (un compte, une cle) reste permis
         hors = (f"\n!! la phase {ph['id']} ({ph['title']}) n'admet de question que pour ce que seul "
                 f"l'humain peut faire (un compte, une cle, un acces) — {ph.get('regle', '')}")
-    return (f"[PlanTrack] question {qid} enregistree : {trunc(text, 80)}\n"
+    return (f"[PlanTrack] question {qid} enregistree" + (f" (carte {carte})" if carte else "")
+            + f" : {trunc(text, 80)}\n"
             "(sans reponse, elle sera rappelee a chaque session)" + hors)
 
 
@@ -2277,6 +2295,16 @@ def arg_de(args):
     return args[i + 1].strip(), args[:i] + args[i + 2:]
 
 
+def arg_carte(args):
+    """Id de carte du poste (d96) : extrait `--carte <id>`."""
+    if "--carte" not in args:
+        return None, args
+    i = args.index("--carte")
+    if i + 1 >= len(args) or not args[i + 1].strip():
+        sys.exit("--carte attend l'id de la carte du poste")
+    return args[i + 1].strip(), args[:i] + args[i + 2:]
+
+
 def arg_motif(args, pos):
     """Extrait le motif obligatoire `-m <texte>` a partir de args[pos]."""
     if len(args) <= pos + 1 or args[pos] != "-m":
@@ -2997,9 +3025,10 @@ def cli(argv):
     elif cmd == "piege-clos":
         print(cmd_piege_clos(args[0] if args else "", " ".join(args[1:])))
     elif cmd == "question":
+        carte, args = arg_carte(args)
         if not args:
-            sys.exit("usage : plantrack question <texte>")
-        ecrit(cmd_question(" ".join(args), st))
+            sys.exit("usage : plantrack question [--carte <id_carte>] <texte>")
+        ecrit(cmd_question(" ".join(args), st, carte=carte))
     elif cmd == "questions-doublons":
         cmd_questions_doublons(args, st)
     elif cmd == "echecs":
@@ -3007,8 +3036,15 @@ def cli(argv):
     elif cmd == "answer":
         de, args = arg_de(args)
         require_human("answer", de)
+        carte, args = arg_carte(args)
+        if carte:
+            # d96 : le poste ne connait que l'id de sa carte
+            qs = [q for q in st["questions"].values() if q.get("carte") == carte and q_ouverte(q)]
+            if not qs:
+                sys.exit(f"aucune question ouverte pour la carte {carte}.")
+            args = [qs[-1]["id"]] + (args or [de or "repondue"])
         if len(args) < 2:
-            sys.exit("usage : plantrack answer <question_id> <texte>")
+            sys.exit("usage : plantrack answer <question_id>|--carte <id_carte> <texte>")
         qid, text = args[0], " ".join(args[1:])
         q = st["questions"].get(qid)
         if not q:
