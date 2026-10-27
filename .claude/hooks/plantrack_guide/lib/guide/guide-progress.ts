@@ -99,6 +99,21 @@ export function verdict(p: GuideProgress, stepId: string, v: StepVerdict): Guide
   return { ...p, verdicts: { ...p.verdicts, [stepId]: v } };
 }
 
+/** Motif d'un "ko" (champ libre, GuideDeTest.tsx) — distinct du verdict lui-même : une
+ *  étape peut avoir un verdict sans motif (elle n'a pas détaillé), jamais l'inverse en
+ *  pratique, mais rien ici ne l'impose. */
+export function noterMotif(p: GuideProgress, stepId: string, motif: string): GuideProgress {
+  return { ...p, motifs: { ...p.motifs, [stepId]: motif } };
+}
+
+/** Marque le geste d'une étape comme joué — sert à `GuideDeTest.tsx` pour ne le jouer
+ *  qu'une fois (un retour arrière, ou le bilan qui saute à un point, ne doit pas le
+ *  rejouer). Idempotent : rejouer `marquerJoue` sur une étape déjà marquée ne change rien. */
+export function marquerJoue(p: GuideProgress, stepId: string): GuideProgress {
+  if (p.joues?.includes(stepId)) return p;
+  return { ...p, joues: [...(p.joues ?? []), stepId] };
+}
+
 export function sauverProgression(p: GuideProgress, storage: Storage | null): void {
   if (!storage) return;
   try {
@@ -194,6 +209,12 @@ export function chargerProgression(
 
   const index = bornerIndex(Number.isInteger(p.index) && (p.index as number) >= 0 ? (p.index as number) : 0);
   const verdicts = p.verdicts && typeof p.verdicts === "object" ? p.verdicts : {};
+  // `motifs`/`joues` sont ARRIVÉS après les progressions déjà persistées (geste + motif de
+  // ko) : une progression ancienne n'a ni l'un ni l'autre, et doit rester chargeable. Même
+  // tolérance que `verdicts` ci-dessus — un champ du mauvais type retombe sur l'état vide
+  // plutôt que de propager une forme suspecte.
+  const motifs = p.motifs && typeof p.motifs === "object" ? p.motifs : {};
+  const joues = Array.isArray(p.joues) ? p.joues.filter((j): j is string => typeof j === "string") : [];
 
   // Reprise au premier point SANS réponse (cf. bloc ci-dessus) — seulement si le point relu en
   // a déjà une : sinon on respecte l'index persisté, y compris quand elle est revenue en
@@ -202,5 +223,5 @@ export function chargerProgression(
   const premierSansReponse = etapesIds.findIndex((id) => !verdicts[id]);
   const reprise = idCourant && verdicts[idCourant] && premierSansReponse !== -1 ? premierSansReponse : index;
 
-  return { scenarioId, index: reprise, verdicts };
+  return { scenarioId, index: reprise, verdicts, motifs, joues };
 }

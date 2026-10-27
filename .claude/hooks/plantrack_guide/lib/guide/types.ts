@@ -9,6 +9,24 @@
  * l'URL. Un scénario proposé au simple survol d'une page l'aurait rendu visible à un convive.
  * ============================================================================== */
 
+/**
+ * Un geste à jouer automatiquement pour Mariella, à l'entrée d'une étape — elle n'a plus à
+ * le faire elle-même, seulement à juger le résultat. Ajouté pour le curseur animé
+ * (`GuideCurseur.tsx`) : `cible` est un sélecteur CSS résolu via `resolveTarget`
+ * (`guide-geometry.ts`), avec repli sur les `cibles` de l'étape si absent.
+ */
+export type GuideGeste = {
+  /** clic : `el.click()`. saisie : pose `valeur` dans un champ (setter natif + events React).
+   *  aller : navigue vers `url` — la visite reprend grâce à `sessionStorage` (guide-visite.ts). */
+  type: "clic" | "saisie" | "aller";
+  /** Sélecteur CSS de l'élément à actionner — absent ⇒ repli sur les `cibles` de l'étape. */
+  cible?: string;
+  /** Valeur à saisir (type "saisie" uniquement). */
+  valeur?: string;
+  /** URL de destination (type "aller" uniquement). */
+  url?: string;
+};
+
 /** Un point à vérifier : où regarder, quoi faire, ce qui doit se passer. */
 export type GuideStep = {
   /** Identifiant stable — c'est lui qui porte la progression. */
@@ -27,6 +45,12 @@ export type GuideStep = {
   action: string;
   /** Ce qu'elle doit voir si c'est bon. */
   attendu: string;
+  /** Geste à jouer automatiquement à l'entrée de l'étape (curseur animé) — absent ⇒
+   *  comportement actuel inchangé (elle fait le geste elle-même). */
+  geste?: GuideGeste;
+  /** Identifiant d'étape PlanTrack (ex. "s3") — porte le verdict vers `guide-envoi.ts`.
+   *  Absent ⇒ l'étape est ignorée de l'envoi du résultat (compte-rendu local uniquement). */
+  pt?: string;
 };
 
 /** Une livraison à valider = une suite ordonnée de points. */
@@ -51,4 +75,11 @@ export type GuideProgress = {
   index: number;
   /** Verdicts rendus, par id d'étape. */
   verdicts: Record<string, StepVerdict>;
+  /** Motif d'un verdict "ko", par id d'étape — optionnel : une progression déjà stockée
+   *  avant ce champ reste valable, `chargerProgression` est tolérant à son absence. */
+  motifs?: Record<string, string>;
+  /** Ids des étapes dont le geste (`GuideStep.geste`) a déjà été joué une fois — sans ça,
+   *  revenir sur une étape (←, bilan) le rejouerait à chaque passage. Optionnel pour la
+   *  même raison que `motifs`. */
+  joues?: string[];
 };
