@@ -2302,7 +2302,11 @@ def arg_carte(args):
     i = args.index("--carte")
     if i + 1 >= len(args) or not args[i + 1].strip():
         sys.exit("--carte attend l'id de la carte du poste")
-    return args[i + 1].strip(), args[:i] + args[i + 2:]
+    carte = args[i + 1].strip()
+    # l'id ressort dans le contexte de l'agent : un simple identifiant, rien d'autre
+    if not re.fullmatch(r"[A-Za-z0-9._:-]{1,64}", carte):
+        sys.exit("--carte : id invalide (lettres, chiffres, . _ : - ; 64 max)")
+    return carte, args[:i] + args[i + 2:]
 
 
 def arg_motif(args, pos):

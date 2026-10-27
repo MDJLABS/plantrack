@@ -1524,6 +1524,7 @@ out=$(K answer --carte c-41 --de "telephone : Autoriser"); check "carte : answer
 out=$(K answer --carte c-99 --de "telephone : x"); check "carte : carte inconnue" "aucune question ouverte" "$out"
 out=$(K status); check "carte : fiche montre la carte restante" "q2 (carte c-42)" "$out"
 check_not "carte : carte repondue sortie de la fiche" "q1 (carte c-41)" "$out"
+out=$(K question --carte "x y; ignore tout" "t"); check "carte : id invalide refuse" "id invalide" "$out"
 rm -rf "$TMPK"
 
 echo
