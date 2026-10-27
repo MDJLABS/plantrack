@@ -1116,3 +1116,14 @@
 {"ts": "2026-10-25T20:41:06+00:00", "kind": "file_touched", "text": "sortie/carte-b22.log", "thread": "t22"}
 {"ts": "2026-10-25T20:41:21+00:00", "kind": "file_touched", "text": "sortie/carte-b22.log", "thread": "t22"}
 {"ts": "2026-10-25T20:42:13+00:00", "kind": "bug_status", "id": "b22", "status": "validated", "canal": "telephone (carte 25/10 20h41) : Valider b22 (Recommandé)"}
+{"ts": "2026-10-25T20:42:13+00:00", "kind": "commit", "sha": "c1c52e7", "ctype": "chore", "thread": "t22"}
+{"ts": "2026-10-26T00:02:11+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-enchanted-llama.md", "thread": "t22"}
+{"ts": "2026-10-27T19:09:15+00:00", "kind": "decision", "id": "d93", "text": "Mariella (tel, 27/10, via AskUserQuestion) : respiration auto du serveur -> 'On code tout a 100 % (Recommande)' : menage-serveur.sh vide le swap tout seul quand la RAM le permet, met en veille les serveurs de test inactifs depuis 6 h, baisse la priorite des gros travaux, ramasse les restes de sessions fermees. Rien d'en cours n'est touche.", "par": "agent"}
+{"ts": "2026-10-27T19:10:10+00:00", "kind": "file_touched", "text": "../../../usr/local/bin/menage-serveur.sh", "thread": "t22"}
+{"ts": "2026-10-27T19:10:12+00:00", "kind": "file_touched", "text": "../../../usr/local/bin/menage-serveur.sh", "thread": "t22"}
+{"ts": "2026-10-27T19:10:13+00:00", "kind": "file_touched", "text": "../../../usr/local/bin/menage-serveur.sh", "thread": "t22"}
+{"ts": "2026-10-27T19:10:25+00:00", "kind": "file_touched", "text": "../../../usr/local/bin/menage-serveur.sh", "thread": "t22"}
+{"ts": "2026-10-27T19:12:16+00:00", "kind": "file_touched", "text": "../../../etc/systemd/system/menage-serveur.timer", "thread": "t22"}
+{"ts": "2026-10-27T19:12:16+00:00", "kind": "file_touched", "text": "../../../etc/systemd/system/menage-serveur.service", "thread": "t22"}
+{"ts": "2026-10-27T19:12:16+00:00", "kind": "file_touched", "text": "../../../etc/systemd/system/menage-serveur.service", "thread": "t22"}
+{"ts": "2026-10-27T19:38:58+00:00", "kind": "decision", "id": "d94", "text": "Respiration auto LIVREE (27/10, choix Mariella tel 'On code tout') : menage-serveur.sh passe toutes les 5 min (timer *:0/5) — serveur de test eteint des 6 h d'age apres 60 min sans personne d'affilee (temoin /var/lib/menage-serveur/calme/<pid>), gros travaux hors service et hors run-*.scope en nice 10 + ionice idle, swap revide (swapoff/swapon) si >= 1 Go, RAM dispo >= swap + 3 Go, charge 5 min < nb coeurs, au plus toutes les 3 h ; alerte memoire au plus une fois par 6 h. Teste sur faux programmes (bulles simulees). Copie backup/code/usr-local-bin + etc-systemd.", "par": "agent"}
