@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t22 : travaux sur main [11 commits]
-  fichiers recemment ecrits : sortie/carte-b22.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-enchanted-llama.md, ../../../usr/local/bin/menage-serveur.sh, ../../../etc/systemd/system/menage-serveur.timer, ../../../etc/systemd/system/menage-serveur.service, sortie/veille-admin-bases.txt
+FIL ACTIF — t22 : travaux sur main [16 commits]
+  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-enchanted-llama.md, ../../../usr/local/bin/menage-serveur.sh, ../../../etc/systemd/system/menage-serveur.timer, ../../../etc/systemd/system/menage-serveur.service, sortie/veille-admin-bases.txt, pyproject.toml
   (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -118,6 +118,8 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d93 : Mariella (tel, 27/10, via AskUserQuestion) : respiration auto du serveur -> 'On code tout a 100 % (Recommande)' : menage-serveur.sh vide le… (agent)
   d94 : Respiration auto LIVREE (27/10, choix Mariella tel 'On code tout') : menage-serveur.sh passe toutes les 5 min (timer *:0/5) — serveur de te… (agent)
   d95 : Mariella (tel, 27/10, via AskUserQuestion) : 'Ecrans d'admin des bases (Recommande)' -> 12 conteneurs studio/pg_meta/analytics/vector (proj… (agent)
+  d96 : Mariella (tel, 27/10, via AskUserQuestion) : cartes laissees de cote (b174 bcc) -> 'Petit ajout PlanTrack (Recommande)' : question --carte … (agent)
+  d97 : v1.9.28 publiee (27/10, GitHub + PyPI verifie, d96) : question --carte <id> / answer --carte <id> --de ; id restreint a [A-Za-z0-9._:-]{1,6… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…

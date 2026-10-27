@@ -1130,3 +1130,12 @@
 {"ts": "2026-10-27T19:38:58+00:00", "kind": "commit", "sha": "d954d6a", "ctype": "chore", "thread": "t22"}
 {"ts": "2026-10-27T19:42:24+00:00", "kind": "file_touched", "text": "sortie/veille-admin-bases.txt", "thread": "t22"}
 {"ts": "2026-10-27T19:42:31+00:00", "kind": "decision", "id": "d95", "text": "Mariella (tel, 27/10, via AskUserQuestion) : 'Ecrans d'admin des bases (Recommande)' -> 12 conteneurs studio/pg_meta/analytics/vector (projob, openstyle, miamboost, prorent-dev, prolearn) arretes par docker stop : +1,6 Go de memoire dispo (5744 -> 7416 Mo). Sites et donnees intacts. Liste dans sortie/veille-admin-bases.txt ; rallumer : docker start $(cat sortie/veille-admin-bases.txt). Preprod miamboost et base openstyle laissees allumees (non choisies).", "par": "agent"}
+{"ts": "2026-10-27T19:42:31+00:00", "kind": "commit", "sha": "793b4ec", "ctype": "chore", "thread": "t22"}
+{"ts": "2026-10-27T21:40:27+00:00", "kind": "decision", "id": "d96", "text": "Mariella (tel, 27/10, via AskUserQuestion) : cartes laissees de cote (b174 bcc) -> 'Petit ajout PlanTrack (Recommande)' : question --carte <id> (anti-doublon par id de carte), answer --carte <id> --de, ligne a part 'Cartes laissees de cote' dans le resume reinjecte ; la garde du Stop ne bloque pas dessus.", "par": "agent"}
+{"ts": "2026-10-27T21:42:49+00:00", "kind": "commit", "sha": "054e5a3", "ctype": "feat", "thread": "t22"}
+{"ts": "2026-10-27T21:42:49+00:00", "kind": "commit", "sha": "4678d50", "ctype": "chore", "thread": "t22"}
+{"ts": "2026-10-27T21:42:51+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t22"}
+{"ts": "2026-10-27T21:45:17+00:00", "kind": "commit", "sha": "ce89124", "ctype": "fix", "thread": "t22"}
+{"ts": "2026-10-27T21:45:17+00:00", "kind": "commit", "sha": "dd99190", "ctype": "chore", "thread": "t22"}
+{"ts": "2026-10-27T21:46:04+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t22"}
+{"ts": "2026-10-27T21:46:12+00:00", "kind": "decision", "id": "d97", "text": "v1.9.28 publiee (27/10, GitHub + PyPI verifie, d96) : question --carte <id> / answer --carte <id> --de ; id restreint a [A-Za-z0-9._:-]{1,64} ; section 'CARTES LAISSEES DE COTE' a part dans le resume et la fiche. Reponse transmise a bcc (b174).", "par": "agent"}
