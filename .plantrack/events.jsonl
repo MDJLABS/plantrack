@@ -1141,3 +1141,6 @@
 {"ts": "2026-10-27T21:46:12+00:00", "kind": "decision", "id": "d97", "text": "v1.9.28 publiee (27/10, GitHub + PyPI verifie, d96) : question --carte <id> / answer --carte <id> --de ; id restreint a [A-Za-z0-9._:-]{1,64} ; section 'CARTES LAISSEES DE COTE' a part dans le resume et la fiche. Reponse transmise a bcc (b174).", "par": "agent"}
 {"ts": "2026-10-27T21:46:12+00:00", "kind": "commit", "sha": "5d2cb63", "ctype": "chore", "thread": "t22"}
 {"ts": "2026-10-27T21:46:39+00:00", "kind": "decision", "id": "d98", "text": "Mariella (tel, 27/10, via AskUserQuestion) : apres v1.9.28 (cartes de cote), choix 'Laisser bcc finir (Recommande)' — veille silencieuse, repondre a bcc s'il ecrit.", "par": "agent"}
+{"ts": "2026-10-27T21:46:39+00:00", "kind": "commit", "sha": "c59efad", "ctype": "chore", "thread": "t22"}
+{"ts": "2026-10-27T23:22:59+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-joyful-hoare.md", "thread": "t22"}
+{"ts": "2026-10-27T23:23:55+00:00", "kind": "decision", "id": "d99", "text": "Mariella (tel, 28/10) : plan 'Rien a faire : je reste en veille' approuve apres relance auto -> veille silencieuse maintenue (d23, d85, d98), aucune carte de suite.", "par": "agent"}
