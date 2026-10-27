@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t22 : travaux sur main [10 commits]
-  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-joyful-goblet.md, sortie/carte-b22.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-enchanted-llama.md, ../../../usr/local/bin/menage-serveur.sh, ../../../etc/systemd/system/menage-serveur.timer, ../../../etc/systemd/system/menage-serveur.service
+FIL ACTIF — t22 : travaux sur main [11 commits]
+  fichiers recemment ecrits : sortie/carte-b22.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-enchanted-llama.md, ../../../usr/local/bin/menage-serveur.sh, ../../../etc/systemd/system/menage-serveur.timer, ../../../etc/systemd/system/menage-serveur.service, sortie/veille-admin-bases.txt
   (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -117,6 +117,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d92 : Mariella (tel, 25/10 20h39) : 'Vu' sur la carte veille -> veille silencieuse maintenue (d23, d85, d90), aucune carte de suite. (agent)
   d93 : Mariella (tel, 27/10, via AskUserQuestion) : respiration auto du serveur -> 'On code tout a 100 % (Recommande)' : menage-serveur.sh vide le… (agent)
   d94 : Respiration auto LIVREE (27/10, choix Mariella tel 'On code tout') : menage-serveur.sh passe toutes les 5 min (timer *:0/5) — serveur de te… (agent)
+  d95 : Mariella (tel, 27/10, via AskUserQuestion) : 'Ecrans d'admin des bases (Recommande)' -> 12 conteneurs studio/pg_meta/analytics/vector (proj… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
