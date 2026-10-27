@@ -1144,3 +1144,8 @@
 {"ts": "2026-10-27T21:46:39+00:00", "kind": "commit", "sha": "c59efad", "ctype": "chore", "thread": "t22"}
 {"ts": "2026-10-27T23:22:59+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-joyful-hoare.md", "thread": "t22"}
 {"ts": "2026-10-27T23:23:55+00:00", "kind": "decision", "id": "d99", "text": "Mariella (tel, 28/10) : plan 'Rien a faire : je reste en veille' approuve apres relance auto -> veille silencieuse maintenue (d23, d85, d98), aucune carte de suite.", "par": "agent"}
+{"ts": "2026-10-27T23:23:55+00:00", "kind": "commit", "sha": "ceae478", "ctype": "chore", "thread": "t22"}
+{"ts": "2026-10-27T23:29:56+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-ethereal-planet.md", "thread": "t22"}
+{"ts": "2026-10-27T23:47:36+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-spicy-sloth.md", "thread": "t22"}
+{"ts": "2026-10-27T23:55:11+00:00", "kind": "decision", "id": "d100", "text": "Mariella (tel, 28/10, plan approuve) : guides de test qui se jouent tout seuls — 'On code tout a 100 %' : geste (clic/saisie/aller) joue par un curseur anime dans le navigateur, resultat renvoye automatiquement a la session via bcc POST /guide/resultat avec jeton a usage unique (plantrack guide-lien / guide-resultat), copier-coller garde en secours.", "par": "agent"}
+{"ts": "2026-10-27T23:55:11+00:00", "kind": "bug", "id": "b24", "text": "mdjlabs-site : la synchro du moteur de guide a ecrase guide-verdict.ts — guide-envoi.ts et ses tests importent compteRenduMarkdown et prog.notes, absents du moteur commun (envoi automatique du 25/07 casse).", "thread": "t22", "severity": "normal", "par": "agent"}

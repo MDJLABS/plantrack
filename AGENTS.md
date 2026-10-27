@@ -14,13 +14,16 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t22 : travaux sur main [18 commits]
-  fichiers recemment ecrits : ../../../usr/local/bin/menage-serveur.sh, ../../../etc/systemd/system/menage-serveur.timer, ../../../etc/systemd/system/menage-serveur.service, sortie/veille-admin-bases.txt, pyproject.toml, ../../../root/.claude/plans/contexte-reconstruit-par-le-joyful-hoare.md
+FIL ACTIF — t22 : travaux sur main [19 commits]
+  fichiers recemment ecrits : ../../../etc/systemd/system/menage-serveur.service, sortie/veille-admin-bases.txt, pyproject.toml, ../../../root/.claude/plans/contexte-reconstruit-par-le-joyful-hoare.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-ethereal-planet.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-spicy-sloth.md
   (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
   t5 : travaux sur main — reprise : retour au travail courant apres la faille
+
+BUGS NON CORRIGES (personne ne s'en est occupe) :
+  b24 (open) [t22] mdjlabs-site : la synchro du moteur de guide a ecrase guide-verdict.ts — guide-envoi.ts et ses tests importent compteRenduMarkdown et prog.… (agent)
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
@@ -122,6 +125,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d97 : v1.9.28 publiee (27/10, GitHub + PyPI verifie, d96) : question --carte <id> / answer --carte <id> --de ; id restreint a [A-Za-z0-9._:-]{1,6… (agent)
   d98 : Mariella (tel, 27/10, via AskUserQuestion) : apres v1.9.28 (cartes de cote), choix 'Laisser bcc finir (Recommande)' — veille silencieuse, r… (agent)
   d99 : Mariella (tel, 28/10) : plan 'Rien a faire : je reste en veille' approuve apres relance auto -> veille silencieuse maintenue (d23, d85, d98… (agent)
+  d100 : Mariella (tel, 28/10, plan approuve) : guides de test qui se jouent tout seuls — 'On code tout a 100 %' : geste (clic/saisie/aller) joue pa… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
