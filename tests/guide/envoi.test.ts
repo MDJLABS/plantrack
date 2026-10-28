@@ -19,7 +19,8 @@
 //     --import ./tests/guide/support/register.mjs tests/guide/envoi.test.ts
 
 import assert from "node:assert/strict";
-import { corpsEnvoi, envoyerResultat } from "../../.claude/hooks/plantrack_guide/lib/guide/guide-envoi";
+import { corpsEnvoi, dejaEnvoye, envoyerResultat, marquerEnvoye } from "../../.claude/hooks/plantrack_guide/lib/guide/guide-envoi";
+import type { StorageVisite } from "../../.claude/hooks/plantrack_guide/lib/guide/guide-visite";
 import type { GuideProgress, GuideScenario } from "../../.claude/hooks/plantrack_guide/lib/guide/types";
 
 // Les pas qui touchent `envoyerResultat` remplacent le `fetch` GLOBAL (pas d'injection de
@@ -177,6 +178,33 @@ step("envoyerResultat : fetch qui lève (réseau coupé) → { ok: false }, jama
   } finally {
     restaurer();
   }
+});
+
+// --- 3. dejaEnvoye() / marquerEnvoye() — mémoire « déjà envoyé », un seul par scénario ----
+
+function storageMemoire(): StorageVisite {
+  const table = new Map<string, string>();
+  return {
+    getItem: (k) => table.get(k) ?? null,
+    setItem: (k, v) => table.set(k, v),
+    removeItem: (k) => table.delete(k),
+  };
+}
+
+step("dejaEnvoye : storage null → false, jamais une exception", () => {
+  assert.equal(dejaEnvoye(null, "guide-x"), false);
+});
+step("dejaEnvoye : rien marqué → false", () => {
+  assert.equal(dejaEnvoye(storageMemoire(), "guide-x"), false);
+});
+step("marquerEnvoye puis dejaEnvoye → true pour CE scénario, false pour un autre", () => {
+  const storage = storageMemoire();
+  marquerEnvoye(storage, "guide-x");
+  assert.equal(dejaEnvoye(storage, "guide-x"), true);
+  assert.equal(dejaEnvoye(storage, "guide-y"), false, "un scénario envoyé ne doit pas en couvrir un autre");
+});
+step("marquerEnvoye : storage null → ne lève jamais", () => {
+  assert.doesNotThrow(() => marquerEnvoye(null, "guide-x"));
 });
 
 await tout();
