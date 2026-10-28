@@ -20,7 +20,7 @@
  * correspondance dans le plan), et un point sans réponse n'a pas de verdict à transmettre.
  * ============================================================================== */
 
-import { validerPoste } from "./guide-visite";
+import { validerPoste, type StorageVisite } from "./guide-visite";
 import type { GuideProgress, GuideScenario, StepVerdict } from "./types";
 
 export type VerdictEnvoi = { pt: string; verdict: StepVerdict; motif?: string };
@@ -94,5 +94,38 @@ export async function envoyerResultat(poste: string, projet: string, corps: Corp
     return { ok: false, message: abandonne ? "délai dépassé (10 s)" : "envoi impossible" };
   } finally {
     clearTimeout(minuteur);
+  }
+}
+
+/* ------------------------------------------------------------------------------------------
+ * Mémoire « déjà envoyé » (lot « curseur animé ») — `GuideDeTest.tsx` envoie automatiquement
+ * au bilan, mais UNE SEULE FOIS par onglet : sans ça, chaque réouverture du bilan (bouton
+ * « Revoir les points » suivi d'une réponse) retenterait un envoi déjà réussi. Portée
+ * `sessionStorage`, comme le reste de la persistance de visite (`guide-visite.ts`) — jamais
+ * `localStorage`, où vit la PROGRESSION : fermer l'onglet remet la mémoire d'envoi à zéro,
+ * exactement comme la visite elle-même.
+ * ------------------------------------------------------------------------------------------ */
+
+const CLE_SESSION_ENVOYE = "mdj_guide_session_envoye";
+
+/** `true` si CE scénario a déjà été envoyé avec succès dans cette session — jamais fatal
+ *  (même motif que tout accès stockage de ce dépôt). */
+export function dejaEnvoye(storage: StorageVisite | null, scenarioId: string): boolean {
+  if (!storage) return false;
+  try {
+    return storage.getItem(CLE_SESSION_ENVOYE) === scenarioId;
+  } catch {
+    return false;
+  }
+}
+
+/** Marque CE scénario comme envoyé — appelé UNIQUEMENT après un `envoyerResultat` réussi. */
+export function marquerEnvoye(storage: StorageVisite | null, scenarioId: string): void {
+  if (!storage) return;
+  try {
+    storage.setItem(CLE_SESSION_ENVOYE, scenarioId);
+  } catch {
+    // Stockage indisponible : l'envoi a quand même réussi, seule cette mémoire est perdue —
+    // au pire, un prochain passage par le bilan retentera un envoi déjà fait, jamais fatal.
   }
 }

@@ -79,12 +79,16 @@ import { createPortal } from "react-dom";
 import { useSearchParams } from "next/navigation";
 import { placeBubble, resolveTarget, type Rect } from "@/lib/guide/guide-geometry";
 import {
-  accederLocalStorage, avancer, chargerProgression, oublierProgression,
+  accederLocalStorage, avancer, chargerProgression, marquerJoue, noterMotif, oublierProgression,
   oublierToutesLesProgressions, reculer, sauverProgression, verdict, vide,
 } from "@/lib/guide/guide-progress";
 import { indexDePoint, SCENARIOS } from "@/lib/guide/scenarios";
 import { verdictScenario } from "@/lib/guide/guide-verdict";
 import { construireCompteRendu } from "@/lib/guide/guide-compte-rendu";
+import { corpsEnvoi, dejaEnvoye, envoyerResultat, marquerEnvoye } from "@/lib/guide/guide-envoi";
+import { accederSessionStorage, type InfosEnvoi } from "@/lib/guide/guide-visite";
+import { GuideCurseur } from "./GuideCurseur";
+import type { ResultatGeste } from "@/lib/guide/guide-geste";
 import type { GuideScenario, GuideProgress } from "@/lib/guide/types";
 
 const BULLE: { w: number; h: number } = { w: 360, h: 250 };
@@ -119,10 +123,14 @@ const C = {
 
 export function GuideDeTest({
   scenario,
+  envoi,
   onFermerDefinitivement,
 }: {
   /** Déjà résolu par `GuideDeTestLazy` (`resoudreVisite`) — jamais recalculé ici. */
   scenario: GuideScenario;
+  /** Déjà résolu par `GuideDeTestLazy` (`resoudreEnvoi`) — `null` si aucune session
+   *  d'envoi n'est active (reprise sans paramètres, ou paramètres invalides). */
+  envoi: InfosEnvoi | null;
   /** Efface la persistance de session ET synchronise `GuideDeTestLazy` — appelé
    *  UNIQUEMENT par le ✕ « Fermer le guide », jamais par « Replier ». */
   onFermerDefinitivement: () => void;
@@ -145,6 +153,7 @@ export function GuideDeTest({
       ? (
         <Visite
           scenario={scenario}
+          envoi={envoi}
           point={params.get("point")}
           onReplier={() => setOuvert(false)}
           // ⚠️ Retour de Mariella du 26/07 : « si je ferme l'overlay je veux un bouton pour
@@ -232,8 +241,10 @@ function BoutonOuvrir({ scenario, onOpen, onQuitter }: {
   );
 }
 
-function Visite({ scenario, point, onReplier, onFermer, onTerminer }: {
+function Visite({ scenario, envoi, point, onReplier, onFermer, onTerminer }: {
   scenario: GuideScenario;
+  /** Session d'envoi active, ou `null` — cf. `GuideDeTest` ci-dessus. */
+  envoi: InfosEnvoi | null;
   /** Étape à ouvrir d'emblée (`?point=<stepId>`) — pour faire re-vérifier UN point corrigé. */
   point: string | null;
   /** Replier : la pastille reste, la visite CONTINUE (session intacte). */
@@ -259,6 +270,24 @@ function Visite({ scenario, point, onReplier, onFermer, onTerminer }: {
   // "echec", qui fait apparaître le repli (textarea en lecture seule, pré-sélectionnée).
   const [etatCopie, setEtatCopie] = useState<"idle" | "ok" | "echec">("idle");
   const secoursRef = useRef<HTMLTextAreaElement | null>(null);
+
+  // Curseur animé (lot « curseur animé ») — joue le geste de l'étape (`etape.geste`) à la
+  // place de Mariella. `curseurCle` force un REMONTAGE de `GuideCurseur` (sa propre garde
+  // anti-double-jeu, `dejaJoue`, ne doit repartir que sur un geste VOULU — un nouveau
+  // montage, pas une mise à jour de props) : changement d'étape, ou bouton « Rejouer ».
+  const [curseurVisible, setCurseurVisible] = useState(false);
+  const [curseurCle, setCurseurCle] = useState(0);
+  const [gesteRaison, setGesteRaison] = useState<string | null>(null);
+
+  // Motif d'un "ko" — champ posé APRÈS avoir noté "ko" (cf. `noter` plus bas), jamais avant :
+  // le verdict est acquis dès le clic, le motif n'est qu'un détail optionnel qui s'y ajoute.
+  const [motifActif, setMotifActif] = useState(false);
+  const [motifSaisie, setMotifSaisie] = useState("");
+
+  // Envoi automatique du résultat au bilan — "idle" tant que le bilan n'est pas affiché (ou
+  // qu'aucune session d'envoi n'est active), puis "envoi" → "ok"/"echec". Le bouton Copier
+  // reste dans tous les cas le filet de sécurité (cf. bandeau de `guide-envoi.ts`).
+  const [etatEnvoi, setEtatEnvoi] = useState<"idle" | "envoi" | "ok" | "echec">("idle");
 
   // Reprise « là où elle s'est arrêtée » — lue APRÈS montage (localStorage n'existe pas
   // au rendu serveur).
@@ -330,7 +359,7 @@ function Visite({ scenario, point, onReplier, onFermer, onTerminer }: {
 
   // Réponses BRUTES, point par point, AUCUNE conclusion (cf. guide-compte-rendu.ts) — ce
   // que le bouton « Copier » ci-dessous met dans le presse-papier.
-  const texteCompteRendu = construireCompteRendu(scenario.id, scenario.etapes, prog.verdicts);
+  const texteCompteRendu = construireCompteRendu(scenario.id, scenario.etapes, prog.verdicts, prog.motifs);
 
   // Repartir de « idle » à chaque nouvelle ouverture du bilan : un « ✓ Copié » qui traîne
   // d'un tour précédent mentirait sur l'état courant du presse-papier.
@@ -355,6 +384,41 @@ function Visite({ scenario, point, onReplier, onFermer, onTerminer }: {
       setEtatCopie("echec");
     }
   };
+
+  // Envoi automatique au bilan, UNE SEULE FOIS par session (`dejaEnvoye`, sessionStorage —
+  // cf. guide-envoi.ts) — jamais à la place du bouton Copier, en complément : un échec
+  // réseau laisse `etatEnvoi` à "echec" et le bouton Copier reste disponible juste au-dessus.
+  //
+  // Dépendances sur les CHAMPS de `envoi` (pas l'objet) : `envoi` est recalculé à chaque
+  // rendu par `resoudreEnvoi` (GuideDeTestLazy.tsx) — une dépendance sur sa référence
+  // réexécuterait cet effet à CHAQUE rendu du layout parent, et retenterait l'envoi à
+  // chaque échec. `prog` n'est volontairement PAS en dépendance : les verdicts envoyés sont
+  // ceux au moment où le bilan s'affiche ; revenir sur un point puis rouvrir le bilan (donc
+  // repasser `ecranBilan` par `false` puis `true`) relit `prog` à ce moment-là, via la
+  // fermeture de l'effet — c'est `ecranBilan` qui porte le redéclenchement, pas `prog`.
+  useEffect(() => {
+    if (!ecranBilan || !envoi) return;
+    const storage = accederSessionStorage();
+    if (dejaEnvoye(storage, scenario.id)) {
+      setEtatEnvoi("ok");
+      return;
+    }
+    let annule = false;
+    setEtatEnvoi("envoi");
+    (async () => {
+      const corps = corpsEnvoi(scenario, prog, envoi.jeton);
+      const r = await envoyerResultat(envoi.poste, envoi.projet, corps);
+      if (annule) return;
+      if (r.ok) {
+        marquerEnvoye(storage, scenario.id);
+        setEtatEnvoi("ok");
+      } else {
+        setEtatEnvoi("echec");
+      }
+    })();
+    return () => { annule = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- cf. commentaire ci-dessus : `prog`/`envoi` volontairement hors deps
+  }, [ecranBilan, envoi?.jeton, envoi?.poste, envoi?.projet, scenario.id]);
 
   // Suivi de la cible : elle bouge (défilement, changement d'état après une bascule).
   // Une boucle d'animation plutôt que des écouteurs : le DOM change ici pour des raisons
@@ -390,6 +454,25 @@ function Visite({ scenario, point, onReplier, onFermer, onTerminer }: {
     el?.scrollIntoView({ block: "center", inline: "nearest", behavior: "smooth" });
   }, [etape]);
 
+  // Curseur animé : à l'entrée d'une étape qui porte un geste ET ne l'a pas déjà joué
+  // (`prog.joues`), on le montre automatiquement — une étape déjà jouée (retour arrière,
+  // bilan qui saute à un point) ne le rejoue QUE si Mariella clique « Rejouer » (ci-dessous).
+  // Clé dépendante d'`etape.id` SEUL (volontairement) : relire `prog.joues` à chaque frappe
+  // de `prog` (un motif saisi, un autre verdict…) n'a aucune raison de redéclencher quoi que
+  // ce soit — seul un changement d'ÉTAPE doit décider de montrer ou non le curseur.
+  useEffect(() => {
+    setGesteRaison(null);
+    setMotifActif(false);
+    setMotifSaisie("");
+    if (etape.geste && !prog.joues?.includes(etape.id)) {
+      setCurseurVisible(true);
+      setCurseurCle((c) => c + 1);
+    } else {
+      setCurseurVisible(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- un seul passage par ÉTAPE, cf. commentaire ci-dessus
+  }, [etape.id]);
+
   // ⚠️ Invariant 4 : Échap ne ferme PAS la visite. Aucun `onKeyDown` ici, volontairement —
   // en ajouter un pour intercepter Échap casserait le test qu'elle sert justement à faire.
 
@@ -397,10 +480,52 @@ function Visite({ scenario, point, onReplier, onFermer, onTerminer }: {
   const v = prog.verdicts[etape.id];
 
   const noter = (val: "ok" | "ko") => {
+    const p = verdict(prog, etape.id, val);
+    if (val === "ko") {
+      // Le "ko" est acquis tout de suite (`maj`), mais n'avance PAS encore : le petit champ
+      // de motif (#guide-motif) s'ouvre, et c'est sa confirmation (`confirmerMotif`) qui fait
+      // avancer — même séquence qu'avant pour "ok", juste différée d'un geste pour "ko".
+      maj(p);
+      setMotifActif(true);
+      setMotifSaisie("");
+      return;
+    }
     // Une seule écriture localStorage : `avancer()` est appliqué au résultat de `verdict()`
     // avant le `maj()` unique, plutôt que d'écrire deux fois pour une seule action.
-    const p = verdict(prog, etape.id, val);
     maj(prog.index < total - 1 ? avancer(p, total) : p);
+  };
+
+  /** Confirme (ou saute) le motif saisi pour le "ko" en cours, puis avance — reprend
+   *  exactement la séquence que `noter("ok")` fait en un seul geste. Un motif vide n'est
+   *  pas une erreur : le champ est facultatif, seul le verdict "ko" lui-même est obligé. */
+  const confirmerMotif = () => {
+    const texte = motifSaisie.trim();
+    const p = texte ? noterMotif(prog, etape.id, texte) : prog;
+    setMotifActif(false);
+    setMotifSaisie("");
+    maj(prog.index < total - 1 ? avancer(p, total) : p);
+  };
+
+  /** Juste avant que `GuideCurseur` ne joue le geste — cf. son bandeau de tête : marquer
+   *  l'étape jouée et PERSISTER avant le geste, jamais après (un geste "aller" décharge la
+   *  page tout de suite). */
+  const avantGeste = useCallback(() => {
+    maj(marquerJoue(prog, etape.id));
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- `prog`/`etape` lus à l'appel, cf. `GuideCurseur`
+  }, [maj, prog, etape.id]);
+
+  const gesteJoue = (resultat: ResultatGeste) => {
+    setCurseurVisible(false);
+    setGesteRaison(resultat.ok ? null : (resultat.raison ?? "le geste a échoué"));
+  };
+
+  /** Bouton « Rejouer » (#guide-rejouer) : repasse le curseur, QUOI QUE `prog.joues` dise —
+   *  `curseurCle` force un remontage de `GuideCurseur`, dont la garde anti-double-jeu
+   *  (`dejaJoue`) ne concerne qu'UN montage, jamais les montages suivants. */
+  const rejouerGeste = () => {
+    setGesteRaison(null);
+    setCurseurVisible(true);
+    setCurseurCle((c) => c + 1);
   };
 
   return (
@@ -431,6 +556,17 @@ function Visite({ scenario, point, onReplier, onFermer, onTerminer }: {
         />
         );
       })()}
+
+      {curseurVisible && etape.geste && !ecranBilan && (
+        <GuideCurseur
+          key={`${etape.id}:${curseurCle}`}
+          depart={{ x: pos.left + tailleBulle.w / 2, y: pos.top + tailleBulle.h / 2 }}
+          geste={etape.geste}
+          ciblesRepli={etape.cibles ?? []}
+          onAvantAction={avantGeste}
+          onJoue={gesteJoue}
+        />
+      )}
 
       <section
         id="guide-bulle"
@@ -463,6 +599,17 @@ function Visite({ scenario, point, onReplier, onFermer, onTerminer }: {
             title="Recommencer depuis le premier point"
             style={{ ...btn, padding: "2px 7px", color: C.doux }}
           >↻</button>
+          {/* Le curseur animé ne joue le geste qu'une fois (`prog.joues`) — ce bouton permet
+              de le REJOUER à la demande, par ex. après avoir corrigé la cible sur la page. */}
+          {etape.geste && !ecranBilan && (
+            <button
+              id="guide-rejouer"
+              onClick={rejouerGeste}
+              aria-label="Rejouer le geste"
+              title="Rejouer le geste automatique"
+              style={{ ...btn, padding: "2px 7px", color: C.doux }}
+            >▶</button>
+          )}
           {/* Replier ≠ Fermer (tâche 11) : replier garde la visite ACTIVE (la pastille la
               rouvre, y compris après un changement de page) ; fermer efface la persistance
               de session — sans cette distinction, impossible de quitter le guide pour de
@@ -495,6 +642,17 @@ function Visite({ scenario, point, onReplier, onFermer, onTerminer }: {
           }}>
             La zone décrite n&rsquo;est pas visible sur cette page — la consigne reste
             valable, mais rien n&rsquo;est encadré.
+          </p>
+        )}
+
+        {gesteRaison && !ecranBilan && (
+          // Invariant 2, même esprit que ci-dessus : le geste automatique a échoué, on ne
+          // prétend jamais qu'il a réussi. Mariella juge le point elle-même (✓/✗ ci-dessous).
+          <p style={{
+            margin: "0 0 8px", padding: "6px 8px", borderRadius: 6,
+            background: C.koSoft, color: C.ko, fontSize: 12,
+          }}>
+            Le geste automatique a échoué : {gesteRaison}. Juge le point toi-même.
           </p>
         )}
 
@@ -536,6 +694,20 @@ function Visite({ scenario, point, onReplier, onFermer, onTerminer }: {
                   </li>
                 ))}
               </ul>
+            )}
+
+            {envoi && (
+              // Envoi automatique en complément du bouton Copier, jamais à sa place (cf.
+              // bandeau de `guide-envoi.ts`) — un échec ("echec") laisse le bouton et son
+              // repli disponibles juste en dessous.
+              <p id="guide-envoi-etat" style={{
+                margin: "0 0 8px", fontSize: 11.5,
+                color: etatEnvoi === "ok" ? C.ok : etatEnvoi === "echec" ? C.ko : C.doux,
+              }}>
+                {etatEnvoi === "envoi" && "Envoi du résultat à la session en cours…"}
+                {etatEnvoi === "ok" && "✓ Résultat envoyé à la session"}
+                {etatEnvoi === "echec" && "Envoi impossible — copie le compte-rendu ci-dessous"}
+              </p>
             )}
 
             <p style={{ margin: "0 0 8px", color: C.doux }}>
@@ -605,6 +777,30 @@ function Visite({ scenario, point, onReplier, onFermer, onTerminer }: {
               aria-label="Point suivant"
               style={{ ...btn, opacity: prog.index >= total - 1 ? .35 : 1, color: C.doux }}
             >→</button>
+          </div>
+        )}
+
+        {motifActif && !ecranBilan && (
+          // Posé APRÈS le "ko" (cf. `noter`) — facultatif : Mariella peut valider sans rien
+          // écrire, le verdict est déjà acquis, ce champ ne fait qu'ajouter un détail.
+          <div style={{ marginTop: 8, display: "flex", gap: 6 }}>
+            <input
+              id="guide-motif"
+              type="text"
+              value={motifSaisie}
+              onChange={(e) => setMotifSaisie(e.target.value)}
+              placeholder="Motif de l'écart (facultatif)"
+              style={{
+                flex: 1, padding: "6px 8px", borderRadius: 6,
+                border: `1px solid ${C.bord}`, background: "transparent", color: C.texte,
+                font: "400 12px/1.3 var(--font-sans, var(--sans, system-ui, sans-serif))",
+              }}
+            />
+            <button
+              id="guide-motif-confirmer"
+              onClick={confirmerMotif}
+              style={{ ...btn, borderColor: C.ko, color: C.ko }}
+            >Valider</button>
           </div>
         )}
 
