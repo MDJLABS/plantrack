@@ -20,6 +20,7 @@
  * correspondance dans le plan), et un point sans réponse n'a pas de verdict à transmettre.
  * ============================================================================== */
 
+import { validerPoste } from "./guide-visite";
 import type { GuideProgress, GuideScenario, StepVerdict } from "./types";
 
 export type VerdictEnvoi = { pt: string; verdict: StepVerdict; motif?: string };
@@ -61,12 +62,24 @@ const DELAI_MS = 10_000;
  * faire), avec un délai de 10 s. Ne lève JAMAIS : réseau coupé, serveur éteint, délai
  * dépassé, réponse non-2xx — tout rend `{ ok: false, message }`, jamais une exception.
  * `GuideDeTest.tsx` garde dans tous les cas le bouton Copier comme filet de sécurité.
+ *
+ * ⚠️ Revalide `poste` via `validerPoste` (`guide-visite.ts`) — DÉFENSE EN PROFONDEUR :
+ * `poste` a déjà dû passer cette même validation en amont (`resoudreEnvoi`), mais une
+ * valeur qui arrive en paramètre de fonction ne doit jamais être supposée fiable juste
+ * parce qu'un appelant l'a validée plus haut dans la pile — le même principe que « un
+ * accès stockage ne lève jamais » appliqué à la frontière entre modules. L'URL finale est
+ * construite avec l'API `URL` (jamais par concaténation de chaînes) : `poste`/`projet` ne
+ * peuvent alors plus injecter de chemin, de query, ni de fragment supplémentaires.
  */
 export async function envoyerResultat(poste: string, projet: string, corps: CorpsEnvoi): Promise<ResultatEnvoi> {
+  const origine = validerPoste(poste);
+  if (!origine) return { ok: false, message: "destination invalide" };
+
   const controleur = new AbortController();
   const minuteur = setTimeout(() => controleur.abort(), DELAI_MS);
   try {
-    const url = `${poste}/guide/resultat?projet=${encodeURIComponent(projet)}`;
+    const url = new URL("/guide/resultat", origine);
+    url.searchParams.set("projet", projet);
     const reponse = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

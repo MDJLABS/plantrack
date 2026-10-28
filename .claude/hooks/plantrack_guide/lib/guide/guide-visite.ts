@@ -161,28 +161,88 @@ const CLE_SESSION_ENVOI = "mdj_guide_session_envoi";
 /** Les trois informations nécessaires pour envoyer un résultat (cf. `guide-envoi.ts`). */
 export type InfosEnvoi = { jeton: string; poste: string; projet: string };
 
+/** Jeton : longueur bornée et alphabet restreint — c'est une valeur qui transite par
+ *  l'URL ET revient dans le corps d'une requête POST (`guide-envoi.ts`) ; lui interdire
+ *  tout caractère hors `[A-Za-z0-9_-]` retire d'emblée toute tentative d'y faire passer
+ *  autre chose qu'un jeton (espaces, guillemets, séquences d'échappement…). 1 à 200 : un
+ *  jeton réel tient largement dedans, 200 écarte un collage accidentel d'un bloc entier. */
+const JETON_RE = /^[A-Za-z0-9_-]{1,200}$/;
+
+/** Hôtes locaux tolérés en clair (`http:`) — développement uniquement. `[::1]` : forme
+ *  EXACTE que `new URL(...).hostname` rend pour le loopback IPv6 (crochets inclus). */
+const HOTES_LOCAUX = new Set(["localhost", "127.0.0.1", "[::1]"]);
+
 /**
- * Décide les infos d'envoi actives, avec la MÊME priorité que `resoudreVisite` : les trois
- * paramètres d'URL s'ils sont TOUS présents (explicite, l'emporte toujours — et c'est le
- * seul cas qui doit écrire la session) ; sinon le contenu de session déjà lu, s'il est
- * valide ; sinon rien. Les trois paramètres sont exigés ENSEMBLE : un `retour` sans `poste`
- * ne désignerait aucune destination, un `poste` sans `jeton` n'authentifierait rien — une
- * combinaison partielle n'est pas une commande explicite valable, on retombe sur la session.
+ * Valide `poste` (l'URL de base de la session qui a ouvert le guide) et rend son
+ * **origine normalisée** (`https://exemple.com`, jamais de chemin/query/hash — même si
+ * `poste` en portait) ; `null` si `poste` n'est pas une destination sûre.
+ *
+ * Refuse, dans l'ordre :
+ * - une chaîne qui n'est pas une URL ABSOLUE valide (`new URL` lève) — élimine d'office
+ *   tout schéma dangereux qui n'a pas d'autorité (`javascript:alert(1)` n'a pas d'origine
+ *   analysable de la même façon, et échoue ici) ;
+ * - un protocole qui n'est NI `https:` NI (`http:` + hôte local) — `javascript:`, `data:`,
+ *   `file:`, ou un `http:` vers un hôte distant (le jeton transite en clair) sont refusés ;
+ * - un userinfo non vide (`https://user:pass@hote/`) — un `poste` qui embarque des
+ *   identifiants dans l'URL n'est pas une forme qu'on accepte de relayer tel quel.
+ *
+ * Partagée par `resoudreEnvoi`/`parserInfosEnvoi` ICI et par `envoyerResultat`
+ * (`guide-envoi.ts`, défense en profondeur — ne jamais supposer qu'une valeur déjà
+ * « validée » plus haut dans l'appel reste fiable une fois passée en paramètre).
+ */
+export function validerPoste(poste: string): string | null {
+  let url: URL;
+  try {
+    url = new URL(poste);
+  } catch {
+    return null;
+  }
+  if (url.username || url.password) return null; // userinfo refusé, cf. ci-dessus
+  const local = HOTES_LOCAUX.has(url.hostname);
+  if (url.protocol !== "https:" && !(url.protocol === "http:" && local)) return null;
+  return url.origin; // origine SEULE : jamais le chemin/query/hash d'entrée
+}
+
+/**
+ * Décide les infos d'envoi actives.
+ *
+ * ⚠️ Gardée par la VISITE elle-même : `decisionVisite` (le résultat de `resoudreVisite`
+ * sur CETTE page) doit être non nul — sans guide activement monté (ni explicite ni
+ * repris), aucune info d'envoi n'est jamais rendue, quoi que l'URL ou la session
+ * prétendent par ailleurs. Et l'ÉCRITURE de la session d'envoi n'a lieu que si CE rendu
+ * est l'ouverture EXPLICITE et valide du guide (`decisionVisite.ecrireSession`) — jamais
+ * sur une simple reprise : lire `retour`/`poste`/`projet` sur une page quelconque qui ne
+ * porte même pas de `?guide=` valide ne doit rien pouvoir déclencher.
+ *
+ * Même priorité que `resoudreVisite` sinon : les trois paramètres d'URL s'ils sont TOUS
+ * présents ET valides individuellement (jeton, poste) ; sinon le contenu de session déjà
+ * lu, s'il est valide ; sinon rien. Un paramètre présent mais invalide retombe sur la
+ * session plutôt que de faire échouer toute la résolution (même politique que
+ * `resoudreVisite` pour un `?guide=` fautif).
  */
 export function resoudreEnvoi(
+  decisionVisite: DecisionMontage,
   paramRetour: string | null | undefined,
   paramPoste: string | null | undefined,
   paramProjet: string | null | undefined,
   contenuSessionEnvoi: string | null | undefined,
 ): InfosEnvoi | null {
-  if (paramRetour && paramPoste && paramProjet) {
-    return { jeton: paramRetour, poste: paramPoste, projet: paramProjet };
+  if (!decisionVisite) return null; // aucun guide actif : rien, jamais
+
+  if (decisionVisite.ecrireSession && paramRetour && paramPoste && paramProjet) {
+    const poste = validerPoste(paramPoste);
+    if (poste && JETON_RE.test(paramRetour)) {
+      return { jeton: paramRetour, poste, projet: paramProjet };
+    }
   }
   return parserInfosEnvoi(contenuSessionEnvoi);
 }
 
-/** Relecture tolérante — un contenu absent, illisible, ou aux champs incomplets rend
- *  `null` plutôt qu'une donnée d'envoi à moitié vraie (jamais de `poste` vide, par ex.). */
+/** Relecture tolérante — un contenu absent, illisible, aux champs incomplets, ou dont le
+ *  `poste`/`jeton` ne passe plus `validerPoste`/`JETON_RE` rend `null` plutôt qu'une
+ *  donnée d'envoi à moitié vraie. Revalider ICI (et pas seulement à l'écriture) couvre une
+ *  clé `sessionStorage` FORGÉE à la main — même esprit que `getScenario` pour la visite :
+ *  une entrée de stockage ne doit jamais valoir mieux qu'un paramètre d'URL direct. */
 function parserInfosEnvoi(contenu: string | null | undefined): InfosEnvoi | null {
   if (!contenu) return null;
   let o: unknown;
@@ -193,10 +253,10 @@ function parserInfosEnvoi(contenu: string | null | undefined): InfosEnvoi | null
   }
   if (!o || typeof o !== "object") return null;
   const { jeton, poste, projet } = o as Partial<InfosEnvoi>;
-  if (typeof jeton === "string" && jeton && typeof poste === "string" && poste && typeof projet === "string" && projet) {
-    return { jeton, poste, projet };
-  }
-  return null;
+  if (typeof jeton !== "string" || typeof poste !== "string" || typeof projet !== "string" || !projet) return null;
+  const posteValide = validerPoste(poste);
+  if (!posteValide || !JETON_RE.test(jeton)) return null;
+  return { jeton, poste: posteValide, projet };
 }
 
 /** Lit la clé de session d'envoi — même repli que `lireVisiteSession` (jamais fatal). */
