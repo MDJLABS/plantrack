@@ -22,6 +22,7 @@ import importlib.util
 import json
 import os
 import re
+import secrets
 import shlex
 import shutil
 import subprocess
@@ -29,6 +30,7 @@ import sys
 import tempfile
 import time
 from datetime import datetime, timedelta, timezone
+from urllib.parse import quote
 
 # ---------------------------------------------------------------- configuration
 
@@ -170,7 +172,7 @@ def project():
     """Rejoue le journal et renvoie l'etat courant."""
     st = {"threads": {}, "bugs": {}, "decisions": [], "inbox": [], "active": None,
           "phases": {}, "tasks": {}, "pieges": {}, "questions": {}, "testcheck": False,
-          "guides": {}, "steps": {}, "parcours": {}, "tri_plus_tard": ""}
+          "guides": {}, "steps": {}, "parcours": {}, "tri_plus_tard": "", "jetons": {}}
     for ev in read_events():
         k = ev.get("kind") if isinstance(ev, dict) else None
         if k is None:
@@ -284,6 +286,14 @@ def project():
         elif k == "check":
             if (s := st["steps"].get(ev["id"])):
                 s["verdict"], s["motif"], s["canal"] = ev.get("verdict"), ev.get("text"), ev.get("canal")
+        elif k == "guide_jeton":
+            # jamais le jeton en clair ici : seul son hash sha256 est journalise (b24/d100)
+            st["jetons"][ev.get("hash", "")] = {"hash": ev.get("hash"), "guide": ev.get("guide"),
+                                                 "consumed": False, "ts": ev["ts"]}
+        elif k == "guide_jeton_consomme":
+            j = st["jetons"].get(ev.get("hash", ""))
+            if j:
+                j["consumed"] = True
         elif k == "parcours_defini":
             st["parcours"][ev.get("text", "")] = {
                 "id": ev["id"], "nom": ev.get("text", ""), "ts": ev["ts"],
@@ -758,6 +768,138 @@ def cmd_check(sid, verdict, motif, st, canal=None):
             + (f" (canal : {trunc(canal, 60)})" if canal else ""))
 
 
+def arg_opt(args, name):
+    """Extrait une option generique `--<name> <valeur>` (premiere occurrence) :
+    meme esprit qu'arg_de/arg_carte, mais reutilisable pour --url/--poste/--scenario."""
+    flag = f"--{name}"
+    if flag not in args:
+        return None, args
+    i = args.index(flag)
+    if i + 1 >= len(args) or not args[i + 1].strip():
+        sys.exit(f"{flag} attend une valeur.")
+    return args[i + 1].strip(), args[:i] + args[i + 2:]
+
+
+def poste_base():
+    """Adresse du poste bcc pour un lien de guide web (b24/d100) — meme source que
+    hook/poste.ts::lirePoste cote bcc : un fichier simple ~/.bcc-poste/poste.json
+    (champ `adresse`), sinon le meme repli local que repondre.ts (127.0.0.1,
+    BCC_PORT ou 8787 — le poste local n'a rien a authentifier)."""
+    chemin = os.path.join(os.path.expanduser("~"), ".bcc-poste", "poste.json")
+    try:
+        with open(chemin, encoding="utf-8") as f:
+            brut = json.load(f)
+        adresse = brut.get("adresse") if isinstance(brut, dict) else None
+        if isinstance(adresse, str) and adresse.strip():
+            return adresse.strip().rstrip("/")
+    except (OSError, ValueError, AttributeError):
+        pass
+    try:
+        port = int(os.environ.get("BCC_PORT") or 8787)
+    except ValueError:
+        port = 8787
+    return f"http://127.0.0.1:{port}"
+
+
+def cmd_guide_lien(gid, args, st):
+    """plantrack guide-lien <gid> --url <page> [--poste <base>] [--scenario <id>] :
+    fabrique le lien d'un guide de test web a usage unique (b24/d100). Autorise en
+    environnement agent — c'est l'agent qui fabrique le lien, pas qui pose le
+    verdict. Le jeton n'est JAMAIS journalise en clair, seul son hash (meme
+    logique qu'un mot de passe) ; c'est lui qui authentifiera le retour du
+    navigateur cote `guide-resultat`, pas une identite humaine CLI."""
+    if not gid or gid not in st["guides"]:
+        sys.exit("usage : plantrack guide-lien <guide_id> --url <page> "
+                 "[--poste <base>] [--scenario <id>] — guide introuvable.")
+    url, args = arg_opt(args, "url")
+    if not url:
+        sys.exit("usage : plantrack guide-lien <guide_id> --url <page> "
+                 "[--poste <base>] [--scenario <id>]")
+    poste, args = arg_opt(args, "poste")
+    scenario, args = arg_opt(args, "scenario")
+
+    jeton = secrets.token_urlsafe(24)
+    h = hashlib.sha256(jeton.encode()).hexdigest()
+    append("guide_jeton", id=h, guide=gid, hash=h)
+
+    base = poste or os.environ.get("PLANTRACK_POSTE") or poste_base()
+    sep = "&" if "?" in url else "?"
+    params = (f"guide={quote(scenario or gid)}&retour={quote(jeton)}"
+              f"&poste={quote(base, safe='')}&projet={quote(journal_root(ROOT), safe='')}")
+    return f"{url}{sep}{params}"
+
+
+GUIDE_RESULTAT_MAX = 32 * 1024  # meme plafond que la route bcc /guide/resultat : un corps hors-norme est un abus, pas un guide
+
+
+def cmd_guide_resultat(st):
+    """plantrack guide-resultat : recoit sur stdin le verdict d'un guide de test
+    rempli dans le navigateur (b24/d100) — appele par la route bcc, jamais par un
+    terminal. Authentifie par jeton a usage unique, PAS par require_human : la
+    route n'a pas de session agent, c'est le jeton qui prouve que la reponse
+    vient bien d'un guide ouvert par l'agent (canal relaye, legitime en env
+    agent — meme famille que --de, d8/d107, mais authentifie differemment)."""
+    brut = sys.stdin.buffer.read(GUIDE_RESULTAT_MAX + 1)
+    if len(brut) > GUIDE_RESULTAT_MAX:
+        sys.exit(2)
+    try:
+        data = json.loads(brut.decode("utf-8"))
+    except (ValueError, UnicodeDecodeError):
+        sys.exit(2)
+    if not isinstance(data, dict):
+        sys.exit(2)
+    jeton, gid, verdicts = data.get("jeton"), data.get("guide"), data.get("verdicts")
+    if not isinstance(jeton, str) or not jeton or not isinstance(gid, str) or not isinstance(verdicts, list):
+        sys.exit(2)
+
+    h = hashlib.sha256(jeton.encode()).hexdigest()
+    j = st["jetons"].get(h)
+    if not j or j.get("guide") != gid:
+        sys.exit(3)
+    if j.get("consumed"):
+        sys.exit(4)
+    guide = st["guides"].get(gid)
+    if not guide:
+        sys.exit(3)
+
+    ok_n = ko_n = 0
+    ko_details, inconnus = [], []
+    for v in verdicts:
+        if not isinstance(v, dict):
+            continue
+        sid, verdict = v.get("pt"), v.get("verdict")
+        if not isinstance(sid, str) or verdict not in ("ok", "ko"):
+            continue
+        if sid not in guide["steps"]:
+            inconnus.append(sid)
+            continue
+        motif = v.get("motif")
+        motif = motif.strip() if isinstance(motif, str) and motif.strip() else None
+        if verdict == "ko" and not motif:
+            # vient du navigateur, pas d'un humain tapant la CLI : on ne perd pas
+            # le verdict pour une case de motif laissee vide (contrairement a
+            # cmd_check appele depuis la CLI, qui refuse un ko sans motif)
+            motif = "(pas de motif donne)"
+        canal = f"guide web : {verdict}" + (f" — {motif}" if motif else "")
+        cmd_check(sid, verdict, motif, st, canal=canal)
+        if verdict == "ok":
+            ok_n += 1
+        else:
+            ko_n += 1
+            ko_details.append(f"{sid} : {motif}")
+
+    append("guide_jeton_consomme", id=h, hash=h)
+
+    ligne = f"Guide {gid} : {ok_n} ok, {ko_n} pas ok"
+    if ko_details:
+        ligne += " — " + " ; ".join(ko_details)
+    print(ligne)
+    if inconnus:
+        print(f"[PlanTrack] etapes inconnues ignorees (hors de ce guide) : {', '.join(inconnus)}",
+              file=sys.stderr)
+    sys.exit(0)
+
+
 def cmd_focus(arg, st):
     if not arg:
         return "usage : !focus <sujet ou identifiant de fil>"
@@ -916,7 +1058,9 @@ CLI humaine : plantrack status | bugs | inbox | verify <id> | reject <id> -m ...
               plantrack piege <texte> | piege-clos <id> <motif> | question <texte>   utilisables par l'agent
               plantrack answer <question_id> <texte>   toi seule, hors session
               plantrack testcheck on|off | guide <titre>|<id> | step <id> <texte> | check <id> ok|ko [-m motif]
-              plantrack init   installation vendoree (tous agents, + hooks git post-commit et pre-commit d'office)
+              plantrack guide-lien <id> --url <page> [--poste <base>] [--scenario <id>]   lien de guide web a jeton unique (b24/d100)
+              plantrack guide-resultat   recoit sur stdin le verdict d'un guide web (jeton), appele par la route bcc
+              plantrack init  installation vendoree (tous agents, + hooks git post-commit et pre-commit d'office)
               uvx plantrack@latest update   mise a jour d'une installation existante
               plantrack doctor [--all]   verifie l'installation et l'usage reel | plantrack stats   usage sur 14 jours
               plantrack ronde   met le coeur du projet a niveau (lancee seule a l'ouverture, toutes les 4 h au plus)
@@ -3084,6 +3228,13 @@ def cli(argv):
             sys.exit("usage : plantrack check <step_id> ok|ko [-m motif] [--de \"<canal> : <reponse>\"]")
         motif = arg_motif(args, 2) if len(args) > 2 else None
         print(cmd_check(args[0], args[1], motif, st, canal=de))
+    elif cmd == "guide-lien":
+        if not args:
+            sys.exit("usage : plantrack guide-lien <guide_id> --url <page> "
+                     "[--poste <base>] [--scenario <id>]")
+        print(cmd_guide_lien(args[0], args[1:], st))
+    elif cmd == "guide-resultat":
+        cmd_guide_resultat(st)
     elif cmd == "attempt":
         cmd_attempt(args, st)
     elif cmd == "attempts":

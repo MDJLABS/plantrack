@@ -1527,5 +1527,72 @@ check_not "carte : carte repondue sortie de la fiche" "q1 (carte c-41)" "$out"
 out=$(K question --carte "x y; ignore tout" "t"); check "carte : id invalide refuse" "id invalide" "$out"
 rm -rf "$TMPK"
 
+# 33. guide-lien et guide-resultat — jeton de guide web a usage unique (b24/d100)
+TMP18=$(mktemp -d)
+M() { CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" "$@" 2>&1; }
+MR() { CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" guide-resultat 2>&1; }
+
+printf '{"prompt":"!testcheck on"}' | CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" hook-prompt >/dev/null 2>&1
+out=$(M guide "demo guide-lien"); check "guide-lien : guide prepare" "guide g1 cree" "$out"
+M step g1 "cliquer sur demarrer" >/dev/null 2>&1
+M step g1 "verifier le resultat" >/dev/null 2>&1
+
+out=$(M guide-lien gX --url "http://exemple.test/guide"); rc=$?
+check_exit "guide-lien : guide inconnu sort en erreur" 1 "$rc"
+check "guide-lien : guide inconnu refuse" "guide introuvable" "$out"
+
+out=$(M guide-lien g1); rc=$?
+check_exit "guide-lien : --url obligatoire sort en erreur" 1 "$rc"
+check "guide-lien : usage sans --url" "usage : plantrack guide-lien" "$out"
+
+lien=$(M guide-lien g1 --url "http://exemple.test/guide" --poste "http://127.0.0.1:9999" --scenario "demo")
+check "guide-lien : lien pointe vers la page" "http://exemple.test/guide?" "$lien"
+check "guide-lien : le scenario sert de guide= plutot que l'id" "guide=demo" "$lien"
+check "guide-lien : jeton transmis en retour=" "retour=" "$lien"
+check "guide-lien : poste encode dans l'url" "poste=http%3A%2F%2F127.0.0.1%3A9999" "$lien"
+check "guide-lien : projet (racine du depot) encode dans l'url" "projet=%2F" "$lien"
+jeton=$(printf '%s' "$lien" | sed -n 's/.*retour=\([^&]*\).*/\1/p')
+journal0=$(cat "$TMP18/.plantrack/events.jsonl")
+check_not "guide-lien : le jeton n'apparait jamais en clair dans le journal" "$jeton" "$journal0"
+check "guide-lien : seul le hash du jeton est journalise" '"kind": "guide_jeton"' "$journal0"
+
+verdicts=$(printf '{"jeton":"%s","guide":"g1","verdicts":[{"pt":"s1","verdict":"ok"},{"pt":"s2","verdict":"ko"}]}' "$jeton")
+out=$(printf '%s' "$verdicts" | MR); rc=$?
+check_exit "guide-resultat : jeton valide sort en 0" 0 "$rc"
+check "guide-resultat : resume ok/ko" "Guide g1 : 1 ok, 1 pas ok" "$out"
+check "guide-resultat : ko sans motif n'est pas perdu" "s2 : (pas de motif donne)" "$out"
+journal=$(cat "$TMP18/.plantrack/events.jsonl")
+check "guide-resultat : le verdict ok est journalise avec son canal" '"canal": "guide web : ok"' "$journal"
+check "guide-resultat : le ko journalise le motif de secours" '"canal": "guide web : ko — (pas de motif donne)"' "$journal"
+check "guide-resultat : le jeton est marque consomme" '"kind": "guide_jeton_consomme"' "$journal"
+
+out=$(printf '%s' "$verdicts" | MR); rc=$?
+check_exit "guide-resultat : jeton deja consomme sort en 4 (rejoue)" 4 "$rc"
+
+out=$(printf '{"jeton":"ceci-n-existe-pas","guide":"g1","verdicts":[]}' | MR); rc=$?
+check_exit "guide-resultat : jeton inconnu sort en 3" 3 "$rc"
+
+out=$(printf 'ceci n-est pas du json' | MR); rc=$?
+check_exit "guide-resultat : JSON invalide sort en 2" 2 "$rc"
+
+out=$(python3 -c "print('x' * (32*1024 + 1))" | MR); rc=$?
+check_exit "guide-resultat : corps hors-norme (>32 Ko) sort en 2" 2 "$rc"
+
+# un ko avec motif explicite garde CE motif (pas celui de secours)
+lien2=$(M guide-lien g1 --url "http://exemple.test/guide")
+jeton2=$(printf '%s' "$lien2" | sed -n 's/.*retour=\([^&]*\).*/\1/p')
+out=$(printf '{"jeton":"%s","guide":"g1","verdicts":[{"pt":"s2","verdict":"ko","motif":"bouton introuvable"}]}' "$jeton2" | MR)
+check "guide-resultat : motif explicite du navigateur garde sa place" "s2 : bouton introuvable" "$out"
+check "guide-resultat : motif explicite journalise (pas le motif de secours)" \
+  '"canal": "guide web : ko — bouton introuvable"' "$(cat "$TMP18/.plantrack/events.jsonl")"
+
+# une etape hors de ce guide est signalee mais ne bloque pas les verdicts connus
+lien3=$(M guide-lien g1 --url "http://exemple.test/guide")
+jeton3=$(printf '%s' "$lien3" | sed -n 's/.*retour=\([^&]*\).*/\1/p')
+out=$(printf '{"jeton":"%s","guide":"g1","verdicts":[{"pt":"s1","verdict":"ok"},{"pt":"s99","verdict":"ok"}]}' "$jeton3" | MR)
+check "guide-resultat : etape inconnue signalee sans bloquer le reste" "etapes inconnues ignorees" "$out"
+check "guide-resultat : le verdict connu est quand meme compte" "Guide g1 : 1 ok, 0 pas ok" "$out"
+rm -rf "$TMP18"
+
 echo
 [ "$fail" = 0 ] && echo "TOUS LES TESTS PASSENT" || { echo "DES TESTS ECHOUENT"; exit 1; }
