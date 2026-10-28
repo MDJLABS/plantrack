@@ -46,7 +46,8 @@ import dynamic from "next/dynamic";
 import { usePathname, useSearchParams } from "next/navigation";
 import {
   resoudreVisite, ecrireVisiteSession, effacerVisiteSession, lireVisiteSession,
-  accederSessionStorage, type DecisionMontage,
+  accederSessionStorage, resoudreEnvoi, ecrireInfosEnvoiSession, effacerInfosEnvoiSession,
+  lireInfosEnvoiSession, validerPoste, validerJeton, type DecisionMontage,
 } from "@/lib/guide/guide-visite";
 
 const GuideDeTest = dynamic(
@@ -58,6 +59,13 @@ export function GuideDeTestLazy() {
   const pathname = usePathname();
   const params = useSearchParams();
   const paramGuide = params.get("guide");
+  // Envoi du résultat (lot « curseur animé ») — les trois paramètres qui désignent la
+  // session qui a ouvert le guide. `resoudreEnvoi` (guide-visite.ts) les valide et les
+  // gate sur `decision` : sans `?guide=` valide sur CETTE page, aucun des trois n'est
+  // jamais honoré, quoi qu'il prétende.
+  const paramRetour = params.get("retour");
+  const paramPoste = params.get("poste");
+  const paramProjet = params.get("projet");
 
   // Le VRAI `sessionStorage` n'existe que côté client — au rendu SERVEUR (et à la toute
   // première passe client, avant hydratation), `hydrate` reste `false` : on retombe sur
@@ -118,17 +126,37 @@ export function GuideDeTestLazy() {
 
   const decision: DecisionMontage = hydrate ? resoudreVisite(paramEffectif, sessionBrute) : null;
 
+  // Même lecture « sûre après hydratation » que `sessionBrute` ci-dessus, pour la session
+  // d'envoi — `resoudreEnvoi` décide ensuite s'il faut l'honorer (cf. son bandeau de tête).
+  const envoiBrut = hydrate ? lireInfosEnvoiSession(accederSessionStorage()) : null;
+  const envoi = hydrate ? resoudreEnvoi(decision, paramRetour, paramPoste, paramProjet, envoiBrut) : null;
+
   // La clé de session ne s'écrit QUE lors d'une ouverture par paramètre explicite et
   // valide (`ecrireSession`, cf. guide-visite.ts) — aucune autre voie ne l'écrit.
   useEffect(() => {
     if (decision?.ecrireSession) ecrireVisiteSession(accederSessionStorage(), decision.scenario.id);
   }, [decision?.ecrireSession, decision?.scenario.id]);
 
+  // Idem pour la session d'envoi — ÉCRITE seulement quand CETTE ouverture apporte les trois
+  // paramètres ET qu'ils sont valides (même garde que `resoudreEnvoi`, recalculée ici avec
+  // les MÊMES validateurs exportés — jamais une seconde logique divergente). Une reprise qui
+  // relit une session déjà valide n'a rien à réécrire.
+  const ecrireEnvoi = Boolean(
+    decision?.ecrireSession && paramRetour && paramPoste && paramProjet &&
+    validerPoste(paramPoste) && validerJeton(paramRetour),
+  );
+  useEffect(() => {
+    if (ecrireEnvoi && envoi) ecrireInfosEnvoiSession(accederSessionStorage(), envoi);
+  }, [ecrireEnvoi, envoi?.jeton, envoi?.poste, envoi?.projet]);
+
   // Le ✕ « Fermer le guide » efface la clé, neutralise le paramètre EN COURS (s'il y en a
   // un) et force un nouveau rendu de CE composant, immédiatement — sortie franche sur la
   // page d'arrivée, sans attendre une navigation.
   const fermerDefinitivement = () => {
     effacerVisiteSession(accederSessionStorage());
+    // La session d'envoi n'a plus lieu d'être non plus : une visite rouverte plus tard sans
+    // ces paramètres ne doit pas retenter un envoi avec un jeton périmé.
+    effacerInfosEnvoiSession(accederSessionStorage());
     setParamNeutralise(paramGuide);
     setVersion((v) => v + 1);
   };
@@ -137,5 +165,11 @@ export function GuideDeTestLazy() {
   // chargé — sans `?guide=` valide vu au moins une fois dans cet onglet (directement, ou
   // porté par la clé de session qu'il a lui-même écrite).
   if (!decision) return null;
-  return <GuideDeTest scenario={decision.scenario} onFermerDefinitivement={fermerDefinitivement} />;
+  return (
+    <GuideDeTest
+      scenario={decision.scenario}
+      envoi={envoi}
+      onFermerDefinitivement={fermerDefinitivement}
+    />
+  );
 }

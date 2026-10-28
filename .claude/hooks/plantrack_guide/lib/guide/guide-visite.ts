@@ -203,6 +203,13 @@ export function validerPoste(poste: string): string | null {
   return url.origin; // origine SEULE : jamais le chemin/query/hash d'entrée
 }
 
+/** Jeton valide — exportée pour que `GuideDeTestLazy.tsx` puisse recalculer EXACTEMENT la
+ *  même garde que `resoudreEnvoi` (ci-dessous) sans dupliquer `JETON_RE` : c'est elle qui
+ *  décide si CETTE ouverture doit (ré)écrire la session d'envoi, cf. son usage là-bas. */
+export function validerJeton(jeton: string): boolean {
+  return JETON_RE.test(jeton);
+}
+
 /**
  * Décide les infos d'envoi actives.
  *
@@ -231,7 +238,7 @@ export function resoudreEnvoi(
 
   if (decisionVisite.ecrireSession && paramRetour && paramPoste && paramProjet) {
     const poste = validerPoste(paramPoste);
-    if (poste && JETON_RE.test(paramRetour)) {
+    if (poste && validerJeton(paramRetour)) {
       return { jeton: paramRetour, poste, projet: paramProjet };
     }
   }
@@ -255,7 +262,7 @@ function parserInfosEnvoi(contenu: string | null | undefined): InfosEnvoi | null
   const { jeton, poste, projet } = o as Partial<InfosEnvoi>;
   if (typeof jeton !== "string" || typeof poste !== "string" || typeof projet !== "string" || !projet) return null;
   const posteValide = validerPoste(poste);
-  if (!posteValide || !JETON_RE.test(jeton)) return null;
+  if (!posteValide || !validerJeton(jeton)) return null;
   return { jeton, poste: posteValide, projet };
 }
 
