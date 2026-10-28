@@ -85,7 +85,7 @@ import {
 import { indexDePoint, SCENARIOS } from "@/lib/guide/scenarios";
 import { verdictScenario } from "@/lib/guide/guide-verdict";
 import { construireCompteRendu } from "@/lib/guide/guide-compte-rendu";
-import { corpsEnvoi, dejaEnvoye, envoyerResultat, marquerEnvoye } from "@/lib/guide/guide-envoi";
+import { corpsEnvoi, dejaEnvoye, envoyerResultat, hoteDestination, marquerEnvoye } from "@/lib/guide/guide-envoi";
 import { accederSessionStorage, type InfosEnvoi } from "@/lib/guide/guide-visite";
 import { GuideCurseur } from "./GuideCurseur";
 import type { ResultatGeste } from "@/lib/guide/guide-geste";
@@ -288,6 +288,7 @@ function Visite({ scenario, envoi, point, onReplier, onFermer, onTerminer }: {
   // qu'aucune session d'envoi n'est active), puis "envoi" → "ok"/"echec". Le bouton Copier
   // reste dans tous les cas le filet de sécurité (cf. bandeau de `guide-envoi.ts`).
   const [etatEnvoi, setEtatEnvoi] = useState<"idle" | "envoi" | "ok" | "echec">("idle");
+  const [hoteEnvoi, setHoteEnvoi] = useState<string | null>(null);
 
   // Reprise « là où elle s'est arrêtée » — lue APRÈS montage (localStorage n'existe pas
   // au rendu serveur).
@@ -400,6 +401,7 @@ function Visite({ scenario, envoi, point, onReplier, onFermer, onTerminer }: {
     if (!ecranBilan || !envoi) return;
     const storage = accederSessionStorage();
     if (dejaEnvoye(storage, scenario.id)) {
+      setHoteEnvoi(hoteDestination(envoi.poste));
       setEtatEnvoi("ok");
       return;
     }
@@ -411,6 +413,7 @@ function Visite({ scenario, envoi, point, onReplier, onFermer, onTerminer }: {
       if (annule) return;
       if (r.ok) {
         marquerEnvoye(storage, scenario.id);
+        setHoteEnvoi(hoteDestination(envoi.poste));
         setEtatEnvoi("ok");
       } else {
         setEtatEnvoi("echec");
@@ -705,7 +708,7 @@ function Visite({ scenario, envoi, point, onReplier, onFermer, onTerminer }: {
                 color: etatEnvoi === "ok" ? C.ok : etatEnvoi === "echec" ? C.ko : C.doux,
               }}>
                 {etatEnvoi === "envoi" && "Envoi du résultat à la session en cours…"}
-                {etatEnvoi === "ok" && "✓ Résultat envoyé à la session"}
+                {etatEnvoi === "ok" && `✓ Résultat envoyé à ${hoteEnvoi ?? "la session"}`}
                 {etatEnvoi === "echec" && "Envoi impossible — copie le compte-rendu ci-dessous"}
               </p>
             )}

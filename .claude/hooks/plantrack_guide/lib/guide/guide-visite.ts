@@ -173,6 +173,30 @@ const JETON_RE = /^[A-Za-z0-9_-]{1,200}$/;
 const HOTES_LOCAUX = new Set(["localhost", "127.0.0.1", "[::1]"]);
 
 /**
+ * Liste blanche FACULTATIVE d'origines (`NEXT_PUBLIC_GUIDE_POSTES`, séparées par des
+ * virgules) — quand elle est définie, `validerPoste` n'accepte plus QUE les origines
+ * qu'elle contient (quel que soit leur protocole), à la place de la règle habituelle
+ * (https / hôte local) ; non définie ou vide, elle ne change rien. Comparaison sur
+ * l'ORIGINE normalisée (`new URL(x).origin`), jamais sur la chaîne brute de la variable —
+ * une entrée mal formée de la liste est ignorée plutôt que de faire planter la validation.
+ */
+function listeBlanchePostes(): Set<string> | null {
+  const brut = process.env.NEXT_PUBLIC_GUIDE_POSTES;
+  if (!brut) return null;
+  const origines = new Set<string>();
+  for (const morceau of brut.split(",")) {
+    const texte = morceau.trim();
+    if (!texte) continue;
+    try {
+      origines.add(new URL(texte).origin);
+    } catch {
+      // entrée mal formée de la liste blanche : ignorée, jamais fatale
+    }
+  }
+  return origines.size > 0 ? origines : null;
+}
+
+/**
  * Valide `poste` (l'URL de base de la session qui a ouvert le guide) et rend son
  * **origine normalisée** (`https://exemple.com`, jamais de chemin/query/hash — même si
  * `poste` en portait) ; `null` si `poste` n'est pas une destination sûre.
@@ -181,10 +205,14 @@ const HOTES_LOCAUX = new Set(["localhost", "127.0.0.1", "[::1]"]);
  * - une chaîne qui n'est pas une URL ABSOLUE valide (`new URL` lève) — élimine d'office
  *   tout schéma dangereux qui n'a pas d'autorité (`javascript:alert(1)` n'a pas d'origine
  *   analysable de la même façon, et échoue ici) ;
- * - un protocole qui n'est NI `https:` NI (`http:` + hôte local) — `javascript:`, `data:`,
- *   `file:`, ou un `http:` vers un hôte distant (le jeton transite en clair) sont refusés ;
  * - un userinfo non vide (`https://user:pass@hote/`) — un `poste` qui embarque des
- *   identifiants dans l'URL n'est pas une forme qu'on accepte de relayer tel quel.
+ *   identifiants dans l'URL n'est pas une forme qu'on accepte de relayer tel quel ;
+ * - si `NEXT_PUBLIC_GUIDE_POSTES` est définie (cf. `listeBlanchePostes` ci-dessus),
+ *   l'origine doit y figurer — SEUL critère dans ce cas, la règle protocole/hôte local
+ *   suivante ne s'applique plus ;
+ * - sinon, un protocole qui n'est NI `https:` NI (`http:` + hôte local) — `javascript:`,
+ *   `data:`, `file:`, ou un `http:` vers un hôte distant (le jeton transite en clair) sont
+ *   refusés.
  *
  * Partagée par `resoudreEnvoi`/`parserInfosEnvoi` ICI et par `envoyerResultat`
  * (`guide-envoi.ts`, défense en profondeur — ne jamais supposer qu'une valeur déjà
@@ -198,6 +226,10 @@ export function validerPoste(poste: string): string | null {
     return null;
   }
   if (url.username || url.password) return null; // userinfo refusé, cf. ci-dessus
+
+  const listeBlanche = listeBlanchePostes();
+  if (listeBlanche) return listeBlanche.has(url.origin) ? url.origin : null;
+
   const local = HOTES_LOCAUX.has(url.hostname);
   if (url.protocol !== "https:" && !(url.protocol === "http:" && local)) return null;
   return url.origin; // origine SEULE : jamais le chemin/query/hash d'entrée

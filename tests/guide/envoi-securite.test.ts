@@ -87,6 +87,69 @@ step('validerPoste("https://exemple.com") → accepté', () => {
   assert.equal(validerPoste("https://exemple.com"), "https://exemple.com");
 });
 
+// --- 1b. validerPoste() — liste blanche facultative (NEXT_PUBLIC_GUIDE_POSTES) -------------
+//
+// Variable lue À CHAQUE appel (pas au chargement du module) : chaque pas pose puis retire
+// la variable — jamais de `step` laissé « sale » pour les sections suivantes, qui comptent
+// sur l'absence de liste blanche pour exercer la règle habituelle (https / loopback).
+
+function avecListeBlanche(valeur: string | undefined, fn: () => void) {
+  const avant = process.env.NEXT_PUBLIC_GUIDE_POSTES;
+  if (valeur === undefined) delete process.env.NEXT_PUBLIC_GUIDE_POSTES;
+  else process.env.NEXT_PUBLIC_GUIDE_POSTES = valeur;
+  try {
+    fn();
+  } finally {
+    if (avant === undefined) delete process.env.NEXT_PUBLIC_GUIDE_POSTES;
+    else process.env.NEXT_PUBLIC_GUIDE_POSTES = avant;
+  }
+}
+
+step("liste blanche définie : origine absente de la liste → null, même en https", () => {
+  avecListeBlanche("https://a.exemple.com,https://b.exemple.com", () => {
+    assert.equal(validerPoste("https://c.exemple.com"), null);
+  });
+});
+step("liste blanche définie : origine présente → acceptée, origine normalisée", () => {
+  avecListeBlanche("https://a.exemple.com,https://b.exemple.com", () => {
+    assert.equal(validerPoste("https://a.exemple.com/chemin-ignore?x=1"), "https://a.exemple.com");
+  });
+});
+step("liste blanche définie : seule elle décide — un http DISTANT listé passe (hors règle habituelle)", () => {
+  avecListeBlanche("http://interne.exemple.com", () => {
+    assert.equal(validerPoste("http://interne.exemple.com"), "http://interne.exemple.com");
+  });
+});
+step("liste blanche définie : localhost NON listé → refusé (la règle habituelle ne le sauve plus)", () => {
+  avecListeBlanche("https://a.exemple.com", () => {
+    assert.equal(validerPoste("http://localhost:3000"), null);
+  });
+});
+step("liste blanche définie mais userinfo présent → refusé AVANT même de consulter la liste", () => {
+  avecListeBlanche("https://exemple.com", () => {
+    assert.equal(validerPoste("https://u:p@exemple.com"), null);
+  });
+});
+step("liste blanche avec entrée mal formée + espaces → ignorée, le reste de la liste fonctionne", () => {
+  avecListeBlanche(" https://a.exemple.com , pas-une-url , https://b.exemple.com ", () => {
+    assert.equal(validerPoste("https://a.exemple.com"), "https://a.exemple.com");
+    assert.equal(validerPoste("https://b.exemple.com"), "https://b.exemple.com");
+    assert.equal(validerPoste("https://pas-une-url"), null);
+  });
+});
+step("liste blanche vide ou faite seulement d'entrées mal formées → retombe sur la règle habituelle", () => {
+  avecListeBlanche(" , pas-une-url , ", () => {
+    assert.equal(validerPoste("https://exemple.com"), "https://exemple.com");
+    assert.equal(validerPoste("http://localhost:3000"), "http://localhost:3000");
+  });
+});
+step("variable absente (cas par défaut) → règle habituelle inchangée, hôte distant http refusé", () => {
+  avecListeBlanche(undefined, () => {
+    assert.equal(validerPoste("http://evil.example.com"), null);
+    assert.equal(validerPoste("https://exemple.com"), "https://exemple.com");
+  });
+});
+
 // --- 2. resoudreEnvoi() — pas de ?guide= valide sur la page → rien, quoi que l'URL porte --
 
 step("decisionVisite null (pas de ?guide= valide) → resoudreEnvoi rend TOUJOURS null", () => {

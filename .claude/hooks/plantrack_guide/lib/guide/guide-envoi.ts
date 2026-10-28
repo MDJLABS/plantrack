@@ -129,3 +129,18 @@ export function marquerEnvoye(storage: StorageVisite | null, scenarioId: string)
     // au pire, un prochain passage par le bilan retentera un envoi déjà fait, jamais fatal.
   }
 }
+
+/**
+ * Nom d'hôte affichable de `poste` — UNIQUEMENT pour l'affichage du statut d'envoi côté
+ * bilan (« Résultat envoyé à <hôte> », `GuideDeTest.tsx`), jamais pour une décision de
+ * sécurité : `validerPoste` (`guide-visite.ts`) reste la SEULE garde. Ne lève jamais : un
+ * `poste` qui ne serait déjà plus une URL analysable à ce stade (ne devrait pas arriver,
+ * il a déjà été validé plus haut) retombe sur "la session" plutôt que de planter le bilan.
+ */
+export function hoteDestination(poste: string): string {
+  try {
+    return new URL(poste).hostname || "la session";
+  } catch {
+    return "la session";
+  }
+}

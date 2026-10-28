@@ -19,7 +19,7 @@
 //     --import ./tests/guide/support/register.mjs tests/guide/envoi.test.ts
 
 import assert from "node:assert/strict";
-import { corpsEnvoi, dejaEnvoye, envoyerResultat, marquerEnvoye } from "../../.claude/hooks/plantrack_guide/lib/guide/guide-envoi";
+import { corpsEnvoi, dejaEnvoye, envoyerResultat, hoteDestination, marquerEnvoye } from "../../.claude/hooks/plantrack_guide/lib/guide/guide-envoi";
 import type { StorageVisite } from "../../.claude/hooks/plantrack_guide/lib/guide/guide-visite";
 import type { GuideProgress, GuideScenario } from "../../.claude/hooks/plantrack_guide/lib/guide/types";
 
@@ -205,6 +205,18 @@ step("marquerEnvoye puis dejaEnvoye → true pour CE scénario, false pour un au
 });
 step("marquerEnvoye : storage null → ne lève jamais", () => {
   assert.doesNotThrow(() => marquerEnvoye(null, "guide-x"));
+});
+
+// --- 4. hoteDestination() — affichage seulement, jamais une garde de sécurité ------------
+
+step("hoteDestination : URL normale → son hostname", () => {
+  assert.equal(hoteDestination("https://exemple.com/chemin?x=1"), "exemple.com");
+});
+step("hoteDestination : hostname avec port → le port n'en fait pas partie", () => {
+  assert.equal(hoteDestination("http://localhost:3000"), "localhost");
+});
+step("hoteDestination : chaîne qui n'est pas une URL → repli \"la session\", jamais une exception", () => {
+  assert.equal(hoteDestination("pas une url"), "la session");
 });
 
 await tout();
