@@ -23,6 +23,11 @@ import { corpsEnvoi, dejaEnvoye, envoyerResultat, hoteDestination, marquerEnvoye
 import type { StorageVisite } from "../../.claude/hooks/plantrack_guide/lib/guide/guide-visite";
 import type { GuideProgress, GuideScenario } from "../../.claude/hooks/plantrack_guide/lib/guide/types";
 
+// b26 : sans liste blanche, seul un poste LOCAL passe. Les sections suivantes et ce fichier
+// testent un poste DISTANT légitime (https://exemple.com) : on le déclare, comme un site le
+// déclare pour son poste bcc public.
+process.env.NEXT_PUBLIC_GUIDE_POSTES = "https://exemple.com";
+
 // Les pas qui touchent `envoyerResultat` remplacent le `fetch` GLOBAL (pas d'injection de
 // dépendance dans ce module) : ils doivent s'exécuter en SÉRIE, jamais en parallèle, sous
 // peine qu'un pas restaure le fetch d'un autre pendant qu'il est encore en vol. `step` empile

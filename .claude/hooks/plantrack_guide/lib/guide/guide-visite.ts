@@ -210,8 +210,11 @@ function listeBlanchePostes(): Set<string> | null {
  * - si `NEXT_PUBLIC_GUIDE_POSTES` est définie (cf. `listeBlanchePostes` ci-dessus),
  *   l'origine doit y figurer — SEUL critère dans ce cas, la règle protocole/hôte local
  *   suivante ne s'applique plus ;
- * - sinon, un protocole qui n'est NI `https:` NI (`http:` + hôte local) — `javascript:`,
- *   `data:`, `file:`, ou un `http:` vers un hôte distant (le jeton transite en clair) sont
+ * - sinon, tout hôte qui n'est pas LOCAL (b26) : sans liste blanche, seul le poste de la
+ *   machine (`localhost`, `127.0.0.1`, `[::1]`, en `http:` ou `https:`) est accepté. Un
+ *   poste distant (`https://bcc.exemple.com`) DOIT être déclaré dans
+ *   `NEXT_PUBLIC_GUIDE_POSTES` — sinon un lien piégé (`?poste=https://ailleurs`) enverrait
+ *   les verdicts et notes du testeur à un tiers. `javascript:`, `data:`, `file:` restent
  *   refusés.
  *
  * Partagée par `resoudreEnvoi`/`parserInfosEnvoi` ICI et par `envoyerResultat`
@@ -230,8 +233,8 @@ export function validerPoste(poste: string): string | null {
   const listeBlanche = listeBlanchePostes();
   if (listeBlanche) return listeBlanche.has(url.origin) ? url.origin : null;
 
-  const local = HOTES_LOCAUX.has(url.hostname);
-  if (url.protocol !== "https:" && !(url.protocol === "http:" && local)) return null;
+  if (!HOTES_LOCAUX.has(url.hostname)) return null; // b26 : distant = liste blanche obligatoire
+  if (url.protocol !== "https:" && url.protocol !== "http:") return null;
   return url.origin; // origine SEULE : jamais le chemin/query/hash d'entrée
 }
 

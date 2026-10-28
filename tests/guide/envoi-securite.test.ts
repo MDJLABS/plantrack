@@ -71,8 +71,8 @@ step('validerPoste("data:text/html,<script>") → null', () => {
 step('validerPoste("not a url") → null (new URL() lève)', () => {
   assert.equal(validerPoste("not a url"), null);
 });
-step('validerPoste("https://exemple.com/chemin?x=1#h") → origine SEULE, jamais le chemin/query/hash', () => {
-  assert.equal(validerPoste("https://exemple.com/chemin?x=1#h"), "https://exemple.com");
+step('validerPoste("http://localhost:3000/chemin?x=1#h") → origine SEULE, jamais le chemin/query/hash', () => {
+  assert.equal(validerPoste("http://localhost:3000/chemin?x=1#h"), "http://localhost:3000");
 });
 step('validerPoste("http://localhost:3000") → accepté (dev), origine normalisée', () => {
   assert.equal(validerPoste("http://localhost:3000"), "http://localhost:3000");
@@ -83,8 +83,11 @@ step('validerPoste("http://127.0.0.1:3000") → accepté (dev)', () => {
 step('validerPoste("http://[::1]:3000") → accepté (dev, loopback IPv6)', () => {
   assert.equal(validerPoste("http://[::1]:3000"), "http://[::1]:3000");
 });
-step('validerPoste("https://exemple.com") → accepté', () => {
-  assert.equal(validerPoste("https://exemple.com"), "https://exemple.com");
+step('validerPoste("https://exemple.com") sans liste blanche → refusé (b26 : distant non déclaré)', () => {
+  assert.equal(validerPoste("https://exemple.com"), null);
+});
+step('validerPoste("https://localhost:8787") → accepté (poste local en https)', () => {
+  assert.equal(validerPoste("https://localhost:8787"), "https://localhost:8787");
 });
 
 // --- 1b. validerPoste() — liste blanche facultative (NEXT_PUBLIC_GUIDE_POSTES) -------------
@@ -139,16 +142,22 @@ step("liste blanche avec entrée mal formée + espaces → ignorée, le reste de
 });
 step("liste blanche vide ou faite seulement d'entrées mal formées → retombe sur la règle habituelle", () => {
   avecListeBlanche(" , pas-une-url , ", () => {
-    assert.equal(validerPoste("https://exemple.com"), "https://exemple.com");
+    assert.equal(validerPoste("https://exemple.com"), null);
     assert.equal(validerPoste("http://localhost:3000"), "http://localhost:3000");
   });
 });
-step("variable absente (cas par défaut) → règle habituelle inchangée, hôte distant http refusé", () => {
+step("variable absente (cas par défaut) → seul le poste local passe, tout distant refusé (b26)", () => {
   avecListeBlanche(undefined, () => {
     assert.equal(validerPoste("http://evil.example.com"), null);
-    assert.equal(validerPoste("https://exemple.com"), "https://exemple.com");
+    assert.equal(validerPoste("https://exemple.com"), null);
+    assert.equal(validerPoste("http://127.0.0.1:8787"), "http://127.0.0.1:8787");
   });
 });
+
+// b26 : sans liste blanche, seul un poste LOCAL passe. Les sections suivantes et ce fichier
+// testent un poste DISTANT légitime (https://exemple.com) : on le déclare, comme un site le
+// déclare pour son poste bcc public.
+process.env.NEXT_PUBLIC_GUIDE_POSTES = "https://exemple.com";
 
 // --- 2. resoudreEnvoi() — pas de ?guide= valide sur la page → rien, quoi que l'URL porte --
 
