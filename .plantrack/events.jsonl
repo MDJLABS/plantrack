@@ -1274,3 +1274,11 @@
 {"ts": "2026-10-28T17:56:44+00:00", "kind": "question", "id": "q5", "text": "Publier v1.9.29 (protection b24 + lot d100 deja code) maintenant ou attendre la fin de d100 ? carte envoyee le 28/10", "carte": "b24pub"}
 {"ts": "2026-10-28T17:56:44+00:00", "kind": "file_touched", "text": "sortie/carte-b24.json", "thread": "t23"}
 {"ts": "2026-10-28T17:56:44+00:00", "kind": "file_touched", "text": "sortie/carte-b24.log", "thread": "t23"}
+{"ts": "2026-10-28T17:56:49+00:00", "kind": "commit", "sha": "a2bc81b", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-10-28T18:25:27+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-tender-journal.md", "thread": "t23"}
+{"ts": "2026-10-28T18:34:55+00:00", "kind": "file_touched", "text": "sortie/scenario-v1929.log", "thread": "t23"}
+{"ts": "2026-10-28T18:34:55+00:00", "kind": "file_touched", "text": "sortie/guide-v1929.log", "thread": "t23"}
+{"ts": "2026-10-28T18:35:04+00:00", "kind": "commit", "sha": "b8ae556", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-10-28T18:35:07+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t23"}
+{"ts": "2026-10-28T18:37:11+00:00", "kind": "answer", "id": "q5", "text": "telephone : Publier maintenant (Recommandé)", "canal": "telephone : Publier maintenant (Recommandé)"}
+{"ts": "2026-10-28T18:37:11+00:00", "kind": "decision", "id": "d101", "text": "v1.9.29 publiee (28/10, GitHub + PyPI verifie, choix Mariella tel 'Publier maintenant (Recommande)') : protection b24 (update ne reecrase plus le guide d'un site qui a le sien) + guides de test automatiques d100. 528 tests scenario + 4 fichiers guide verts. b24 reste to_verify.", "par": "agent"}

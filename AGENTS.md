@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [14 commits]
-  fichiers recemment ecrits : tests/scenario.sh, ../mdjlabs-site/sortie/tests-b24.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-sequential-glade.md, sortie/scenario-b24.log, sortie/carte-b24.json, sortie/carte-b24.log
+FIL ACTIF — t23 : guides de test automatiques (d100) [16 commits]
+  fichiers recemment ecrits : sortie/carte-b24.json, sortie/carte-b24.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-tender-journal.md, sortie/scenario-v1929.log, sortie/guide-v1929.log, pyproject.toml
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -125,14 +125,12 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d98 : Mariella (tel, 27/10, via AskUserQuestion) : apres v1.9.28 (cartes de cote), choix 'Laisser bcc finir (Recommande)' — veille silencieuse, r… (agent)
   d99 : Mariella (tel, 28/10) : plan 'Rien a faire : je reste en veille' approuve apres relance auto -> veille silencieuse maintenue (d23, d85, d98… (agent)
   d100 : Mariella (tel, 28/10, plan approuve) : guides de test qui se jouent tout seuls — 'On code tout a 100 %' : geste (clic/saisie/aller) joue pa… (agent)
+  d101 : v1.9.29 publiee (28/10, GitHub + PyPI verifie, choix Mariella tel 'Publier maintenant (Recommande)') : protection b24 (update ne reecrase p… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
   pg10 : Le post-commit journalise le commit lui-meme (events.jsonl) et regenere l'insta…
   pg13 : Gabarit de parcours : la phase de construction est a 'questions: false', mais u…
   pg15 : Le Stop hook bcc (hook/index.ts, regle 'projet ne s'endort jamais' du 03/10) EX…
-
-Cartes laissees de cote (action a reprendre a la reponse : answer --carte <id>) :
-  q5 (carte b24pub) : Publier v1.9.29 (protection b24 + lot d100 deja code) maintenant ou attendre la…
 ```
 <!-- plantrack:state-end -->
