@@ -1186,7 +1186,7 @@ rm -rf "$W"
 # Ronde dans chaque projet (d51) : le coeur est rattrape et commite seul, sans embarquer
 # le travail en cours ; pt.py retouche a la main -> pas touche. uvx simule par un faux.
 R=$(mktemp -d); mkdir "$R/bin"
-printf '#!/bin/sh\nshift; exec python3 "%s" "$@"\n' "$PT" > "$R/bin/uvx"; chmod +x "$R/bin/uvx"
+printf '#!/bin/sh\necho "$@" > "%s/args"\nwhile [ "$1" != plantrack@latest ]; do shift; done; shift; exec python3 "%s" "$@"\n' "$R" "$PT" > "$R/bin/uvx"; chmod +x "$R/bin/uvx"
 r() { (cd "$D" && PATH="$R/bin:$PATH" CLAUDE_PROJECT_DIR="$D" python3 "$PT" ronde); }
 D="$R/depot"; git init -q "$D" && CLAUDE_PROJECT_DIR="$D" python3 "$PT" init >/dev/null 2>&1
 git -C "$D" add -A && git -C "$D" commit -qm init
@@ -1194,6 +1194,8 @@ echo "# ancienne version" >> "$D/.claude/hooks/pt.py" && git -C "$D" commit -qam
 echo travail > "$D/en-cours.txt"
 out=$(r); check "ronde : coeur rattrape" "OK" "$(cmp -s "$D/.claude/hooks/pt.py" "$PT" && echo OK)"
 check "ronde : commit du rattrapage" "par la ronde" "$(git -C "$D" log -1 --format=%s)"
+# b24 : uvx ne doit jamais rejouer une vieille version en cache (v1.9.28 servie le 28/10 19h25)
+check "ronde : uvx rafraichit plantrack" "--refresh-package plantrack plantrack@latest" "$(cat "$R/args")"
 check "ronde : travail en cours non embarque" "?? en-cours.txt" "$(git -C "$D" status --porcelain)"
 check "ronde : deja a jour" "deja a jour" "$(r)"
 echo "# retouche" >> "$D/.claude/hooks/pt.py"; cp "$D/.claude/hooks/pt.py" "$R/main"

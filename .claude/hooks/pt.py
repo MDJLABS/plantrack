@@ -1439,8 +1439,10 @@ def cmd_ronde():
     si_publie = suivi and ".claude/hooks/pt.py" in avant
     if si_publie:
         avant.discard(".claude/hooks/pt.py")
+    # --refresh-package : sans lui, uv peut resservir une version en cache, plus vieille que
+    # la derniere publiee (b24 : v1.9.28 sans protection du guide, 28/10 19h25)
     try:
-        p = subprocess.run(["uvx", "plantrack@latest", "update", *(["--si-publie"] if si_publie else [])],
+        p = subprocess.run(["uvx", "--refresh-package", "plantrack", "plantrack@latest", "update", *(["--si-publie"] if si_publie else [])],
                            cwd=ROOT, capture_output=True, text=True, timeout=300)
     except (OSError, subprocess.TimeoutExpired) as e:
         return print(f"ronde : update impossible ({e})")
