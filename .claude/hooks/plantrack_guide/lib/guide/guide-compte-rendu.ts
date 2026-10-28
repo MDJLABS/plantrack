@@ -13,6 +13,12 @@
  * réponses. Un point sans réponse apparaît EXPLICITEMENT comme tel : le taire ferait
  * passer une visite abandonnée à mi-chemin pour un succès, la même famille d'erreur
  * qu'une garde qui sous-rapporte sans faire de bruit (cf. CLAUDE.md § secrets).
+ *
+ * ⚠️ Motif des écarts (lot « curseur animé ») : un "ko" peut désormais porter un motif
+ * libre (`GuideProgress.motifs`, posé par le petit champ #guide-motif de `GuideDeTest.tsx`).
+ * Il rejoint la ligne du point concerné — toujours entre parenthèses, jamais une ligne à
+ * part : sans motif donné, la ligne reste identique à avant ce lot (rétro-compatible avec
+ * les anciens compte-rendus copiés).
  * ============================================================================== */
 
 import type { StepVerdict } from "./types";
@@ -31,11 +37,15 @@ const LIBELLE: Record<StepVerdict | "manquant", string> = {
  * un point par ligne, dans l'ordre du scénario, AUCUNE conclusion.
  */
 export function construireCompteRendu(
-  scenarioId: string, etapes: Etape[], verdicts: Record<string, StepVerdict | undefined>,
+  scenarioId: string,
+  etapes: Etape[],
+  verdicts: Record<string, StepVerdict | undefined>,
+  motifs: Record<string, string | undefined> = {},
 ): string {
   const lignes = etapes.map((e) => {
     const v = verdicts[e.id];
-    return `- ${e.titre} : ${v ? LIBELLE[v] : LIBELLE.manquant}`;
+    const motif = v === "ko" ? motifs[e.id] : undefined;
+    return `- ${e.titre} : ${v ? LIBELLE[v] : LIBELLE.manquant}${motif ? ` (${motif})` : ""}`;
   });
   return [`Guide de test — ${scenarioId}`, "", ...lignes].join("\n");
 }
