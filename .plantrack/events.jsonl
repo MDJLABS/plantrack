@@ -1282,3 +1282,18 @@
 {"ts": "2026-10-28T18:35:07+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t23"}
 {"ts": "2026-10-28T18:37:11+00:00", "kind": "answer", "id": "q5", "text": "telephone : Publier maintenant (Recommandé)", "canal": "telephone : Publier maintenant (Recommandé)"}
 {"ts": "2026-10-28T18:37:11+00:00", "kind": "decision", "id": "d101", "text": "v1.9.29 publiee (28/10, GitHub + PyPI verifie, choix Mariella tel 'Publier maintenant (Recommande)') : protection b24 (update ne reecrase plus le guide d'un site qui a le sien) + guides de test automatiques d100. 528 tests scenario + 4 fichiers guide verts. b24 reste to_verify.", "par": "agent"}
+{"ts": "2026-10-28T18:37:12+00:00", "kind": "commit", "sha": "86eab93", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-10-28T18:38:07+00:00", "kind": "file_touched", "text": "../../../root/kvm-lourd/tests/test_config.py", "thread": "t23"}
+{"ts": "2026-10-28T18:38:08+00:00", "kind": "file_touched", "text": "../../../root/kvm-lourd/tests/test_run.py", "thread": "t23"}
+{"ts": "2026-10-28T18:38:16+00:00", "kind": "file_touched", "text": "../../../root/kvm-lourd/tests/test_run.py", "thread": "t23"}
+{"ts": "2026-10-28T18:38:19+00:00", "kind": "file_touched", "text": "../../../root/kvm-lourd/tests/test_run.py", "thread": "t23"}
+{"ts": "2026-10-28T18:38:30+00:00", "kind": "file_touched", "text": "../../../root/kvm-lourd/kvm_lourd.py", "thread": "t23"}
+{"ts": "2026-10-28T18:38:31+00:00", "kind": "file_touched", "text": "../../../root/kvm-lourd/kvm_lourd.py", "thread": "t23"}
+{"ts": "2026-10-28T18:38:32+00:00", "kind": "file_touched", "text": "../../../root/kvm-lourd/kvm_lourd.py", "thread": "t23"}
+{"ts": "2026-10-28T18:38:34+00:00", "kind": "file_touched", "text": "../../../root/kvm-lourd/kvm_lourd.py", "thread": "t23"}
+{"ts": "2026-10-28T18:38:38+00:00", "kind": "file_touched", "text": "../../../root/kvm-lourd/kvm_lourd.py", "thread": "t23"}
+{"ts": "2026-10-28T18:38:44+00:00", "kind": "file_touched", "text": "../../../root/kvm-lourd/kvm_lourd.py", "thread": "t23"}
+{"ts": "2026-10-28T18:38:46+00:00", "kind": "file_touched", "text": "../../../root/kvm-lourd/kvm_lourd.py", "thread": "t23"}
+{"ts": "2026-10-28T18:38:47+00:00", "kind": "file_touched", "text": "../../../root/kvm-lourd/kvm_lourd.py", "thread": "t23"}
+{"ts": "2026-10-28T18:39:02+00:00", "kind": "file_touched", "text": "../../../root/kvm-lourd/install.sh", "thread": "t23"}
+{"ts": "2026-10-28T18:39:12+00:00", "kind": "decision", "id": "d102", "text": "Mariella (tel, 28/10) : la file kvm-lourd laisse toujours au moins 5 % de RAM et de processeur libres aux taches en cours. Livre : reserve RAM = max(1,5 Go, 5 % MemTotal) ; aucun demarrage tant que < 5 % du processeur est libre (mesure /proc/stat entre deux tours) ; lourd.slice plafonne a CPUQuota 95 x nproc (drop-in lourd.slice.d/libre.conf). Reglable KVM_LOURD_LIBRE. 78 tests verts, installe (sauvegarde backup/code/usr-local-bin/*.281028).", "par": "agent"}
