@@ -1270,3 +1270,7 @@
 {"ts": "2026-10-28T17:55:49+00:00", "kind": "commit", "sha": "6e04298", "ctype": "fix", "thread": "t23"}
 {"ts": "2026-10-28T17:56:31+00:00", "kind": "attempt", "id": "a33", "bug": "b24", "hypothesis": "reprise de a32 (session morte) : sync_guide saute un site dont un fichier du moteur differe sans empreinte GUIDE_PUBLIES (commit 6e04298) ; scenario.sh 528 ok dont 3 controles b24 ; site mdjlabs restaure (451852f, 929 tests ok)", "session": "959cfca3-0bf7-46ca-90da-428b03e16f71", "repris_de": "2ed1e4e4-cf96-4af7-8258-5ce068510e61", "actor": "claude-code"}
 {"ts": "2026-10-28T17:56:32+00:00", "kind": "bug_status", "id": "b24", "status": "to_verify"}
+{"ts": "2026-10-28T17:56:32+00:00", "kind": "commit", "sha": "cef2305", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-10-28T17:56:44+00:00", "kind": "question", "id": "q5", "text": "Publier v1.9.29 (protection b24 + lot d100 deja code) maintenant ou attendre la fin de d100 ? carte envoyee le 28/10", "carte": "b24pub"}
+{"ts": "2026-10-28T17:56:44+00:00", "kind": "file_touched", "text": "sortie/carte-b24.json", "thread": "t23"}
+{"ts": "2026-10-28T17:56:44+00:00", "kind": "file_touched", "text": "sortie/carte-b24.log", "thread": "t23"}

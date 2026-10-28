@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [13 commits]
-  fichiers recemment ecrits : .claude/hooks/pt.py, .claude/hooks/pt_publies.py, tests/scenario.sh, ../mdjlabs-site/sortie/tests-b24.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-sequential-glade.md, sortie/scenario-b24.log
+FIL ACTIF — t23 : guides de test automatiques (d100) [14 commits]
+  fichiers recemment ecrits : tests/scenario.sh, ../mdjlabs-site/sortie/tests-b24.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-sequential-glade.md, sortie/scenario-b24.log, sortie/carte-b24.json, sortie/carte-b24.log
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -131,5 +131,8 @@ Pieges connus :
   pg10 : Le post-commit journalise le commit lui-meme (events.jsonl) et regenere l'insta…
   pg13 : Gabarit de parcours : la phase de construction est a 'questions: false', mais u…
   pg15 : Le Stop hook bcc (hook/index.ts, regle 'projet ne s'endort jamais' du 03/10) EX…
+
+Cartes laissees de cote (action a reprendre a la reponse : answer --carte <id>) :
+  q5 (carte b24pub) : Publier v1.9.29 (protection b24 + lot d100 deja code) maintenant ou attendre la…
 ```
 <!-- plantrack:state-end -->
