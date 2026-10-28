@@ -14,16 +14,15 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t22 : travaux sur main [19 commits]
-  fichiers recemment ecrits : ../../../etc/systemd/system/menage-serveur.service, sortie/veille-admin-bases.txt, pyproject.toml, ../../../root/.claude/plans/contexte-reconstruit-par-le-joyful-hoare.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-ethereal-planet.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-spicy-sloth.md
-  (fil ouvert d'office pour ne perdre aucun commit — `!close` puis `!focus <sujet>` pour le nommer)
+FIL ACTIF — t23 : guides de test automatiques (d100) [13 commits]
+  fichiers recemment ecrits : .claude/hooks/pt.py, .claude/hooks/pt_publies.py, tests/scenario.sh, ../mdjlabs-site/sortie/tests-b24.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-sequential-glade.md, sortie/scenario-b24.log
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
   t5 : travaux sur main — reprise : retour au travail courant apres la faille
 
-BUGS NON CORRIGES (personne ne s'en est occupe) :
-  b24 (open) [t22] mdjlabs-site : la synchro du moteur de guide a ecrase guide-verdict.ts — guide-envoi.ts et ses tests importent compteRenduMarkdown et prog.… (agent)
+BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
+  b24 (to_verify) [t22] mdjlabs-site : la synchro du moteur de guide a ecrase guide-verdict.ts — guide-envoi.ts et ses tests importent compteRenduMarkdown et prog.… (agent) [2 tentatives, derniere: reprise de a32 (session morte) : sync_guide saute un site d…]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)

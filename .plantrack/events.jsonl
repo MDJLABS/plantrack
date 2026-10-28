@@ -1149,3 +1149,124 @@
 {"ts": "2026-10-27T23:47:36+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-spicy-sloth.md", "thread": "t22"}
 {"ts": "2026-10-27T23:55:11+00:00", "kind": "decision", "id": "d100", "text": "Mariella (tel, 28/10, plan approuve) : guides de test qui se jouent tout seuls — 'On code tout a 100 %' : geste (clic/saisie/aller) joue par un curseur anime dans le navigateur, resultat renvoye automatiquement a la session via bcc POST /guide/resultat avec jeton a usage unique (plantrack guide-lien / guide-resultat), copier-coller garde en secours.", "par": "agent"}
 {"ts": "2026-10-27T23:55:11+00:00", "kind": "bug", "id": "b24", "text": "mdjlabs-site : la synchro du moteur de guide a ecrase guide-verdict.ts — guide-envoi.ts et ses tests importent compteRenduMarkdown et prog.notes, absents du moteur commun (envoi automatique du 25/07 casse).", "thread": "t22", "severity": "normal", "par": "agent"}
+{"ts": "2026-10-27T23:55:15+00:00", "kind": "commit", "sha": "33ae26e", "ctype": "chore", "thread": "t22"}
+{"ts": "2026-10-27T23:55:18+00:00", "kind": "close", "id": "t22"}
+{"ts": "2026-10-27T23:55:29+00:00", "kind": "thread_open", "id": "t23", "text": "guides de test automatiques (d100)"}
+{"ts": "2026-10-27T23:56:59+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/lib/guide/types.ts", "thread": "t23"}
+{"ts": "2026-10-27T23:57:05+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/lib/guide/types.ts", "thread": "t23"}
+{"ts": "2026-10-27T23:57:18+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/lib/guide/guide-progress.ts", "thread": "t23"}
+{"ts": "2026-10-27T23:57:32+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/lib/guide/guide-progress.ts", "thread": "t23"}
+{"ts": "2026-10-27T23:57:43+00:00", "kind": "commit", "sha": "2386726", "ctype": "feat", "thread": "t23"}
+{"ts": "2026-10-27T23:59:02+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/lib/guide/guide-geste.ts", "thread": "t23"}
+{"ts": "2026-10-27T23:59:07+00:00", "kind": "commit", "sha": "a9b7bfd", "ctype": "feat", "thread": "t23"}
+{"ts": "2026-10-28T00:00:42+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/components/guide/GuideCurseur.tsx", "thread": "t23"}
+{"ts": "2026-10-28T00:00:49+00:00", "kind": "commit", "sha": "df1823c", "ctype": "feat", "thread": "t23"}
+{"ts": "2026-10-28T00:01:22+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-10-28T00:01:26+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-10-28T00:01:31+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-10-28T00:01:37+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/lib/guide/guide-compte-rendu.ts", "thread": "t23"}
+{"ts": "2026-10-28T00:01:43+00:00", "kind": "commit", "sha": "9c67559", "ctype": "feat", "thread": "t23"}
+{"ts": "2026-10-28T00:01:55+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-10-28T00:02:00+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-10-28T00:02:05+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-10-28T00:02:06+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/lib/guide/guide-visite.ts", "thread": "t23"}
+{"ts": "2026-10-28T00:02:12+00:00", "kind": "commit", "sha": "403078e", "ctype": "feat", "thread": "t23"}
+{"ts": "2026-10-28T00:02:41+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/lib/guide/guide-envoi.ts", "thread": "t23"}
+{"ts": "2026-10-28T00:02:46+00:00", "kind": "commit", "sha": "7a8a1cc", "ctype": "feat", "thread": "t23"}
+{"ts": "2026-10-28T00:05:05+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/lib/guide/guide-visite.ts", "thread": "t23"}
+{"ts": "2026-10-28T00:07:38+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/lib/guide/guide-envoi.ts", "thread": "t23"}
+{"ts": "2026-10-28T00:07:50+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/lib/guide/guide-envoi.ts", "thread": "t23"}
+{"ts": "2026-10-28T00:09:10+00:00", "kind": "file_touched", "text": "tests/guide/support/resolve-ts.mjs", "thread": "t23"}
+{"ts": "2026-10-28T00:09:13+00:00", "kind": "file_touched", "text": "tests/guide/support/register.mjs", "thread": "t23"}
+{"ts": "2026-10-28T00:10:10+00:00", "kind": "file_touched", "text": "tests/guide/fixtures/scenarios.ts", "thread": "t23"}
+{"ts": "2026-10-28T00:10:23+00:00", "kind": "file_touched", "text": "tests/guide/support/resolve-ts.mjs", "thread": "t23"}
+{"ts": "2026-10-28T00:11:05+00:00", "kind": "file_touched", "text": "tests/guide/envoi-securite.test.ts", "thread": "t23"}
+{"ts": "2026-10-28T00:11:41+00:00", "kind": "file_touched", "text": "tests/guide/envoi.test.ts", "thread": "t23"}
+{"ts": "2026-10-28T00:11:50+00:00", "kind": "file_touched", "text": "tests/guide/envoi.test.ts", "thread": "t23"}
+{"ts": "2026-10-28T00:11:53+00:00", "kind": "file_touched", "text": "tests/guide/envoi.test.ts", "thread": "t23"}
+{"ts": "2026-10-28T00:12:22+00:00", "kind": "commit", "sha": "faeb7cd", "ctype": "fix", "thread": "t23"}
+{"ts": "2026-10-28T00:13:25+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/lib/guide/guide-visite.ts", "thread": "t23"}
+{"ts": "2026-10-28T00:13:29+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/lib/guide/guide-visite.ts", "thread": "t23"}
+{"ts": "2026-10-28T00:13:32+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/lib/guide/guide-visite.ts", "thread": "t23"}
+{"ts": "2026-10-28T00:13:37+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/components/guide/GuideDeTestLazy.tsx", "thread": "t23"}
+{"ts": "2026-10-28T00:13:43+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/components/guide/GuideDeTestLazy.tsx", "thread": "t23"}
+{"ts": "2026-10-28T00:13:58+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/components/guide/GuideDeTestLazy.tsx", "thread": "t23"}
+{"ts": "2026-10-28T00:19:09+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-28T00:19:12+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-28T00:19:19+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-28T00:19:21+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-28T00:19:26+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-28T00:19:36+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-28T00:19:47+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-28T00:19:59+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-28T00:20:23+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-28T00:20:29+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-28T00:20:34+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-28T00:20:40+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-28T00:20:46+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-28T00:20:52+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-28T00:20:56+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/lib/guide/guide-envoi.ts", "thread": "t23"}
+{"ts": "2026-10-28T00:21:05+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/lib/guide/guide-envoi.ts", "thread": "t23"}
+{"ts": "2026-10-28T00:21:10+00:00", "kind": "file_touched", "text": "../../../tmp/tsc-guide-check.json", "thread": "t23"}
+{"ts": "2026-10-28T04:25:40+00:00", "kind": "file_touched", "text": "tests/guide/guide-geste.test.ts", "thread": "t23"}
+{"ts": "2026-10-28T04:26:08+00:00", "kind": "file_touched", "text": "tests/guide/guide-progress-compat.test.ts", "thread": "t23"}
+{"ts": "2026-10-28T04:26:15+00:00", "kind": "file_touched", "text": "tests/guide/envoi.test.ts", "thread": "t23"}
+{"ts": "2026-10-28T04:26:21+00:00", "kind": "file_touched", "text": "tests/guide/envoi.test.ts", "thread": "t23"}
+{"ts": "2026-10-28T05:52:07+00:00", "kind": "commit", "sha": "4ceb33d", "ctype": "feat", "thread": "t23"}
+{"ts": "2026-10-28T05:52:20+00:00", "kind": "commit", "sha": "8c1aae0", "ctype": "feat", "thread": "t23"}
+{"ts": "2026-10-28T05:54:33+00:00", "kind": "commit", "sha": "fd27559", "ctype": "test", "thread": "t23"}
+{"ts": "2026-10-28T05:55:41+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/lib/guide/guide-visite.ts", "thread": "t23"}
+{"ts": "2026-10-28T05:55:50+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/lib/guide/guide-envoi.ts", "thread": "t23"}
+{"ts": "2026-10-28T05:55:57+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-28T05:56:00+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-28T05:56:07+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-28T05:56:14+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-28T05:56:40+00:00", "kind": "file_touched", "text": "tests/guide/envoi-securite.test.ts", "thread": "t23"}
+{"ts": "2026-10-28T05:56:45+00:00", "kind": "file_touched", "text": "tests/guide/envoi.test.ts", "thread": "t23"}
+{"ts": "2026-10-28T05:56:50+00:00", "kind": "file_touched", "text": "tests/guide/envoi.test.ts", "thread": "t23"}
+{"ts": "2026-10-28T07:00:37+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/2ed1e4e4-cf96-4af7-8258-5ce068510e61/scratchpad/typecheck-guide/tsconfig.json", "thread": "t23"}
+{"ts": "2026-10-28T07:02:56+00:00", "kind": "commit", "sha": "a9d9a81", "ctype": "feat", "thread": "t23"}
+{"ts": "2026-10-28T11:14:07+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/2ed1e4e4-cf96-4af7-8258-5ce068510e61/scratchpad/probe.txt", "thread": "t23"}
+{"ts": "2026-10-28T11:14:32+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/2ed1e4e4-cf96-4af7-8258-5ce068510e61/scratchpad/section33.sh", "thread": "t23"}
+{"ts": "2026-10-28T15:24:01+00:00", "kind": "commit", "sha": "5addebf", "ctype": "feat", "thread": "t23"}
+{"ts": "2026-10-28T15:33:20+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/2ed1e4e4-cf96-4af7-8258-5ce068510e61/scratchpad/probe-write.txt", "thread": "t23"}
+{"ts": "2026-10-28T15:34:26+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/2ed1e4e4-cf96-4af7-8258-5ce068510e61/scratchpad/plantrack.ts", "thread": "t23"}
+{"ts": "2026-10-28T15:35:29+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/2ed1e4e4-cf96-4af7-8258-5ce068510e61/scratchpad/route-guide-resultat.txt", "thread": "t23"}
+{"ts": "2026-10-28T15:35:30+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/2ed1e4e4-cf96-4af7-8258-5ce068510e61/scratchpad/constante-guide-resultat.txt", "thread": "t23"}
+{"ts": "2026-10-28T15:35:57+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/2ed1e4e4-cf96-4af7-8258-5ce068510e61/scratchpad/route-guide-resultat.txt", "thread": "t23"}
+{"ts": "2026-10-28T15:57:48+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/2ed1e4e4-cf96-4af7-8258-5ce068510e61/scratchpad/plantrack-suffix.txt", "thread": "t23"}
+{"ts": "2026-10-28T15:58:17+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/2ed1e4e4-cf96-4af7-8258-5ce068510e61/scratchpad/plantrack-prefix.txt", "thread": "t23"}
+{"ts": "2026-10-28T15:58:26+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/2ed1e4e4-cf96-4af7-8258-5ce068510e61/scratchpad/plantrack-full.ts", "thread": "t23"}
+{"ts": "2026-10-28T15:59:27+00:00", "kind": "file_touched", "text": "../bcc/server/plantrack.ts", "thread": "t23"}
+{"ts": "2026-10-28T15:59:40+00:00", "kind": "file_touched", "text": "../bcc/server/plantrack.ts", "thread": "t23"}
+{"ts": "2026-10-28T16:02:07+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/2ed1e4e4-cf96-4af7-8258-5ce068510e61/scratchpad/route-guide-resultat-v2.txt", "thread": "t23"}
+{"ts": "2026-10-28T16:02:58+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/2ed1e4e4-cf96-4af7-8258-5ce068510e61/scratchpad/api-work.ts", "thread": "t23"}
+{"ts": "2026-10-28T16:03:02+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/2ed1e4e4-cf96-4af7-8258-5ce068510e61/scratchpad/api-work.ts", "thread": "t23"}
+{"ts": "2026-10-28T16:03:07+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/2ed1e4e4-cf96-4af7-8258-5ce068510e61/scratchpad/lock-guide-resultat.txt", "thread": "t23"}
+{"ts": "2026-10-28T16:03:10+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/2ed1e4e4-cf96-4af7-8258-5ce068510e61/scratchpad/api-work.ts", "thread": "t23"}
+{"ts": "2026-10-28T16:03:27+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/2ed1e4e4-cf96-4af7-8258-5ce068510e61/scratchpad/messages-guide-resultat.txt", "thread": "t23"}
+{"ts": "2026-10-28T16:03:31+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/2ed1e4e4-cf96-4af7-8258-5ce068510e61/scratchpad/api-work.ts", "thread": "t23"}
+{"ts": "2026-10-28T16:03:37+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/2ed1e4e4-cf96-4af7-8258-5ce068510e61/scratchpad/lire-corps-borne.txt", "thread": "t23"}
+{"ts": "2026-10-28T16:03:47+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/2ed1e4e4-cf96-4af7-8258-5ce068510e61/scratchpad/api-work.ts", "thread": "t23"}
+{"ts": "2026-10-28T16:03:50+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/2ed1e4e4-cf96-4af7-8258-5ce068510e61/scratchpad/api-work.ts", "thread": "t23"}
+{"ts": "2026-10-28T16:12:23+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/2ed1e4e4-cf96-4af7-8258-5ce068510e61/scratchpad/api.test-work.ts", "thread": "t23"}
+{"ts": "2026-10-28T16:13:01+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/2ed1e4e4-cf96-4af7-8258-5ce068510e61/scratchpad/guide-resultat-tests.txt", "thread": "t23"}
+{"ts": "2026-10-28T16:13:04+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/2ed1e4e4-cf96-4af7-8258-5ce068510e61/scratchpad/api.test-work.ts", "thread": "t23"}
+{"ts": "2026-10-28T16:13:53+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/2ed1e4e4-cf96-4af7-8258-5ce068510e61/scratchpad/guide-resultat-unit.txt", "thread": "t23"}
+{"ts": "2026-10-28T16:13:57+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/2ed1e4e4-cf96-4af7-8258-5ce068510e61/scratchpad/plantrack.test-work.ts", "thread": "t23"}
+{"ts": "2026-10-28T16:18:22+00:00", "kind": "attempt", "id": "a32", "bug": "b24", "hypothesis": "sync_guide ne recopie le moteur que si chaque fichier cible existant est identique a une version deja livree par PlanTrack (historique git de plantrack_guide) ; sinon le site a son propre moteur : on saute et on le signale", "session": "2ed1e4e4-cf96-4af7-8258-5ce068510e61", "actor": "claude-code"}
+{"ts": "2026-10-28T16:33:53+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/2ed1e4e4-cf96-4af7-8258-5ce068510e61/scratchpad/edit-isolation-test.txt", "thread": "t23"}
+{"ts": "2026-10-28T16:33:57+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/2ed1e4e4-cf96-4af7-8258-5ce068510e61/scratchpad/edit-isolation-test.txt", "thread": "t23"}
+{"ts": "2026-10-28T16:39:54+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/2ed1e4e4-cf96-4af7-8258-5ce068510e61/scratchpad/carte.json", "thread": "t23"}
+{"ts": "2026-10-28T17:24:00+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/a0ab6c5c-5a82-45dc-a018-c556c7e6f8e8/scratchpad/bash_calls.jsonl", "thread": "t23"}
+{"ts": "2026-10-28T17:26:47+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-10-28T17:26:51+00:00", "kind": "file_touched", "text": ".claude/hooks/pt_publies.py", "thread": "t23"}
+{"ts": "2026-10-28T17:27:05+00:00", "kind": "file_touched", "text": ".claude/hooks/pt_publies.py", "thread": "t23"}
+{"ts": "2026-10-28T17:27:28+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t23"}
+{"ts": "2026-10-28T17:27:31+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t23"}
+{"ts": "2026-10-28T17:27:50+00:00", "kind": "file_touched", "text": "../mdjlabs-site/sortie/tests-b24.log", "thread": "t23"}
+{"ts": "2026-10-28T17:44:19+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-sequential-glade.md", "thread": "t23"}
+{"ts": "2026-10-28T17:51:19+00:00", "kind": "file_touched", "text": "sortie/scenario-b24.log", "thread": "t23"}
+{"ts": "2026-10-28T17:55:49+00:00", "kind": "commit", "sha": "6e04298", "ctype": "fix", "thread": "t23"}
+{"ts": "2026-10-28T17:56:31+00:00", "kind": "attempt", "id": "a33", "bug": "b24", "hypothesis": "reprise de a32 (session morte) : sync_guide saute un site dont un fichier du moteur differe sans empreinte GUIDE_PUBLIES (commit 6e04298) ; scenario.sh 528 ok dont 3 controles b24 ; site mdjlabs restaure (451852f, 929 tests ok)", "session": "959cfca3-0bf7-46ca-90da-428b03e16f71", "repris_de": "2ed1e4e4-cf96-4af7-8258-5ce068510e61", "actor": "claude-code"}
+{"ts": "2026-10-28T17:56:32+00:00", "kind": "bug_status", "id": "b24", "status": "to_verify"}
