@@ -454,7 +454,8 @@ check "et renvoie vers uvx" "uvx plantrack@latest update" "$out"
 check_not "update : un depot sans guide de test n en recoit pas" "guide de test" "$out$(ls "$TMP8")"
 # d34 : le moteur du guide de test suit PlanTrack ; les scenarios du site ne bougent pas
 mkdir -p "$TMP8/src/lib/guide"
-echo vieux > "$TMP8/src/lib/guide/types.ts"; echo miens > "$TMP8/src/lib/guide/scenarios.ts"
+git -C "$(dirname "$PT")" show v1.9.5:.claude/hooks/plantrack_guide/lib/guide/types.ts > "$TMP8/src/lib/guide/types.ts"
+echo miens > "$TMP8/src/lib/guide/scenarios.ts"
 out=$(CLAUDE_PROJECT_DIR="$TMP8" python3 "$PT" update 2>&1)
 check "update : le moteur du guide de test est mis a jour" "fichier(s) du moteur mis a jour" "$out"
 check "update : types.ts remplace par la version PlanTrack" "ok" \
@@ -463,6 +464,14 @@ check "update : scenarios.ts du site intact" "miens" "$(cat "$TMP8/src/lib/guide
 check "update : composant du guide pose" "ok" "$([ -f "$TMP8/src/components/guide/GuideDeTest.tsx" ] && echo ok)"
 out=$(CLAUDE_PROJECT_DIR="$TMP8" python3 "$PT" update 2>&1)
 check "update : guide idempotent" "guide de test deja a jour" "$out"
+# b24 : un site qui a son propre guide (fichier retouche, aucune version publiee) n'est pas touche
+echo "// retouche du site" >> "$TMP8/src/lib/guide/guide-verdict.ts"
+rm "$TMP8/src/components/guide/GuideDeTest.tsx"
+out=$(CLAUDE_PROJECT_DIR="$TMP8" python3 "$PT" update 2>&1)
+check "update : un site qui a son propre guide est laisse tel quel" "a son propre guide" "$out"
+check "update : son fichier retouche est garde" "retouche du site" "$(tail -1 "$TMP8/src/lib/guide/guide-verdict.ts")"
+check "update : aucun fichier du moteur rajoute chez lui" "absent" \
+  "$([ -f "$TMP8/src/components/guide/GuideDeTest.tsx" ] && echo present || echo absent)"
 rm -rf "$TMP8"
 
 # 24. garde-fou surcouches — un outil (GSD...) regenere CLAUDE.md sans la reference

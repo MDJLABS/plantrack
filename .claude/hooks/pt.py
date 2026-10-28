@@ -1836,12 +1836,31 @@ def cmd_init(args):
 def sync_guide():
     """Le moteur du guide de test (Next.js) vit ici, en un seul exemplaire (d34) : un site
     qui l'a deja (lib/guide/types.ts) recoit la derniere version. Ses scenarios.ts restent a lui.
-    Un depot sans guide n'est pas touche."""
+    Un depot sans guide n'est pas touche. Un site qui a son propre guide (un fichier du moteur
+    qui n'est aucune version publiee par PlanTrack) n'est pas touche non plus (b24)."""
     src = os.path.join(os.path.dirname(os.path.abspath(__file__)), "plantrack_guide")
     if not os.path.isdir(src):
         return  # copie vendoree : le moteur ne voyage qu'avec le paquet ou le depot plantrack
+    try:
+        from pt_publies import GUIDE_PUBLIES
+    except ImportError:
+        GUIDE_PUBLIES = set()
     for base in ("", "src"):
         if not os.path.exists(os.path.join(ROOT, base, "lib", "guide", "types.ts")):
+            continue
+        propres = []
+        for dirpath, _, files in os.walk(src):
+            for name in files:
+                s = os.path.join(dirpath, name)
+                d = os.path.join(ROOT, base, os.path.relpath(s, src))
+                if os.path.isfile(d) and not os.path.islink(d):
+                    contenu = open(d, "rb").read()
+                    if (contenu != open(s, "rb").read()
+                            and hashlib.sha256(contenu).hexdigest() not in GUIDE_PUBLIES):
+                        propres.append(os.path.relpath(d, ROOT))
+        if propres:
+            print(f"guide de test : le site a son propre guide ({', '.join(propres[:3])}"
+                  f"{'…' if len(propres) > 3 else ''}), laisse tel quel.")
             continue
         changes = 0
         for dirpath, _, files in os.walk(src):
