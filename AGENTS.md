@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [17 commits]
-  fichiers recemment ecrits : sortie/guide-v1929.log, pyproject.toml, ../../../root/kvm-lourd/tests/test_config.py, ../../../root/kvm-lourd/tests/test_run.py, ../../../root/kvm-lourd/kvm_lourd.py, ../../../root/kvm-lourd/install.sh
+FIL ACTIF — t23 : guides de test automatiques (d100) [18 commits]
+  fichiers recemment ecrits : ../../../root/kvm-lourd/tests/test_run.py, ../../../root/kvm-lourd/kvm_lourd.py, ../../../root/kvm-lourd/install.sh, sortie/carte-suite-2810.json, sortie/carte-suite-2810.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-immutable-cupcake.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -127,6 +127,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d100 : Mariella (tel, 28/10, plan approuve) : guides de test qui se jouent tout seuls — 'On code tout a 100 %' : geste (clic/saisie/aller) joue pa… (agent)
   d101 : v1.9.29 publiee (28/10, GitHub + PyPI verifie, choix Mariella tel 'Publier maintenant (Recommande)') : protection b24 (update ne reecrase p… (agent)
   d102 : Mariella (tel, 28/10) : la file kvm-lourd laisse toujours au moins 5 % de RAM et de processeur libres aux taches en cours. Livre : reserve … (agent)
+  d103 : Mariella (tel, 28/10, plan approuve) : brancher les guides automatiques (d100) sur mdjlabs (portage dans SON guide, garde guide-gate/compte… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…

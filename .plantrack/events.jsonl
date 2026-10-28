@@ -1297,3 +1297,8 @@
 {"ts": "2026-10-28T18:38:47+00:00", "kind": "file_touched", "text": "../../../root/kvm-lourd/kvm_lourd.py", "thread": "t23"}
 {"ts": "2026-10-28T18:39:02+00:00", "kind": "file_touched", "text": "../../../root/kvm-lourd/install.sh", "thread": "t23"}
 {"ts": "2026-10-28T18:39:12+00:00", "kind": "decision", "id": "d102", "text": "Mariella (tel, 28/10) : la file kvm-lourd laisse toujours au moins 5 % de RAM et de processeur libres aux taches en cours. Livre : reserve RAM = max(1,5 Go, 5 % MemTotal) ; aucun demarrage tant que < 5 % du processeur est libre (mesure /proc/stat entre deux tours) ; lourd.slice plafonne a CPUQuota 95 x nproc (drop-in lourd.slice.d/libre.conf). Reglable KVM_LOURD_LIBRE. 78 tests verts, installe (sauvegarde backup/code/usr-local-bin/*.281028).", "par": "agent"}
+{"ts": "2026-10-28T18:39:12+00:00", "kind": "commit", "sha": "011cf34", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-10-28T18:39:30+00:00", "kind": "file_touched", "text": "sortie/carte-suite-2810.json", "thread": "t23"}
+{"ts": "2026-10-28T18:39:30+00:00", "kind": "file_touched", "text": "sortie/carte-suite-2810.log", "thread": "t23"}
+{"ts": "2026-10-28T19:53:53+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-immutable-cupcake.md", "thread": "t23"}
+{"ts": "2026-10-28T19:54:35+00:00", "kind": "decision", "id": "d103", "text": "Mariella (tel, 28/10, plan approuve) : brancher les guides automatiques (d100) sur mdjlabs (portage dans SON guide, garde guide-gate/compteRenduMarkdown), miamboost (update du guide commun, git add cible), promovie (portage dans studio/src/composants/GuideDeTest.tsx) ; prorent = docs seules, rien a brancher.", "par": "agent"}
