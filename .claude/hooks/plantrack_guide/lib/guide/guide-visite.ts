@@ -142,3 +142,93 @@ export function effacerVisiteSession(storage: StorageVisite | null): void {
     // idem — tant pis pour la reprise, jamais pour la page.
   }
 }
+
+/* ------------------------------------------------------------------------------------------
+ * Envoi du résultat (lot « curseur animé ») — `retour` (jeton), `poste` (base URL de la
+ * session qui a ouvert le guide) et `projet` arrivent en paramètres d'URL EN MÊME TEMPS que
+ * `?guide=`, et doivent survivre au même changement de page que la visite elle-même : d'où
+ * leur persistance ICI, avec la MÊME logique (une clé `sessionStorage` à part, écrite
+ * seulement sur une ouverture explicite et valide, relue sinon). Étendre ce fichier plutôt
+ * qu'en ouvrir un second qui dupliquerait `accederSessionStorage()`/le motif try-catch.
+ *
+ * Ce module ne SAIT PAS envoyer quoi que ce soit (aucun `fetch` ici) : ça reste à
+ * `guide-envoi.ts`, pur lui aussi côté construction du corps, impur seulement pour l'appel
+ * réseau — ce fichier-ci ne fait que PORTER les trois informations d'une page à l'autre.
+ * ------------------------------------------------------------------------------------------ */
+
+const CLE_SESSION_ENVOI = "mdj_guide_session_envoi";
+
+/** Les trois informations nécessaires pour envoyer un résultat (cf. `guide-envoi.ts`). */
+export type InfosEnvoi = { jeton: string; poste: string; projet: string };
+
+/**
+ * Décide les infos d'envoi actives, avec la MÊME priorité que `resoudreVisite` : les trois
+ * paramètres d'URL s'ils sont TOUS présents (explicite, l'emporte toujours — et c'est le
+ * seul cas qui doit écrire la session) ; sinon le contenu de session déjà lu, s'il est
+ * valide ; sinon rien. Les trois paramètres sont exigés ENSEMBLE : un `retour` sans `poste`
+ * ne désignerait aucune destination, un `poste` sans `jeton` n'authentifierait rien — une
+ * combinaison partielle n'est pas une commande explicite valable, on retombe sur la session.
+ */
+export function resoudreEnvoi(
+  paramRetour: string | null | undefined,
+  paramPoste: string | null | undefined,
+  paramProjet: string | null | undefined,
+  contenuSessionEnvoi: string | null | undefined,
+): InfosEnvoi | null {
+  if (paramRetour && paramPoste && paramProjet) {
+    return { jeton: paramRetour, poste: paramPoste, projet: paramProjet };
+  }
+  return parserInfosEnvoi(contenuSessionEnvoi);
+}
+
+/** Relecture tolérante — un contenu absent, illisible, ou aux champs incomplets rend
+ *  `null` plutôt qu'une donnée d'envoi à moitié vraie (jamais de `poste` vide, par ex.). */
+function parserInfosEnvoi(contenu: string | null | undefined): InfosEnvoi | null {
+  if (!contenu) return null;
+  let o: unknown;
+  try {
+    o = JSON.parse(contenu);
+  } catch {
+    return null;
+  }
+  if (!o || typeof o !== "object") return null;
+  const { jeton, poste, projet } = o as Partial<InfosEnvoi>;
+  if (typeof jeton === "string" && jeton && typeof poste === "string" && poste && typeof projet === "string" && projet) {
+    return { jeton, poste, projet };
+  }
+  return null;
+}
+
+/** Lit la clé de session d'envoi — même repli que `lireVisiteSession` (jamais fatal). */
+export function lireInfosEnvoiSession(storage: StorageVisite | null): string | null {
+  if (!storage) return null;
+  try {
+    return storage.getItem(CLE_SESSION_ENVOI);
+  } catch {
+    return null;
+  }
+}
+
+/** Écrit la clé de session d'envoi — appelée UNIQUEMENT quand `resoudreEnvoi` a reçu les
+ *  trois paramètres d'URL explicites (même garde que `ecrireVisiteSession`). */
+export function ecrireInfosEnvoiSession(storage: StorageVisite | null, infos: InfosEnvoi): void {
+  if (!storage) return;
+  try {
+    storage.setItem(CLE_SESSION_ENVOI, JSON.stringify(infos));
+  } catch {
+    // Stockage indisponible : l'envoi automatique ne survivra pas au changement de page,
+    // le bouton Copier reste le filet de sécurité — jamais faire tomber la page pour ça.
+  }
+}
+
+/** Efface la clé de session d'envoi — à la fermeture DÉFINITIVE du guide (même geste que
+ *  `effacerVisiteSession`), pour qu'une visite rouverte plus tard ne retente pas un envoi
+ *  avec un jeton périmé. */
+export function effacerInfosEnvoiSession(storage: StorageVisite | null): void {
+  if (!storage) return;
+  try {
+    storage.removeItem(CLE_SESSION_ENVOI);
+  } catch {
+    // idem — tant pis pour la reprise, jamais pour la page.
+  }
+}
