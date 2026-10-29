@@ -1302,3 +1302,99 @@
 {"ts": "2026-10-28T18:39:30+00:00", "kind": "file_touched", "text": "sortie/carte-suite-2810.log", "thread": "t23"}
 {"ts": "2026-10-28T19:53:53+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-immutable-cupcake.md", "thread": "t23"}
 {"ts": "2026-10-28T19:54:35+00:00", "kind": "decision", "id": "d103", "text": "Mariella (tel, 28/10, plan approuve) : brancher les guides automatiques (d100) sur mdjlabs (portage dans SON guide, garde guide-gate/compteRenduMarkdown), miamboost (update du guide commun, git add cible), promovie (portage dans studio/src/composants/GuideDeTest.tsx) ; prorent = docs seules, rien a brancher.", "par": "agent"}
+{"ts": "2026-10-28T19:55:08+00:00", "kind": "commit", "sha": "eaa74b9", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-10-28T19:55:14+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/a16bb434-c5cd-497e-9b6f-823c0cbb712f/scratchpad/avant.txt", "thread": "t23"}
+{"ts": "2026-10-28T19:55:39+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/a16bb434-c5cd-497e-9b6f-823c0cbb712f/scratchpad/apres.txt", "thread": "t23"}
+{"ts": "2026-10-28T19:57:27+00:00", "kind": "file_touched", "text": "../promovie/studio/src/lib/guide/guide-geste.ts", "thread": "t23"}
+{"ts": "2026-10-28T19:57:54+00:00", "kind": "file_touched", "text": "../promovie/studio/src/composants/GuideCurseur.tsx", "thread": "t23"}
+{"ts": "2026-10-28T19:58:05+00:00", "kind": "file_touched", "text": "../promovie/studio/src/composants/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-28T19:58:09+00:00", "kind": "file_touched", "text": "../promovie/studio/src/composants/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-28T19:58:16+00:00", "kind": "file_touched", "text": "../promovie/studio/src/composants/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-28T19:58:21+00:00", "kind": "file_touched", "text": "../promovie/studio/src/composants/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-28T19:58:26+00:00", "kind": "file_touched", "text": "../promovie/studio/src/composants/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-28T19:58:49+00:00", "kind": "file_touched", "text": "../promovie/studio/src/composants/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-28T19:59:01+00:00", "kind": "file_touched", "text": "../promovie/studio/src/composants/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-28T19:59:10+00:00", "kind": "file_touched", "text": "../promovie/studio/src/composants/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-28T19:59:18+00:00", "kind": "file_touched", "text": "../promovie/studio/src/composants/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-28T19:59:30+00:00", "kind": "file_touched", "text": "../promovie/studio/src/composants/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-28T20:01:41+00:00", "kind": "attempt", "id": "a34", "bug": "b24", "hypothesis": "Re-ecrasement du 28/10 19h25 : la ronde de mdjlabs a lance 'uvx plantrack@latest update' qui a servi v1.9.28 (cache uv, v1.9.29 publiee a 18h37), donc sync_guide SANS protection. Correctif : (1) mdjlabs restaure a 451852f puis passe a pt.py v1.9.29 ; (2) cmd_ronde force 'uvx --refresh-package plantrack' pour ne jamais rejouer une version en cache.", "session": "a16bb434-c5cd-497e-9b6f-823c0cbb712f", "repris_de": "959cfca3-0bf7-46ca-90da-428b03e16f71", "actor": "claude-code"}
+{"ts": "2026-10-28T20:02:13+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t23"}
+{"ts": "2026-10-28T20:02:16+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t23"}
+{"ts": "2026-10-28T20:02:17+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-10-28T20:02:24+00:00", "kind": "file_touched", "text": "sortie/scenario-refresh.log", "thread": "t23"}
+{"ts": "2026-10-28T20:05:38+00:00", "kind": "bug", "id": "b25", "text": "guide-lien rend le jeton en clair a l'agent et guide-resultat n'a ni require_human ni garde AGENT_ENV : l'agent peut fabriquer lui-meme un verdict 'guide web' (contourne la regle verdict reserve a l'humain). Pistes : refuser guide-resultat en env agent si la route bcc tourne hors env Claude, ou jeton tenu par le poste bcc (HMAC). Revue securite auto du 28/10.", "thread": "t23", "severity": "normal", "par": "agent"}
+{"ts": "2026-10-28T20:05:43+00:00", "kind": "file_touched", "text": "../mdjlabs-site/lib/guide/types.ts", "thread": "t23"}
+{"ts": "2026-10-28T20:05:47+00:00", "kind": "file_touched", "text": "../mdjlabs-site/lib/guide/types.ts", "thread": "t23"}
+{"ts": "2026-10-28T20:05:52+00:00", "kind": "file_touched", "text": "../mdjlabs-site/lib/guide/guide-progress.ts", "thread": "t23"}
+{"ts": "2026-10-28T20:05:56+00:00", "kind": "file_touched", "text": "../mdjlabs-site/lib/guide/guide-progress.ts", "thread": "t23"}
+{"ts": "2026-10-28T20:06:02+00:00", "kind": "file_touched", "text": "../mdjlabs-site/lib/guide/guide-progress.ts", "thread": "t23"}
+{"ts": "2026-10-28T20:06:29+00:00", "kind": "file_touched", "text": "../mdjlabs-site/lib/guide/guide-geste.ts", "thread": "t23"}
+{"ts": "2026-10-28T20:10:47+00:00", "kind": "file_touched", "text": "../mdjlabs-site/components/guide/guide-curseur.tsx", "thread": "t23"}
+{"ts": "2026-10-28T20:11:25+00:00", "kind": "file_touched", "text": "../mdjlabs-site/components/guide/guide-de-test.tsx", "thread": "t23"}
+{"ts": "2026-10-28T20:11:31+00:00", "kind": "file_touched", "text": "../mdjlabs-site/components/guide/guide-de-test.tsx", "thread": "t23"}
+{"ts": "2026-10-28T20:11:38+00:00", "kind": "file_touched", "text": "../mdjlabs-site/components/guide/guide-de-test.tsx", "thread": "t23"}
+{"ts": "2026-10-28T20:11:45+00:00", "kind": "file_touched", "text": "../mdjlabs-site/components/guide/guide-de-test.tsx", "thread": "t23"}
+{"ts": "2026-10-28T20:11:50+00:00", "kind": "file_touched", "text": "../mdjlabs-site/components/guide/guide-de-test.tsx", "thread": "t23"}
+{"ts": "2026-10-28T20:11:54+00:00", "kind": "file_touched", "text": "../mdjlabs-site/components/guide/guide-de-test.tsx", "thread": "t23"}
+{"ts": "2026-10-28T20:12:00+00:00", "kind": "file_touched", "text": "../mdjlabs-site/components/guide/guide-de-test.tsx", "thread": "t23"}
+{"ts": "2026-10-28T20:12:25+00:00", "kind": "file_touched", "text": "../mdjlabs-site/lib/guide/__tests__/guide-geste.test.ts", "thread": "t23"}
+{"ts": "2026-10-28T20:22:20+00:00", "kind": "file_touched", "text": "../mdjlabs-site/lib/guide/__tests__/guide-geste.test.ts", "thread": "t23"}
+{"ts": "2026-10-28T20:22:32+00:00", "kind": "file_touched", "text": "../mdjlabs-site/lib/guide/__tests__/guide-geste.test.ts", "thread": "t23"}
+{"ts": "2026-10-28T20:22:46+00:00", "kind": "commit", "sha": "653d5e6", "ctype": "fix", "thread": "t23"}
+{"ts": "2026-10-28T20:33:14+00:00", "kind": "bug", "id": "b26", "text": "Moteur guide (guide-visite.ts, commun) : l'adresse du poste ou partent les resultats vient du lien (?poste=) et toute origine https est acceptee — un lien piege enverrait les verdicts/notes d'un testeur ailleurs. Piste : liste blanche (loopback + NEXT_PUBLIC_GUIDE_POSTES). Revue securite auto du 28/10 (vu dans miamboost).", "thread": "t23", "severity": "normal", "par": "agent"}
+{"ts": "2026-10-28T20:34:29+00:00", "kind": "file_touched", "text": "../mdjlabs-site/lib/guide/guide-progress.ts", "thread": "t23"}
+{"ts": "2026-10-28T20:34:34+00:00", "kind": "file_touched", "text": "sortie/tsc-miamboost.log", "thread": "t23"}
+{"ts": "2026-10-28T20:49:59+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/a16bb434-c5cd-497e-9b6f-823c0cbb712f/scratchpad/test.txt", "thread": "t23"}
+{"ts": "2026-10-28T20:50:04+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/a16bb434-c5cd-497e-9b6f-823c0cbb712f/scratchpad/test.txt", "thread": "t23"}
+{"ts": "2026-10-28T20:50:23+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/a16bb434-c5cd-497e-9b6f-823c0cbb712f/scratchpad/insert_scenario.py", "thread": "t23"}
+{"ts": "2026-10-28T20:50:40+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/a16bb434-c5cd-497e-9b6f-823c0cbb712f/scratchpad/insert_scenario.py", "thread": "t23"}
+{"ts": "2026-10-28T20:52:16+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/a16bb434-c5cd-497e-9b6f-823c0cbb712f/scratchpad/test.txt", "thread": "t23"}
+{"ts": "2026-10-28T20:52:32+00:00", "kind": "file_touched", "text": "../mdjlabs-site/scratch-test-probe.txt", "thread": "t23"}
+{"ts": "2026-10-28T20:52:59+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/a16bb434-c5cd-497e-9b6f-823c0cbb712f/scratchpad/scenario-block.txt", "thread": "t23"}
+{"ts": "2026-10-28T20:53:03+00:00", "kind": "file_touched", "text": "../mdjlabs-site/lib/guide/scenarios.ts", "thread": "t23"}
+{"ts": "2026-10-28T21:32:13+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-floofy-key.md", "thread": "t23"}
+{"ts": "2026-10-28T21:37:55+00:00", "kind": "file_touched", "text": "../mdjlabs-site/sortie/essai-gestes.sh", "thread": "t23"}
+{"ts": "2026-10-28T21:37:55+00:00", "kind": "file_touched", "text": "../mdjlabs-site/sortie/essai-gestes.log", "thread": "t23"}
+{"ts": "2026-10-28T21:54:40+00:00", "kind": "decision", "id": "d104", "text": "Mariella (tel, 28/10, apres essai de l'exemple essai-gestes sur preprod mdjlabs) : 'ca serait bien de laisser afficher la carte de fin pour que je comprenne que tout est fini, valide et envoye a la session concernee. D'ailleurs il faudrait faire un /design de l'ui ux du guide, pour avoir des cartes nickel.' -> 1) apres un geste 'aller' en derniere etape, le guide doit rester ouvert et finir sur l'ecran de bilan (fini / valide / envoye a la session) au lieu de se replier en pastille ; 2) maquette Claude Design de l'UI/UX du guide (cartes) avant recodage.", "par": "agent"}
+{"ts": "2026-10-28T21:55:03+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/6afa687c-5dfd-4fe2-8c38-681c638a32cd/scratchpad/guide-design/project/canvas.json", "thread": "t23"}
+{"ts": "2026-10-28T21:55:23+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/6afa687c-5dfd-4fe2-8c38-681c638a32cd/scratchpad/guide-design/project/Main.dc.html", "thread": "t23"}
+{"ts": "2026-10-28T21:55:47+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/6afa687c-5dfd-4fe2-8c38-681c638a32cd/scratchpad/guide-design/project/Fin.dc.html", "thread": "t23"}
+{"ts": "2026-10-28T21:56:08+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/6afa687c-5dfd-4fe2-8c38-681c638a32cd/scratchpad/guide-design/project/Echec.dc.html", "thread": "t23"}
+{"ts": "2026-10-28T21:56:33+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/6afa687c-5dfd-4fe2-8c38-681c638a32cd/scratchpad/guide-design/project/Bureau.dc.html", "thread": "t23"}
+{"ts": "2026-10-28T21:58:45+00:00", "kind": "decision", "id": "d105", "text": "Mariella (tel, 28/10) : maquette des cartes du guide VALIDEE ('Valider, code-la (Recommande)') — https://claude.ai/artifact/CrmX2JdkqBtpucihUxYAgo : point a juger en feuille du bas (telephone) / carte en bas a droite (ordinateur), progression en segments, menu ⋯ (rejouer/recommencer/fermer), bandeau 'J'ai fait le geste pour toi', encart 'Tu dois voir', boutons 'Oui, je le vois' / 'Non, pas ca', geste rate en encart orange + 'Reessayer le geste', carte de fin 'C'est fini, tout est bon · N sur N · Envoye a la session <projet> a HHhMM' qui reste affichee meme apres un geste 'aller'.", "par": "agent"}
+{"ts": "2026-10-28T22:04:31+00:00", "kind": "file_touched", "text": "../mdjlabs-site/lib/guide/guide-gate.ts", "thread": "t23"}
+{"ts": "2026-10-28T22:04:38+00:00", "kind": "file_touched", "text": "../mdjlabs-site/lib/guide/__tests__/guide-gate.test.ts", "thread": "t23"}
+{"ts": "2026-10-28T22:04:47+00:00", "kind": "file_touched", "text": "../mdjlabs-site/lib/guide/__tests__/guide-gate.test.ts", "thread": "t23"}
+{"ts": "2026-10-28T22:05:47+00:00", "kind": "file_touched", "text": "../mdjlabs-site/components/guide/guide-de-test.tsx", "thread": "t23"}
+{"ts": "2026-10-28T22:06:02+00:00", "kind": "file_touched", "text": "../mdjlabs-site/components/guide/guide-de-test.tsx", "thread": "t23"}
+{"ts": "2026-10-28T22:09:57+00:00", "kind": "file_touched", "text": "../mdjlabs-site/components/guide/guide-de-test.tsx", "thread": "t23"}
+{"ts": "2026-10-28T22:14:23+00:00", "kind": "file_touched", "text": "../mdjlabs-site/components/guide/guide-de-test.tsx", "thread": "t23"}
+{"ts": "2026-10-28T22:14:30+00:00", "kind": "file_touched", "text": "../mdjlabs-site/components/guide/guide-de-test.tsx", "thread": "t23"}
+{"ts": "2026-10-28T22:14:37+00:00", "kind": "file_touched", "text": "../mdjlabs-site/components/guide/guide-de-test.tsx", "thread": "t23"}
+{"ts": "2026-10-28T22:14:40+00:00", "kind": "file_touched", "text": "../mdjlabs-site/components/guide/guide-de-test.tsx", "thread": "t23"}
+{"ts": "2026-10-28T22:14:44+00:00", "kind": "file_touched", "text": "../mdjlabs-site/components/guide/guide-de-test.tsx", "thread": "t23"}
+{"ts": "2026-10-28T22:14:56+00:00", "kind": "file_touched", "text": "../mdjlabs-site/components/guide/guide-de-test.tsx", "thread": "t23"}
+{"ts": "2026-10-28T22:16:37+00:00", "kind": "file_touched", "text": "../mdjlabs-site/components/guide/guide-de-test.tsx", "thread": "t23"}
+{"ts": "2026-10-28T22:52:59+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-purrfect-fiddle.md", "thread": "t23"}
+{"ts": "2026-10-28T23:41:20+00:00", "kind": "file_touched", "text": "sortie/carte-failles-guide.json", "thread": "t23"}
+{"ts": "2026-10-28T23:41:20+00:00", "kind": "file_touched", "text": "sortie/carte-failles-guide.log", "thread": "t23"}
+{"ts": "2026-10-28T23:41:24+00:00", "kind": "question", "id": "q6", "text": "Failles guide b25/b26 : les fermer toutes les deux (poste seul destinataire + cle gardee par le poste) ? carte envoyee le 29/10"}
+{"ts": "2026-10-28T23:49:03+00:00", "kind": "file_touched", "text": "sortie/tests-guide.log", "thread": "t23"}
+{"ts": "2026-10-28T23:49:03+00:00", "kind": "file_touched", "text": "sortie/tests-guide.log", "thread": "t23"}
+{"ts": "2026-10-28T23:49:26+00:00", "kind": "answer", "id": "q6", "text": "Les deux, comme conseille", "canal": "telephone : Les deux, comme conseillé (Recommandé)"}
+{"ts": "2026-10-28T23:49:27+00:00", "kind": "decision", "id": "d106", "text": "Mariella (tel, 29/10, carte Failles guide) : 'Les deux, comme conseille (Recommande)' — b26 : le guide n'envoie plus qu'au poste (liste blanche, plus de 'toute origine https') ; b25 : la cle qui prouve le verdict est gardee par le poste bcc, pas rendue en clair a l'agent.", "par": "agent"}
+{"ts": "2026-10-28T23:49:49+00:00", "kind": "attempt", "id": "a35", "bug": "b26", "hypothesis": "validerPoste : sans liste blanche NEXT_PUBLIC_GUIDE_POSTES, n'accepter que les hotes locaux (loopback) — plus aucune origine https quelconque ; un poste distant (bcc.mdjlabs.com) doit etre declare dans la liste blanche du site. Tests envoi-securite ajustes.", "session": "b16a52e3-9e4f-4a60-a83f-9fa621c089a7", "actor": "claude-code"}
+{"ts": "2026-10-28T23:51:09+00:00", "kind": "file_touched", "text": "sortie/test-envoi-securite.log", "thread": "t23"}
+{"ts": "2026-10-28T23:51:17+00:00", "kind": "commit", "sha": "9c6c092", "ctype": "fix", "thread": "t23"}
+{"ts": "2026-10-28T23:51:32+00:00", "kind": "bug_status", "id": "b26", "status": "to_verify"}
+{"ts": "2026-10-29T09:06:10+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-wise-pelican.md", "thread": "t23"}
+{"ts": "2026-10-29T09:11:51+00:00", "kind": "attempt", "id": "a36", "bug": "b25", "hypothesis": "guide-lien refuse en env agent (le lien part par node bcc/hook/guide-lien.ts qui l'envoie en bulle sans l'imprimer) ; guide-resultat refuse en env agent (seul le poste, env nettoye, le depose)", "session": "02ac0db1-b798-4e9a-ac4d-cd5d57fdba3e", "actor": "claude-code"}
+{"ts": "2026-10-29T09:14:21+00:00", "kind": "file_touched", "text": "../bcc/hook/guide-lien.ts", "thread": "t23"}
+{"ts": "2026-10-29T09:14:33+00:00", "kind": "file_touched", "text": "../bcc/tests/guide-lien.test.ts", "thread": "t23"}
+{"ts": "2026-10-29T09:16:36+00:00", "kind": "commit", "sha": "3a9080e", "ctype": "fix", "thread": "t23"}
+{"ts": "2026-10-29T09:21:24+00:00", "kind": "commit", "sha": "b793ed6", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-10-29T09:21:29+00:00", "kind": "bug_status", "id": "b25", "status": "to_verify"}
+{"ts": "2026-10-29T09:21:29+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t23"}
+{"ts": "2026-10-29T09:21:43+00:00", "kind": "file_touched", "text": "../bcc/sortie/commit-guide-lien.log", "thread": "t23"}
+{"ts": "2026-10-29T09:22:24+00:00", "kind": "decision", "id": "d107", "text": "v1.9.30 publiee (29/10, GitHub + PyPI verifie, plan valide par Mariella tel) : b25 ferme selon d106 — guide-lien et guide-resultat refuses en env agent ; le lien part par node bcc/hook/guide-lien.ts (env nettoye, bulle --ton info, jamais imprime). Tests scenario verts + 7 tests bcc. b25 et b26 to_verify.", "par": "agent"}
+{"ts": "2026-10-29T09:24:52+00:00", "kind": "file_touched", "text": "../bcc/sortie/commit-guide-lien.log", "thread": "t23"}

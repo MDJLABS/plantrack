@@ -14,15 +14,17 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [18 commits]
-  fichiers recemment ecrits : ../../../root/kvm-lourd/tests/test_run.py, ../../../root/kvm-lourd/kvm_lourd.py, ../../../root/kvm-lourd/install.sh, sortie/carte-suite-2810.json, sortie/carte-suite-2810.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-immutable-cupcake.md
+FIL ACTIF — t23 : guides de test automatiques (d100) [23 commits]
+  fichiers recemment ecrits : sortie/test-envoi-securite.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-wise-pelican.md, ../bcc/hook/guide-lien.ts, ../bcc/tests/guide-lien.test.ts, pyproject.toml, ../bcc/sortie/commit-guide-lien.log
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
   t5 : travaux sur main — reprise : retour au travail courant apres la faille
 
 BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
-  b24 (to_verify) [t22] mdjlabs-site : la synchro du moteur de guide a ecrase guide-verdict.ts — guide-envoi.ts et ses tests importent compteRenduMarkdown et prog.… (agent) [2 tentatives, derniere: reprise de a32 (session morte) : sync_guide saute un site d…]
+  b24 (to_verify) [t22] mdjlabs-site : la synchro du moteur de guide a ecrase guide-verdict.ts — guide-envoi.ts et ses tests importent compteRenduMarkdown et prog.… (agent) [3 tentatives, derniere: Re-ecrasement du 28/10 19h25 : la ronde de mdjlabs a lance …]
+  b25 (to_verify) [t23] guide-lien rend le jeton en clair a l'agent et guide-resultat n'a ni require_human ni garde AGENT_ENV : l'agent peut fabriquer lui-meme un … (agent) [1 tentatives, derniere: guide-lien refuse en env agent (le lien part par node bcc/h…]
+  b26 (to_verify) [t23] Moteur guide (guide-visite.ts, commun) : l'adresse du poste ou partent les resultats vient du lien (?poste=) et toute origine https est acc… (agent) [1 tentatives, derniere: validerPoste : sans liste blanche NEXT_PUBLIC_GUIDE_POSTES,…]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
@@ -128,6 +130,10 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d101 : v1.9.29 publiee (28/10, GitHub + PyPI verifie, choix Mariella tel 'Publier maintenant (Recommande)') : protection b24 (update ne reecrase p… (agent)
   d102 : Mariella (tel, 28/10) : la file kvm-lourd laisse toujours au moins 5 % de RAM et de processeur libres aux taches en cours. Livre : reserve … (agent)
   d103 : Mariella (tel, 28/10, plan approuve) : brancher les guides automatiques (d100) sur mdjlabs (portage dans SON guide, garde guide-gate/compte… (agent)
+  d104 : Mariella (tel, 28/10, apres essai de l'exemple essai-gestes sur preprod mdjlabs) : 'ca serait bien de laisser afficher la carte de fin pour… (agent)
+  d105 : Mariella (tel, 28/10) : maquette des cartes du guide VALIDEE ('Valider, code-la (Recommande)') — https://claude.ai/artifact/CrmX2JdkqBtpuci… (agent)
+  d106 : Mariella (tel, 29/10, carte Failles guide) : 'Les deux, comme conseille (Recommande)' — b26 : le guide n'envoie plus qu'au poste (liste bla… (agent)
+  d107 : v1.9.30 publiee (29/10, GitHub + PyPI verifie, plan valide par Mariella tel) : b25 ferme selon d106 — guide-lien et guide-resultat refuses … (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
