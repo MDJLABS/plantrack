@@ -807,7 +807,15 @@ def cmd_guide_lien(gid, args, st):
     environnement agent — c'est l'agent qui fabrique le lien, pas qui pose le
     verdict. Le jeton n'est JAMAIS journalise en clair, seul son hash (meme
     logique qu'un mot de passe) ; c'est lui qui authentifiera le retour du
-    navigateur cote `guide-resultat`, pas une identite humaine CLI."""
+    navigateur cote `guide-resultat`, pas une identite humaine CLI.
+    b25/d106 : REFUSE en environnement agent, sans exception --de — un agent
+    qui lit le jeton pourrait forger lui-meme le verdict. Le lien est fabrique
+    par le poste (`node <bcc>/hook/guide-lien.ts`, env nettoye) qui l'envoie
+    en bulle a l'humain sans jamais l'imprimer."""
+    if any(os.environ.get(v) for v in AGENT_ENV):
+        sys.exit("[PlanTrack] refuse : `guide-lien` rendrait le jeton du guide a l'agent (b25).\n"
+                 "Envoie le lien par le poste : node <bcc>/hook/guide-lien.ts <guide_id> --url <page> "
+                 "[--scenario <id>] — il part en bulle sur le telephone, le jeton ne s'affiche jamais.")
     if not gid or gid not in st["guides"]:
         sys.exit("usage : plantrack guide-lien <guide_id> --url <page> "
                  "[--poste <base>] [--scenario <id>] — guide introuvable.")
@@ -838,7 +846,13 @@ def cmd_guide_resultat(st):
     terminal. Authentifie par jeton a usage unique, PAS par require_human : la
     route n'a pas de session agent, c'est le jeton qui prouve que la reponse
     vient bien d'un guide ouvert par l'agent (canal relaye, legitime en env
-    agent — meme famille que --de, d8/d107, mais authentifie differemment)."""
+    agent — meme famille que --de, d8/d107, mais authentifie differemment).
+    b25/d106 : refuse (code 5) en environnement agent — seul le poste, qui
+    appelle avec un env nettoye des variables agent, depose un resultat."""
+    if any(os.environ.get(v) for v in AGENT_ENV):
+        print("[PlanTrack] refuse : `guide-resultat` est reserve au poste (environnement agent detecte, b25).",
+              file=sys.stderr)
+        sys.exit(5)
     brut = sys.stdin.buffer.read(GUIDE_RESULTAT_MAX + 1)
     if len(brut) > GUIDE_RESULTAT_MAX:
         sys.exit(2)
@@ -1058,7 +1072,7 @@ CLI humaine : plantrack status | bugs | inbox | verify <id> | reject <id> -m ...
               plantrack piege <texte> | piege-clos <id> <motif> | question <texte>   utilisables par l'agent
               plantrack answer <question_id> <texte>   toi seule, hors session
               plantrack testcheck on|off | guide <titre>|<id> | step <id> <texte> | check <id> ok|ko [-m motif]
-              plantrack guide-lien <id> --url <page> [--poste <base>] [--scenario <id>]   lien de guide web a jeton unique (b24/d100)
+              plantrack guide-lien <id> --url <page> [--poste <base>] [--scenario <id>]   lien de guide web a jeton unique (b24/d100) — poste seulement ; agent : node <bcc>/hook/guide-lien.ts (b25)
               plantrack guide-resultat   recoit sur stdin le verdict d'un guide web (jeton), appele par la route bcc
               plantrack init  installation vendoree (tous agents, + hooks git post-commit et pre-commit d'office)
               uvx plantrack@latest update   mise a jour d'une installation existante

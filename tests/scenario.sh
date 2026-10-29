@@ -1541,22 +1541,31 @@ rm -rf "$TMPK"
 # 33. guide-lien et guide-resultat — jeton de guide web a usage unique (b24/d100)
 TMP18=$(mktemp -d)
 M() { CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" "$@" 2>&1; }
-MR() { CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" guide-resultat 2>&1; }
+# b25 : guide-lien et guide-resultat sont reserves au poste (env nettoye des variables agent)
+P() { env -u CLAUDECODE -u CLAUDE_CODE_ENTRYPOINT -u CODEX_THREAD_ID -u CODEX_SANDBOX CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" "$@" 2>&1; }
+MR() { P guide-resultat; }
 
 printf '{"prompt":"!testcheck on"}' | CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" hook-prompt >/dev/null 2>&1
 out=$(M guide "demo guide-lien"); check "guide-lien : guide prepare" "guide g1 cree" "$out"
 M step g1 "cliquer sur demarrer" >/dev/null 2>&1
 M step g1 "verifier le resultat" >/dev/null 2>&1
 
-out=$(M guide-lien gX --url "http://exemple.test/guide"); rc=$?
+out=$(P guide-lien gX --url "http://exemple.test/guide"); rc=$?
 check_exit "guide-lien : guide inconnu sort en erreur" 1 "$rc"
 check "guide-lien : guide inconnu refuse" "guide introuvable" "$out"
 
-out=$(M guide-lien g1); rc=$?
+out=$(P guide-lien g1); rc=$?
 check_exit "guide-lien : --url obligatoire sort en erreur" 1 "$rc"
 check "guide-lien : usage sans --url" "usage : plantrack guide-lien" "$out"
 
-lien=$(M guide-lien g1 --url "http://exemple.test/guide" --poste "http://127.0.0.1:9999" --scenario "demo")
+out=$(M guide-lien g1 --url "http://exemple.test/guide"); rc=$?
+check_exit "guide-lien : refuse en env agent (b25)" 1 "$rc"
+check "guide-lien : le refus renvoie vers le hook du poste" "hook/guide-lien.ts" "$out"
+check_not "guide-lien : aucun jeton rendu a l'agent" "retour=" "$out"
+out=$(printf '{"jeton":"x","guide":"g1","verdicts":[]}' | CLAUDE_PROJECT_DIR="$TMP18" python3 "$PT" guide-resultat 2>&1); rc=$?
+check_exit "guide-resultat : refuse en env agent (b25)" 5 "$rc"
+
+lien=$(P guide-lien g1 --url "http://exemple.test/guide" --poste "http://127.0.0.1:9999" --scenario "demo")
 check "guide-lien : lien pointe vers la page" "http://exemple.test/guide?" "$lien"
 check "guide-lien : le scenario sert de guide= plutot que l'id" "guide=demo" "$lien"
 check "guide-lien : jeton transmis en retour=" "retour=" "$lien"
@@ -1590,7 +1599,7 @@ out=$(python3 -c "print('x' * (32*1024 + 1))" | MR); rc=$?
 check_exit "guide-resultat : corps hors-norme (>32 Ko) sort en 2" 2 "$rc"
 
 # un ko avec motif explicite garde CE motif (pas celui de secours)
-lien2=$(M guide-lien g1 --url "http://exemple.test/guide")
+lien2=$(P guide-lien g1 --url "http://exemple.test/guide")
 jeton2=$(printf '%s' "$lien2" | sed -n 's/.*retour=\([^&]*\).*/\1/p')
 out=$(printf '{"jeton":"%s","guide":"g1","verdicts":[{"pt":"s2","verdict":"ko","motif":"bouton introuvable"}]}' "$jeton2" | MR)
 check "guide-resultat : motif explicite du navigateur garde sa place" "s2 : bouton introuvable" "$out"
@@ -1598,7 +1607,7 @@ check "guide-resultat : motif explicite journalise (pas le motif de secours)" \
   '"canal": "guide web : ko — bouton introuvable"' "$(cat "$TMP18/.plantrack/events.jsonl")"
 
 # une etape hors de ce guide est signalee mais ne bloque pas les verdicts connus
-lien3=$(M guide-lien g1 --url "http://exemple.test/guide")
+lien3=$(P guide-lien g1 --url "http://exemple.test/guide")
 jeton3=$(printf '%s' "$lien3" | sed -n 's/.*retour=\([^&]*\).*/\1/p')
 out=$(printf '{"jeton":"%s","guide":"g1","verdicts":[{"pt":"s1","verdict":"ok"},{"pt":"s99","verdict":"ok"}]}' "$jeton3" | MR)
 check "guide-resultat : etape inconnue signalee sans bloquer le reste" "etapes inconnues ignorees" "$out"
