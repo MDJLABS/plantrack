@@ -76,7 +76,12 @@ export function GuideCurseur({
     if (dejaJoue.current) return;
     dejaJoue.current = true;
 
+    // StrictMode (dev) monte, DÉMONTE puis remonte l'effet : le nettoyage annule les minuteurs.
+    // Si le geste n'est pas encore parti, relâcher la garde — sinon le remontage le croit joué
+    // et rien ne part jamais (b28). Une fois parti, la garde tient : jamais deux départs.
+    let parti = false;
     const conclure = () => {
+      parti = true;
       onAvantAction();
       onJoue(jouerGeste(geste, document, ciblesRepli));
     };
@@ -124,6 +129,7 @@ export function GuideCurseur({
       cancelAnimationFrame(raf);
       clearTimeout(timerClic);
       clearTimeout(timerAction);
+      if (!parti) dejaJoue.current = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- un seul passage par montage, cf. `dejaJoue`
   }, []);
