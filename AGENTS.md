@@ -14,12 +14,12 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [23 commits]
-  fichiers recemment ecrits : sortie/test-envoi-securite.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-wise-pelican.md, ../bcc/hook/guide-lien.ts, ../bcc/tests/guide-lien.test.ts, pyproject.toml, ../bcc/sortie/commit-guide-lien.log
+FIL ACTIF : aucun. Ouvre un fil avec `!focus <sujet>` avant de coder — sans fil, aucun de tes commits n'est rattache.
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
   t5 : travaux sur main — reprise : retour au travail courant apres la faille
+  t23 : guides de test automatiques (d100) — reprise : essai guide miamboost (b25/b26 s1/s2) en attente du signal de Mariella (d113) ; fil a reprendre quand elle ve…
 
 BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b24 (to_verify) [t22] mdjlabs-site : la synchro du moteur de guide a ecrase guide-verdict.ts — guide-envoi.ts et ses tests importent compteRenduMarkdown et prog.… (agent) [3 tentatives, derniere: Re-ecrasement du 28/10 19h25 : la ronde de mdjlabs a lance …]
@@ -134,6 +134,12 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d105 : Mariella (tel, 28/10) : maquette des cartes du guide VALIDEE ('Valider, code-la (Recommande)') — https://claude.ai/artifact/CrmX2JdkqBtpuci… (agent)
   d106 : Mariella (tel, 29/10, carte Failles guide) : 'Les deux, comme conseille (Recommande)' — b26 : le guide n'envoie plus qu'au poste (liste bla… (agent)
   d107 : v1.9.30 publiee (29/10, GitHub + PyPI verifie, plan valide par Mariella tel) : b25 ferme selon d106 — guide-lien et guide-resultat refuses … (agent)
+  d108 : Mariella (tel, 29/10, carte Suite) : 'Faire l'essai (Recommande)' — lien du guide d'exemple essai-gestes (mdjlabs) envoye par le nouveau ho… (agent)
+  d109 : Correction de d108 : l'essai sur mdjlabs n'exerce PAS b25/b26 (mdjlabs envoie ses verdicts par sa Function /api/guide-verdict, pas par bcc … (agent)
+  d110 : Mariella (tel, 29/10, carte Essai) : 'Essai sur MiamBoost (Recommande)' — declarer l'adresse publique du poste dans miamboost (NEXT_PUBLIC_… (agent)
+  d111 : Mariella (tel, 30/10, plan approuve) : 'Rien a faire : j'attends ton essai sur MiamBoost' — l'essai b25/b26 (guide miamboost, s1/s2 sans ve… (agent)
+  d112 : Mariella (tel, 30/10, plan approuve apres relance auto) : 'Rien a faire : j'attends toujours ton essai sur MiamBoost' — guide b25/b26 s1/s2… (agent)
+  d113 : Mariella (tel, 30/10 13h04, via AskUserQuestion) : essai b25/b26 sur MiamBoost -> 'Mettre en pause' ; fil t23 mis en pause, aucune relance,… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…

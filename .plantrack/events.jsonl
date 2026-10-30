@@ -1398,3 +1398,22 @@
 {"ts": "2026-10-29T09:21:43+00:00", "kind": "file_touched", "text": "../bcc/sortie/commit-guide-lien.log", "thread": "t23"}
 {"ts": "2026-10-29T09:22:24+00:00", "kind": "decision", "id": "d107", "text": "v1.9.30 publiee (29/10, GitHub + PyPI verifie, plan valide par Mariella tel) : b25 ferme selon d106 — guide-lien et guide-resultat refuses en env agent ; le lien part par node bcc/hook/guide-lien.ts (env nettoye, bulle --ton info, jamais imprime). Tests scenario verts + 7 tests bcc. b25 et b26 to_verify.", "par": "agent"}
 {"ts": "2026-10-29T09:24:52+00:00", "kind": "file_touched", "text": "../bcc/sortie/commit-guide-lien.log", "thread": "t23"}
+{"ts": "2026-10-29T09:31:04+00:00", "kind": "commit", "sha": "e1ba028", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-10-29T09:31:07+00:00", "kind": "file_touched", "text": "sortie/carte-suite-b25.json", "thread": "t23"}
+{"ts": "2026-10-29T09:31:07+00:00", "kind": "file_touched", "text": "sortie/carte-suite-b25.log", "thread": "t23"}
+{"ts": "2026-10-29T10:10:57+00:00", "kind": "decision", "id": "d108", "text": "Mariella (tel, 29/10, carte Suite) : 'Faire l'essai (Recommande)' — lien du guide d'exemple essai-gestes (mdjlabs) envoye par le nouveau hook bcc/hook/guide-lien.ts pour verifier b25 + b26.", "par": "agent"}
+{"ts": "2026-10-29T10:11:58+00:00", "kind": "decision", "id": "d109", "text": "Correction de d108 : l'essai sur mdjlabs n'exerce PAS b25/b26 (mdjlabs envoie ses verdicts par sa Function /api/guide-verdict, pas par bcc /guide/resultat). Le moteur protege tourne sur miamboost, mais NEXT_PUBLIC_GUIDE_POSTES n'y est pas declare. Carte posee a Mariella : essai miamboost / valider sur tests / attendre une recette.", "par": "agent"}
+{"ts": "2026-10-29T10:11:58+00:00", "kind": "file_touched", "text": "sortie/carte-essai-b25.json", "thread": "t23"}
+{"ts": "2026-10-29T10:12:31+00:00", "kind": "decision", "id": "d110", "text": "Mariella (tel, 29/10, carte Essai) : 'Essai sur MiamBoost (Recommande)' — declarer l'adresse publique du poste dans miamboost (NEXT_PUBLIC_GUIDE_POSTES), preprod miamboost avec un guide d'exemple, lien envoye par bcc/hook/guide-lien.ts.", "par": "agent"}
+{"ts": "2026-10-29T10:19:48+00:00", "kind": "file_touched", "text": "../miamboost/.env.local", "thread": "t23"}
+{"ts": "2026-10-29T17:43:57+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-bright-rivest.md", "thread": "t23"}
+{"ts": "2026-10-29T23:27:40+00:00", "kind": "decision", "id": "d111", "text": "Mariella (tel, 30/10, plan approuve) : 'Rien a faire : j'attends ton essai sur MiamBoost' — l'essai b25/b26 (guide miamboost, s1/s2 sans verdict) reste a faire par elle ; b25/b26 restent to_verify, veille silencieuse (d23).", "par": "agent"}
+{"ts": "2026-10-29T23:27:51+00:00", "kind": "file_touched", "text": "sortie/carte-suite-essai-30-10.json", "thread": "t23"}
+{"ts": "2026-10-29T23:27:55+00:00", "kind": "file_touched", "text": "sortie/carte-suite-essai-30-10.log", "thread": "t23"}
+{"ts": "2026-10-30T12:36:21+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-resilient-dove.md", "thread": "t23"}
+{"ts": "2026-10-30T13:04:18+00:00", "kind": "decision", "id": "d112", "text": "Mariella (tel, 30/10, plan approuve apres relance auto) : 'Rien a faire : j'attends toujours ton essai sur MiamBoost' — guide b25/b26 s1/s2 toujours sans verdict ; veille silencieuse, aucune nouvelle carte (d111).", "par": "agent"}
+{"ts": "2026-10-30T13:04:30+00:00", "kind": "file_touched", "text": "sortie/carte-suite-30-10b.json", "thread": "t23"}
+{"ts": "2026-10-30T13:04:35+00:00", "kind": "file_touched", "text": "sortie/carte-suite-30-10b.log", "thread": "t23"}
+{"ts": "2026-10-30T13:05:46+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-prancy-starlight.md", "thread": "t23"}
+{"ts": "2026-10-30T13:07:37+00:00", "kind": "decision", "id": "d113", "text": "Mariella (tel, 30/10 13h04, via AskUserQuestion) : essai b25/b26 sur MiamBoost -> 'Mettre en pause' ; fil t23 mis en pause, aucune relance, veille silencieuse (d23).", "par": "agent"}
+{"ts": "2026-10-30T13:07:55+00:00", "kind": "park", "id": "t23", "text": "essai guide miamboost (b25/b26 s1/s2) en attente du signal de Mariella (d113) ; fil a reprendre quand elle veut faire l essai"}
