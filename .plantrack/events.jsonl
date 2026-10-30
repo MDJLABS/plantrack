@@ -1474,3 +1474,7 @@
 {"ts": "2026-10-30T23:46:18+00:00", "kind": "decision", "id": "d126", "text": "Mariella (tel, 30/10, carte Suite) : 'Je teste les 4 sites (Recommande)' — ses verdicts arrivent par le guide ; parcours Mizzzen sans menu (choix agent, d120) signale et accepte tel quel.", "par": "agent"}
 {"ts": "2026-10-30T23:46:18+00:00", "kind": "commit", "sha": "04543cd", "ctype": "chore", "thread": "t23"}
 {"ts": "2026-10-30T23:46:19+00:00", "kind": "decision", "id": "d127", "text": "Mariella (tel, 31/10, carte Suite) : cle PyPI -> 'Plus tard, sans PyPI' — v1.9.31 reste sur GitHub seulement (les sites l'ont par update) ; guichet ferme, ne pas reposer la question", "par": "agent"}
+{"ts": "2026-10-30T23:46:19+00:00", "kind": "commit", "sha": "f7b4da8", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-10-30T23:46:42+00:00", "kind": "file_touched", "text": "sortie/carte-suite-31-10.log", "thread": "t23"}
+{"ts": "2026-10-30T23:47:00+00:00", "kind": "file_touched", "text": "sortie/carte-suite-31-10.json", "thread": "t23"}
+{"ts": "2026-10-30T23:47:09+00:00", "kind": "decision", "id": "d128", "text": "Mariella (tel, 31/10, carte Suite) : 'J attends tes essais (Recommande)' — attente de ses verdicts des guides ProLearn/ProJob/OpenStyle/Mizzzen ; corriger a reception, pas de nouvelle carte d'ici la.", "par": "agent"}
