@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [27 commits]
-  fichiers recemment ecrits : sortie/rebuild-guide.sh, sortie/rebuild-guide.log, ../../../tmp/claude-0/-home-mariella-plantrack/54a0decf-8305-4574-b3e9-85d35996a4cf/scratchpad/essai-guide.cjs, ../../../root/.claude/plans/contexte-reconstruit-par-le-radiant-oasis.md, pyproject.toml, ../../../tmp/claude-0/-home-mariella-plantrack/54a0decf-8305-4574-b3e9-85d35996a4cf/scratchpad/scen.log
+FIL ACTIF — t23 : guides de test automatiques (d100) [28 commits]
+  fichiers recemment ecrits : sortie/rebuild-guide.log, ../../../tmp/claude-0/-home-mariella-plantrack/54a0decf-8305-4574-b3e9-85d35996a4cf/scratchpad/essai-guide.cjs, ../../../root/.claude/plans/contexte-reconstruit-par-le-radiant-oasis.md, pyproject.toml, ../../../tmp/claude-0/-home-mariella-plantrack/54a0decf-8305-4574-b3e9-85d35996a4cf/scratchpad/scen.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-steady-panda.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -152,6 +152,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d121 : b27 corrige (30/10, accord Mariella tel 'Reprendre tout (Recommande)') : kvm-lourd a une duree maximale par type (lint/tests 30m, build/nex… (agent)
   d122 : Mariella (tel, 30/10 18h40, via AskUserQuestion) : session en double sur b27/d119 (une autre session a deja modifie kvm-lourd a 18h37, tent… (agent)
   d123 : v1.9.31 (30/10, choix Mariella tel 'Reprendre tout') : correctif b28 pousse sur GitHub (main + tag), PyPI NON publie : aucune cle PyPI sur … (agent)
+  d124 : Mariella (tel, 30/10, carte essais guide) : Mizzzen -> 'Creer l'adresse (Recommande)' : mizzzen-dev.mdjlabs.com, protegee comme prolearn-de… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…

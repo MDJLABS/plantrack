@@ -1463,3 +1463,6 @@
 {"ts": "2026-10-30T20:48:58+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/54a0decf-8305-4574-b3e9-85d35996a4cf/scratchpad/scen.log", "thread": "t23"}
 {"ts": "2026-10-30T20:49:04+00:00", "kind": "commit", "sha": "b90f195", "ctype": "chore", "thread": "t23"}
 {"ts": "2026-10-30T20:53:25+00:00", "kind": "decision", "id": "d123", "text": "v1.9.31 (30/10, choix Mariella tel 'Reprendre tout') : correctif b28 pousse sur GitHub (main + tag), PyPI NON publie : aucune cle PyPI sur le serveur (uv publish : Missing credentials). Guide joue par Playwright : ProJob 3/3 gestes, Mizzzen 3/3, OpenStyle ok jusqu'a la connexion (rubrique du menu = derriere login). Copies de travail *-guide-auto rangees.", "par": "agent"}
+{"ts": "2026-10-30T20:53:25+00:00", "kind": "commit", "sha": "32f90f3", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-10-30T20:57:36+00:00", "kind": "decision", "id": "d124", "text": "Mariella (tel, 30/10, carte essais guide) : Mizzzen -> 'Creer l'adresse (Recommande)' : mizzzen-dev.mdjlabs.com, protegee comme prolearn-dev (Cloudflare Access) ; cle PyPI -> 'Plus tard' : v1.9.31 reste sur GitHub seulement.", "par": "agent"}
+{"ts": "2026-10-30T20:57:43+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-steady-panda.md", "thread": "t23"}
