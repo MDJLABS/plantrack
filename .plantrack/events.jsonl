@@ -1466,3 +1466,7 @@
 {"ts": "2026-10-30T20:53:25+00:00", "kind": "commit", "sha": "32f90f3", "ctype": "chore", "thread": "t23"}
 {"ts": "2026-10-30T20:57:36+00:00", "kind": "decision", "id": "d124", "text": "Mariella (tel, 30/10, carte essais guide) : Mizzzen -> 'Creer l'adresse (Recommande)' : mizzzen-dev.mdjlabs.com, protegee comme prolearn-dev (Cloudflare Access) ; cle PyPI -> 'Plus tard' : v1.9.31 reste sur GitHub seulement.", "par": "agent"}
 {"ts": "2026-10-30T20:57:43+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-steady-panda.md", "thread": "t23"}
+{"ts": "2026-10-30T20:58:23+00:00", "kind": "commit", "sha": "f14eb7d", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-10-30T20:58:37+00:00", "kind": "file_touched", "text": "sortie/guichet-pypi.log", "thread": "t23"}
+{"ts": "2026-10-30T20:58:44+00:00", "kind": "file_touched", "text": "sortie/carte-pypi-3010.json", "thread": "t23"}
+{"ts": "2026-10-30T20:59:02+00:00", "kind": "decision", "id": "d125", "text": "mizzzen-dev.mdjlabs.com cree (30/10, choix Mariella tel) : ingress tunnel -> localhost:3110 (/etc/cloudflared/config.yml, copie .bak-pre-mizzzen-20261030), CNAME proxifie vers le tunnel a7052596, Cloudflare Access app 61f3dd44 (politique reutilisable 'Mariella', session 730h). Verifie : 302 vers la connexion Access.", "par": "agent"}
