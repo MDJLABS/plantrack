@@ -14,12 +14,15 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [33 commits]
-  fichiers recemment ecrits : ../../../tmp/claude-0/-home-mariella-plantrack/54a0decf-8305-4574-b3e9-85d35996a4cf/scratchpad/scen.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-steady-panda.md, sortie/guichet-pypi.log, sortie/carte-pypi-3010.json, sortie/carte-suite-31-10.log, sortie/carte-suite-31-10.json
+FIL ACTIF — t23 : guides de test automatiques (d100) [34 commits]
+  fichiers recemment ecrits : sortie/guichet-pypi.log, sortie/carte-pypi-3010.json, sortie/carte-suite-31-10.log, sortie/carte-suite-31-10.json, sortie/carte-verdict-b28.json, sortie/carte-hydratation.json
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
   t5 : travaux sur main — reprise : retour au travail courant apres la faille
+
+BUGS NON CORRIGES (personne ne s'en est occupe) :
+  b29 (open) [t23] Essai guide ProLearn (31/10, tel Mariella) : erreur 'Hydration failed' en dev sur /login?guide=essai-gestes — diff dans le MetadataWrapper … (agent)
 
 BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b24 (to_verify) [t22] mdjlabs-site : la synchro du moteur de guide a ecrase guide-verdict.ts — guide-envoi.ts et ses tests importent compteRenduMarkdown et prog.… (agent) [3 tentatives, derniere: Re-ecrasement du 28/10 19h25 : la ronde de mdjlabs a lance …]
