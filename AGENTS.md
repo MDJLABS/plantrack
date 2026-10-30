@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [30 commits]
+FIL ACTIF — t23 : guides de test automatiques (d100) [31 commits]
   fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-radiant-oasis.md, pyproject.toml, ../../../tmp/claude-0/-home-mariella-plantrack/54a0decf-8305-4574-b3e9-85d35996a4cf/scratchpad/scen.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-steady-panda.md, sortie/guichet-pypi.log, sortie/carte-pypi-3010.json
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -155,6 +155,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d124 : Mariella (tel, 30/10, carte essais guide) : Mizzzen -> 'Creer l'adresse (Recommande)' : mizzzen-dev.mdjlabs.com, protegee comme prolearn-de… (agent)
   d125 : mizzzen-dev.mdjlabs.com cree (30/10, choix Mariella tel) : ingress tunnel -> localhost:3110 (/etc/cloudflared/config.yml, copie .bak-pre-mi… (agent)
   d126 : Mariella (tel, 30/10, carte Suite) : 'Je teste les 4 sites (Recommande)' — ses verdicts arrivent par le guide ; parcours Mizzzen sans menu … (agent)
+  d127 : Mariella (tel, 31/10, carte Suite) : cle PyPI -> 'Plus tard, sans PyPI' — v1.9.31 reste sur GitHub seulement (les sites l'ont par update) ;… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
