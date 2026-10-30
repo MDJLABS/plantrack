@@ -14,17 +14,18 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF : aucun. Ouvre un fil avec `!focus <sujet>` avant de coder — sans fil, aucun de tes commits n'est rattache.
+FIL ACTIF — t23 : guides de test automatiques (d100) [24 commits]
+  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-radiant-oasis-agent-a91bf39bdabc77489.md, ../openstyle-guide-auto/app/lib/guide/scenarios.ts, ../Mizzzen-guide-auto/apps/web/src/lib/guide/scenarios.ts, ../../../root/.claude/plans/contexte-reconstruit-par-le-radiant-oasis-agent-adc5087680e261809.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-radiant-oasis.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-precious-scott.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
   t5 : travaux sur main — reprise : retour au travail courant apres la faille
-  t23 : guides de test automatiques (d100) — reprise : essai guide miamboost (b25/b26 s1/s2) en attente du signal de Mariella (d113) ; fil a reprendre quand elle ve…
 
 BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b24 (to_verify) [t22] mdjlabs-site : la synchro du moteur de guide a ecrase guide-verdict.ts — guide-envoi.ts et ses tests importent compteRenduMarkdown et prog.… (agent) [3 tentatives, derniere: Re-ecrasement du 28/10 19h25 : la ronde de mdjlabs a lance …]
   b25 (to_verify) [t23] guide-lien rend le jeton en clair a l'agent et guide-resultat n'a ni require_human ni garde AGENT_ENV : l'agent peut fabriquer lui-meme un … (agent) [1 tentatives, derniere: guide-lien refuse en env agent (le lien part par node bcc/h…]
   b26 (to_verify) [t23] Moteur guide (guide-visite.ts, commun) : l'adresse du poste ou partent les resultats vient du lien (?poste=) et toute origine https est acc… (agent) [1 tentatives, derniere: validerPoste : sans liste blanche NEXT_PUBLIC_GUIDE_POSTES,…]
+  b27 (to_verify) kvm-lourd historique : entree bcc/lint du 30/10 16:19 avec duree 107869.6 s (30 h) pour un eslint de quelques minutes — la duree semble com… (agent) [2 tentatives, derniere: Duree maximale par type (lint/tests 30m, build/next-build/d…]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
@@ -140,11 +141,21 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d111 : Mariella (tel, 30/10, plan approuve) : 'Rien a faire : j'attends ton essai sur MiamBoost' — l'essai b25/b26 (guide miamboost, s1/s2 sans ve… (agent)
   d112 : Mariella (tel, 30/10, plan approuve apres relance auto) : 'Rien a faire : j'attends toujours ton essai sur MiamBoost' — guide b25/b26 s1/s2… (agent)
   d113 : Mariella (tel, 30/10 13h04, via AskUserQuestion) : essai b25/b26 sur MiamBoost -> 'Mettre en pause' ; fil t23 mis en pause, aucune relance,… (agent)
+  d114 : Mariella (tel, 30/10, plan approuve 'liberer de la RAM') : ecrans d'admin des bases (studio/pg_meta/analytics/vector/imgproxy prorent/prole… (agent)
+  d115 : Menage auto des ecrans d'admin LIVRE (choix Mariella tel 30/10 'Menage auto (Recommande)') : menage-serveur.sh (toutes les 5 min) fait dock… (agent)
+  d116 : Mariella (tel, 30/10, carte Suite) : 'Brainstorming de la suite (Recommande)' — theme : garder le serveur leger quand beaucoup de sessions … (agent)
+  d117 : Mariella (tel, 30/10, carte Brainstorm) : 'Verifs lourdes en file (Recommande)' — eslint/tsc/vitest/next build lances par les sessions pass… (agent)
+  d118 : Verifs lourdes une par une LIVRE (d117) : kvm-lourd (/usr/local/bin, hors depot) gagne Config.parallele (KVM_LOURD_PARALLELE, defaut 1) — u… (agent)
+  d119 : Mariella (tel, 30/10, carte Suite) : 'Les deux (Recommande)' — plan approuve : brancher le nouveau guide sur tous les sites (S69 x3, prolea… (agent)
+  d120 : Mariella (feu vert tel, 30/10, execution d119) : Mizzzen n'a aucun menu aujourd'hui (juste accueil + selecteur de theme) ; scenario decouve… (agent)
+  d121 : b27 corrige (30/10, accord Mariella tel 'Reprendre tout (Recommande)') : kvm-lourd a une duree maximale par type (lint/tests 30m, build/nex… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
   pg10 : Le post-commit journalise le commit lui-meme (events.jsonl) et regenere l'insta…
   pg13 : Gabarit de parcours : la phase de construction est a 'questions: false', mais u…
   pg15 : Le Stop hook bcc (hook/index.ts, regle 'projet ne s'endort jamais' du 03/10) EX…
+  pg18 : Un site peut recevoir par la ronde une version du moteur de guide jamais commit…
+  pg19 : Moteur guide (guide-visite.ts, commun) importe ./scenarios.ts et ./types.ts ave…
 ```
 <!-- plantrack:state-end -->
