@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [32 commits]
+FIL ACTIF — t23 : guides de test automatiques (d100) [33 commits]
   fichiers recemment ecrits : ../../../tmp/claude-0/-home-mariella-plantrack/54a0decf-8305-4574-b3e9-85d35996a4cf/scratchpad/scen.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-steady-panda.md, sortie/guichet-pypi.log, sortie/carte-pypi-3010.json, sortie/carte-suite-31-10.log, sortie/carte-suite-31-10.json
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -157,6 +157,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d126 : Mariella (tel, 30/10, carte Suite) : 'Je teste les 4 sites (Recommande)' — ses verdicts arrivent par le guide ; parcours Mizzzen sans menu … (agent)
   d127 : Mariella (tel, 31/10, carte Suite) : cle PyPI -> 'Plus tard, sans PyPI' — v1.9.31 reste sur GitHub seulement (les sites l'ont par update) ;… (agent)
   d128 : Mariella (tel, 31/10, carte Suite) : 'J attends tes essais (Recommande)' — attente de ses verdicts des guides ProLearn/ProJob/OpenStyle/Miz… (agent)
+  d129 : Mariella (tel, 31/10, carte Suite) : 'Je fais l'essai (Recommande)' — essai du guide auto sur ProLearn/ProJob/OpenStyle ; verdict b28 a sai… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…

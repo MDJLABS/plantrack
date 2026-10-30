@@ -1478,3 +1478,5 @@
 {"ts": "2026-10-30T23:46:42+00:00", "kind": "file_touched", "text": "sortie/carte-suite-31-10.log", "thread": "t23"}
 {"ts": "2026-10-30T23:47:00+00:00", "kind": "file_touched", "text": "sortie/carte-suite-31-10.json", "thread": "t23"}
 {"ts": "2026-10-30T23:47:09+00:00", "kind": "decision", "id": "d128", "text": "Mariella (tel, 31/10, carte Suite) : 'J attends tes essais (Recommande)' — attente de ses verdicts des guides ProLearn/ProJob/OpenStyle/Mizzzen ; corriger a reception, pas de nouvelle carte d'ici la.", "par": "agent"}
+{"ts": "2026-10-30T23:47:10+00:00", "kind": "commit", "sha": "a3bff6e", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-10-30T23:47:56+00:00", "kind": "decision", "id": "d129", "text": "Mariella (tel, 31/10, carte Suite) : 'Je fais l'essai (Recommande)' — essai du guide auto sur ProLearn/ProJob/OpenStyle ; verdict b28 a saisir des son retour, ne pas relancer", "par": "agent"}
