@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [38 commits]
-  fichiers recemment ecrits : ../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/build.log, ../prolearn/app/lib/guide/guide-progress.ts, ../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/tsc.log, sortie/carte-d105/nav.mjs, ../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/capture-bilan.mjs, sortie/carte-d105/fermer.mjs
+FIL ACTIF — t23 : guides de test automatiques (d100) [40 commits]
+  fichiers recemment ecrits : .claude/hooks/plantrack_guide/lib/guide/types.ts, .claude/hooks/plantrack_guide/lib/guide/guide-envoi.ts, .claude/hooks/plantrack_guide/lib/guide/guide-visite.ts, ../openstyle/app/components/guide/GuideDeTest.tsx, .claude/hooks/plantrack_guide/components/guide/GuideDeTest.tsx, ../openstyle/app/lib/guide/scenarios.ts
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -164,6 +164,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d129 : Mariella (tel, 31/10, carte Suite) : 'Je fais l'essai (Recommande)' — essai du guide auto sur ProLearn/ProJob/OpenStyle ; verdict b28 a sai… (agent)
   d130 : Mariella (tel, 31/10, plan approuve) : le design des cartes du guide valide en d105 (https://claude.ai/artifact/CrmX2JdkqBtpucihUxYAgo) n'a… (agent)
   d131 : Mariella (tel, 31/10) : 'au changement de page le guide de test doit rester ouvert ; si je ne suis pas au bon endroit, un bouton doit m'y e… (agent)
+  d132 : Portage carte d105 sur OpenStyle (sha cbb0fd6, suite d130) : guide reste ouvert au changement de page (architecture guide-visite.ts deja ex… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…

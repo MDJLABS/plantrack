@@ -1585,3 +1585,55 @@
 {"ts": "2026-10-31T13:11:22+00:00", "kind": "file_touched", "text": "sortie/carte-d105/fermer.mjs", "thread": "t23"}
 {"ts": "2026-10-31T13:11:48+00:00", "kind": "bug_status", "id": "b28", "status": "validated", "canal": "guide de test ProLearn (prolearn/.planning/retours-tests.md, 30/10 23:48) : VALIDÉ par Mariella — 3/3 points conformes (Le guide clique pour toi, Le guide écrit pour toi, Le guide change de page pour toi)"}
 {"ts": "2026-10-31T13:11:48+00:00", "kind": "decision", "id": "d131", "text": "Mariella (tel, 31/10) : 'au changement de page le guide de test doit rester ouvert ; si je ne suis pas au bon endroit, un bouton doit m'y emmener'. Livre sur ProLearn (958ecde2) : guide actif garde par onglet (sessionStorage mdj_guide_actif, efface a la fermeture), url par point/scenario ([formation] resolu), bouton 'M'emmener au bon endroit' (#guide-aller-au-bon-endroit) hors page ou zone introuvable. A porter sur ProJob, OpenStyle, Mizzzen, mdjlabs et moteur commun.", "par": "agent"}
+{"ts": "2026-10-31T13:12:30+00:00", "kind": "commit", "sha": "27cb509", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-10-31T13:14:54+00:00", "kind": "file_touched", "text": "../Mizzzen/apps/web/src/lib/guide/types.ts", "thread": "t23"}
+{"ts": "2026-10-31T13:14:56+00:00", "kind": "file_touched", "text": "../Mizzzen/apps/web/src/lib/guide/types.ts", "thread": "t23"}
+{"ts": "2026-10-31T13:15:10+00:00", "kind": "file_touched", "text": "../Mizzzen/apps/web/src/lib/guide/guide-visite.ts", "thread": "t23"}
+{"ts": "2026-10-31T13:15:14+00:00", "kind": "file_touched", "text": "../Mizzzen/apps/web/src/lib/guide/scenarios.ts", "thread": "t23"}
+{"ts": "2026-10-31T13:15:24+00:00", "kind": "file_touched", "text": "../Mizzzen/apps/web/src/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-31T13:15:32+00:00", "kind": "file_touched", "text": "../Mizzzen/apps/web/src/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-31T13:15:39+00:00", "kind": "file_touched", "text": "../Mizzzen/apps/web/src/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-31T13:15:49+00:00", "kind": "file_touched", "text": "../Mizzzen/apps/web/src/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-31T13:17:36+00:00", "kind": "file_touched", "text": "../projob/apps/web/lib/guide/types.ts", "thread": "t23"}
+{"ts": "2026-10-31T13:17:41+00:00", "kind": "file_touched", "text": "../projob/apps/web/lib/guide/types.ts", "thread": "t23"}
+{"ts": "2026-10-31T13:17:45+00:00", "kind": "file_touched", "text": "../projob/apps/web/lib/guide/guide-progress.ts", "thread": "t23"}
+{"ts": "2026-10-31T13:17:59+00:00", "kind": "file_touched", "text": "../projob/apps/web/lib/guide/guide-progress.ts", "thread": "t23"}
+{"ts": "2026-10-31T13:18:04+00:00", "kind": "file_touched", "text": "../openstyle/app/lib/guide/types.ts", "thread": "t23"}
+{"ts": "2026-10-31T13:18:05+00:00", "kind": "file_touched", "text": "../projob/apps/web/lib/guide/scenarios.ts", "thread": "t23"}
+{"ts": "2026-10-31T13:18:06+00:00", "kind": "file_touched", "text": "../projob/apps/web/lib/guide/scenarios.ts", "thread": "t23"}
+{"ts": "2026-10-31T13:18:07+00:00", "kind": "file_touched", "text": "../projob/apps/web/lib/guide/scenarios.ts", "thread": "t23"}
+{"ts": "2026-10-31T13:18:08+00:00", "kind": "file_touched", "text": "../openstyle/app/lib/guide/types.ts", "thread": "t23"}
+{"ts": "2026-10-31T13:18:09+00:00", "kind": "file_touched", "text": "../projob/apps/web/lib/guide/scenarios.ts", "thread": "t23"}
+{"ts": "2026-10-31T13:18:11+00:00", "kind": "file_touched", "text": "../projob/apps/web/lib/guide/scenarios.ts", "thread": "t23"}
+{"ts": "2026-10-31T13:18:12+00:00", "kind": "file_touched", "text": "../projob/apps/web/lib/guide/scenarios.ts", "thread": "t23"}
+{"ts": "2026-10-31T13:18:14+00:00", "kind": "file_touched", "text": "../projob/apps/web/lib/guide/scenarios.ts", "thread": "t23"}
+{"ts": "2026-10-31T13:18:16+00:00", "kind": "file_touched", "text": "../projob/apps/web/lib/guide/scenarios.ts", "thread": "t23"}
+{"ts": "2026-10-31T13:18:17+00:00", "kind": "file_touched", "text": "../openstyle/app/lib/guide/guide-progress.ts", "thread": "t23"}
+{"ts": "2026-10-31T13:18:23+00:00", "kind": "file_touched", "text": "../projob/apps/web/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-31T13:18:36+00:00", "kind": "file_touched", "text": "../projob/apps/web/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-31T13:18:42+00:00", "kind": "file_touched", "text": "../projob/apps/web/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-31T13:18:48+00:00", "kind": "file_touched", "text": "../projob/apps/web/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-31T13:18:53+00:00", "kind": "file_touched", "text": "../projob/apps/web/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-31T13:18:59+00:00", "kind": "file_touched", "text": "../projob/apps/web/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-31T13:19:08+00:00", "kind": "file_touched", "text": "../projob/apps/web/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-31T13:21:28+00:00", "kind": "file_touched", "text": "../openstyle/app/lib/guide/guide-envoi.ts", "thread": "t23"}
+{"ts": "2026-10-31T13:21:40+00:00", "kind": "file_touched", "text": "../openstyle/app/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-31T13:21:54+00:00", "kind": "file_touched", "text": "../openstyle/app/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-31T13:22:07+00:00", "kind": "file_touched", "text": "../openstyle/app/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-31T13:22:12+00:00", "kind": "file_touched", "text": "../openstyle/app/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-31T13:22:17+00:00", "kind": "file_touched", "text": "../openstyle/app/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-31T13:22:28+00:00", "kind": "file_touched", "text": "../openstyle/app/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-31T13:23:28+00:00", "kind": "file_touched", "text": "../openstyle/app/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-31T13:23:34+00:00", "kind": "file_touched", "text": "../openstyle/app/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-31T13:23:39+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/lib/guide/types.ts", "thread": "t23"}
+{"ts": "2026-10-31T13:23:40+00:00", "kind": "file_touched", "text": "../openstyle/app/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-31T13:23:43+00:00", "kind": "file_touched", "text": "../openstyle/app/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-31T13:23:49+00:00", "kind": "file_touched", "text": "../openstyle/app/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-31T13:23:52+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/lib/guide/guide-envoi.ts", "thread": "t23"}
+{"ts": "2026-10-31T13:23:58+00:00", "kind": "file_touched", "text": "../openstyle/app/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-31T13:24:04+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/lib/guide/guide-visite.ts", "thread": "t23"}
+{"ts": "2026-10-31T13:24:07+00:00", "kind": "file_touched", "text": "../openstyle/app/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-31T13:27:33+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-10-31T13:28:43+00:00", "kind": "file_touched", "text": "../openstyle/app/lib/guide/scenarios.ts", "thread": "t23"}
+{"ts": "2026-10-31T13:32:46+00:00", "kind": "commit", "sha": "e04b7bf", "ctype": "feat", "thread": "t23"}
+{"ts": "2026-10-31T13:33:13+00:00", "kind": "decision", "id": "d132", "text": "Portage carte d105 sur OpenStyle (sha cbb0fd6, suite d130) : guide reste ouvert au changement de page (architecture guide-visite.ts deja existante, rien a porter de Prolearn sur ce point) ; horsPage + carte #guide-pas-au-bon-endroit/#guide-aller-au-bon-endroit ajoutes (guide-progress.ts: surLaPage/resoudreUrl/avecGuide, GuideDeTest.tsx) et testes en LIVE (nav.mjs, essai temporaire avec url provisoire sur l'etape 'accueil' puis revert, jamais commite) : navigation OK, bouton present, clic ramene bien au bon endroit ; scenarios.ts NON modifie (le seul scenario 'decouverte' traverse / et /adherents via un geste automatique, poser une url fixe aurait casse le jugement Oui/Non en cours de route - laisse pour un scenario futur sans ambiguite) ; bug corrige : bouton 'Fermer' de la carte de fin appelle desormais onFermer (simple fermeture, comme la maquette mdjlabs 1ddbc6f) au lieu de terminer() qui effacait la progression (ecart au comportement du 05/08, signale) ; heure d'envoi memorisee en sessionStorage (heureEnvoiMemorisee/memoriserHeureEnvoi, porte de Mizzzen 73fef2e) pour ne plus afficher l'heure de reouverture. tsc + build verts (kvm-lourd), service openstyle-next redemarre.", "par": "agent"}
