@@ -272,6 +272,10 @@ export async function consignerGuide(
     total: bilan.total,
     // Le motif qu'elle a écrit sur un point raté voyage jusqu'au carnet : sans lui,
     // l'agent ne saurait que « ça ne va pas », pas ce qu'elle a vu.
+    points: scenario.etapes.flatMap((e) => {
+      const x = correspond ? entree!.verdicts[e.id] : undefined;
+      return x ? [{ id: e.id, v: x.v, ...(x.note ? { note: x.note } : {}) }] : [];
+    }),
     ko: bilan.ko.map((k) => {
       const note = correspond ? entree!.verdicts[k.id]?.note : undefined;
       return note ? { ...k, note } : k;

@@ -118,6 +118,8 @@ export type ResultatGuide = {
   statut: "valide" | "a-revoir";
   total: number;
   ko: { id: string; titre: string; note?: string }[];
+  /** Tous les points jugés, ok compris — pour un site qui trace chaque verdict (ProLearn). */
+  points: { id: string; v: StepVerdict; note?: string }[];
 };
 
 /**
