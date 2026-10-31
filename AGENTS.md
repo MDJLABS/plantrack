@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [43 commits]
+FIL ACTIF — t23 : guides de test automatiques (d100) [44 commits]
   fichiers recemment ecrits : ../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/design2-run.mjs, ../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/b31.json, sortie/carte-b31.log, ../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/rot.mjs, ../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/check.mjs, ../projob/sortie/build-rotation.log
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -169,6 +169,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d133 : Mariella (tel, 31/10, via AskUserQuestion) : bouton Fermer de la carte de fin -> 'Fermer sans effacer (Recommande)' sur les 4 sites (comme … (agent)
   d134 : Mariella (tel, 31/10, via AskUserQuestion) : guides quasi automatiques -> 'Le guide ProJob d'abord (Recommande)' : rendre automatiques les … (agent)
   d135 : 31/10 : guide design2 ProJob rendu automatique (27de37f, 16 points avec geste) + historique seed (2999e2d). Incident : un sous-agent a grep… (agent)
+  d136 : Mariella (tel, 31/10, via AskUserQuestion) : guide design2 ProJob automatique -> 'Je fais l'essai (Recommande)' ; ses verdicts arrivent par… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
