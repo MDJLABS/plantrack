@@ -1743,3 +1743,14 @@
 {"ts": "2026-10-31T16:01:40+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/tsc-guide-d138.log", "thread": "t23"}
 {"ts": "2026-10-31T16:01:56+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/tsc-openstyle.log", "thread": "t23"}
 {"ts": "2026-10-31T16:04:24+00:00", "kind": "bug", "id": "b35", "text": "kvm-lourd (31/10, install guide OpenStyle) : une commande 'git add ...' a ete classee 'next-build' et mise en file derriere un build Mizzzen — classement trop large (mot build dans un chemin/argument ?)", "thread": "t23", "severity": "normal", "par": "agent"}
+{"ts": "2026-10-31T16:04:24+00:00", "kind": "commit", "sha": "8bd703f", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-10-31T16:04:56+00:00", "kind": "file_touched", "text": "sortie/tests-guide.log", "thread": "t23"}
+{"ts": "2026-10-31T16:05:05+00:00", "kind": "commit", "sha": "0f62184", "ctype": "feat", "thread": "t23"}
+{"ts": "2026-10-31T16:05:41+00:00", "kind": "commit", "sha": "e2059e0", "ctype": "fix", "thread": "t23"}
+{"ts": "2026-10-31T16:05:42+00:00", "kind": "file_touched", "text": "sortie/tests-guide.log", "thread": "t23"}
+{"ts": "2026-10-31T16:06:39+00:00", "kind": "file_touched", "text": "../projob/apps/web/app/app/suivi/SuiviClient.tsx", "thread": "t23"}
+{"ts": "2026-10-31T16:06:46+00:00", "kind": "file_touched", "text": "../projob/apps/web/app/app/suivi/SuiviClient.tsx", "thread": "t23"}
+{"ts": "2026-10-31T16:06:51+00:00", "kind": "file_touched", "text": "../projob/apps/web/app/app/suivi/SuiviClient.tsx", "thread": "t23"}
+{"ts": "2026-10-31T16:06:59+00:00", "kind": "file_touched", "text": "../projob/apps/web/app/app/suivi/SuiviClient.tsx", "thread": "t23"}
+{"ts": "2026-10-31T16:07:11+00:00", "kind": "file_touched", "text": "../projob/apps/web/lib/guide/scenarios.ts", "thread": "t23"}
+{"ts": "2026-10-31T16:08:40+00:00", "kind": "decision", "id": "d139", "text": "d138 livre sur OpenStyle (c169aff + 6c66989, estAdmin = role admin d'une adhesion via getUserSchoolMemberships) et Mizzzen (b6a6248 + 5a84949, estAdmin = session next-auth) ; moteur 163e9d3..e2059e0 : double porte GUIDE_ACTIF=1 (drop-in systemd guide.conf, sites de test seulement) + estAdmin, remarques citees sur une ligne dans retours-tests.md. Builds ok, services actifs.", "par": "agent"}

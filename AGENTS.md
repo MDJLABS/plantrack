@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [53 commits]
-  fichiers recemment ecrits : ../openstyle/app/lib/guide/guide-reglages.ts, ../openstyle/app/lib/guide/guide-reglages-serveur.ts, ../Mizzzen/apps/web/src/lib/guide/guide-reglages.ts, ../Mizzzen/apps/web/src/lib/guide/guide-reglages-serveur.ts, ../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/tsc-guide-d138.log, ../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/tsc-openstyle.log
+FIL ACTIF — t23 : guides de test automatiques (d100) [56 commits]
+  fichiers recemment ecrits : ../Mizzzen/apps/web/src/lib/guide/guide-reglages-serveur.ts, ../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/tsc-guide-d138.log, ../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/tsc-openstyle.log, sortie/tests-guide.log, ../projob/apps/web/app/app/suivi/SuiviClient.tsx, ../projob/apps/web/lib/guide/scenarios.ts
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -175,6 +175,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d136 : Mariella (tel, 31/10, via AskUserQuestion) : guide design2 ProJob automatique -> 'Je fais l'essai (Recommande)' ; ses verdicts arrivent par… (agent)
   d137 : Mariella (tel, 31/10, carte b31) : 'Un seul guide commun' (contre ma reco) — sync_guide doit trouver le moteur sous app/, apps/web, apps/we… (agent)
   d138 : Mariella (tel, 31/10, carte Guide commun + appels 9639/9651) : un guide commun comme MOTEUR — pareil partout, chaque projet l'appelle et co… (agent)
+  d139 : d138 livre sur OpenStyle (c169aff + 6c66989, estAdmin = role admin d'une adhesion via getUserSchoolMemberships) et Mizzzen (b6a6248 + 5a849… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
