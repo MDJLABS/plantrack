@@ -17,19 +17,27 @@
 // propres à CHAQUE SITE qui en embarque un). Pour exécuter ce fichier en test depuis
 // PlanTrack lui-même, on redirige CE specifier précis vers un témoin local
 // (`tests/guide/fixtures/scenarios.ts`) — jamais vers un fichier du moteur source.
+//
+// Même cas pour `guide-actions.ts`, qui importe `./guide-reglages.ts` et
+// `./guide-reglages-serveur.ts` — eux aussi PROPRES À CHAQUE SITE (comme `scenarios.ts`,
+// jamais dans le moteur). Redirigés vers `tests/guide/fixtures/guide-reglages(-serveur).ts`.
 import { existsSync, statSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 const EXTENSIONS = ["", ".ts", ".tsx", ".js", ".mjs", "/index.ts", "/index.tsx"];
 const MOTEUR = "/.claude/hooks/plantrack_guide/lib/guide/";
-const TEMOIN_SCENARIOS = new URL("../fixtures/scenarios.ts", import.meta.url);
+const TEMOINS = new Map([
+  ["./scenarios", "../fixtures/scenarios.ts"],
+  ["./scenarios.ts", "../fixtures/scenarios.ts"],
+  ["./guide-reglages", "../fixtures/guide-reglages.ts"],
+  ["./guide-reglages.ts", "../fixtures/guide-reglages.ts"],
+  ["./guide-reglages-serveur", "../fixtures/guide-reglages-serveur.ts"],
+  ["./guide-reglages-serveur.ts", "../fixtures/guide-reglages-serveur.ts"],
+]);
 
 export async function resolve(specifier, context, nextResolve) {
-  if (
-    (specifier === "./scenarios" || specifier === "./scenarios.ts") &&
-    context.parentURL?.includes(MOTEUR)
-  ) {
-    return nextResolve(TEMOIN_SCENARIOS.href, context);
+  if (TEMOINS.has(specifier) && context.parentURL?.includes(MOTEUR)) {
+    return nextResolve(new URL(TEMOINS.get(specifier), import.meta.url).href, context);
   }
   if (specifier.startsWith("./") || specifier.startsWith("../")) {
     const parent = context.parentURL;

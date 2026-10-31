@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [46 commits]
-  fichiers recemment ecrits : ../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/design2-run.mjs, ../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/b31.json, sortie/carte-b31.log, ../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/rot.mjs, ../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/check.mjs, ../projob/sortie/build-rotation.log
+FIL ACTIF — t23 : guides de test automatiques (d100) [47 commits]
+  fichiers recemment ecrits : tests/guide/actions.test.ts, .claude/hooks/plantrack_guide/lib/guide/guide-actions.ts, .claude/hooks/plantrack_guide/components/guide/GuideCurseur.tsx, .claude/hooks/plantrack_guide/components/guide/GuideDeTest.tsx, .claude/hooks/plantrack_guide/components/guide/GuideDeTestLazy.tsx, .claude/hooks/plantrack_guide/lib/guide/types.ts
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella

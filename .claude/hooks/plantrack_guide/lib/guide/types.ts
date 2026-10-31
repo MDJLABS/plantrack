@@ -48,8 +48,11 @@ export type GuideStep = {
   /** Geste à jouer automatiquement à l'entrée de l'étape (curseur animé) — absent ⇒
    *  comportement actuel inchangé (elle fait le geste elle-même). */
   geste?: GuideGeste;
-  /** Identifiant d'étape PlanTrack (ex. "s3") — porte le verdict vers `guide-envoi.ts`.
-   *  Absent ⇒ l'étape est ignorée de l'envoi du résultat (compte-rendu local uniquement). */
+  /** Identifiant d'étape PlanTrack (ex. "s3") — RETIRÉ DE SERVICE (d138, 31/10) : portait le
+   *  verdict vers l'ancien envoi réseau `guide-envoi.ts`, supprimé. Champ laissé TEL QUEL
+   *  (type optionnel, jamais lu) pour ne pas forcer une modification des `scenarios.ts` de
+   *  chaque site à cette seule occasion — un site peut le retirer de ses propres scénarios
+   *  quand il y retouche, rien ne l'y oblige. */
   pt?: string;
   /**
    * Page où se joue ce point (ex. `/aujourdhui`). Hors de cette page, la carte propose
@@ -61,10 +64,14 @@ export type GuideStep = {
 
 /** Une livraison à valider = une suite ordonnée de points. */
 export type GuideScenario = {
-  /** Identifiant utilisé dans l'URL (`?guide=<id>`). */
+  /** Identifiant du scénario — choisi dans le panneau (lanceur bas-droite), plus jamais lu
+   *  dans une URL (`?guide=` retiré, d138 : « ça ne fonctionne pas par lien, ça fonctionne
+   *  par session »). */
   id: string;
   titre: string;
-  /** Date de livraison — sert de repère humain dans le registre. */
+  /** Date de livraison — sert de repère humain dans le registre, ET de condition de
+   *  « relivraison » (`guide-etat.ts` : une date différente de celle stockée repart à
+   *  zéro — c'est ainsi qu'un point "ko" corrigé redevient à traiter). */
   date: string;
   /** Page concernée, en clair (affiché dans le registre, pas dans la bulle). */
   page: string;
@@ -72,6 +79,11 @@ export type GuideScenario = {
    *  conduit, pour les points qui n'ont pas leur propre `url` (porté de Prolearn, commit
    *  958ecde2, demande Mariella 31/10). */
   url?: string;
+  /** Jamais lu par ce moteur (qui ne propose plus rien tout seul selon l'URL courante : le
+   *  lanceur bas-droite remplace toute proposition spontanée). Porté UNIQUEMENT pour qu'un
+   *  scénario copié depuis un site qui s'en servait encore reste assignable sans erreur de
+   *  type — compatibilité, pas comportement. */
+  match?: string;
   etapes: GuideStep[];
 };
 
@@ -92,4 +104,47 @@ export type GuideProgress = {
    *  revenir sur une étape (←, bilan) le rejouerait à chaque passage. Optionnel pour la
    *  même raison que `motifs`. */
   joues?: string[];
+};
+
+/**
+ * Verdict d'une visite CLOSE — transmis à `apresConsigne` (réglages serveur du site) par
+ * `consignerGuide` (guide-actions.ts), une fois le compte-rendu écrit dans
+ * `.planning/retours-tests.md`. `ko` ne porte que les points en écart (jamais tous les
+ * points : un site qui veut tracer, ex. ProLearn/SQLite, n'a besoin que de ça).
+ */
+export type ResultatGuide = {
+  scenarioId: string;
+  titre: string;
+  statut: "valide" | "a-revoir";
+  total: number;
+  ko: { id: string; titre: string }[];
+};
+
+/**
+ * Réglages CLIENT-safe propres à UN site — `lib/guide/guide-reglages.ts`, comme
+ * `scenarios.ts` : jamais dans le moteur, jamais écrasé par la synchro.
+ * Défauts (si le site ne fournit pas le champ) : `resoudreUrl` = identité,
+ * `ancetresReplies` = aucun.
+ */
+export type ReglagesGuideClient = {
+  /** Remplace l'ancien `resoudreUrl` générique du moteur — transforme l'URL d'un point selon
+   *  le pathname courant (ex. ids dynamiques). Absent ⇒ l'URL est utilisée telle quelle. */
+  resoudreUrl?: (url: string, pathname: string) => string;
+  /** Sélecteurs d'ancêtres repliés à ignorer lors de la recherche d'une cible visible (ex.
+   *  ProLearn : `.tn-childwrap.collapsed`) — voir `guide-geometry.ts`. Absent ⇒ aucun. */
+  ancetresReplies?: string[];
+};
+
+/**
+ * Réglages SERVEUR propres à UN site — `lib/guide/guide-reglages-serveur.ts`, jamais dans le
+ * moteur, jamais écrasé. `estAdmin` est la SEULE porte qui autorise `guide-actions.ts` à lire
+ * ou écrire quoi que ce soit : toute action commence par `await estAdmin()`.
+ */
+export type ReglagesGuideServeur = {
+  /** `true` si la visite en cours est authentifiée comme admin du site — chaque site
+   *  implémente avec SA propre session (cookie, JWT…). Jamais de valeur par défaut : un site
+   *  qui oublie ce fichier n'a pas de guide du tout, jamais un guide ouvert à tous. */
+  estAdmin: () => Promise<boolean>;
+  /** Hook optionnel après consignation d'un guide terminé (ex. ProLearn : traçage SQLite). */
+  apresConsigne?: (r: ResultatGuide) => Promise<void>;
 };

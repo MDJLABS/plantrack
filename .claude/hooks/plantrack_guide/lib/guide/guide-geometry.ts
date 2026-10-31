@@ -3,11 +3,16 @@
  * Porté de Prolearn (`app/lib/guide/guide-geometry.ts`). Séparé du composant pour être
  * testable sans navigateur.
  *
- * Adaptation MiamBoost : `resolveTarget` ne connaît plus `.tn-childwrap.collapsed` (une
- * classe de l'arbre Parcours de Prolearn, sans équivalent ici) — la détection d'un élément
- * masqué repose uniquement sur sa taille mesurée (largeur/hauteur nulles), ce qui couvre
- * `display:none`, `visibility:hidden` et tout ancêtre replié quel que soit son nom de classe :
- * plus général, donc valable sur n'importe quelle page du dépôt sans entretien.
+ * La détection d'un élément masqué repose d'abord sur sa taille mesurée (largeur/hauteur
+ * nulles), ce qui couvre `display:none`, `visibility:hidden` et tout ancêtre replié quel que
+ * soit son nom de classe — valable sur n'importe quelle page sans entretien.
+ *
+ * MAIS un ancêtre repliable (ex. l'arbre Parcours de ProLearn, `.tn-childwrap.collapsed`)
+ * peut rester monté avec sa VRAIE hauteur — rien ne le distingue alors d'un élément visible
+ * à la seule mesure. `ancetresReplies` (réglages du site, `guide-reglages.ts`) porte les
+ * sélecteurs de ces ancêtres : un candidat qui en a un dans ses ancêtres est traité comme
+ * non visible, exactement comme s'il avait une taille nulle (porté de Prolearn
+ * `app/lib/guide/guide-geometry.ts`, généralisé — plus de classe en dur dans le moteur).
  * ============================================================================== */
 
 export type Rect = { x: number; y: number; w: number; h: number };
@@ -71,13 +76,24 @@ const mesureDom = (el: Element): Rect => {
  * là » — exactement ce qu'une aide ne doit jamais faire.
  *
  * Un sélecteur invalide est ignoré plutôt que fatal : une faute de frappe dans un
- * scénario ne doit pas faire tomber tout le guide.
+ * scénario ne doit pas faire tomber tout le guide. Même tolérance pour `ancetresReplies` :
+ * un sélecteur d'ancêtre invalide est ignoré (le candidat reste jugé sur sa seule taille).
  */
 export function resolveTarget(
   selecteurs: string[],
   doc: Document,
   mesure: (el: Element) => Rect = mesureDom,
+  ancetresReplies: string[] = [],
 ): Element | null {
+  const dansUnAncetreReplie = (el: Element): boolean =>
+    ancetresReplies.some((sel) => {
+      try {
+        return el.closest(sel) !== null;
+      } catch {
+        return false;
+      }
+    });
+
   for (const sel of selecteurs) {
     let candidats: Element[] = [];
     try {
@@ -89,6 +105,7 @@ export function resolveTarget(
     // sélecteurs génériques et le premier du DOM peut très bien être masqué alors qu'un
     // autre est parfaitement visible.
     for (const el of candidats) {
+      if (dansUnAncetreReplie(el)) continue;
       const r = mesure(el);
       if (r.w > 0 && r.h > 0) return el;
     }

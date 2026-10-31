@@ -27,6 +27,11 @@
  *
  * `#guide-curseur` : id stable, pour que la visite guidée puisse un jour s'auto-vérifier
  * (et pour qu'un humain qui inspecte la page retrouve facilement ce qui bouge).
+ *
+ * `ancetresReplies` (réglages CLIENT du site, `guide-reglages.ts`) : même garde que les
+ * deux `resolveTarget` de `GuideDeTest.tsx` (surlignage, scroll) — sans elle, le curseur
+ * pouvait viser/cliquer un élément caché sous un ancêtre replié (ex. ProLearn,
+ * `.tn-childwrap.collapsed`) alors même que l'encadrement refusait de le surligner.
  * ============================================================================== */
 
 import { useEffect, useRef, useState } from "react";
@@ -50,6 +55,7 @@ export function GuideCurseur({
   depart,
   geste,
   ciblesRepli = [],
+  ancetresReplies = [],
   onAvantAction,
   onJoue,
 }: {
@@ -59,6 +65,9 @@ export function GuideCurseur({
   /** `cibles` de l'étape — repli si `geste.cible` est absent ou ne résout rien (même
    *  logique que `jouerGeste`, cf. `selecteursGeste`). */
   ciblesRepli?: string[];
+  /** Réglages CLIENT du site (`reglagesGuide.ancetresReplies`, `guide-reglages.ts`) — cf.
+   *  bandeau de tête. Absent ⇒ aucun ancêtre replié ignoré, comportement inchangé. */
+  ancetresReplies?: string[];
   /** Appelé juste avant `jouerGeste` — cf. bandeau de tête : c'est ici que l'appelant doit
    *  marquer l'étape jouée et persister la progression. */
   onAvantAction: () => void;
@@ -83,7 +92,7 @@ export function GuideCurseur({
     const conclure = () => {
       parti = true;
       onAvantAction();
-      onJoue(jouerGeste(geste, document, ciblesRepli));
+      onJoue(jouerGeste(geste, document, ciblesRepli, undefined, ancetresReplies));
     };
 
     if (geste.type === "aller") {
@@ -92,7 +101,7 @@ export function GuideCurseur({
       return;
     }
 
-    const el = resolveTarget(selecteursGeste(geste, ciblesRepli), document);
+    const el = resolveTarget(selecteursGeste(geste, ciblesRepli), document, undefined, ancetresReplies);
     if (!el) {
       // Invariant 2 du guide (GuideDeTest.tsx) : ne jamais prétendre avoir atteint une
       // cible absente. On ne joue rien, et on le dit.

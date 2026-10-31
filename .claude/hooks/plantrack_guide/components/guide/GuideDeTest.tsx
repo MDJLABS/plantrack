@@ -16,8 +16,12 @@
  * 3. la bulle est MESURÉE (bulleRef + tick()), jamais supposée, et le cadre de surlignage
  *    est borné au viewport (Math.max/Math.min sur t/l/w/h).
  * 4. Échap NE ferme PAS la visite — aucun `onKeyDown` ne l'intercepte, volontairement.
- * 5. rien ne se monte tant qu'un `?guide=<id>` explicite ET VALIDE n'a pas été vu au moins
- *    une fois dans cet onglet, sur cette origine — voir la note ci-dessous.
+ * 5. REFORMULÉ (d138, 31/10 — « ça ne fonctionne pas par lien, ça fonctionne par
+ *    session ») : rien ne se monte sans une session ADMIN du site, vérifiée CÔTÉ SERVEUR
+ *    (`estAdmin()`, réglages serveur, lu par `guide-actions.ts`/`etatGuides()`). Il n'existe
+ *    plus de paramètre d'URL (`?guide=`) : `GuideDeTestLazy.tsx` décide seul, à partir de
+ *    `etatGuides()` et du « guide actif » (`sessionStorage`, `lireGuideActif`), lequel
+ *    `scenario` (s'il y en a un) passer en prop à ce fichier.
  * 6. styles auto-portés (inline, aucune classe), montage en portail sur `document.body`.
  *
  * ⚠️ `react-hooks/set-state-in-effect` — CINQ tolérances motivées dans ce fichier (chantier
@@ -41,16 +45,13 @@
  * trois verdicts négatifs de juillet portaient déjà sur le dispositif, jamais sur la
  * fonctionnalité qu'il vérifiait.
  *
- * ⚠️ Adaptation MiamBoost à l'invariant 5 : la version Prolearn se garde AUSSI par
- * `process.env.NODE_ENV === 'production'`, et propose un bouton d'ouverture dès qu'une
- * page correspond au `match` d'un scénario, MÊME sans `?guide=`. Les deux sont inadaptés
- * ici : MiamBoost n'a pas de séparation prod/préprod par variable d'environnement — la
- * préprod PUBLIQUE (servie par `miamboost-workers`, vue par de vrais convives sur
- * `<slug>.miamboost.com`) est buildée par `next build`, donc NODE_ENV=production comme une
- * vraie prod. Le seul garde-fou qui tienne est donc purement STRUCTUREL : aucune recherche
- * de scénario par URL courante, uniquement par un paramètre `?guide=<id>` explicite — un
- * convive ne le tapera jamais. D'où l'absence de `usePathname()`/`match` ici (cf.
- * src/lib/guide/types.ts).
+ * ⚠️ Ancienne adaptation MiamBoost à l'invariant 5 (RETIRÉE au 31/10, d138) : la garde
+ * reposait sur l'ABSENCE de `?guide=` dans l'URL (MiamBoost n'a pas de séparation prod/
+ * préprod par variable d'environnement — sa préprod publique est buildée par `next build`,
+ * donc `NODE_ENV=production` comme une vraie prod, ce qui rendait `process.env.NODE_ENV`
+ * inutilisable comme garde-fou). Le nouveau garde-fou (invariant 5 ci-dessus) est la session
+ * admin VÉRIFIÉE CÔTÉ SERVEUR — valable identiquement sur CHAQUE site, MiamBoost compris,
+ * sans dépendre d'une particularité de son hébergement.
  *
  * ⚠️ Présentation (30/10, maquette validée par Mariella, cf. commit mdjlabs 1ddbc6f —
  * `https://claude.ai/artifact/CrmX2JdkqBtpucihUxYAgo`, portée telle quelle d'un site à
@@ -61,58 +62,47 @@
  * `bulleRef` reste mesuré (invariant 3, reformulé) — plus pour PLACER la carte, mais pour
  * donner au curseur animé un point de départ réel (`departCurseur`, dans `Visite`).
  *
- * ⚠️ Tâche 11 — CE COMPOSANT NE RÉSOUT PLUS LUI-MÊME LE SCÉNARIO. `scenario` arrive en
- * PROP, déjà résolu par `GuideDeTestLazy` via `resoudreVisite()` (`@/lib/guide/guide-
- * visite.ts`), seule porte qui sait combiner `?guide=` ET la clé de `sessionStorage` (la
- * persistance qui permet à la visite de survivre à un changement de page). Une seule
- * résolution, à un seul endroit : ce fichier n'a donc AUCUN chemin qui monterait un
- * scénario par lui-même, y compris à partir d'un stockage forgé à la main — il ne lit
- * même plus `sessionStorage`.
+ * ⚠️ Tâche 11, mise à jour d138 — CE COMPOSANT NE RÉSOUT PLUS LUI-MÊME LE SCÉNARIO.
+ * `scenario` arrive en PROP, déjà résolu par `GuideDeTestLazy` via le catalogue
+ * (`getScenario`, `@/lib/guide/guide-visite.ts`) et le « guide actif » choisi dans son
+ * panneau (`lireGuideActif`/`ecrireGuideActif`, `@/lib/guide/guide-progress.ts`) : une
+ * seule résolution, à un seul endroit.
  *
- * ⚠️ Ce que ce fichier NE PORTE PAS de Prolearn : l'écriture automatique des retours dans
- * `.planning/retours-tests.md` (guide-feedback.ts côté Prolearn, `'use server'` +
- * `node:fs/promises`). MiamBoost sert sa préprod publique via `miamboost-workers.service`
- * (workerd / OpenNext-Cloudflare, cf. wrangler.jsonc) et non via un process Node classique :
- * un Worker Cloudflare n'a pas accès en écriture au système de fichiers de la machine hôte,
- * `node:fs` sur un chemin réel n'y fonctionnerait pas malgré `nodejs_compat`. Porter ce
- * fichier tel quel aurait donc COMPILÉ mais échoué en silence relatif (erreur affichée,
- * jamais écrite) sur l'environnement réellement servi — signalé au contrôleur en même temps
- * que ce rapport plutôt que tranché seul. Ici, les verdicts ✓/✗ restent LOCAUX (progression
- * dans localStorage, bilan calculé côté client) : Mariella les voit sur la page pendant sa
- * visite, et les relaie dans le chat comme aujourd'hui pour qu'ils atterrissent dans
- * `.planning/retours-tests.md`.
+ * ⚠️ CONSIGNATION SERVEUR (d138, remplace l'ancien envoi réseau `guide-envoi.ts`) : chaque
+ * verdict appelle `consignerPoint` et le dernier point du scénario appelle `consignerGuide`
+ * (`@/lib/guide/guide-actions.ts`, `'use server'`, `node:fs/promises` sur
+ * `.planning/guides-etat.json` + `.planning/retours-tests.md`). Ces écritures supposent un
+ * VRAI process Node (pas un runtime Workers sans accès fichier réel) — `consignerPoint`/
+ * `consignerGuide` rendent `{ error: "…" }` plutôt que de lever si l'écriture échoue, mais
+ * un site qui servirait ce moteur depuis un environnement sans `node:fs` réel ne pourrait
+ * alors JAMAIS consigner ses verdicts : point resté incertain, à vérifier par site (cf.
+ * rapport de livraison). Le bouton « Copier le compte-rendu » (`guide-compte-rendu.ts`)
+ * reste dans tous les cas le filet de sécurité.
  * ============================================================================== */
 
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { resolveTarget, type Rect } from "@/lib/guide/guide-geometry";
 import {
   accederLocalStorage, avancer, chargerProgression, marquerJoue, noterMotif, oublierProgression,
-  oublierToutesLesProgressions, reculer, sauverProgression, verdict, vide,
+  oublierToutesLesProgressions, progressionDepuisServeur, reculer, sauverProgression, serveurPrime,
+  verdict, vide,
 } from "@/lib/guide/guide-progress";
 import { indexDePoint, SCENARIOS } from "@/lib/guide/scenarios";
 import { verdictScenario } from "@/lib/guide/guide-verdict";
 import { construireCompteRendu } from "@/lib/guide/guide-compte-rendu";
-import {
-  corpsEnvoi, dejaEnvoye, envoyerResultat, heureEnvoiMemorisee, hoteDestination, marquerEnvoye,
-  memoriserHeureEnvoi,
-} from "@/lib/guide/guide-envoi";
-import { accederSessionStorage, avecGuide, resoudreUrl, surLaPage, type InfosEnvoi } from "@/lib/guide/guide-visite";
+import { consignerGuide, consignerPoint } from "@/lib/guide/guide-actions";
+import { reglagesGuide } from "@/lib/guide/guide-reglages";
+import { surLaPage } from "@/lib/guide/guide-visite";
 import { GuideCurseur } from "./GuideCurseur";
 import type { ResultatGeste } from "@/lib/guide/guide-geste";
+import type { VerdictStocke } from "@/lib/guide/guide-etat";
 import type { GuideScenario, GuideProgress } from "@/lib/guide/types";
 
 const Z = 2147483000; // au-dessus de tout : la page a des overlays à z-index élevé (max mesuré : 1000)
 /** Seuil posture (charte mdjlabs) : < 600 → feuille collée en bas ; >= 600 → carte fixe. */
 const SEUIL_ORDINATEUR = 600;
-
-/** "22 h 51" — porté du design validé (mdjlabs 1ddbc6f), même format partout. */
-function formatHeure(d: Date): string {
-  const h = String(d.getHours()).padStart(2, "0");
-  const m = String(d.getMinutes()).padStart(2, "0");
-  return `${h} h ${m}`;
-}
 
 /**
  * Couleurs FIXES (littérales, pas des jetons `var(--…)`) : le fond de la bulle
@@ -129,7 +119,7 @@ function formatHeure(d: Date): string {
  * page claire — illisible, et rien ne le signalait (ni type, ni build, ni test). D'où le repli
  * écrit dans le `var()` lui-même : la valeur du cockpit reste utilisée là où le jeton existe.
  */
-const C = {
+export const C = {
   fond: "var(--surface-inverse, #2A2724)",
   bord: "#403A31", // --line-strong (thème sombre)
   texte: "#F3EEE6", // --ink (thème sombre)
@@ -165,19 +155,19 @@ const C = {
 
 export function GuideDeTest({
   scenario,
-  envoi,
+  verdictsServeur,
   onFermerDefinitivement,
 }: {
-  /** Déjà résolu par `GuideDeTestLazy` (`resoudreVisite`) — jamais recalculé ici. */
+  /** Choisi dans le panneau du lanceur (`GuideDeTestLazy`) — jamais résolu ici. */
   scenario: GuideScenario;
-  /** Déjà résolu par `GuideDeTestLazy` (`resoudreEnvoi`) — `null` si aucune session
-   *  d'envoi n'est active (reprise sans paramètres, ou paramètres invalides). */
-  envoi: InfosEnvoi | null;
+  /** Verdicts déjà connus du SERVEUR pour ce scénario (`etatGuides()`, lu par
+   *  `GuideDeTestLazy`) — `undefined` si la liste n'a pas encore répondu. Sert UNIQUEMENT à
+   *  faire primer le serveur sur le `localStorage` du poste (d138), cf. `serveurPrime`. */
+  verdictsServeur?: Record<string, VerdictStocke>;
   /** Efface la persistance de session ET synchronise `GuideDeTestLazy` — appelé
    *  UNIQUEMENT par le ✕ « Fermer le guide », jamais par « Replier ». */
   onFermerDefinitivement: () => void;
 }) {
-  const params = useSearchParams();
   const [monte, setMonte] = useState(false);
   // eslint-disable-next-line react-hooks/set-state-in-effect -- drapeau d'hydratation, cf. bandeau de tête
   useEffect(() => setMonte(true), []);
@@ -195,8 +185,7 @@ export function GuideDeTest({
       ? (
         <Visite
           scenario={scenario}
-          envoi={envoi}
-          point={params.get("point")}
+          verdictsServeur={verdictsServeur}
           onReplier={() => setOuvert(false)}
           // ⚠️ Retour de Mariella du 26/07 : « si je ferme l'overlay je veux un bouton pour
           // le rouvrir ». Le ✕ effaçait la clé de session, donc PLUS RIEN ne se montait —
@@ -283,12 +272,10 @@ function BoutonOuvrir({ scenario, onOpen, onQuitter }: {
   );
 }
 
-function Visite({ scenario, envoi, point, onReplier, onFermer, onTerminer }: {
+function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer }: {
   scenario: GuideScenario;
-  /** Session d'envoi active, ou `null` — cf. `GuideDeTest` ci-dessus. */
-  envoi: InfosEnvoi | null;
-  /** Étape à ouvrir d'emblée (`?point=<stepId>`) — pour faire re-vérifier UN point corrigé. */
-  point: string | null;
+  /** Verdicts SERVEUR déjà connus pour ce scénario — cf. `GuideDeTest` ci-dessus. */
+  verdictsServeur?: Record<string, VerdictStocke>;
   /** Replier : la pastille reste, la visite CONTINUE (session intacte). */
   onReplier: () => void;
   /** Fermer : tout s'efface (session) — un dispositif dont on ne peut pas sortir serait
@@ -345,19 +332,10 @@ function Visite({ scenario, envoi, point, onReplier, onFermer, onTerminer }: {
   const [motifActif, setMotifActif] = useState(false);
   const [motifSaisie, setMotifSaisie] = useState("");
 
-  // Envoi automatique du résultat au bilan — "idle" tant que le bilan n'est pas affiché (ou
-  // qu'aucune session d'envoi n'est active), puis "envoi" → "ok"/"echec". Le bouton Copier
-  // reste dans tous les cas le filet de sécurité (cf. bandeau de `guide-envoi.ts`).
-  const [etatEnvoi, setEtatEnvoi] = useState<"idle" | "envoi" | "ok" | "echec">("idle");
-  const [hoteEnvoi, setHoteEnvoi] = useState<string | null>(null);
-  // Heure d'envoi affichée sur la carte de fin (design validé : « Envoyé à la session
-  // <projet> à HH h MM »). PERSISTÉE dans `sessionStorage` (`heureEnvoiMemorisee`/
-  // `memoriserHeureEnvoi`, guide-envoi.ts, même motif que `dejaEnvoye`/`marquerEnvoye`) :
-  // à la réouverture (navigation, rechargement) où `dejaEnvoye` est vrai, on relit l'heure
-  // RÉELLE de l'envoi d'origine plutôt que de reposer l'heure courante. Si elle n'a jamais
-  // été écrite (stockage indisponible à l'envoi), on n'affiche AUCUNE heure plutôt qu'une
-  // heure fausse.
-  const [envoiHeure, setEnvoiHeure] = useState<string | null>(null);
+  // Consignation du scénario (`consignerGuide`) — une seule fois par passage à l'état
+  // complet (cf. l'effet de bascule plus bas) : garde contre un double appel (changement de
+  // point qui ne modifie pas le statut final, double rendu StrictMode…).
+  const consigneRef = useRef<string | null>(null);
 
   // Reprise « là où elle s'est arrêtée » — lue APRÈS montage (localStorage n'existe pas
   // au rendu serveur).
@@ -366,56 +344,68 @@ function Visite({ scenario, envoi, point, onReplier, onFermer, onTerminer }: {
     // Les IDS, pas le nombre d'étapes : c'est ce qui permet à `chargerProgression` de rouvrir
     // sur le premier point SANS RÉPONSE quand le scénario a gagné des points depuis la
     // dernière visite (défaut du 05/08 : « j'ai pas les nouveaux points du guide »).
-    const p = chargerProgression(scenario.id, accederLocalStorage(), scenario.etapes.map((e) => e.id));
-    // `?point=` a la priorité sur la reprise : le lien désigne explicitement l'étape à
-    // revoir. Étape inconnue → on garde la reprise plutôt que de pointer au hasard.
-    // Nommée `indexVise` (et non `cible`, qui désigne ailleurs le `Rect` surligné) pour ne
-    // pas masquer l'état `cible`/`setCible` déclaré juste au-dessus.
-    const indexVise = indexDePoint(scenario.etapes, point);
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- reprise lue dans localStorage après montage, cf. bandeau de tête
-    setProg(indexVise === null ? p : { ...p, index: indexVise });
+    const etapesIds = scenario.etapes.map((e) => e.id);
+    const local = chargerProgression(scenario.id, accederLocalStorage(), etapesIds);
+    // Le serveur prime sur ce poste SEULEMENT s'il porte STRICTEMENT plus de verdicts (d138)
+    // — ex. un point jugé sur le téléphone de Mariella, jamais rouvert ici.
+    const p = serveurPrime(local, verdictsServeur)
+      ? progressionDepuisServeur(scenario.id, verdictsServeur!, etapesIds)
+      : local;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reprise lue dans localStorage/serveur après montage, cf. bandeau de tête
+    setProg(p);
     setCharge(true);
-  }, [scenario.id, scenario.etapes, point]);
+  }, [scenario.id, scenario.etapes, verdictsServeur]);
 
   const etape = scenario.etapes[Math.min(prog.index, scenario.etapes.length - 1)];
   const total = scenario.etapes.length;
 
   // « Si je ne suis pas sur la bonne page, un bouton doit m'y emmener » (porté de Prolearn,
   // commit 958ecde2, demande Mariella 31/10). `urlPoint` : la destination connue de CE point
-  // (ou, à défaut, celle du scénario), passée par `resoudreUrl` — GÉNÉRIQUE dans le moteur
-  // commun (renvoie l'url telle quelle, cf. guide-visite.ts) : un site qui aurait besoin
-  // d'y substituer un segment variable (ex. ProLearn/[formation]) la surcharge dans sa
-  // propre copie, sans que cela change le comportement d'un site qui n'en a pas besoin.
+  // (ou, à défaut, celle du scénario), passée par `reglagesGuide.resoudreUrl` — réglages
+  // PROPRES à chaque site (`guide-reglages.ts`) : un site qui aurait besoin d'y substituer
+  // un segment variable (ex. ProLearn/[formation]) le fait dans sa propre copie, sans que
+  // cela change le comportement d'un site qui n'en a pas besoin (identité par défaut).
   // `null` si ni le point ni le scénario n'en portent.
   const pathname = usePathname();
   const router = useRouter();
   const urlBrute = etape.url ?? scenario.url ?? null;
-  const urlPoint = urlBrute === null ? null : resoudreUrl(urlBrute, pathname);
+  const urlPoint = urlBrute === null ? null : (reglagesGuide.resoudreUrl ?? ((u: string) => u))(urlBrute, pathname);
   const horsPage = urlPoint !== null && !surLaPage(pathname, urlPoint);
   // Présent quand elle n'est pas au bon endroit pour ce point, OU que la zone décrite y est
-  // introuvable mais qu'une destination connue pourrait corriger ça.
+  // introuvable mais qu'une destination connue pourrait corriger ça. Plus de `?guide=` à
+  // reporter dans l'URL (d138) : la visite tient par le « guide actif » en sessionStorage,
+  // qui survit tout seul au changement de page.
   const onAllerAuBonEndroit = urlPoint !== null && (horsPage || !trouvee)
-    ? () => router.push(avecGuide(urlPoint, scenario.id))
+    ? () => router.push(urlPoint)
     : null;
 
   const bilan = verdictScenario(scenario.etapes, prog.verdicts);
 
   // Bascule sur le bilan dès que tous les points ont une réponse (décision Mariella
   // 2026-07-25, portée telle quelle : répondre à tous les points VAUT sa validation).
+  // Depuis d138, c'est aussi CE passage qui déclenche `consignerGuide` (« le dernier point
+  // appelle consignerGuide ») — une seule fois par scénario tant qu'elle ne revient pas à
+  // "en-cours" (`consigneRef`, remis à `null` ci-dessous) : revoir un point déjà jugé sans
+  // repasser par "en-cours" ne réécrit pas le journal, cf. rapport de livraison.
   useEffect(() => {
     // Rien avant que la progression soit LUE : au premier rendu elle est vide, donc
     // « en-cours », et son chargement passerait pour une complétion.
     if (!charge) return;
     if (bilan.statut === "en-cours") {
-      // Retour à une visite incomplète (elle a cliqué ↻) : refermer le récapitulatif.
+      // Retour à une visite incomplète (elle a cliqué ↻, ou un point a perdu son verdict) :
+      // refermer le récapitulatif, et autoriser une prochaine consignation.
+      consigneRef.current = null;
       // eslint-disable-next-line react-hooks/set-state-in-effect -- bascule du bilan sur progression relue, cf. bandeau de tête
       setEcranBilan(false);
       return;
     }
-    // À l'ouverture, ne pas imposer le bilan si un `?point=` est visé : ce lien exprime
-    // l'intention de revoir CE point, l'écraser le rendrait inutilisable. Sinon, l'afficher.
-    if (!point) setEcranBilan(true);
-  }, [charge, bilan.statut, point]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- bascule du bilan sur progression relue, cf. bandeau de tête
+    setEcranBilan(true);
+    if (consigneRef.current !== scenario.id) {
+      consigneRef.current = scenario.id;
+      void consignerGuide(scenario.id);
+    }
+  }, [charge, bilan.statut, scenario.id]);
 
   const maj = useCallback((p: GuideProgress) => {
     setProg(p);
@@ -474,49 +464,6 @@ function Visite({ scenario, envoi, point, onReplier, onFermer, onTerminer }: {
     }
   };
 
-  // Envoi automatique au bilan, UNE SEULE FOIS par session (`dejaEnvoye`, sessionStorage —
-  // cf. guide-envoi.ts) — jamais à la place du bouton Copier, en complément : un échec
-  // réseau laisse `etatEnvoi` à "echec" et le bouton Copier reste disponible juste au-dessus.
-  //
-  // Dépendances sur les CHAMPS de `envoi` (pas l'objet) : `envoi` est recalculé à chaque
-  // rendu par `resoudreEnvoi` (GuideDeTestLazy.tsx) — une dépendance sur sa référence
-  // réexécuterait cet effet à CHAQUE rendu du layout parent, et retenterait l'envoi à
-  // chaque échec. `prog` n'est volontairement PAS en dépendance : les verdicts envoyés sont
-  // ceux au moment où le bilan s'affiche ; revenir sur un point puis rouvrir le bilan (donc
-  // repasser `ecranBilan` par `false` puis `true`) relit `prog` à ce moment-là, via la
-  // fermeture de l'effet — c'est `ecranBilan` qui porte le redéclenchement, pas `prog`.
-  useEffect(() => {
-    if (!ecranBilan || !envoi) return;
-    const storage = accederSessionStorage();
-    if (dejaEnvoye(storage, scenario.id)) {
-      setHoteEnvoi(hoteDestination(envoi.poste));
-      setEtatEnvoi("ok");
-      // Heure d'ORIGINE relue depuis `sessionStorage` — `null` si elle n'a jamais été
-      // écrite : pas d'heure affichée plutôt qu'une heure fausse (heure de réouverture).
-      setEnvoiHeure(heureEnvoiMemorisee(storage, scenario.id));
-      return;
-    }
-    let annule = false;
-    setEtatEnvoi("envoi");
-    (async () => {
-      const corps = corpsEnvoi(scenario, prog, envoi.jeton);
-      const r = await envoyerResultat(envoi.poste, envoi.projet, corps);
-      if (annule) return;
-      if (r.ok) {
-        marquerEnvoye(storage, scenario.id);
-        const heure = formatHeure(new Date());
-        memoriserHeureEnvoi(storage, scenario.id, heure);
-        setHoteEnvoi(hoteDestination(envoi.poste));
-        setEtatEnvoi("ok");
-        setEnvoiHeure(heure);
-      } else {
-        setEtatEnvoi("echec");
-      }
-    })();
-    return () => { annule = true; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- cf. commentaire ci-dessus : `prog`/`envoi` volontairement hors deps
-  }, [ecranBilan, envoi?.jeton, envoi?.poste, envoi?.projet, scenario.id]);
-
   // Suivi de la cible : elle bouge (défilement, changement d'état après une bascule).
   // Une boucle d'animation plutôt que des écouteurs : le DOM change ici pour des raisons
   // qu'aucun événement ne signale (React qui rerend l'arbre après un fetch).
@@ -524,7 +471,7 @@ function Visite({ scenario, envoi, point, onReplier, onFermer, onTerminer }: {
     let raf = 0;
     let dernier = "";
     const tick = () => {
-      const el = resolveTarget(etape.cibles ?? [], document);
+      const el = resolveTarget(etape.cibles ?? [], document, undefined, reglagesGuide.ancetresReplies ?? []);
       const r = el
         ? (({ x, y, width, height }) => ({ x, y, w: width, h: height }))(el.getBoundingClientRect())
         : null;
@@ -543,7 +490,7 @@ function Visite({ scenario, envoi, point, onReplier, onFermer, onTerminer }: {
   // Amener la zone à l'écran au changement d'étape — sinon la bulle parle d'une ligne
   // que Mariella ne voit pas.
   useEffect(() => {
-    const el = resolveTarget(etape.cibles ?? [], document);
+    const el = resolveTarget(etape.cibles ?? [], document, undefined, reglagesGuide.ancetresReplies ?? []);
     // `inline: 'nearest'` explicite : aucun défilement HORIZONTAL provoqué par le guide.
     el?.scrollIntoView({ block: "center", inline: "nearest", behavior: "smooth" });
   }, [etape]);
@@ -599,6 +546,11 @@ function Visite({ scenario, envoi, point, onReplier, onFermer, onTerminer }: {
 
   const noter = (val: "ok" | "ko") => {
     const p = verdict(prog, etape.id, val);
+    // Consigné côté serveur dès le clic (d138 : « chaque verdict appelle consignerPoint ») —
+    // jamais bloquant pour l'affichage local, qui reste la source immédiate de vérité pour
+    // CETTE page. Un "ko" sans motif est reconfirmé (avec le motif) par `confirmerMotif`
+    // ci-dessous : deux écritures pour ce cas, l'une écrase l'autre, jamais destructeur.
+    void consignerPoint(scenario.id, etape.id, val);
     if (val === "ko") {
       // Le "ko" est acquis tout de suite (`maj`), mais n'avance PAS encore : le petit champ
       // de motif (#guide-motif) s'ouvre, et c'est sa confirmation (`confirmerMotif`) qui fait
@@ -619,6 +571,9 @@ function Visite({ scenario, envoi, point, onReplier, onFermer, onTerminer }: {
   const confirmerMotif = () => {
     const texte = motifSaisie.trim();
     const p = texte ? noterMotif(prog, etape.id, texte) : prog;
+    // Reconsigne avec le motif, s'il y en a un — `consignerPoint` remplace simplement
+    // l'entrée posée par `noter("ko")` ci-dessus (jamais deux verdicts qui coexistent).
+    void consignerPoint(scenario.id, etape.id, "ko", texte || undefined);
     setMotifActif(false);
     setMotifSaisie("");
     maj(prog.index < total - 1 ? avancer(p, total) : p);
@@ -690,6 +645,7 @@ function Visite({ scenario, envoi, point, onReplier, onFermer, onTerminer }: {
           depart={departCurseur}
           geste={etape.geste}
           ciblesRepli={etape.cibles ?? []}
+          ancetresReplies={reglagesGuide.ancetresReplies ?? []}
           onAvantAction={avantGeste}
           onJoue={gesteJoue}
         />
@@ -885,9 +841,6 @@ function Visite({ scenario, envoi, point, onReplier, onFermer, onTerminer }: {
               {bilan.statut === "valide"
                 ? `C'est fini, tout est bon · ${bilan.total} sur ${bilan.total}`
                 : `⚠️ ${bilan.total - bilan.ko.length}/${bilan.total} conformes — ${bilan.ko.length} à revoir.`}
-              {bilan.statut === "valide" && etatEnvoi === "ok" && envoi && envoiHeure
-                ? ` · Envoyé à la session ${envoi.projet} à ${envoiHeure}`
-                : ""}
             </p>
             {bilan.statut === "a-revoir" && (
               <ul style={{ margin: "0 0 10px", paddingLeft: 16, color: C.doux }}>
@@ -903,20 +856,6 @@ function Visite({ scenario, envoi, point, onReplier, onFermer, onTerminer }: {
                   </li>
                 ))}
               </ul>
-            )}
-
-            {envoi && (
-              // Envoi automatique en complément du bouton Copier, jamais à sa place (cf.
-              // bandeau de `guide-envoi.ts`) — un échec ("echec") laisse le bouton et son
-              // repli disponibles juste en dessous.
-              <p id="guide-envoi-etat" style={{
-                margin: "0 0 8px", fontSize: 11.5,
-                color: etatEnvoi === "ok" ? C.ok : etatEnvoi === "echec" ? C.ko : C.doux,
-              }}>
-                {etatEnvoi === "envoi" && "Envoi du résultat à la session en cours…"}
-                {etatEnvoi === "ok" && `✓ Résultat envoyé à ${hoteEnvoi ?? "la session"}`}
-                {etatEnvoi === "echec" && "Envoi impossible — copie le compte-rendu ci-dessous"}
-              </p>
             )}
 
             <p style={{ margin: "0 0 8px", color: C.doux }}>

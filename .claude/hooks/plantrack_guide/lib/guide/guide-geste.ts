@@ -113,6 +113,7 @@ export function jouerGeste(
   doc: Document,
   ciblesRepli: readonly string[] = [],
   resolve: typeof resolveTarget = resolveTarget,
+  ancetresReplies: readonly string[] = [],
 ): ResultatGeste {
   try {
     if (geste.type === "aller") {
@@ -127,7 +128,7 @@ export function jouerGeste(
     }
 
     const selecteurs = selecteursGeste(geste, ciblesRepli);
-    const el = resolve(selecteurs, doc);
+    const el = resolve(selecteurs, doc, undefined, ancetresReplies as string[]);
     if (!el) return { ok: false, raison: "cible introuvable" };
 
     if (geste.type === "clic") return appliquerClic(el);

@@ -40,6 +40,7 @@
  * ============================================================================== */
 
 import type { GuideProgress, StepVerdict } from "./types";
+import type { VerdictStocke } from "./guide-etat";
 
 /** Interface minimale d'un stockage — injectable pour les tests. `removeItem` depuis le
  *  05/08 (« un guide validé s'efface », ci-dessous) : sans lui, une progression terminée ne
@@ -219,9 +220,106 @@ export function chargerProgression(
   // Reprise au premier point SANS réponse (cf. bloc ci-dessus) — seulement si le point relu en
   // a déjà une : sinon on respecte l'index persisté, y compris quand elle est revenue en
   // arrière pour revoir un point qu'elle n'a pas encore tranché.
-  const idCourant: string | undefined = etapesIds[index];
-  const premierSansReponse = etapesIds.findIndex((id) => !verdicts[id]);
-  const reprise = idCourant && verdicts[idCourant] && premierSansReponse !== -1 ? premierSansReponse : index;
+  const reprise = premierSansReponseOuIndex(etapesIds, verdicts, index);
 
   return { scenarioId, index: reprise, verdicts, motifs, joues };
+}
+
+/** Index où reprendre : le premier point SANS réponse si le point actuellement pointé en a
+ *  déjà une, sinon l'index tel quel (elle est peut-être revenue en arrière sur un point
+ *  qu'elle n'a pas encore tranché — on ne l'en déloge pas). Factorisé entre
+ *  `chargerProgression` (localStorage) et `progressionDepuisServeur` (ci-dessous) : même
+ *  règle de reprise, quelle que soit la SOURCE des verdicts. */
+function premierSansReponseOuIndex(
+  etapesIds: readonly string[], verdicts: Record<string, StepVerdict>, index: number,
+): number {
+  const idCourant: string | undefined = etapesIds[index];
+  const premierSansReponse = etapesIds.findIndex((id) => !verdicts[id]);
+  return idCourant && verdicts[idCourant] && premierSansReponse !== -1 ? premierSansReponse : index;
+}
+
+/* ------------------------------------------------------------------------------------------
+ * Guide ACTIF (lanceur bas-droite, d138) — quel scénario est ouvert dans la carte, PARMI
+ * ceux proposés par le panneau. `sessionStorage`, PAS `localStorage` : fermer l'onglet remet
+ * le lanceur à zéro (elle re-choisit dans la liste à la prochaine page), alors que la
+ * PROGRESSION d'un scénario (ci-dessus) survit, elle, à la fermeture de l'onglet.
+ * ------------------------------------------------------------------------------------------ */
+
+const CLE_ACTIF = "mdj_guide_actif";
+
+/**
+ * Id du scénario actif, ou `null` si aucun / stockage indisponible / id forgé.
+ *
+ * `estIdConnu` est la garde de clé forgée — l'appelant passe `(id) => getScenario(id) !==
+ * null` (`guide-visite.ts`, même garde `hasOwnProperty.call` que partout ailleurs dans ce
+ * module) : un id qui ne résout à AUCUN scénario du catalogue courant (forgé, ou scénario
+ * retiré depuis) n'est jamais rendu actif — le lanceur retombe alors sur sa liste.
+ */
+export function lireGuideActif(storage: Storage | null, estIdConnu: (id: string) => boolean): string | null {
+  if (!storage) return null;
+  try {
+    const id = storage.getItem(CLE_ACTIF);
+    return id && estIdConnu(id) ? id : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Rend CE scénario actif — appelé quand elle choisit « Commencer »/« Reprendre » dans le
+ *  panneau du lanceur. */
+export function ecrireGuideActif(storage: Storage | null, scenarioId: string): void {
+  if (!storage) return;
+  try {
+    storage.setItem(CLE_ACTIF, scenarioId);
+  } catch {
+    // Jamais fatal — au pire le lanceur réaffiche la liste à la prochaine page plutôt que de
+    // rouvrir directement ce scénario.
+  }
+}
+
+/** Efface le guide actif — « Fermer sans effacer » (d133) et « Terminer » (une fois consigné)
+ *  y ramènent : la PROGRESSION du scénario, elle, n'est pas touchée par cette fonction. */
+export function effacerGuideActif(storage: Storage | null): void {
+  if (!storage) return;
+  try {
+    storage.removeItem(CLE_ACTIF);
+  } catch {
+    // Même repli que le reste de ce module.
+  }
+}
+
+/**
+ * `true` si l'état SERVEUR (`etatGuides()`, `guide-actions.ts`) porte STRICTEMENT plus de
+ * verdicts que la progression locale — seul critère de préséance (d138 : « la progression
+ * serveur prime sur le localStorage si elle contient plus de verdicts »), jamais la date ni
+ * l'ordre d'écriture : un simple décompte, le même esprit que `faitsPour` (`guide-etat.ts`).
+ */
+export function serveurPrime(local: GuideProgress, verdictsServeur: Record<string, unknown> | undefined): boolean {
+  if (!verdictsServeur) return false;
+  return Object.keys(verdictsServeur).length > Object.keys(local.verdicts).length;
+}
+
+/**
+ * Construit une `GuideProgress` à partir de l'état SERVEUR — utilisée uniquement quand
+ * `serveurPrime` est vrai. Index posé par la MÊME règle de reprise que `chargerProgression`
+ * (premier point sans réponse). `joues` repart vide : le geste automatique d'un point déjà
+ * jugé côté serveur n'a aucune raison d'être rejoué, mais ce module ne sait pas lequel l'a
+ * déjà été sur CET appareil — `GuideDeTest.tsx` le marquera à la volée si besoin, comme pour
+ * toute étape qu'on retraverse.
+ */
+export function progressionDepuisServeur(
+  scenarioId: string,
+  verdictsServeur: Record<string, VerdictStocke>,
+  etapesIds: readonly string[],
+): GuideProgress {
+  const verdicts: Record<string, StepVerdict> = {};
+  const motifs: Record<string, string> = {};
+  for (const id of etapesIds) {
+    const v = verdictsServeur[id];
+    if (!v) continue;
+    verdicts[id] = v.v;
+    if (v.note) motifs[id] = v.note;
+  }
+  const index = premierSansReponseOuIndex(etapesIds, verdicts, 0);
+  return { scenarioId, index, verdicts, motifs, joues: [] };
 }
