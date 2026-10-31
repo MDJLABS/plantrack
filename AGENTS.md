@@ -14,15 +14,15 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [62 commits]
-  fichiers recemment ecrits : ../../../etc/systemd/system/projob-web.service.d/guide.conf, ../projob/sortie/build-guide-commun.log, ../../../tmp/claude-0/-home-mariella-plantrack/0903f074-7a8f-46a8-82a6-d94b9a64bf16/scratchpad/carte.json, ../../../etc/systemd/system/prolearn-next-proxy.service, ../../../tmp/claude-0/-home-mariella-plantrack/0903f074-7a8f-46a8-82a6-d94b9a64bf16/scratchpad/carte2.json, ../../../usr/local/bin/portier-reveil
+FIL ACTIF — t23 : guides de test automatiques (d100) [63 commits]
+  fichiers recemment ecrits : ../../../tmp/claude-0/-home-mariella-plantrack/0903f074-7a8f-46a8-82a6-d94b9a64bf16/scratchpad/carte.json, ../../../etc/systemd/system/prolearn-next-proxy.service, ../../../tmp/claude-0/-home-mariella-plantrack/0903f074-7a8f-46a8-82a6-d94b9a64bf16/scratchpad/carte2.json, ../../../usr/local/bin/portier-reveil, ../../../tmp/claude-0/-home-mariella-plantrack/0903f074-7a8f-46a8-82a6-d94b9a64bf16/scratchpad/carte3.json, ../../../tmp/claude-0/-home-mariella-plantrack/0903f074-7a8f-46a8-82a6-d94b9a64bf16/scratchpad/carte4.json
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
   t5 : travaux sur main — reprise : retour au travail courant apres la faille
 
 BUGS NON CORRIGES (personne ne s'en est occupe) :
-  b29 (open) [t23] Essai guide ProLearn (31/10, tel Mariella) : erreur 'Hydration failed' en dev sur /login?guide=essai-gestes — diff dans le MetadataWrapper … (agent) [1 tentatives, derniere: Piste robot ecartee : les navigateurs vus par Cloudflare su…]
+  b29 (open) [t23] Essai guide ProLearn (31/10, tel Mariella) : erreur 'Hydration failed' en dev sur /login?guide=essai-gestes — diff dans le MetadataWrapper … (agent) [2 tentatives, derniere: Vu sur ordinateur (q9). Sur ordinateur, cause la plus proba…]
 
 BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b24 (to_verify) [t22] mdjlabs-site : la synchro du moteur de guide a ecrase guide-verdict.ts — guide-envoi.ts et ses tests importent compteRenduMarkdown et prog.… (agent) [3 tentatives, derniere: Re-ecrasement du 28/10 19h25 : la ronde de mdjlabs a lance …]
@@ -192,8 +192,5 @@ Pieges connus :
   pg19 : Moteur guide (guide-visite.ts, commun) importe ./scenarios.ts et ./types.ts ave…
   pg20 : Un sous-agent a qui on dit 'ne lis aucun .env' peut quand meme grep apps/web/.e…
   pg21 : Enchainer git add/commit ET le lancement d'un build (meme detache par setsid no…
-
-Questions en attente (reponds via !answer qN ...) :
-  q9 : b29 : sur quel appareil le message rouge est-il apparu ? (ordinateur = module d…
 ```
 <!-- plantrack:state-end -->
