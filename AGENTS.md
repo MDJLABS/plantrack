@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [42 commits]
-  fichiers recemment ecrits : ../projob/scripts/seed-guide-design2.sql, ../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/verif-guide.sql, ../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/verif-3299.log, ../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/design2-run.mjs, ../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/b31.json, sortie/carte-b31.log
+FIL ACTIF — t23 : guides de test automatiques (d100) [43 commits]
+  fichiers recemment ecrits : ../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/design2-run.mjs, ../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/b31.json, sortie/carte-b31.log, ../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/rot.mjs, ../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/check.mjs, ../projob/sortie/build-rotation.log
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -168,6 +168,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d132 : Portage carte d105 sur OpenStyle (sha cbb0fd6, suite d130) : guide reste ouvert au changement de page (architecture guide-visite.ts deja ex… (agent)
   d133 : Mariella (tel, 31/10, via AskUserQuestion) : bouton Fermer de la carte de fin -> 'Fermer sans effacer (Recommande)' sur les 4 sites (comme … (agent)
   d134 : Mariella (tel, 31/10, via AskUserQuestion) : guides quasi automatiques -> 'Le guide ProJob d'abord (Recommande)' : rendre automatiques les … (agent)
+  d135 : 31/10 : guide design2 ProJob rendu automatique (27de37f, 16 points avec geste) + historique seed (2999e2d). Incident : un sous-agent a grep… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
@@ -176,6 +177,7 @@ Pieges connus :
   pg15 : Le Stop hook bcc (hook/index.ts, regle 'projet ne s'endort jamais' du 03/10) EX…
   pg18 : Un site peut recevoir par la ronde une version du moteur de guide jamais commit…
   pg19 : Moteur guide (guide-visite.ts, commun) importe ./scenarios.ts et ./types.ts ave…
+  pg20 : Un sous-agent a qui on dit 'ne lis aucun .env' peut quand meme grep apps/web/.e…
 
 Questions en attente (reponds via !answer qN ...) :
   q8 : b30 : page d'attente au reveil du site de test ProLearn, le garder eveille, ou …
