@@ -114,7 +114,7 @@ async function ecrireCompteRendu(racine: string, scenario: { titre: string }, re
     ? `**✅ VALIDÉ** · ${resultat.total}/${resultat.total} points conformes.\n`
     : `**⚠️ À REVOIR** · ${resultat.total - resultat.ko.length}/${resultat.total} conformes, `
       + `${resultat.ko.length} écart${resultat.ko.length > 1 ? "s" : ""} :\n`
-      + resultat.ko.map((k) => `  - « ${k.titre} »\n`).join("");
+      + resultat.ko.map((k) => `  - « ${k.titre} »${k.note ? ` — ${k.note}` : ""}\n`).join("");
   try {
     await appendFile(join(racine, FICHIER_RETOURS), entete + corps, "utf8");
   } catch {
@@ -248,7 +248,12 @@ export async function consignerGuide(
     titre: scenario.titre,
     statut: bilan.statut === "valide" ? "valide" : "a-revoir",
     total: bilan.total,
-    ko: bilan.ko,
+    // Le motif qu'elle a écrit sur un point raté voyage jusqu'au carnet : sans lui,
+    // l'agent ne saurait que « ça ne va pas », pas ce qu'elle a vu.
+    ko: bilan.ko.map((k) => {
+      const note = correspond ? entree!.verdicts[k.id]?.note : undefined;
+      return note ? { ...k, note } : k;
+    }),
   };
 
   await ecrireCompteRendu(racine, scenario, resultat, quand);

@@ -117,7 +117,7 @@ export type ResultatGuide = {
   titre: string;
   statut: "valide" | "a-revoir";
   total: number;
-  ko: { id: string; titre: string }[];
+  ko: { id: string; titre: string; note?: string }[];
 };
 
 /**
