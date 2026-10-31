@@ -144,6 +144,48 @@ export function effacerVisiteSession(storage: StorageVisite | null): void {
 }
 
 /* ------------------------------------------------------------------------------------------
+ * « M'emmener au bon endroit » (porté de Prolearn, commit 958ecde2, demande Mariella 31/10) —
+ * un point peut porter sa propre `url` (ou retomber sur celle du scénario, `GuideStep.url`/
+ * `GuideScenario.url`, cf. types.ts) : si la page courante n'est pas la bonne, la carte
+ * propose d'y aller plutôt que de chercher une zone qui ne peut pas y être.
+ *
+ * Pas de `resoudreUrl([formation])` chez Mizzzen (aucune URL à segment variable) — le moteur
+ * COMMUN, lui, expose `resoudreUrl` GÉNÉRIQUE (renvoie l'url telle quelle) pour qu'un site
+ * qui en aurait besoin (ex. ProLearn/[formation]) puisse la surcharger dans sa propre copie,
+ * sans que cela change le comportement d'un site qui n'en a pas besoin.
+ * ------------------------------------------------------------------------------------------ */
+
+/** Chemin seul (sans `?…` ni `#…`) d'une URL relative ou absolue. */
+function cheminDe(url: string): string {
+  try {
+    return new URL(url, "http://x").pathname.replace(/\/+$/, "") || "/";
+  } catch {
+    return url;
+  }
+}
+
+/** Vrai si `pathname` est la page désignée par `url` (paramètres ignorés). */
+export function surLaPage(pathname: string, url: string): boolean {
+  return cheminDe(pathname) === cheminDe(url);
+}
+
+/**
+ * URL concrète d'un point — GÉNÉRIQUE dans le moteur commun : contrairement à ProLearn (qui
+ * y substitue `[formation]`), ce moteur ne connaît aucune convention de route propre à un
+ * site ; il renvoie `url` telle quelle. Un site qui en a besoin la surcharge dans sa copie.
+ */
+export function resoudreUrl(url: string, _pathname: string): string {
+  return url;
+}
+
+/** Ajoute `guide=<id>` à une URL (sans doubler un paramètre déjà présent). */
+export function avecGuide(url: string, scenarioId: string): string {
+  const u = new URL(url, "http://x");
+  u.searchParams.set("guide", scenarioId);
+  return `${u.pathname}${u.search}${u.hash}`;
+}
+
+/* ------------------------------------------------------------------------------------------
  * Envoi du résultat (lot « curseur animé ») — `retour` (jeton), `poste` (base URL de la
  * session qui a ouvert le guide) et `projet` arrivent en paramètres d'URL EN MÊME TEMPS que
  * `?guide=`, et doivent survivre au même changement de page que la visite elle-même : d'où

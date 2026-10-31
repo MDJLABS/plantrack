@@ -51,6 +51,12 @@ export type GuideStep = {
   /** Identifiant d'étape PlanTrack (ex. "s3") — porte le verdict vers `guide-envoi.ts`.
    *  Absent ⇒ l'étape est ignorée de l'envoi du résultat (compte-rendu local uniquement). */
   pt?: string;
+  /**
+   * Page où se joue ce point (ex. `/aujourdhui`). Hors de cette page, la carte propose
+   * « M'emmener au bon endroit » plutôt que de chercher une zone qui ne peut pas y être.
+   * Absent ⇒ l'`url` du scénario (porté de Prolearn, commit 958ecde2, demande Mariella 31/10).
+   */
+  url?: string;
 };
 
 /** Une livraison à valider = une suite ordonnée de points. */
@@ -62,6 +68,10 @@ export type GuideScenario = {
   date: string;
   /** Page concernée, en clair (affiché dans le registre, pas dans la bulle). */
   page: string;
+  /** Page de départ (ex. `/aujourdhui`) — là où le bouton « M'emmener au bon endroit »
+   *  conduit, pour les points qui n'ont pas leur propre `url` (porté de Prolearn, commit
+   *  958ecde2, demande Mariella 31/10). */
+  url?: string;
   etapes: GuideStep[];
 };
 

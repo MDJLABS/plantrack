@@ -131,6 +131,44 @@ export function marquerEnvoye(storage: StorageVisite | null, scenarioId: string)
 }
 
 /**
+ * Heure RÉELLE de l'envoi (format `formatHeure`, « 22 h 51 ») — mémorisée à part de
+ * `CLE_SESSION_ENVOYE` pour que la carte de fin affiche l'heure d'origine, pas l'heure de
+ * REOUVERTURE, quand `?guide=` ramène sur le bilan après un changement de page (`dejaEnvoye`
+ * vrai). Même motif que `marquerEnvoye` : scopée par `scenarioId` (un second scénario envoyé
+ * dans le même onglet ne doit pas afficher l'heure du premier), jamais fatale.
+ */
+const CLE_SESSION_ENVOYE_HEURE = "mdj_guide_session_envoye_heure";
+
+/** Heure mémorisée pour CE scénario, ou `null` si elle n'a jamais été écrite (stockage
+ *  indisponible au moment de l'envoi, ou scénario différent) — la carte de fin n'affiche
+ *  alors aucune heure plutôt qu'une heure fausse. */
+export function heureEnvoiMemorisee(storage: StorageVisite | null, scenarioId: string): string | null {
+  if (!storage) return null;
+  try {
+    const brut = storage.getItem(CLE_SESSION_ENVOYE_HEURE);
+    if (!brut) return null;
+    const separateur = brut.indexOf("|");
+    if (separateur === -1) return null;
+    if (brut.slice(0, separateur) !== scenarioId) return null;
+    return brut.slice(separateur + 1) || null;
+  } catch {
+    return null;
+  }
+}
+
+/** Mémorise l'heure d'envoi de CE scénario — appelé UNIQUEMENT après un `envoyerResultat`
+ *  réussi, juste après `marquerEnvoye`. */
+export function memoriserHeureEnvoi(storage: StorageVisite | null, scenarioId: string, heure: string): void {
+  if (!storage) return;
+  try {
+    storage.setItem(CLE_SESSION_ENVOYE_HEURE, `${scenarioId}|${heure}`);
+  } catch {
+    // Stockage indisponible : l'envoi a quand même réussi, seule l'heure affichée à une
+    // éventuelle réouverture est perdue (la carte de fin n'affichera alors pas d'heure).
+  }
+}
+
+/**
  * Nom d'hôte affichable de `poste` — UNIQUEMENT pour l'affichage du statut d'envoi côté
  * bilan (« Résultat envoyé à <hôte> », `GuideDeTest.tsx`), jamais pour une décision de
  * sécurité : `validerPoste` (`guide-visite.ts`) reste la SEULE garde. Ne lève jamais : un

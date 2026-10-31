@@ -52,6 +52,15 @@
  * convive ne le tapera jamais. D'où l'absence de `usePathname()`/`match` ici (cf.
  * src/lib/guide/types.ts).
  *
+ * ⚠️ Présentation (30/10, maquette validée par Mariella, cf. commit mdjlabs 1ddbc6f —
+ * `https://claude.ai/artifact/CrmX2JdkqBtpucihUxYAgo`, portée telle quelle d'un site à
+ * l'autre) : la carte n'est plus positionnée par rapport à la cible surlignée
+ * (`placeBubble`, `guide-geometry.ts` — toujours exporté, simplement plus appelé ICI).
+ * Posture d'affichage (charte mdjlabs) : feuille collée en bas de l'écran au pouce/à deux
+ * mains (`< 600px`), carte fixe 420px en bas à droite sur la table/au bureau (`>= 600px`).
+ * `bulleRef` reste mesuré (invariant 3, reformulé) — plus pour PLACER la carte, mais pour
+ * donner au curseur animé un point de départ réel (`departCurseur`, dans `Visite`).
+ *
  * ⚠️ Tâche 11 — CE COMPOSANT NE RÉSOUT PLUS LUI-MÊME LE SCÉNARIO. `scenario` arrive en
  * PROP, déjà résolu par `GuideDeTestLazy` via `resoudreVisite()` (`@/lib/guide/guide-
  * visite.ts`), seule porte qui sait combiner `?guide=` ET la clé de `sessionStorage` (la
@@ -76,8 +85,8 @@
 
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
-import { useSearchParams } from "next/navigation";
-import { placeBubble, resolveTarget, type Rect } from "@/lib/guide/guide-geometry";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { resolveTarget, type Rect } from "@/lib/guide/guide-geometry";
 import {
   accederLocalStorage, avancer, chargerProgression, marquerJoue, noterMotif, oublierProgression,
   oublierToutesLesProgressions, reculer, sauverProgression, verdict, vide,
@@ -85,14 +94,25 @@ import {
 import { indexDePoint, SCENARIOS } from "@/lib/guide/scenarios";
 import { verdictScenario } from "@/lib/guide/guide-verdict";
 import { construireCompteRendu } from "@/lib/guide/guide-compte-rendu";
-import { corpsEnvoi, dejaEnvoye, envoyerResultat, hoteDestination, marquerEnvoye } from "@/lib/guide/guide-envoi";
-import { accederSessionStorage, type InfosEnvoi } from "@/lib/guide/guide-visite";
+import {
+  corpsEnvoi, dejaEnvoye, envoyerResultat, heureEnvoiMemorisee, hoteDestination, marquerEnvoye,
+  memoriserHeureEnvoi,
+} from "@/lib/guide/guide-envoi";
+import { accederSessionStorage, avecGuide, resoudreUrl, surLaPage, type InfosEnvoi } from "@/lib/guide/guide-visite";
 import { GuideCurseur } from "./GuideCurseur";
 import type { ResultatGeste } from "@/lib/guide/guide-geste";
 import type { GuideScenario, GuideProgress } from "@/lib/guide/types";
 
-const BULLE: { w: number; h: number } = { w: 360, h: 250 };
 const Z = 2147483000; // au-dessus de tout : la page a des overlays à z-index élevé (max mesuré : 1000)
+/** Seuil posture (charte mdjlabs) : < 600 → feuille collée en bas ; >= 600 → carte fixe. */
+const SEUIL_ORDINATEUR = 600;
+
+/** "22 h 51" — porté du design validé (mdjlabs 1ddbc6f), même format partout. */
+function formatHeure(d: Date): string {
+  const h = String(d.getHours()).padStart(2, "0");
+  const m = String(d.getMinutes()).padStart(2, "0");
+  return `${h} h ${m}`;
+}
 
 /**
  * Couleurs FIXES (littérales, pas des jetons `var(--…)`) : le fond de la bulle
@@ -119,6 +139,28 @@ const C = {
   okSoft: "#1C2A21", // --ok-soft (thème sombre)
   ko: "#EDB0A2", // --danger-ink (thème sombre)
   koSoft: "#2E1C18", // --danger-soft (thème sombre)
+  // Boutons de verdict pleins + progression en segments/cadre de surlignage (design validé
+  // mdjlabs 1ddbc6f, mêmes valeurs que ProLearn) — littérales comme le groupe ci-dessous :
+  // contrairement à `accent`/`ok`/`ko`, ces teintes ne suivent PAS le thème du site.
+  vert: "#4fc38a",
+  vertTexte: "#06140d",
+  cyan: "#5fd4f4",
+  cyanTexte: "#04161d",
+  // Encart « TU DOIS VOIR » (même design) — fond distinct du fond de la carte, littéral.
+  fondProfond: "#0b0e12",
+  bordClair: "#262c34",
+  tresDoux: "#8fa3b3",
+  // Bandeau « Tu dois voir » / « J'ai fait le geste pour toi » (design validé mdjlabs
+  // 1ddbc6f) — valeurs REPRISES telles quelles du mockup, pas inventées ici.
+  cyanFond: "#0f2a33",
+  cyanDoux: "#9be5f9",
+  cyanFort: "#d6f4fc",
+  // Bandeau « geste automatique en échec » + bouton « Réessayer le geste », et contour du
+  // bouton de verdict « Non, pas ça » — idem.
+  orange: "#f0a35a",
+  orangeFond: "#2b1d0f",
+  orangeBord: "#6b4520",
+  orangeTexte: "#f6c08a",
 };
 
 export function GuideDeTest({
@@ -259,11 +301,27 @@ function Visite({ scenario, envoi, point, onReplier, onFermer, onTerminer }: {
   const [prog, setProg] = useState<GuideProgress>(() => vide(scenario.id));
   const [cible, setCible] = useState<Rect | null>(null);
   const [trouvee, setTrouvee] = useState(true);
-  // Taille RÉELLE de la bulle (invariant 3) : la supposer serait une erreur de placement
-  // garantie, le texte des étapes varie d'un point à l'autre.
+  // La carte n'est plus placée par rapport à la cible (cf. bandeau de tête) : `bulleRef`
+  // reste mesuré (invariant 3, reformulé) uniquement pour donner au curseur animé un point
+  // de départ réel — jamais pour calculer la position de la carte elle-même.
   const bulleRef = useRef<HTMLElement | null>(null);
-  const [tailleBulle, setTailleBulle] = useState(BULLE);
   const [ecranBilan, setEcranBilan] = useState(false);
+  // Posture (charte mdjlabs, design validé 1ddbc6f) : feuille collée en bas au pouce/à deux
+  // mains, carte fixe en bas à droite sur la table/au bureau. `window` est lu ici comme le
+  // reste du fichier le fait déjà en render (cf. l'ancien calcul de `pos`) : `Visite` ne
+  // monte qu'après hydratation (portail dans `GuideDeTest`), donc toujours côté client.
+  const [largeurEcran, setLargeurEcran] = useState(() =>
+    typeof window !== "undefined" ? window.innerWidth : 1280,
+  );
+  useEffect(() => {
+    const onResize = () => setLargeurEcran(window.innerWidth);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+  const mobile = largeurEcran < SEUIL_ORDINATEUR;
+  // Menu « ⋯ » (design validé) : regroupe les commandes auparavant en icônes séparées
+  // (rejouer/recommencer/replier/fermer) — mêmes actions, même sémantique, cf. plus bas.
+  const [menuOuvert, setMenuOuvert] = useState(false);
   // Bouton « Copier le compte-rendu » (décision Mariella, round de correction 1) : pas de
   // distinction fine ici, juste « ça a marché » / « ça a échoué » — `navigator.clipboard`
   // peut être absent (contexte non sécurisé) ou refusé (permission), les deux tombent dans
@@ -278,6 +336,9 @@ function Visite({ scenario, envoi, point, onReplier, onFermer, onTerminer }: {
   const [curseurVisible, setCurseurVisible] = useState(false);
   const [curseurCle, setCurseurCle] = useState(0);
   const [gesteRaison, setGesteRaison] = useState<string | null>(null);
+  // Bandeau « J'ai fait le geste pour toi » (design validé) — vrai quand le geste
+  // automatique a réussi, pour que Mariella sache qu'elle n'a rien à faire elle-même.
+  const [gesteOk, setGesteOk] = useState(false);
 
   // Motif d'un "ko" — champ posé APRÈS avoir noté "ko" (cf. `noter` plus bas), jamais avant :
   // le verdict est acquis dès le clic, le motif n'est qu'un détail optionnel qui s'y ajoute.
@@ -289,6 +350,14 @@ function Visite({ scenario, envoi, point, onReplier, onFermer, onTerminer }: {
   // reste dans tous les cas le filet de sécurité (cf. bandeau de `guide-envoi.ts`).
   const [etatEnvoi, setEtatEnvoi] = useState<"idle" | "envoi" | "ok" | "echec">("idle");
   const [hoteEnvoi, setHoteEnvoi] = useState<string | null>(null);
+  // Heure d'envoi affichée sur la carte de fin (design validé : « Envoyé à la session
+  // <projet> à HH h MM »). PERSISTÉE dans `sessionStorage` (`heureEnvoiMemorisee`/
+  // `memoriserHeureEnvoi`, guide-envoi.ts, même motif que `dejaEnvoye`/`marquerEnvoye`) :
+  // à la réouverture (navigation, rechargement) où `dejaEnvoye` est vrai, on relit l'heure
+  // RÉELLE de l'envoi d'origine plutôt que de reposer l'heure courante. Si elle n'a jamais
+  // été écrite (stockage indisponible à l'envoi), on n'affiche AUCUNE heure plutôt qu'une
+  // heure fausse.
+  const [envoiHeure, setEnvoiHeure] = useState<string | null>(null);
 
   // Reprise « là où elle s'est arrêtée » — lue APRÈS montage (localStorage n'existe pas
   // au rendu serveur).
@@ -310,6 +379,25 @@ function Visite({ scenario, envoi, point, onReplier, onFermer, onTerminer }: {
 
   const etape = scenario.etapes[Math.min(prog.index, scenario.etapes.length - 1)];
   const total = scenario.etapes.length;
+
+  // « Si je ne suis pas sur la bonne page, un bouton doit m'y emmener » (porté de Prolearn,
+  // commit 958ecde2, demande Mariella 31/10). `urlPoint` : la destination connue de CE point
+  // (ou, à défaut, celle du scénario), passée par `resoudreUrl` — GÉNÉRIQUE dans le moteur
+  // commun (renvoie l'url telle quelle, cf. guide-visite.ts) : un site qui aurait besoin
+  // d'y substituer un segment variable (ex. ProLearn/[formation]) la surcharge dans sa
+  // propre copie, sans que cela change le comportement d'un site qui n'en a pas besoin.
+  // `null` si ni le point ni le scénario n'en portent.
+  const pathname = usePathname();
+  const router = useRouter();
+  const urlBrute = etape.url ?? scenario.url ?? null;
+  const urlPoint = urlBrute === null ? null : resoudreUrl(urlBrute, pathname);
+  const horsPage = urlPoint !== null && !surLaPage(pathname, urlPoint);
+  // Présent quand elle n'est pas au bon endroit pour ce point, OU que la zone décrite y est
+  // introuvable mais qu'une destination connue pourrait corriger ça.
+  const onAllerAuBonEndroit = urlPoint !== null && (horsPage || !trouvee)
+    ? () => router.push(avecGuide(urlPoint, scenario.id))
+    : null;
+
   const bilan = verdictScenario(scenario.etapes, prog.verdicts);
 
   // Bascule sur le bilan dès que tous les points ont une réponse (décision Mariella
@@ -403,6 +491,9 @@ function Visite({ scenario, envoi, point, onReplier, onFermer, onTerminer }: {
     if (dejaEnvoye(storage, scenario.id)) {
       setHoteEnvoi(hoteDestination(envoi.poste));
       setEtatEnvoi("ok");
+      // Heure d'ORIGINE relue depuis `sessionStorage` — `null` si elle n'a jamais été
+      // écrite : pas d'heure affichée plutôt qu'une heure fausse (heure de réouverture).
+      setEnvoiHeure(heureEnvoiMemorisee(storage, scenario.id));
       return;
     }
     let annule = false;
@@ -413,8 +504,11 @@ function Visite({ scenario, envoi, point, onReplier, onFermer, onTerminer }: {
       if (annule) return;
       if (r.ok) {
         marquerEnvoye(storage, scenario.id);
+        const heure = formatHeure(new Date());
+        memoriserHeureEnvoi(storage, scenario.id, heure);
         setHoteEnvoi(hoteDestination(envoi.poste));
         setEtatEnvoi("ok");
+        setEnvoiHeure(heure);
       } else {
         setEtatEnvoi("echec");
       }
@@ -435,13 +529,10 @@ function Visite({ scenario, envoi, point, onReplier, onFermer, onTerminer }: {
         ? (({ x, y, width, height }) => ({ x, y, w: width, h: height }))(el.getBoundingClientRect())
         : null;
       const cle = r ? `${Math.round(r.x)},${Math.round(r.y)},${Math.round(r.w)},${Math.round(r.h)}` : "null";
-      const b = bulleRef.current?.getBoundingClientRect();
-      const cleB = b ? `${Math.round(b.width)}x${Math.round(b.height)}` : "";
-      if (cle + cleB !== dernier) {
-        dernier = cle + cleB;
+      if (cle !== dernier) {
+        dernier = cle;
         setCible(r);
         setTrouvee(!(etape.cibles?.length) || !!el);
-        if (b) setTailleBulle({ w: Math.round(b.width), h: Math.round(b.height) });
       }
       raf = requestAnimationFrame(tick);
     };
@@ -465,21 +556,45 @@ function Visite({ scenario, envoi, point, onReplier, onFermer, onTerminer }: {
   // ce soit — seul un changement d'ÉTAPE doit décider de montrer ou non le curseur.
   useEffect(() => {
     setGesteRaison(null);
+    setGesteOk(false);
+    setMenuOuvert(false);
     setMotifActif(false);
     setMotifSaisie("");
+    // Pas sur la bonne page (porté de Prolearn, commit 958ecde2) : le geste raterait sa
+    // cible. Il partira une fois arrivée (cf. `onAllerAuBonEndroit`).
+    if (horsPage) { setCurseurVisible(false); return; }
     if (etape.geste && !prog.joues?.includes(etape.id)) {
       setCurseurVisible(true);
       setCurseurCle((c) => c + 1);
     } else {
       setCurseurVisible(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- un seul passage par ÉTAPE, cf. commentaire ci-dessus
-  }, [etape.id]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- un seul passage par ÉTAPE (et par arrivée sur sa page), cf. commentaire ci-dessus
+  }, [etape.id, horsPage]);
 
   // ⚠️ Invariant 4 : Échap ne ferme PAS la visite. Aucun `onKeyDown` ici, volontairement —
   // en ajouter un pour intercepter Échap casserait le test qu'elle sert justement à faire.
 
-  const pos = placeBubble(cible, tailleBulle, { w: window.innerWidth, h: window.innerHeight });
+  // Carte posée par POSTURE (design validé), plus par rapport à la cible surlignée —
+  // cf. bandeau de tête. Lu directement en render comme l'ancien `pos`, pour la même
+  // raison (client only, après hydratation/portail).
+  const carteStyle: CSSProperties = mobile
+    ? {
+        position: "fixed", left: 0, right: 0, bottom: 0,
+        width: "auto", maxWidth: "100%", maxHeight: "75vh", overflowY: "auto",
+        borderRadius: "14px 14px 0 0", boxSizing: "border-box",
+      }
+    : {
+        position: "fixed", right: 16, bottom: 16,
+        width: 420, maxHeight: "80vh", overflowY: "auto",
+        borderRadius: 10, boxSizing: "border-box",
+      };
+  // Point de départ du curseur animé : le centre RÉEL de la carte mesurée (invariant 3,
+  // reformulé) — un repli raisonnable tant qu'elle n'a encore jamais été mesurée.
+  const bRect = bulleRef.current?.getBoundingClientRect();
+  const departCurseur = bRect
+    ? { x: bRect.left + bRect.width / 2, y: bRect.top + bRect.height / 2 }
+    : { x: window.innerWidth - 220, y: window.innerHeight - 160 };
   const v = prog.verdicts[etape.id];
 
   const noter = (val: "ok" | "ko") => {
@@ -519,14 +634,23 @@ function Visite({ scenario, envoi, point, onReplier, onFermer, onTerminer }: {
 
   const gesteJoue = (resultat: ResultatGeste) => {
     setCurseurVisible(false);
-    setGesteRaison(resultat.ok ? null : (resultat.raison ?? "le geste a échoué"));
+    if (resultat.ok) {
+      setGesteRaison(null);
+      setGesteOk(true);
+    } else {
+      setGesteRaison(resultat.raison ?? "le geste a échoué");
+      setGesteOk(false);
+    }
   };
 
-  /** Bouton « Rejouer » (#guide-rejouer) : repasse le curseur, QUOI QUE `prog.joues` dise —
-   *  `curseurCle` force un remontage de `GuideCurseur`, dont la garde anti-double-jeu
-   *  (`dejaJoue`) ne concerne qu'UN montage, jamais les montages suivants. */
+  /** Bouton « Rejouer le geste » / « Réessayer le geste » (menu, ou bandeau d'échec) :
+   *  repasse le curseur, QUOI QUE `prog.joues` dise — `curseurCle` force un remontage de
+   *  `GuideCurseur`, dont la garde anti-double-jeu (`dejaJoue`) ne concerne qu'UN montage,
+   *  jamais les montages suivants. */
   const rejouerGeste = () => {
+    setMenuOuvert(false);
     setGesteRaison(null);
+    setGesteOk(false);
     setCurseurVisible(true);
     setCurseurCle((c) => c + 1);
   };
@@ -551,7 +675,7 @@ function Visite({ scenario, envoi, point, onReplier, onFermer, onTerminer }: {
             top: t, left: l,
             width: Math.max(0, w), height: Math.max(0, h),
             borderRadius: 6,
-            border: `2px solid ${C.accent}`,
+            border: `2px solid ${C.cyan}`,
             boxShadow: "0 0 0 9999px rgba(0,0,0,.55)",
             pointerEvents: "none",
             transition: "top .12s ease, left .12s ease, width .12s ease, height .12s ease",
@@ -563,7 +687,7 @@ function Visite({ scenario, envoi, point, onReplier, onFermer, onTerminer }: {
       {curseurVisible && etape.geste && !ecranBilan && (
         <GuideCurseur
           key={`${etape.id}:${curseurCle}`}
-          depart={{ x: pos.left + tailleBulle.w / 2, y: pos.top + tailleBulle.h / 2 }}
+          depart={departCurseur}
           geste={etape.geste}
           ciblesRepli={etape.cibles ?? []}
           onAvantAction={avantGeste}
@@ -577,66 +701,113 @@ function Visite({ scenario, envoi, point, onReplier, onFermer, onTerminer }: {
         aria-label={`Point à vérifier ${prog.index + 1} sur ${total}`}
         ref={bulleRef}
         style={{
-          // `border-box` : sinon la largeur réelle inclut padding et bordure, et le
-          // centrage horizontal est faux d'autant.
-          position: "fixed", top: pos.top, left: pos.left, width: BULLE.w, boxSizing: "border-box",
+          ...carteStyle,
           pointerEvents: "auto", // invariant 1 : seule la bulle capte les clics
           background: C.fond, color: C.texte,
-          border: `1px solid ${C.bord}`, borderRadius: 10,
+          border: `1px solid ${C.bord}`,
           boxShadow: "0 18px 50px rgba(0,0,0,.6)",
           font: "400 13px/1.5 var(--font-sans, var(--sans, system-ui, sans-serif))",
           padding: 14,
         }}
       >
-        <header style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-          <span style={{ color: C.accent, fontSize: 11, fontWeight: 600, letterSpacing: ".06em" }}>
-            {prog.index + 1}/{total}
+        <header style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+          <span style={{
+            font: "500 11px/1 var(--font-mono, monospace)", color: C.doux, whiteSpace: "nowrap",
+          }}>
+            Point {prog.index + 1} sur {total}
           </span>
-          <strong style={{ flex: 1, fontSize: 13.5, fontWeight: 600 }}>{etape.titre}</strong>
-          {/* La visite reprend là où elle s'est arrêtée : sans ce bouton, rejouer un
-              scénario déjà terminé (après correction d'un point) serait impossible. */}
-          <button
-            id="guide-recommencer"
-            onClick={() => maj(vide(scenario.id))}
-            aria-label="Recommencer depuis le premier point"
-            title="Recommencer depuis le premier point"
-            style={{ ...btn, padding: "2px 7px", color: C.doux }}
-          >↻</button>
-          {/* Le curseur animé ne joue le geste qu'une fois (`prog.joues`) — ce bouton permet
-              de le REJOUER à la demande, par ex. après avoir corrigé la cible sur la page. */}
-          {etape.geste && !ecranBilan && (
-            <button
-              id="guide-rejouer"
-              onClick={rejouerGeste}
-              aria-label="Rejouer le geste"
-              title="Rejouer le geste automatique"
-              style={{ ...btn, padding: "2px 7px", color: C.doux }}
-            >▶</button>
+          {!ecranBilan && (
+            // Barre de progression segmentée (design validé 1ddbc6f, mêmes valeurs que
+            // ProLearn) : vert = point déjà jugé, cyan = point courant, bord = à venir.
+            <div id="guide-progression" aria-hidden="true" style={{ flexGrow: 1, display: "flex", gap: 4 }}>
+              {scenario.etapes.map((e, i) => (
+                <span
+                  key={e.id}
+                  style={{
+                    flex: 1, height: 4, borderRadius: 2,
+                    background: prog.verdicts[e.id] ? C.vert : i === prog.index ? C.cyan : C.bord,
+                  }}
+                />
+              ))}
+            </div>
           )}
-          {/* Replier ≠ Fermer (tâche 11) : replier garde la visite ACTIVE (la pastille la
-              rouvre, y compris après un changement de page) ; fermer efface la persistance
-              de session — sans cette distinction, impossible de quitter le guide pour de
-              bon, ou impossible de le reprendre en changeant de page. */}
-          <button
-            id="guide-replier"
-            onClick={onReplier}
-            aria-label="Replier le guide (la visite reste active)"
-            title="Replier — la visite reste active"
-            style={{ ...btn, padding: "2px 7px", color: C.doux }}
-          >─</button>
-          <button
-            id="guide-fermer"
-            onClick={onFermer}
-            // Ne détruit plus rien (retour du 26/07) : aucun des deux boutons de cet en-tête
-            // ne peut faire perdre la visite. Quitter pour de bon se fait sur la croix de la
-            // pastille — un seul endroit, et c'est celui qu'on cherche quand on veut partir.
-            aria-label="Fermer la bulle (la visite reste accessible par la pastille)"
-            title="Fermer — la visite reste accessible par la pastille"
-            style={{ ...btn, padding: "2px 7px", color: C.doux }}
-          >✕</button>
+          {/* Menu « ⋯ » (design validé 1ddbc6f) : regroupe les commandes auparavant en
+              icônes séparées — mêmes actions, même sémantique, ids conservés. */}
+          <div style={{ position: "relative", flexShrink: 0 }}>
+            <button
+              id="guide-menu"
+              onClick={() => setMenuOuvert((o) => !o)}
+              aria-label="Menu du guide"
+              aria-haspopup="true"
+              aria-expanded={menuOuvert}
+              style={menuBtnStyle}
+            >⋯</button>
+            {menuOuvert && (
+              <div id="guide-menu-panel" role="menu" style={menuPanelStyle}>
+                {/* Le curseur animé ne joue le geste qu'une fois (`prog.joues`) — cette entrée
+                    permet de le REJOUER à la demande, par ex. après correction de la cible. */}
+                {etape.geste && !ecranBilan && (
+                  <button id="guide-rejouer" role="menuitem" onClick={rejouerGeste} style={menuItemStyle}>
+                    Rejouer le geste
+                  </button>
+                )}
+                {/* La visite reprend là où elle s'est arrêtée : sans cette entrée, rejouer un
+                    scénario déjà terminé (après correction d'un point) serait impossible. */}
+                <button
+                  id="guide-recommencer"
+                  role="menuitem"
+                  onClick={() => { setMenuOuvert(false); maj(vide(scenario.id)); }}
+                  style={menuItemStyle}
+                >Recommencer depuis le début</button>
+                {/* Replier ≠ Fermer (tâche 11) : replier garde la visite ACTIVE (la pastille la
+                    rouvre, y compris après un changement de page) ; fermer efface la persistance
+                    de session — sans cette distinction, impossible de quitter le guide pour de
+                    bon, ou impossible de le reprendre en changeant de page. Deux entrées
+                    distinctes, volontairement, même si leur effet se ressemble aujourd'hui :
+                    elles portent une intention différente (cf. commentaires d'origine). */}
+                <button
+                  id="guide-replier"
+                  role="menuitem"
+                  onClick={() => { setMenuOuvert(false); onReplier(); }}
+                  style={menuItemStyle}
+                >Replier</button>
+                <button
+                  id="guide-fermer"
+                  role="menuitem"
+                  onClick={() => { setMenuOuvert(false); onFermer(); }}
+                  style={menuItemStyle}
+                >Fermer</button>
+              </div>
+            )}
+          </div>
         </header>
 
-        {!trouvee && !ecranBilan && (
+        <strong style={{ display: "block", marginBottom: 10, fontSize: 14.5, fontWeight: 600, lineHeight: 1.3 }}>
+          {etape.titre}
+        </strong>
+
+        {onAllerAuBonEndroit && !ecranBilan ? (
+          // Porté de Prolearn (commit 958ecde2, demande Mariella 31/10) : pas la bonne page,
+          // ou zone introuvable avec une destination connue — l'y conduire plutôt que de
+          // laisser chercher une zone qui ne peut pas être là.
+          <div id="guide-pas-au-bon-endroit" style={{
+            display: "flex", flexDirection: "column", gap: 10, marginBottom: 8,
+            padding: 12, borderRadius: 10, background: C.orangeFond, border: `1px solid ${C.orangeBord}`,
+          }}>
+            <span style={{ color: C.orangeTexte, fontSize: 13, fontWeight: 600 }}>
+              Tu n&rsquo;es pas au bon endroit pour ce point.
+            </span>
+            <button
+              id="guide-aller-au-bon-endroit"
+              onClick={onAllerAuBonEndroit}
+              style={{
+                height: 44, borderRadius: 10, border: "none",
+                background: C.cyan, color: C.cyanTexte,
+                font: "600 14px/1 var(--font-sans, var(--sans, system-ui, sans-serif))", cursor: "pointer",
+              }}
+            >M&rsquo;emmener au bon endroit</button>
+          </div>
+        ) : !trouvee && !ecranBilan && (
           // Invariant 2 : ne JAMAIS laisser croire que la zone encadrée est la bonne quand
           // elle est introuvable — le dire est le minimum honnête.
           <p style={{
@@ -651,20 +822,52 @@ function Visite({ scenario, envoi, point, onReplier, onFermer, onTerminer }: {
         {gesteRaison && !ecranBilan && (
           // Invariant 2, même esprit que ci-dessus : le geste automatique a échoué, on ne
           // prétend jamais qu'il a réussi. Mariella juge le point elle-même (✓/✗ ci-dessous).
-          <p style={{
-            margin: "0 0 8px", padding: "6px 8px", borderRadius: 6,
-            background: C.koSoft, color: C.ko, fontSize: 12,
+          <div style={{
+            margin: "0 0 9px", padding: "8px 9px", borderRadius: 6,
+            background: C.orangeFond, border: `1px solid ${C.orangeBord}`, color: C.orangeTexte,
           }}>
-            Le geste automatique a échoué : {gesteRaison}. Juge le point toi-même.
-          </p>
+            <p style={{ margin: "0 0 7px", fontSize: 12 }}>
+              Le geste automatique a échoué : {gesteRaison}. Juge le point toi-même.
+            </p>
+            <button
+              id="guide-reessayer-geste"
+              onClick={rejouerGeste}
+              style={{ ...btn, borderColor: C.orangeBord, color: C.orangeTexte }}
+            >Réessayer le geste</button>
+          </div>
         )}
 
         {!ecranBilan && (
           <>
-            <p style={{ margin: "0 0 9px" }}>{etape.action}</p>
-            <p style={{ margin: "0 0 12px", paddingLeft: 9, borderLeft: `2px solid ${C.bord}`, color: C.doux }}>
-              <span style={{ color: C.texte, fontWeight: 500 }}>Attendu · </span>{etape.attendu}
-            </p>
+            {/* Bandeau « J'ai fait le geste pour toi » (design validé) — remplace le texte
+                de la consigne quand le geste automatique a réussi : rien à faire, juste à
+                juger le résultat (✓/✗ ci-dessous). */}
+            {gesteOk ? (
+              <p id="guide-geste-ok" style={{
+                margin: "0 0 9px", padding: "8px 9px", borderRadius: 8,
+                background: C.cyanFond, color: C.cyanDoux, fontSize: 12.5, fontWeight: 500,
+                display: "flex", alignItems: "center", gap: 7,
+              }}>
+                <span aria-hidden="true">✓</span>
+                J&rsquo;ai fait le geste pour toi
+              </p>
+            ) : (
+              <p style={{ margin: "0 0 9px" }}>{etape.action}</p>
+            )}
+            <div style={{
+              margin: "0 0 12px", padding: "10px 11px", borderRadius: 8,
+              background: C.fondProfond, border: `1px solid ${C.bordClair}`,
+            }}>
+              <div style={{
+                font: "600 10.5px/1 var(--font-sans, var(--sans, system-ui, sans-serif))",
+                letterSpacing: ".08em", color: C.tresDoux,
+              }}>
+                TU DOIS VOIR
+              </div>
+              <p id="guide-attendu" style={{ margin: "5px 0 0", fontSize: 12.5, lineHeight: 1.45, color: C.texte }}>
+                {etape.attendu}
+              </p>
+            </div>
           </>
         )}
 
@@ -674,14 +877,17 @@ function Visite({ scenario, envoi, point, onReplier, onFermer, onTerminer }: {
           // CONFORT DE LECTURE affiché à l'écran : le texte COPIÉ ci-dessous, lui, ne porte
           // jamais de conclusion (cf. guide-compte-rendu.ts) — round de correction 1.
           <div>
-            <p style={{
+            <p id="guide-bilan-titre" style={{
               margin: "0 0 9px", padding: "7px 9px", borderRadius: 6,
               background: bilan.statut === "valide" ? C.okSoft : C.koSoft,
               color: bilan.statut === "valide" ? C.ok : C.ko, fontWeight: 500,
             }}>
               {bilan.statut === "valide"
-                ? `✅ ${bilan.total}/${bilan.total} conformes.`
+                ? `C'est fini, tout est bon · ${bilan.total} sur ${bilan.total}`
                 : `⚠️ ${bilan.total - bilan.ko.length}/${bilan.total} conformes — ${bilan.ko.length} à revoir.`}
+              {bilan.statut === "valide" && etatEnvoi === "ok" && envoi && envoiHeure
+                ? ` · Envoyé à la session ${envoi.projet} à ${envoiHeure}`
+                : ""}
             </p>
             {bilan.statut === "a-revoir" && (
               <ul style={{ margin: "0 0 10px", paddingLeft: 16, color: C.doux }}>
@@ -761,26 +967,42 @@ function Visite({ scenario, envoi, point, onReplier, onFermer, onTerminer }: {
             </div>
           </div>
         ) : (
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <button
-              onClick={() => maj(reculer(prog))}
-              disabled={prog.index === 0}
-              aria-label="Point précédent"
-              style={{ ...btn, opacity: prog.index === 0 ? .35 : 1, color: C.doux }}
-            >←</button>
-            <button onClick={() => noter("ok")} style={{ ...btn, borderColor: C.ok, color: C.ok, flex: 1 }}>
-              ✓ Ça marche
-            </button>
-            <button onClick={() => noter("ko")} style={{ ...btn, borderColor: C.ko, color: C.ko, flex: 1 }}>
-              ✗ Ça ne va pas
-            </button>
-            <button
-              onClick={() => maj(avancer(prog, total))}
-              disabled={prog.index >= total - 1}
-              aria-label="Point suivant"
-              style={{ ...btn, opacity: prog.index >= total - 1 ? .35 : 1, color: C.doux }}
-            >→</button>
-          </div>
+          <>
+            {/* Boutons de verdict pleins, 56 px (design validé 1ddbc6f, mêmes valeurs que
+                ProLearn) — remplacent les anciens « ✓ Ça marche » / « ✗ Ça ne va pas ». */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 8 }}>
+              <button
+                onClick={() => noter("ok")}
+                style={{
+                  height: 56, borderRadius: 10, border: "none",
+                  background: C.vert, color: C.vertTexte,
+                  font: "600 15px/1 var(--font-sans, var(--sans, system-ui, sans-serif))", cursor: "pointer",
+                }}
+              >Oui, je le vois</button>
+              <button
+                onClick={() => noter("ko")}
+                style={{
+                  height: 56, borderRadius: 10, border: `2px solid ${C.orange}`,
+                  background: "transparent", color: C.orangeTexte,
+                  font: "600 15px/1 var(--font-sans, var(--sans, system-ui, sans-serif))", cursor: "pointer",
+                }}
+              >Non, pas ça</button>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 6 }}>
+              <button
+                onClick={() => maj(reculer(prog))}
+                disabled={prog.index === 0}
+                aria-label="Point précédent"
+                style={{ ...btn, border: "none", opacity: prog.index === 0 ? .35 : 1, color: C.doux }}
+              >← Précédent</button>
+              <button
+                onClick={() => maj(avancer(prog, total))}
+                disabled={prog.index >= total - 1}
+                aria-label="Point suivant"
+                style={{ ...btn, border: "none", opacity: prog.index >= total - 1 ? .35 : 1, color: C.doux }}
+              >Suivant →</button>
+            </div>
+          </>
         )}
 
         {motifActif && !ecranBilan && (
@@ -854,4 +1076,24 @@ const btn: CSSProperties = {
   padding: "6px 10px", borderRadius: 6,
   border: `1px solid ${C.bord}`, background: "transparent", color: C.texte,
   font: "500 12.5px/1 var(--font-sans, var(--sans, system-ui, sans-serif))", cursor: "pointer",
+};
+
+/** Bouton « ⋯ » du menu (design validé) — déclenche `#guide-menu-panel`. */
+const menuBtnStyle: CSSProperties = {
+  width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center",
+  borderRadius: 6, border: `1px solid ${C.bord}`, background: "transparent", color: C.doux,
+  fontSize: 16, lineHeight: 1, cursor: "pointer",
+};
+/** Panneau du menu « ⋯ » — ancré sous le bouton, jamais hors écran côté droit (right: 0). */
+const menuPanelStyle: CSSProperties = {
+  position: "absolute", top: "calc(100% + 4px)", right: 0, zIndex: 1,
+  minWidth: 190, display: "flex", flexDirection: "column", gap: 2,
+  padding: 4, borderRadius: 8, border: `1px solid ${C.bord}`,
+  background: C.fond, boxShadow: "0 10px 30px rgba(0,0,0,.5)",
+};
+/** Une entrée du menu « ⋯ ». */
+const menuItemStyle: CSSProperties = {
+  textAlign: "left", padding: "7px 9px", borderRadius: 6,
+  border: "none", background: "transparent", color: C.texte,
+  font: "400 12.5px/1.3 var(--font-sans, var(--sans, system-ui, sans-serif))", cursor: "pointer",
 };
