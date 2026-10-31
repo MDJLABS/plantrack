@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [41 commits]
-  fichiers recemment ecrits : .claude/hooks/plantrack_guide/lib/guide/types.ts, .claude/hooks/plantrack_guide/lib/guide/guide-envoi.ts, .claude/hooks/plantrack_guide/lib/guide/guide-visite.ts, ../openstyle/app/components/guide/GuideDeTest.tsx, .claude/hooks/plantrack_guide/components/guide/GuideDeTest.tsx, ../openstyle/app/lib/guide/scenarios.ts
+FIL ACTIF — t23 : guides de test automatiques (d100) [42 commits]
+  fichiers recemment ecrits : ../projob/scripts/seed-guide-design2.sql, ../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/verif-guide.sql, ../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/verif-3299.log, ../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/design2-run.mjs, ../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/b31.json, sortie/carte-b31.log
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -180,5 +180,6 @@ Pieges connus :
 Questions en attente (reponds via !answer qN ...) :
   q8 : b30 : page d'attente au reveil du site de test ProLearn, le garder eveille, ou …
   q9 : b29 : sur quel appareil le message rouge est-il apparu ? (ordinateur = module d…
+  q10 : b31 : guide commun propage dans les 4 sites (elargir sync_guide + harmoniser Op…
 ```
 <!-- plantrack:state-end -->

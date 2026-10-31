@@ -1641,3 +1641,23 @@
 {"ts": "2026-10-31T13:39:39+00:00", "kind": "decision", "id": "d133", "text": "Mariella (tel, 31/10, via AskUserQuestion) : bouton Fermer de la carte de fin -> 'Fermer sans effacer (Recommande)' sur les 4 sites (comme la maquette d105) ; remplace l'effacement a la fermeture du 05/08 sur OpenStyle (deja livre cbb0fd6).", "par": "agent"}
 {"ts": "2026-10-31T13:39:39+00:00", "kind": "bug", "id": "b32", "text": "Essai guide ProJob (31/10, tel Mariella) : 'catastrophe' — au lieu d'un guide qui joue les etapes pour elle, elle doit tout faire elle-meme, et la plupart des points decrivent des choses qu'elle ne voit pas a l'ecran. Rappel : le guide doit etre quasi automatique (un bouton par etape, le test se fait pour elle, d100).", "thread": "t23", "severity": "normal", "par": "agent"}
 {"ts": "2026-10-31T13:43:31+00:00", "kind": "decision", "id": "d134", "text": "Mariella (tel, 31/10, via AskUserQuestion) : guides quasi automatiques -> 'Le guide ProJob d'abord (Recommande)' : rendre automatiques les 10 points de design2 (gestes clic/saisie/aller) + preparer le compte de test (candidature avec historique, dossier avec decryptage et CV), puis reprendre les autres guides un par un (ProLearn ~340 points sans geste).", "par": "agent"}
+{"ts": "2026-10-31T13:44:00+00:00", "kind": "commit", "sha": "614c060", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-10-31T13:49:28+00:00", "kind": "file_touched", "text": "../projob/apps/web/app/app/suivi/[id]/FicheClient.tsx", "thread": "t23"}
+{"ts": "2026-10-31T13:54:19+00:00", "kind": "file_touched", "text": "../projob/apps/web/app/app/suivi/SuiviClient.tsx", "thread": "t23"}
+{"ts": "2026-10-31T13:54:24+00:00", "kind": "file_touched", "text": "../projob/apps/web/app/app/suivi/SuiviClient.tsx", "thread": "t23"}
+{"ts": "2026-10-31T13:54:29+00:00", "kind": "file_touched", "text": "../projob/apps/web/app/app/suivi/SuiviClient.tsx", "thread": "t23"}
+{"ts": "2026-10-31T13:54:34+00:00", "kind": "file_touched", "text": "../projob/apps/web/app/app/suivi/SuiviClient.tsx", "thread": "t23"}
+{"ts": "2026-10-31T13:54:38+00:00", "kind": "file_touched", "text": "../projob/apps/web/app/app/suivi/SuiviClient.tsx", "thread": "t23"}
+{"ts": "2026-10-31T13:54:45+00:00", "kind": "file_touched", "text": "../projob/apps/web/app/app/suivi/SuiviClient.tsx", "thread": "t23"}
+{"ts": "2026-10-31T13:54:50+00:00", "kind": "file_touched", "text": "../projob/apps/web/app/app/suivi/SuiviClient.tsx", "thread": "t23"}
+{"ts": "2026-10-31T13:54:54+00:00", "kind": "file_touched", "text": "../projob/apps/web/app/app/suivi/SuiviClient.tsx", "thread": "t23"}
+{"ts": "2026-10-31T13:55:46+00:00", "kind": "file_touched", "text": "../projob/apps/web/lib/guide/scenarios.ts", "thread": "t23"}
+{"ts": "2026-10-31T14:02:30+00:00", "kind": "file_touched", "text": "../projob/backup/db/candidatures-0e25e051-avant-seed.tsv", "thread": "t23"}
+{"ts": "2026-10-31T14:02:30+00:00", "kind": "file_touched", "text": "../projob/backup/db/dossiers-0e25e051-avant-seed.tsv", "thread": "t23"}
+{"ts": "2026-10-31T14:02:41+00:00", "kind": "file_touched", "text": "../projob/scripts/seed-guide-design2.sql", "thread": "t23"}
+{"ts": "2026-10-31T14:03:39+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/verif-guide.sql", "thread": "t23"}
+{"ts": "2026-10-31T14:05:21+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/verif-3299.log", "thread": "t23"}
+{"ts": "2026-10-31T14:06:49+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/design2-run.mjs", "thread": "t23"}
+{"ts": "2026-10-31T14:12:25+00:00", "kind": "question", "id": "q10", "text": "b31 : guide commun propage dans les 4 sites (elargir sync_guide + harmoniser OpenStyle/Mizzzen) ou une copie par site pour l'instant ?"}
+{"ts": "2026-10-31T14:12:25+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/b31.json", "thread": "t23"}
+{"ts": "2026-10-31T14:12:25+00:00", "kind": "file_touched", "text": "sortie/carte-b31.log", "thread": "t23"}
