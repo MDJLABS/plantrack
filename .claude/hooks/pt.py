@@ -1851,7 +1851,7 @@ def cmd_init(args):
 
 def sync_guide():
     """Le moteur du guide de test (Next.js) vit ici, en un seul exemplaire (d34) : un site
-    qui l'a deja (lib/guide/types.ts) recoit la derniere version. Ses scenarios.ts restent a lui.
+    qui l'a deja (lib/guide/types.ts, a la racine ou sous src/, app/, apps/web[/src]) recoit la derniere version. Ses scenarios.ts restent a lui.
     Un depot sans guide n'est pas touche. Un site qui a son propre guide (un fichier du moteur
     qui n'est aucune version publiee par PlanTrack) n'est pas touche non plus (b24)."""
     src = os.path.join(os.path.dirname(os.path.abspath(__file__)), "plantrack_guide")
@@ -1861,7 +1861,10 @@ def sync_guide():
         from pt_publies import GUIDE_PUBLIES
     except ImportError:
         GUIDE_PUBLIES = set()
-    for base in ("", "src"):
+    # b31 : les sites rangent leur code sous app/ (prolearn, openstyle) ou dans un monorepo
+    # (projob : apps/web, mizzzen : apps/web/src) — chercher seulement a la racine et sous
+    # src/ laissait ces quatre sites hors de toute mise a jour du moteur.
+    for base in ("", "src", "app", os.path.join("apps", "web"), os.path.join("apps", "web", "src")):
         if not os.path.exists(os.path.join(ROOT, base, "lib", "guide", "types.ts")):
             continue
         propres = []
