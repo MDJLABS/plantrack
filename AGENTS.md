@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [44 commits]
+FIL ACTIF — t23 : guides de test automatiques (d100) [45 commits]
   fichiers recemment ecrits : ../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/design2-run.mjs, ../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/b31.json, sortie/carte-b31.log, ../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/rot.mjs, ../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/check.mjs, ../projob/sortie/build-rotation.log
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -170,6 +170,8 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d134 : Mariella (tel, 31/10, via AskUserQuestion) : guides quasi automatiques -> 'Le guide ProJob d'abord (Recommande)' : rendre automatiques les … (agent)
   d135 : 31/10 : guide design2 ProJob rendu automatique (27de37f, 16 points avec geste) + historique seed (2999e2d). Incident : un sous-agent a grep… (agent)
   d136 : Mariella (tel, 31/10, via AskUserQuestion) : guide design2 ProJob automatique -> 'Je fais l'essai (Recommande)' ; ses verdicts arrivent par… (agent)
+  d137 : Mariella (tel, 31/10, carte b31) : 'Un seul guide commun' (contre ma reco) — sync_guide doit trouver le moteur sous app/, apps/web, apps/we… (agent)
+  d138 : Mariella (tel, 31/10, carte Guide commun + appels 9639/9651) : un guide commun comme MOTEUR — pareil partout, chaque projet l'appelle et co… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
@@ -183,6 +185,5 @@ Pieges connus :
 Questions en attente (reponds via !answer qN ...) :
   q8 : b30 : page d'attente au reveil du site de test ProLearn, le garder eveille, ou …
   q9 : b29 : sur quel appareil le message rouge est-il apparu ? (ordinateur = module d…
-  q10 : b31 : guide commun propage dans les 4 sites (elargir sync_guide + harmoniser Op…
 ```
 <!-- plantrack:state-end -->
