@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [60 commits]
-  fichiers recemment ecrits : ../projob/apps/web/lib/guide/guide-reglages.ts, ../projob/apps/web/lib/guide/guide-reglages-serveur.ts, ../projob/apps/web/tsconfig.json, ../projob/apps/web/app/layout.tsx, ../../../etc/systemd/system/projob-web.service.d/guide.conf, ../projob/sortie/build-guide-commun.log
+FIL ACTIF — t23 : guides de test automatiques (d100) [61 commits]
+  fichiers recemment ecrits : ../projob/apps/web/app/layout.tsx, ../../../etc/systemd/system/projob-web.service.d/guide.conf, ../projob/sortie/build-guide-commun.log, ../../../tmp/claude-0/-home-mariella-plantrack/0903f074-7a8f-46a8-82a6-d94b9a64bf16/scratchpad/carte.json, ../../../usr/local/bin/portier-reveil, ../../../etc/systemd/system/prolearn-next-proxy.service
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -23,13 +23,13 @@ FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
 
 BUGS NON CORRIGES (personne ne s'en est occupe) :
   b29 (open) [t23] Essai guide ProLearn (31/10, tel Mariella) : erreur 'Hydration failed' en dev sur /login?guide=essai-gestes — diff dans le MetadataWrapper … (agent) [1 tentatives, derniere: Piste robot ecartee : les navigateurs vus par Cloudflare su…]
-  b30 (open) [t23] Essai guide ProLearn (31/10 06h16, tel Mariella) : apres le code Cloudflare Access (accepte a 05:16:56Z dans le registre Access), la page '… (agent)
 
 BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b24 (to_verify) [t22] mdjlabs-site : la synchro du moteur de guide a ecrase guide-verdict.ts — guide-envoi.ts et ses tests importent compteRenduMarkdown et prog.… (agent) [3 tentatives, derniere: Re-ecrasement du 28/10 19h25 : la ronde de mdjlabs a lance …]
   b25 (to_verify) [t23] guide-lien rend le jeton en clair a l'agent et guide-resultat n'a ni require_human ni garde AGENT_ENV : l'agent peut fabriquer lui-meme un … (agent) [1 tentatives, derniere: guide-lien refuse en env agent (le lien part par node bcc/h…]
   b26 (to_verify) [t23] Moteur guide (guide-visite.ts, commun) : l'adresse du poste ou partent les resultats vient du lien (?poste=) et toute origine https est acc… (agent) [1 tentatives, derniere: validerPoste : sans liste blanche NEXT_PUBLIC_GUIDE_POSTES,…]
   b27 (to_verify) kvm-lourd historique : entree bcc/lint du 30/10 16:19 avec duree 107869.6 s (30 h) pour un eslint de quelques minutes — la duree semble com… (agent) [2 tentatives, derniere: Duree maximale par type (lint/tests 30m, build/next-build/d…]
+  b30 (to_verify) [t23] Essai guide ProLearn (31/10 06h16, tel Mariella) : apres le code Cloudflare Access (accepte a 05:16:56Z dans le registre Access), la page '… (agent) [1 tentatives, derniere: Page d'attente (d143) : /usr/local/bin/portier-reveil (pyth…]
   b31 (to_verify) [t23] sync_guide (pt.py) ne cherche le moteur que sous ROOT et ROOT/src (lib/guide/types.ts) : les sites qui le rangent sous app/ (prolearn, open… (agent) [1 tentatives, derniere: sync_guide cherche le moteur sous ROOT, src, app, apps/web …]
   b32 (to_verify) [t23] Essai guide ProJob (31/10, tel Mariella) : 'catastrophe' — au lieu d'un guide qui joue les etapes pour elle, elle doit tout faire elle-meme… (agent) [1 tentatives, derniere: Guide design2 ProJob rendu automatique (27de37f, 16 points …]
   b33 (to_verify) [t23] ProJob design2 (essai Mariella 31/10 13h33, guide) : tableau de suivi, au clic sur 'Passer a' la liste s'affiche dans le cadre de la carte … (agent) [1 tentatives, derniere: Menu Passer a sorti du cadre qui defile : portail vers docu…]
@@ -180,6 +180,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d140 : 31/10 : le moteur commun transmet tous les points juges (ok compris) a apresConsigne (ResultatGuide.points, 08cbc46) — ProLearn trace chaqu… (agent)
   d141 : 31/10 : d138 livre sur ProJob (72f6f47) — estAdmin = mot de passe du site de test (PROJOB_TEST_PASSWORD, basic ou cookie projob_test) ET co… (agent)
   d142 : Mariella (tel, 31/10 19h58, carte Suite) : 'Je fais l'essai (Recommande)' apres la pastille 'Guides a traiter' sur les 4 sites — j'attends … (agent)
+  d143 : Mariella (tel, 31/10, carte Suite) : b30 -> 'Page d'attente (Recommande)' — pendant le reveil du site de test ProLearn endormi, afficher 'L… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
@@ -192,7 +193,6 @@ Pieges connus :
   pg21 : Enchainer git add/commit ET le lancement d'un build (meme detache par setsid no…
 
 Questions en attente (reponds via !answer qN ...) :
-  q8 : b30 : page d'attente au reveil du site de test ProLearn, le garder eveille, ou …
   q9 : b29 : sur quel appareil le message rouge est-il apparu ? (ordinateur = module d…
 ```
 <!-- plantrack:state-end -->
