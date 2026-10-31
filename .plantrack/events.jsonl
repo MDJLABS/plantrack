@@ -1725,3 +1725,10 @@
 {"ts": "2026-10-31T15:54:49+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/components/guide/GuideDeTestLazy.tsx", "thread": "t23"}
 {"ts": "2026-10-31T15:55:30+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/lib/guide/types.ts", "thread": "t23"}
 {"ts": "2026-10-31T15:57:06+00:00", "kind": "commit", "sha": "163e9d3", "ctype": "feat", "thread": "t23"}
+{"ts": "2026-10-31T15:57:15+00:00", "kind": "commit", "sha": "8f656a1", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-10-31T15:58:00+00:00", "kind": "file_touched", "text": "sortie/tests-guide.log", "thread": "t23"}
+{"ts": "2026-10-31T15:58:07+00:00", "kind": "file_touched", "text": "sortie/tests-guide.log", "thread": "t23"}
+{"ts": "2026-10-31T15:58:18+00:00", "kind": "commit", "sha": "c756739", "ctype": "feat", "thread": "t23"}
+{"ts": "2026-10-31T15:58:30+00:00", "kind": "attempt", "id": "a41", "bug": "b31", "hypothesis": "sync_guide cherche le moteur sous ROOT, src, app, apps/web et apps/web/src (ProLearn/OpenStyle sous app/, ProJob sous apps/web, Mizzzen sous apps/web/src)", "session": "6441dd63-cb1a-46fa-be22-bc500e819dd4", "actor": "claude-code"}
+{"ts": "2026-10-31T15:58:42+00:00", "kind": "commit", "sha": "14e46ac", "ctype": "fix", "thread": "t23"}
+{"ts": "2026-10-31T15:58:50+00:00", "kind": "bug_status", "id": "b31", "status": "to_verify"}
