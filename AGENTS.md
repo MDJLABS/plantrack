@@ -14,15 +14,15 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [35 commits]
-  fichiers recemment ecrits : sortie/carte-suite-31-10.log, sortie/carte-suite-31-10.json, sortie/carte-verdict-b28.json, sortie/carte-hydratation.json, sortie/carte-reveil-prolearn.json, sortie/carte-reveil-prolearn.log
+FIL ACTIF — t23 : guides de test automatiques (d100) [36 commits]
+  fichiers recemment ecrits : sortie/carte-hydratation.json, sortie/carte-reveil-prolearn.json, sortie/carte-reveil-prolearn.log, ../../../tmp/claude-0/-home-mariella-plantrack/fb7bf18f-ceb2-45d0-b208-6cacb3a65621/scratchpad/q.json, ../../../tmp/claude-0/-home-mariella-plantrack/fb7bf18f-ceb2-45d0-b208-6cacb3a65621/scratchpad/login.html, sortie/carte-b29-b30.json
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
   t5 : travaux sur main — reprise : retour au travail courant apres la faille
 
 BUGS NON CORRIGES (personne ne s'en est occupe) :
-  b29 (open) [t23] Essai guide ProLearn (31/10, tel Mariella) : erreur 'Hydration failed' en dev sur /login?guide=essai-gestes — diff dans le MetadataWrapper … (agent)
+  b29 (open) [t23] Essai guide ProLearn (31/10, tel Mariella) : erreur 'Hydration failed' en dev sur /login?guide=essai-gestes — diff dans le MetadataWrapper … (agent) [1 tentatives, derniere: Piste robot ecartee : les navigateurs vus par Cloudflare su…]
   b30 (open) [t23] Essai guide ProLearn (31/10 06h16, tel Mariella) : apres le code Cloudflare Access (accepte a 05:16:56Z dans le registre Access), la page '… (agent)
 
 BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
@@ -170,5 +170,9 @@ Pieges connus :
   pg15 : Le Stop hook bcc (hook/index.ts, regle 'projet ne s'endort jamais' du 03/10) EX…
   pg18 : Un site peut recevoir par la ronde une version du moteur de guide jamais commit…
   pg19 : Moteur guide (guide-visite.ts, commun) importe ./scenarios.ts et ./types.ts ave…
+
+Questions en attente (reponds via !answer qN ...) :
+  q8 : b30 : page d'attente au reveil du site de test ProLearn, le garder eveille, ou …
+  q9 : b29 : sur quel appareil le message rouge est-il apparu ? (ordinateur = module d…
 ```
 <!-- plantrack:state-end -->
