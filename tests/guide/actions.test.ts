@@ -36,6 +36,15 @@ const { etatGuides, consignerPoint, consignerGuide } = await import(
 );
 const { appelsApresConsigne } = await import("./fixtures/guide-reglages-serveur.ts");
 
+await step("instance sans GUIDE_ACTIF=1 → muet même pour un admin", async () => {
+  delete process.env.GUIDE_ACTIF;
+  process.env.GUIDE_TEST_ADMIN = "1";
+  assert.equal(await etatGuides(), null);
+  const r = await consignerPoint("essai", "x", "ok");
+  assert.notEqual(r.error, null);
+});
+process.env.GUIDE_ACTIF = "1";
+
 await step("hors admin (GUIDE_TEST_ADMIN=0) → etatGuides rend null", async () => {
   process.env.GUIDE_TEST_ADMIN = "0";
   assert.equal(await etatGuides(), null);

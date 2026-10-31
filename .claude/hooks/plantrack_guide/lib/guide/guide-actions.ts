@@ -29,6 +29,22 @@ import { verdictScenario } from "./guide-verdict";
 import { getScenario, SCENARIOS } from "./scenarios.ts";
 import { reglagesGuideServeur } from "./guide-reglages-serveur.ts";
 
+/**
+ * Double porte (revue de sécurité du 31/10) : un rôle « admin » du SITE n'est pas forcément
+ * Mariella — sur un site multi-clients (OpenStyle : chaque école a ses admins), un client
+ * admin verrait le guide et écrirait dans le dépôt. Le guide ne s'allume donc que sur une
+ * instance où `GUIDE_ACTIF=1` est posé côté serveur (site de test) ; une production client
+ * ne le pose jamais, et toutes les actions y restent muettes quel que soit le rôle.
+ */
+async function porteAdmin(): Promise<boolean> {
+  if (process.env.GUIDE_ACTIF !== "1") return false;
+  try {
+    return await reglagesGuideServeur.estAdmin();
+  } catch {
+    return false;
+  }
+}
+
 const FICHIER_ETAT = join(".planning", "guides-etat.json");
 const FICHIER_RETOURS = join(".planning", "retours-tests.md");
 const MAX_NOTE = 2000;
@@ -131,7 +147,7 @@ async function ecrireCompteRendu(racine: string, scenario: { titre: string }, re
  * traiter », `null` dit « ce visiteur ne voit même pas le lanceur ».
  */
 export async function etatGuides(): Promise<EtatGuides | null> {
-  if (!(await reglagesGuideServeur.estAdmin())) return null;
+  if (!(await porteAdmin())) return null;
 
   const racine = await racineDuDepot();
   const etatComplet = racine ? await lireEtat(racine) : {};
@@ -166,7 +182,7 @@ export async function etatGuides(): Promise<EtatGuides | null> {
 export async function consignerPoint(
   scenarioId: string, stepId: string, v: StepVerdict, note?: string,
 ): Promise<{ error: string | null }> {
-  if (!(await reglagesGuideServeur.estAdmin())) return { error: "hors session admin" };
+  if (!(await porteAdmin())) return { error: "hors session admin" };
 
   const scenario = getScenario(scenarioId);
   if (!scenario) return { error: "scénario inconnu" };
@@ -207,7 +223,7 @@ export async function consignerPoint(
 export async function consignerGuide(
   scenarioId: string,
 ): Promise<{ error: string | null; statut: "en-cours" | "valide" | "a-revoir" | null }> {
-  if (!(await reglagesGuideServeur.estAdmin())) return { error: "hors session admin", statut: null };
+  if (!(await porteAdmin())) return { error: "hors session admin", statut: null };
 
   const scenario = getScenario(scenarioId);
   if (!scenario) return { error: "scénario inconnu", statut: null };
