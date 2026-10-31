@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [51 commits]
+FIL ACTIF — t23 : guides de test automatiques (d100) [52 commits]
   fichiers recemment ecrits : .claude/hooks/plantrack_guide/lib/guide/guide-actions.ts, .claude/hooks/plantrack_guide/components/guide/GuideCurseur.tsx, .claude/hooks/plantrack_guide/components/guide/GuideDeTest.tsx, .claude/hooks/plantrack_guide/components/guide/GuideDeTestLazy.tsx, .claude/hooks/plantrack_guide/lib/guide/types.ts, sortie/tests-guide.log
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -25,6 +25,8 @@ BUGS NON CORRIGES (personne ne s'en est occupe) :
   b29 (open) [t23] Essai guide ProLearn (31/10, tel Mariella) : erreur 'Hydration failed' en dev sur /login?guide=essai-gestes — diff dans le MetadataWrapper … (agent) [1 tentatives, derniere: Piste robot ecartee : les navigateurs vus par Cloudflare su…]
   b30 (open) [t23] Essai guide ProLearn (31/10 06h16, tel Mariella) : apres le code Cloudflare Access (accepte a 05:16:56Z dans le registre Access), la page '… (agent)
   b32 (open) [t23] Essai guide ProJob (31/10, tel Mariella) : 'catastrophe' — au lieu d'un guide qui joue les etapes pour elle, elle doit tout faire elle-meme… (agent)
+  b33 (open) [t23] ProJob design2 (essai Mariella 31/10 13h33, guide) : tableau de suivi, au clic sur 'Passer a' la liste s'affiche dans le cadre de la carte … (agent)
+  b34 (open) [t23] ProJob design2 (essai Mariella 31/10 13h34-13h35, guide) : points 'La fiche : en-tete et les 5 etapes', 'L historique a l heure de Paris', … (agent)
 
 BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b24 (to_verify) [t22] mdjlabs-site : la synchro du moteur de guide a ecrase guide-verdict.ts — guide-envoi.ts et ses tests importent compteRenduMarkdown et prog.… (agent) [3 tentatives, derniere: Re-ecrasement du 28/10 19h25 : la ronde de mdjlabs a lance …]
