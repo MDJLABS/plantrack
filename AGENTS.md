@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [37 commits]
-  fichiers recemment ecrits : sortie/carte-reveil-prolearn.log, ../../../tmp/claude-0/-home-mariella-plantrack/fb7bf18f-ceb2-45d0-b208-6cacb3a65621/scratchpad/q.json, ../../../tmp/claude-0/-home-mariella-plantrack/fb7bf18f-ceb2-45d0-b208-6cacb3a65621/scratchpad/login.html, sortie/carte-b29-b30.json, sortie/carte-b29-b30.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-recursive-rossum.md
+FIL ACTIF — t23 : guides de test automatiques (d100) [38 commits]
+  fichiers recemment ecrits : ../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/build.log, ../prolearn/app/lib/guide/guide-progress.ts, ../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/tsc.log, sortie/carte-d105/nav.mjs, ../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/capture-bilan.mjs, sortie/carte-d105/fermer.mjs
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -31,7 +31,6 @@ BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b25 (to_verify) [t23] guide-lien rend le jeton en clair a l'agent et guide-resultat n'a ni require_human ni garde AGENT_ENV : l'agent peut fabriquer lui-meme un … (agent) [1 tentatives, derniere: guide-lien refuse en env agent (le lien part par node bcc/h…]
   b26 (to_verify) [t23] Moteur guide (guide-visite.ts, commun) : l'adresse du poste ou partent les resultats vient du lien (?poste=) et toute origine https est acc… (agent) [1 tentatives, derniere: validerPoste : sans liste blanche NEXT_PUBLIC_GUIDE_POSTES,…]
   b27 (to_verify) kvm-lourd historique : entree bcc/lint du 30/10 16:19 avec duree 107869.6 s (30 h) pour un eslint de quelques minutes — la duree semble com… (agent) [2 tentatives, derniere: Duree maximale par type (lint/tests 30m, build/next-build/d…]
-  b28 (to_verify) [t23] GuideCurseur (moteur commun) : en dev (React StrictMode) l'effet monte/demonte/remonte ; la garde dejaJoue reste a true apres le nettoyage … (agent) [1 tentatives, derniere: La garde dejaJoue est relachee dans le nettoyage de l'effet…]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
@@ -164,6 +163,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d128 : Mariella (tel, 31/10, carte Suite) : 'J attends tes essais (Recommande)' — attente de ses verdicts des guides ProLearn/ProJob/OpenStyle/Miz… (agent)
   d129 : Mariella (tel, 31/10, carte Suite) : 'Je fais l'essai (Recommande)' — essai du guide auto sur ProLearn/ProJob/OpenStyle ; verdict b28 a sai… (agent)
   d130 : Mariella (tel, 31/10, plan approuve) : le design des cartes du guide valide en d105 (https://claude.ai/artifact/CrmX2JdkqBtpucihUxYAgo) n'a… (agent)
+  d131 : Mariella (tel, 31/10) : 'au changement de page le guide de test doit rester ouvert ; si je ne suis pas au bon endroit, un bouton doit m'y e… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
