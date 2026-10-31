@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [63 commits]
-  fichiers recemment ecrits : ../../../tmp/claude-0/-home-mariella-plantrack/0903f074-7a8f-46a8-82a6-d94b9a64bf16/scratchpad/carte.json, ../../../etc/systemd/system/prolearn-next-proxy.service, ../../../tmp/claude-0/-home-mariella-plantrack/0903f074-7a8f-46a8-82a6-d94b9a64bf16/scratchpad/carte2.json, ../../../usr/local/bin/portier-reveil, ../../../tmp/claude-0/-home-mariella-plantrack/0903f074-7a8f-46a8-82a6-d94b9a64bf16/scratchpad/carte3.json, ../../../tmp/claude-0/-home-mariella-plantrack/0903f074-7a8f-46a8-82a6-d94b9a64bf16/scratchpad/carte4.json
+FIL ACTIF — t23 : guides de test automatiques (d100) [64 commits]
+  fichiers recemment ecrits : ../../../tmp/claude-0/-home-mariella-plantrack/0903f074-7a8f-46a8-82a6-d94b9a64bf16/scratchpad/carte3.json, ../../../tmp/claude-0/-home-mariella-plantrack/0903f074-7a8f-46a8-82a6-d94b9a64bf16/scratchpad/carte4.json, ../../../tmp/claude-0/-home-mariella-plantrack/0903f074-7a8f-46a8-82a6-d94b9a64bf16/scratchpad/carte5.json, ../prolearn/app/components/creator-studio/state/reducer.ts, ../prolearn/app/components/creator-studio/state/__tests__/hydrate-sans-audio.test.ts, ../../../tmp/claude-0/-home-mariella-plantrack/0903f074-7a8f-46a8-82a6-d94b9a64bf16/scratchpad/carte6.json
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -182,6 +182,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d142 : Mariella (tel, 31/10 19h58, carte Suite) : 'Je fais l'essai (Recommande)' apres la pastille 'Guides a traiter' sur les 4 sites — j'attends … (agent)
   d143 : Mariella (tel, 31/10, carte Suite) : b30 -> 'Page d'attente (Recommande)' — pendant le reveil du site de test ProLearn endormi, afficher 'L… (agent)
   d144 : Mariella (tel, 31/10, carte Suite) : 'Les deux autres aussi (Recommande)' — portier-reveil (page d'attente, d143) branche aussi sur bcc-pro… (agent)
+  d145 : Mariella (tel, 31/10 soir, carte Suite) : 'Je continue mes essais (Recommande)' apres la correction du studio ProLearn (b4 ProLearn) — j'at… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
