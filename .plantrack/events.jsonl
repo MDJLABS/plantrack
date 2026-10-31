@@ -1495,3 +1495,9 @@
 {"ts": "2026-10-31T05:23:06+00:00", "kind": "file_touched", "text": "sortie/carte-b29-b30.json", "thread": "t23"}
 {"ts": "2026-10-31T05:23:11+00:00", "kind": "question", "id": "q8", "text": "b30 : page d'attente au reveil du site de test ProLearn, le garder eveille, ou ne rien changer ? (carte envoyee le 31/10)"}
 {"ts": "2026-10-31T05:23:11+00:00", "kind": "question", "id": "q9", "text": "b29 : sur quel appareil le message rouge est-il apparu ? (ordinateur = module du navigateur probable)"}
+{"ts": "2026-10-31T05:23:11+00:00", "kind": "commit", "sha": "48a62d1", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-10-31T05:23:11+00:00", "kind": "file_touched", "text": "sortie/carte-b29-b30.log", "thread": "t23"}
+{"ts": "2026-10-31T05:23:24+00:00", "kind": "file_touched", "text": "sortie/carte-b29-b30.log", "thread": "t23"}
+{"ts": "2026-10-31T12:20:01+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-recursive-rossum.md", "thread": "t23"}
+{"ts": "2026-10-31T12:33:04+00:00", "kind": "decision", "id": "d130", "text": "Mariella (tel, 31/10, plan approuve) : le design des cartes du guide valide en d105 (https://claude.ai/artifact/CrmX2JdkqBtpucihUxYAgo) n'avait ete code que sur mdjlabs (commit 1ddbc6f) ; ProLearn/ProJob/OpenStyle/Mizzzen ont garde l'ancienne carte. On porte la carte d105 dans le guide de chacun des 4 sites et dans le moteur commun, sans toucher aux scenarios ni aux apports b25/b26/b28. b29 reste ouvert (q9).", "par": "agent"}
+{"ts": "2026-10-31T12:33:04+00:00", "kind": "bug", "id": "b31", "text": "sync_guide (pt.py) ne cherche le moteur que sous ROOT et ROOT/src (lib/guide/types.ts) : les sites qui le rangent sous app/ (prolearn, openstyle) ou apps/web/ (projob, Mizzzen apps/web/src) ne recoivent jamais le moteur commun — chaque site garde sa copie, d'ou la carte d105 absente de ProLearn.", "thread": "t23", "severity": "normal", "par": "agent"}

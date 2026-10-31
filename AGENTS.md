@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [36 commits]
-  fichiers recemment ecrits : sortie/carte-hydratation.json, sortie/carte-reveil-prolearn.json, sortie/carte-reveil-prolearn.log, ../../../tmp/claude-0/-home-mariella-plantrack/fb7bf18f-ceb2-45d0-b208-6cacb3a65621/scratchpad/q.json, ../../../tmp/claude-0/-home-mariella-plantrack/fb7bf18f-ceb2-45d0-b208-6cacb3a65621/scratchpad/login.html, sortie/carte-b29-b30.json
+FIL ACTIF — t23 : guides de test automatiques (d100) [37 commits]
+  fichiers recemment ecrits : sortie/carte-reveil-prolearn.log, ../../../tmp/claude-0/-home-mariella-plantrack/fb7bf18f-ceb2-45d0-b208-6cacb3a65621/scratchpad/q.json, ../../../tmp/claude-0/-home-mariella-plantrack/fb7bf18f-ceb2-45d0-b208-6cacb3a65621/scratchpad/login.html, sortie/carte-b29-b30.json, sortie/carte-b29-b30.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-recursive-rossum.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -24,6 +24,7 @@ FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
 BUGS NON CORRIGES (personne ne s'en est occupe) :
   b29 (open) [t23] Essai guide ProLearn (31/10, tel Mariella) : erreur 'Hydration failed' en dev sur /login?guide=essai-gestes — diff dans le MetadataWrapper … (agent) [1 tentatives, derniere: Piste robot ecartee : les navigateurs vus par Cloudflare su…]
   b30 (open) [t23] Essai guide ProLearn (31/10 06h16, tel Mariella) : apres le code Cloudflare Access (accepte a 05:16:56Z dans le registre Access), la page '… (agent)
+  b31 (open) [t23] sync_guide (pt.py) ne cherche le moteur que sous ROOT et ROOT/src (lib/guide/types.ts) : les sites qui le rangent sous app/ (prolearn, open… (agent)
 
 BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b24 (to_verify) [t22] mdjlabs-site : la synchro du moteur de guide a ecrase guide-verdict.ts — guide-envoi.ts et ses tests importent compteRenduMarkdown et prog.… (agent) [3 tentatives, derniere: Re-ecrasement du 28/10 19h25 : la ronde de mdjlabs a lance …]
@@ -162,6 +163,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d127 : Mariella (tel, 31/10, carte Suite) : cle PyPI -> 'Plus tard, sans PyPI' — v1.9.31 reste sur GitHub seulement (les sites l'ont par update) ;… (agent)
   d128 : Mariella (tel, 31/10, carte Suite) : 'J attends tes essais (Recommande)' — attente de ses verdicts des guides ProLearn/ProJob/OpenStyle/Miz… (agent)
   d129 : Mariella (tel, 31/10, carte Suite) : 'Je fais l'essai (Recommande)' — essai du guide auto sur ProLearn/ProJob/OpenStyle ; verdict b28 a sai… (agent)
+  d130 : Mariella (tel, 31/10, plan approuve) : le design des cartes du guide valide en d105 (https://claude.ai/artifact/CrmX2JdkqBtpucihUxYAgo) n'a… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
