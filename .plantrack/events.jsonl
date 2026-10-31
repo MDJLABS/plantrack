@@ -1758,3 +1758,7 @@
 {"ts": "2026-10-31T16:10:13+00:00", "kind": "attempt", "id": "a42", "bug": "b33", "hypothesis": "Menu Passer a sorti du cadre qui defile : portail vers document.body en position fixed calculee depuis le bouton (projob f10d580)", "session": "6441dd63-cb1a-46fa-be22-bc500e819dd4", "actor": "claude-code"}
 {"ts": "2026-10-31T16:10:14+00:00", "kind": "bug_status", "id": "b33", "status": "to_verify"}
 {"ts": "2026-10-31T16:10:14+00:00", "kind": "attempt", "id": "a43", "bug": "b34", "hypothesis": "Bouton + : n'existe que sous 600 px, texte du point precise (12ec6cb). Fiche/historique : la 1re carte (dossier 11) n'a pas de candidature donc pas de lien fiche ; les ids du guide passent sur la 1re carte qui a une fiche", "session": "6441dd63-cb1a-46fa-be22-bc500e819dd4", "actor": "claude-code"}
+{"ts": "2026-10-31T16:10:15+00:00", "kind": "commit", "sha": "1054783", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-10-31T16:10:28+00:00", "kind": "file_touched", "text": "../projob/apps/web/app/app/suivi/SuiviClient.tsx", "thread": "t23"}
+{"ts": "2026-10-31T16:10:34+00:00", "kind": "file_touched", "text": "../projob/apps/web/app/app/suivi/SuiviClient.tsx", "thread": "t23"}
+{"ts": "2026-10-31T16:12:29+00:00", "kind": "bug_status", "id": "b34", "status": "to_verify"}
