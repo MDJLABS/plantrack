@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [47 commits]
+FIL ACTIF — t23 : guides de test automatiques (d100) [48 commits]
   fichiers recemment ecrits : tests/guide/actions.test.ts, .claude/hooks/plantrack_guide/lib/guide/guide-actions.ts, .claude/hooks/plantrack_guide/components/guide/GuideCurseur.tsx, .claude/hooks/plantrack_guide/components/guide/GuideDeTest.tsx, .claude/hooks/plantrack_guide/components/guide/GuideDeTestLazy.tsx, .claude/hooks/plantrack_guide/lib/guide/types.ts
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
