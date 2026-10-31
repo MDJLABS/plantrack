@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [40 commits]
+FIL ACTIF — t23 : guides de test automatiques (d100) [41 commits]
   fichiers recemment ecrits : .claude/hooks/plantrack_guide/lib/guide/types.ts, .claude/hooks/plantrack_guide/lib/guide/guide-envoi.ts, .claude/hooks/plantrack_guide/lib/guide/guide-visite.ts, ../openstyle/app/components/guide/GuideDeTest.tsx, .claude/hooks/plantrack_guide/components/guide/GuideDeTest.tsx, ../openstyle/app/lib/guide/scenarios.ts
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -25,6 +25,7 @@ BUGS NON CORRIGES (personne ne s'en est occupe) :
   b29 (open) [t23] Essai guide ProLearn (31/10, tel Mariella) : erreur 'Hydration failed' en dev sur /login?guide=essai-gestes — diff dans le MetadataWrapper … (agent) [1 tentatives, derniere: Piste robot ecartee : les navigateurs vus par Cloudflare su…]
   b30 (open) [t23] Essai guide ProLearn (31/10 06h16, tel Mariella) : apres le code Cloudflare Access (accepte a 05:16:56Z dans le registre Access), la page '… (agent)
   b31 (open) [t23] sync_guide (pt.py) ne cherche le moteur que sous ROOT et ROOT/src (lib/guide/types.ts) : les sites qui le rangent sous app/ (prolearn, open… (agent)
+  b32 (open) [t23] Essai guide ProJob (31/10, tel Mariella) : 'catastrophe' — au lieu d'un guide qui joue les etapes pour elle, elle doit tout faire elle-meme… (agent)
 
 BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b24 (to_verify) [t22] mdjlabs-site : la synchro du moteur de guide a ecrase guide-verdict.ts — guide-envoi.ts et ses tests importent compteRenduMarkdown et prog.… (agent) [3 tentatives, derniere: Re-ecrasement du 28/10 19h25 : la ronde de mdjlabs a lance …]
@@ -165,6 +166,8 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d130 : Mariella (tel, 31/10, plan approuve) : le design des cartes du guide valide en d105 (https://claude.ai/artifact/CrmX2JdkqBtpucihUxYAgo) n'a… (agent)
   d131 : Mariella (tel, 31/10) : 'au changement de page le guide de test doit rester ouvert ; si je ne suis pas au bon endroit, un bouton doit m'y e… (agent)
   d132 : Portage carte d105 sur OpenStyle (sha cbb0fd6, suite d130) : guide reste ouvert au changement de page (architecture guide-visite.ts deja ex… (agent)
+  d133 : Mariella (tel, 31/10, via AskUserQuestion) : bouton Fermer de la carte de fin -> 'Fermer sans effacer (Recommande)' sur les 4 sites (comme … (agent)
+  d134 : Mariella (tel, 31/10, via AskUserQuestion) : guides quasi automatiques -> 'Le guide ProJob d'abord (Recommande)' : rendre automatiques les … (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
