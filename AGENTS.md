@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [58 commits]
-  fichiers recemment ecrits : ../Mizzzen/apps/web/src/lib/guide/guide-reglages-serveur.ts, ../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/tsc-guide-d138.log, ../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/tsc-openstyle.log, sortie/tests-guide.log, ../projob/apps/web/lib/guide/scenarios.ts, ../projob/apps/web/app/app/suivi/SuiviClient.tsx
+FIL ACTIF — t23 : guides de test automatiques (d100) [60 commits]
+  fichiers recemment ecrits : ../projob/apps/web/lib/guide/guide-reglages.ts, ../projob/apps/web/lib/guide/guide-reglages-serveur.ts, ../projob/apps/web/tsconfig.json, ../projob/apps/web/app/layout.tsx, ../../../etc/systemd/system/projob-web.service.d/guide.conf, ../projob/sortie/build-guide-commun.log
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -24,8 +24,6 @@ FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
 BUGS NON CORRIGES (personne ne s'en est occupe) :
   b29 (open) [t23] Essai guide ProLearn (31/10, tel Mariella) : erreur 'Hydration failed' en dev sur /login?guide=essai-gestes — diff dans le MetadataWrapper … (agent) [1 tentatives, derniere: Piste robot ecartee : les navigateurs vus par Cloudflare su…]
   b30 (open) [t23] Essai guide ProLearn (31/10 06h16, tel Mariella) : apres le code Cloudflare Access (accepte a 05:16:56Z dans le registre Access), la page '… (agent)
-  b32 (open) [t23] Essai guide ProJob (31/10, tel Mariella) : 'catastrophe' — au lieu d'un guide qui joue les etapes pour elle, elle doit tout faire elle-meme… (agent)
-  b35 (open) [t23] kvm-lourd (31/10, install guide OpenStyle) : une commande 'git add ...' a ete classee 'next-build' et mise en file derriere un build Mizzze… (agent)
 
 BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b24 (to_verify) [t22] mdjlabs-site : la synchro du moteur de guide a ecrase guide-verdict.ts — guide-envoi.ts et ses tests importent compteRenduMarkdown et prog.… (agent) [3 tentatives, derniere: Re-ecrasement du 28/10 19h25 : la ronde de mdjlabs a lance …]
@@ -33,8 +31,11 @@ BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b26 (to_verify) [t23] Moteur guide (guide-visite.ts, commun) : l'adresse du poste ou partent les resultats vient du lien (?poste=) et toute origine https est acc… (agent) [1 tentatives, derniere: validerPoste : sans liste blanche NEXT_PUBLIC_GUIDE_POSTES,…]
   b27 (to_verify) kvm-lourd historique : entree bcc/lint du 30/10 16:19 avec duree 107869.6 s (30 h) pour un eslint de quelques minutes — la duree semble com… (agent) [2 tentatives, derniere: Duree maximale par type (lint/tests 30m, build/next-build/d…]
   b31 (to_verify) [t23] sync_guide (pt.py) ne cherche le moteur que sous ROOT et ROOT/src (lib/guide/types.ts) : les sites qui le rangent sous app/ (prolearn, open… (agent) [1 tentatives, derniere: sync_guide cherche le moteur sous ROOT, src, app, apps/web …]
+  b32 (to_verify) [t23] Essai guide ProJob (31/10, tel Mariella) : 'catastrophe' — au lieu d'un guide qui joue les etapes pour elle, elle doit tout faire elle-meme… (agent) [1 tentatives, derniere: Guide design2 ProJob rendu automatique (27de37f, 16 points …]
   b33 (to_verify) [t23] ProJob design2 (essai Mariella 31/10 13h33, guide) : tableau de suivi, au clic sur 'Passer a' la liste s'affiche dans le cadre de la carte … (agent) [1 tentatives, derniere: Menu Passer a sorti du cadre qui defile : portail vers docu…]
   b34 (to_verify) [t23] ProJob design2 (essai Mariella 31/10 13h34-13h35, guide) : points 'La fiche : en-tete et les 5 etapes', 'L historique a l heure de Paris', … (agent) [1 tentatives, derniere: Bouton + : n'existe que sous 600 px, texte du point precise…]
+  b35 (to_verify) [t23] kvm-lourd (31/10, install guide OpenStyle) : une commande 'git add ...' a ete classee 'next-build' et mise en file derriere un build Mizzze… (agent) [1 tentatives, derniere: Diagnostic, aucun changement de code : les commandes mises …]
+  b36 (to_verify) [t23] Recurrence de b35 (31/10, session ProJob guide commun) : un simple 'git add <fichiers>' (etape 10 du portage guide) a ete classe 'next-buil… (agent) [1 tentatives, derniere: Meme cause que b35 : la commande de l'etape 10 contenait au…]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
@@ -176,6 +177,9 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d137 : Mariella (tel, 31/10, carte b31) : 'Un seul guide commun' (contre ma reco) — sync_guide doit trouver le moteur sous app/, apps/web, apps/we… (agent)
   d138 : Mariella (tel, 31/10, carte Guide commun + appels 9639/9651) : un guide commun comme MOTEUR — pareil partout, chaque projet l'appelle et co… (agent)
   d139 : d138 livre sur OpenStyle (c169aff + 6c66989, estAdmin = role admin d'une adhesion via getUserSchoolMemberships) et Mizzzen (b6a6248 + 5a849… (agent)
+  d140 : 31/10 : le moteur commun transmet tous les points juges (ok compris) a apresConsigne (ResultatGuide.points, 08cbc46) — ProLearn trace chaqu… (agent)
+  d141 : 31/10 : d138 livre sur ProJob (72f6f47) — estAdmin = mot de passe du site de test (PROJOB_TEST_PASSWORD, basic ou cookie projob_test) ET co… (agent)
+  d142 : Mariella (tel, 31/10 19h58, carte Suite) : 'Je fais l'essai (Recommande)' apres la pastille 'Guides a traiter' sur les 4 sites — j'attends … (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
@@ -185,6 +189,7 @@ Pieges connus :
   pg18 : Un site peut recevoir par la ronde une version du moteur de guide jamais commit…
   pg19 : Moteur guide (guide-visite.ts, commun) importe ./scenarios.ts et ./types.ts ave…
   pg20 : Un sous-agent a qui on dit 'ne lis aucun .env' peut quand meme grep apps/web/.e…
+  pg21 : Enchainer git add/commit ET le lancement d'un build (meme detache par setsid no…
 
 Questions en attente (reponds via !answer qN ...) :
   q8 : b30 : page d'attente au reveil du site de test ProLearn, le garder eveille, ou …

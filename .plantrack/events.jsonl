@@ -1762,3 +1762,50 @@
 {"ts": "2026-10-31T16:10:28+00:00", "kind": "file_touched", "text": "../projob/apps/web/app/app/suivi/SuiviClient.tsx", "thread": "t23"}
 {"ts": "2026-10-31T16:10:34+00:00", "kind": "file_touched", "text": "../projob/apps/web/app/app/suivi/SuiviClient.tsx", "thread": "t23"}
 {"ts": "2026-10-31T16:12:29+00:00", "kind": "bug_status", "id": "b34", "status": "to_verify"}
+{"ts": "2026-10-31T16:12:29+00:00", "kind": "commit", "sha": "69b9436", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-10-31T16:14:16+00:00", "kind": "file_touched", "text": "../prolearn/app/lib/guide/guide-reglages.ts", "thread": "t23"}
+{"ts": "2026-10-31T16:14:33+00:00", "kind": "file_touched", "text": "../prolearn/app/lib/guide/guide-reglages-serveur.ts", "thread": "t23"}
+{"ts": "2026-10-31T16:14:40+00:00", "kind": "file_touched", "text": "../prolearn/app/tsconfig.json", "thread": "t23"}
+{"ts": "2026-10-31T16:14:49+00:00", "kind": "file_touched", "text": "../prolearn/app/app/(site)/layout.tsx", "thread": "t23"}
+{"ts": "2026-10-31T16:14:49+00:00", "kind": "file_touched", "text": "../prolearn/app/app/(site)/layout.tsx", "thread": "t23"}
+{"ts": "2026-10-31T16:14:50+00:00", "kind": "file_touched", "text": "../prolearn/app/app/(portail)/layout.tsx", "thread": "t23"}
+{"ts": "2026-10-31T16:14:51+00:00", "kind": "file_touched", "text": "../prolearn/app/app/(portail)/layout.tsx", "thread": "t23"}
+{"ts": "2026-10-31T16:14:52+00:00", "kind": "file_touched", "text": "../prolearn/app/app/(studio)/layout.tsx", "thread": "t23"}
+{"ts": "2026-10-31T16:14:53+00:00", "kind": "file_touched", "text": "../prolearn/app/app/(studio)/layout.tsx", "thread": "t23"}
+{"ts": "2026-10-31T16:15:21+00:00", "kind": "file_touched", "text": "../prolearn/app/lib/guide/__tests__/guide-progress.test.ts", "thread": "t23"}
+{"ts": "2026-10-31T16:15:37+00:00", "kind": "file_touched", "text": "../prolearn/app/lib/guide/__tests__/guide-progress.test.ts", "thread": "t23"}
+{"ts": "2026-10-31T16:15:46+00:00", "kind": "file_touched", "text": "../prolearn/app/lib/guide/__tests__/guide-geometry.test.ts", "thread": "t23"}
+{"ts": "2026-10-31T16:15:48+00:00", "kind": "file_touched", "text": "../prolearn/app/lib/guide/__tests__/guide-geometry.test.ts", "thread": "t23"}
+{"ts": "2026-10-31T16:16:07+00:00", "kind": "file_touched", "text": "../prolearn/sortie/tsc-guide-d138.log", "thread": "t23"}
+{"ts": "2026-10-31T16:16:33+00:00", "kind": "file_touched", "text": "../prolearn/app/lib/guide/__tests__/guide-progress.test.ts", "thread": "t23"}
+{"ts": "2026-10-31T16:16:40+00:00", "kind": "file_touched", "text": "../prolearn/sortie/tsc-guide-d138.log", "thread": "t23"}
+{"ts": "2026-10-31T16:16:52+00:00", "kind": "file_touched", "text": "../prolearn/sortie/tests-guide.log", "thread": "t23"}
+{"ts": "2026-10-31T16:17:16+00:00", "kind": "file_touched", "text": "../prolearn/app/lib/guide/__tests__/guide-progress.test.ts", "thread": "t23"}
+{"ts": "2026-10-31T16:17:30+00:00", "kind": "file_touched", "text": "../prolearn/sortie/tests-guide.log", "thread": "t23"}
+{"ts": "2026-10-31T16:18:04+00:00", "kind": "file_touched", "text": "../../../etc/systemd/system/prolearn-next.service.d/guide.conf", "thread": "t23"}
+{"ts": "2026-10-31T16:20:38+00:00", "kind": "file_touched", "text": "sortie/tests-guide.log", "thread": "t23"}
+{"ts": "2026-10-31T16:20:48+00:00", "kind": "file_touched", "text": "../prolearn/sortie/tsc-guide-points.log", "thread": "t23"}
+{"ts": "2026-10-31T16:20:55+00:00", "kind": "file_touched", "text": "../prolearn/sortie/tsc-guide-points.log", "thread": "t23"}
+{"ts": "2026-10-31T16:22:12+00:00", "kind": "commit", "sha": "08cbc46", "ctype": "feat", "thread": "t23"}
+{"ts": "2026-10-31T16:23:21+00:00", "kind": "file_touched", "text": "../openstyle/sortie/rebuild-points.sh", "thread": "t23"}
+{"ts": "2026-10-31T16:23:21+00:00", "kind": "file_touched", "text": "../openstyle/sortie/build-points.log", "thread": "t23"}
+{"ts": "2026-10-31T16:23:21+00:00", "kind": "file_touched", "text": "../openstyle/sortie/build-points.log", "thread": "t23"}
+{"ts": "2026-10-31T16:23:21+00:00", "kind": "file_touched", "text": "../openstyle/sortie/rebuild-points.out", "thread": "t23"}
+{"ts": "2026-10-31T16:24:43+00:00", "kind": "decision", "id": "d140", "text": "31/10 : le moteur commun transmet tous les points juges (ok compris) a apresConsigne (ResultatGuide.points, 08cbc46) — ProLearn trace chaque verdict en SQLite (d9). Recopie sur ProLearn (d5b68649), OpenStyle (d5853a7), Mizzzen (b5f8149), rebuilds EXIT=0. Revue securite : pastille ProLearn reservee au seul super_admin (5c21bc02) ; faille plus large (un utilisateur peut changer son propre role via la policy update de prolearn_users_profiles) notee comme bug dans le depot prolearn, a traiter dans ce projet (d11).", "par": "agent"}
+{"ts": "2026-10-31T16:28:11+00:00", "kind": "file_touched", "text": "../projob/apps/web/lib/guide/guide-reglages.ts", "thread": "t23"}
+{"ts": "2026-10-31T16:28:19+00:00", "kind": "file_touched", "text": "../projob/apps/web/lib/guide/guide-reglages-serveur.ts", "thread": "t23"}
+{"ts": "2026-10-31T16:28:29+00:00", "kind": "file_touched", "text": "../projob/apps/web/tsconfig.json", "thread": "t23"}
+{"ts": "2026-10-31T16:28:33+00:00", "kind": "file_touched", "text": "../projob/apps/web/app/layout.tsx", "thread": "t23"}
+{"ts": "2026-10-31T16:28:41+00:00", "kind": "file_touched", "text": "../projob/apps/web/app/layout.tsx", "thread": "t23"}
+{"ts": "2026-10-31T16:32:35+00:00", "kind": "file_touched", "text": "../../../etc/systemd/system/projob-web.service.d/guide.conf", "thread": "t23"}
+{"ts": "2026-10-31T16:48:39+00:00", "kind": "file_touched", "text": "../projob/sortie/build-guide-commun.log", "thread": "t23"}
+{"ts": "2026-10-31T16:57:42+00:00", "kind": "bug", "id": "b36", "text": "Recurrence de b35 (31/10, session ProJob guide commun) : un simple 'git add <fichiers>' (etape 10 du portage guide) a ete classe 'next-build' (~2,0 Go estime) par le PreToolUse kvm-lourd et mis en file — pas de blocage cette fois (file vide), mais la mauvaise classification persiste.", "thread": "t23", "severity": "normal", "par": "agent"}
+{"ts": "2026-10-31T16:58:10+00:00", "kind": "decision", "id": "d141", "text": "31/10 : d138 livre sur ProJob (72f6f47) — estAdmin = mot de passe du site de test (PROJOB_TEST_PASSWORD, basic ou cookie projob_test) ET compte Supabase connecte ; GUIDE_ACTIF=1 par drop-in projob-web ; plus de lien ?guide=. Les 4 sites (OpenStyle, Mizzzen, ProLearn, ProJob) ont la pastille Guides a traiter.", "par": "agent"}
+{"ts": "2026-10-31T19:59:15+00:00", "kind": "decision", "id": "d142", "text": "Mariella (tel, 31/10 19h58, carte Suite) : 'Je fais l'essai (Recommande)' apres la pastille 'Guides a traiter' sur les 4 sites — j'attends ses verdicts par la pastille, aucune carte de suite (d23/d128). Doctor : 1 commit sans fil (eba6bd5, plafond de fils atteint), sans gravite.", "par": "agent"}
+{"ts": "2026-10-31T20:01:21+00:00", "kind": "attempt", "id": "a44", "bug": "b35", "hypothesis": "Diagnostic, aucun changement de code : les commandes mises en file (projob, openstyle) enchainaient git add && git commit && cd apps/web && setsid nohup bash -c 'npx next build' — le classement next-build est donc juste (le build detache aurait echappe a la file sinon). Verifie : un git add seul (meme avec 'build' dans un chemin ou le message) -> non classe. Recherche dans les 60 dernieres sessions : aucun git add mis en file sans 'npx next build' dans la meme commande.", "session": "0903f074-7a8f-46a8-82a6-d94b9a64bf16", "actor": "claude-code"}
+{"ts": "2026-10-31T20:01:22+00:00", "kind": "attempt", "id": "a45", "bug": "b36", "hypothesis": "Meme cause que b35 : la commande de l'etape 10 contenait aussi 'setsid nohup bash -c npx next build' apres le git add/commit ; classement correct, aucun changement de code.", "session": "0903f074-7a8f-46a8-82a6-d94b9a64bf16", "actor": "claude-code"}
+{"ts": "2026-10-31T20:01:22+00:00", "kind": "piege", "id": "pg21", "text": "Enchainer git add/commit ET le lancement d'un build (meme detache par setsid nohup) dans UNE commande Bash fait passer toute la commande, commit compris, dans la file kvm-lourd (next-build). Separer : commit dans une commande, build dans une autre."}
+{"ts": "2026-10-31T20:01:22+00:00", "kind": "bug_status", "id": "b35", "status": "to_verify"}
+{"ts": "2026-10-31T20:01:22+00:00", "kind": "bug_status", "id": "b36", "status": "to_verify"}
+{"ts": "2026-10-31T20:01:22+00:00", "kind": "attempt", "id": "a46", "bug": "b32", "hypothesis": "Guide design2 ProJob rendu automatique (27de37f, 16 points avec geste joue par le guide) + seed de l'historique (2999e2d), puis b33/b34 (menu Passer a, bouton +). Reste l'essai de Mariella (d136).", "session": "0903f074-7a8f-46a8-82a6-d94b9a64bf16", "actor": "claude-code"}
+{"ts": "2026-10-31T20:01:22+00:00", "kind": "bug_status", "id": "b32", "status": "to_verify"}
