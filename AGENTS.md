@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [52 commits]
-  fichiers recemment ecrits : .claude/hooks/plantrack_guide/lib/guide/guide-actions.ts, .claude/hooks/plantrack_guide/components/guide/GuideCurseur.tsx, .claude/hooks/plantrack_guide/components/guide/GuideDeTest.tsx, .claude/hooks/plantrack_guide/components/guide/GuideDeTestLazy.tsx, .claude/hooks/plantrack_guide/lib/guide/types.ts, sortie/tests-guide.log
+FIL ACTIF — t23 : guides de test automatiques (d100) [53 commits]
+  fichiers recemment ecrits : ../openstyle/app/lib/guide/guide-reglages.ts, ../openstyle/app/lib/guide/guide-reglages-serveur.ts, ../Mizzzen/apps/web/src/lib/guide/guide-reglages.ts, ../Mizzzen/apps/web/src/lib/guide/guide-reglages-serveur.ts, ../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/tsc-guide-d138.log, ../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/tsc-openstyle.log
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -27,6 +27,7 @@ BUGS NON CORRIGES (personne ne s'en est occupe) :
   b32 (open) [t23] Essai guide ProJob (31/10, tel Mariella) : 'catastrophe' — au lieu d'un guide qui joue les etapes pour elle, elle doit tout faire elle-meme… (agent)
   b33 (open) [t23] ProJob design2 (essai Mariella 31/10 13h33, guide) : tableau de suivi, au clic sur 'Passer a' la liste s'affiche dans le cadre de la carte … (agent)
   b34 (open) [t23] ProJob design2 (essai Mariella 31/10 13h34-13h35, guide) : points 'La fiche : en-tete et les 5 etapes', 'L historique a l heure de Paris', … (agent)
+  b35 (open) [t23] kvm-lourd (31/10, install guide OpenStyle) : une commande 'git add ...' a ete classee 'next-build' et mise en file derriere un build Mizzze… (agent)
 
 BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b24 (to_verify) [t22] mdjlabs-site : la synchro du moteur de guide a ecrase guide-verdict.ts — guide-envoi.ts et ses tests importent compteRenduMarkdown et prog.… (agent) [3 tentatives, derniere: Re-ecrasement du 28/10 19h25 : la ronde de mdjlabs a lance …]

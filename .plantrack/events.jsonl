@@ -1735,3 +1735,11 @@
 {"ts": "2026-10-31T15:58:50+00:00", "kind": "commit", "sha": "7bf2a2d", "ctype": "chore", "thread": "t23"}
 {"ts": "2026-10-31T15:59:55+00:00", "kind": "bug", "id": "b33", "text": "ProJob design2 (essai Mariella 31/10 13h33, guide) : tableau de suivi, au clic sur 'Passer a' la liste s'affiche dans le cadre de la carte mais tout est coupe (menu rogne par un overflow du conteneur)", "thread": "t23", "severity": "normal", "par": "agent"}
 {"ts": "2026-10-31T15:59:56+00:00", "kind": "bug", "id": "b34", "text": "ProJob design2 (essai Mariella 31/10 13h34-13h35, guide) : points 'La fiche : en-tete et les 5 etapes', 'L historique a l heure de Paris', 'Le bouton + du menu du bas' — 'je ne vois pas du tout ce lien' / 'je ne vois rien de tout ca' ; non rejoues lors de son 2e passage (14h26-14h28, 6 points OK). Point telephone : 'je ne suis pas sur tel' (pas un ecart).", "thread": "t23", "severity": "normal", "par": "agent"}
+{"ts": "2026-10-31T15:59:56+00:00", "kind": "commit", "sha": "b2901c9", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-10-31T16:00:46+00:00", "kind": "file_touched", "text": "../openstyle/app/lib/guide/guide-reglages.ts", "thread": "t23"}
+{"ts": "2026-10-31T16:00:55+00:00", "kind": "file_touched", "text": "../openstyle/app/lib/guide/guide-reglages-serveur.ts", "thread": "t23"}
+{"ts": "2026-10-31T16:01:15+00:00", "kind": "file_touched", "text": "../Mizzzen/apps/web/src/lib/guide/guide-reglages.ts", "thread": "t23"}
+{"ts": "2026-10-31T16:01:22+00:00", "kind": "file_touched", "text": "../Mizzzen/apps/web/src/lib/guide/guide-reglages-serveur.ts", "thread": "t23"}
+{"ts": "2026-10-31T16:01:40+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/tsc-guide-d138.log", "thread": "t23"}
+{"ts": "2026-10-31T16:01:56+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/6441dd63-cb1a-46fa-be22-bc500e819dd4/scratchpad/tsc-openstyle.log", "thread": "t23"}
+{"ts": "2026-10-31T16:04:24+00:00", "kind": "bug", "id": "b35", "text": "kvm-lourd (31/10, install guide OpenStyle) : une commande 'git add ...' a ete classee 'next-build' et mise en file derriere un build Mizzzen — classement trop large (mot build dans un chemin/argument ?)", "thread": "t23", "severity": "normal", "par": "agent"}
