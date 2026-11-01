@@ -1919,17 +1919,25 @@ def poser_guide(src):
     base = base_guide_next()
     if base is None:
         return
+    racine = os.path.realpath(ROOT) + os.sep
+
+    def dans_depot(d):  # jamais d'ecriture a travers un lien qui sortirait du depot
+        return not os.path.islink(d) and os.path.realpath(d).startswith(racine)
+
     for dirpath, _, files in os.walk(src):
         for name in files:
             s = os.path.join(dirpath, name)
             d = os.path.join(ROOT, base, os.path.relpath(s, src))
             os.makedirs(os.path.dirname(d), exist_ok=True)
-            shutil.copy(s, d)
+            if dans_depot(d):
+                shutil.copy(s, d)
     for rel, texte in GUIDE_SITE.items():
         d = os.path.join(ROOT, base, rel)
-        if not os.path.exists(d):
-            with open(d, "w", encoding="utf-8") as f:
-                f.write(texte)
+        if os.path.lexists(d) or not dans_depot(d):
+            continue
+        fd = os.open(d, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o644)
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            f.write(texte)
     etat["_guide"] = "pose"
     with open(INJECTIONS, "w", encoding="utf-8") as f:
         json.dump(etat, f, indent=1, sort_keys=True)
