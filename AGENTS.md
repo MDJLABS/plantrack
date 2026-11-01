@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [76 commits]
-  fichiers recemment ecrits : pyproject.toml, ../miamboost/package.json, ../../../tmp/claude-0/-home-mariella-plantrack/50d4eaf4-b1c3-4483-9db5-0fb6dea3a120/scratchpad/carte.json, sortie/carte-d151.log, sortie/guide-miamboost.sh, sortie/guide-miamboost-tsc.log
+FIL ACTIF — t23 : guides de test automatiques (d100) [77 commits]
+  fichiers recemment ecrits : ../miamboost/package.json, ../../../tmp/claude-0/-home-mariella-plantrack/50d4eaf4-b1c3-4483-9db5-0fb6dea3a120/scratchpad/carte.json, sortie/carte-d151.log, sortie/guide-miamboost.sh, sortie/guide-miamboost-tsc.log, ../../../root/.claude/projects/-home-mariella-plantrack/memory/pannes-corriger-en-general-et-publier.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -190,6 +190,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d150 : Mariella (tel, 01/11, carte Suite) : 'Je verifie les corrections (Recommande)' apres classement de b29 — j'attends ses verdicts sur les 11 … (agent)
   d151 : Mariella (tel, 01/11, plan approuve) : guide de test partout — publier la derniere version du moteur (tag v1.9.32, GitHub seul, d127), mett… (agent)
   d152 : Mariella (tel, 01/11, carte q13) : 'Versions de test a part (Recommande)' — MiamBoost, S69 Francoviet, S69 Soirees recoivent chacun une ins… (agent)
+  d153 : Mariella (tel, 01/11) : 'quand tu mets a jour sur pypi, mets aussi a jour sur github' — toujours les deux ensemble. Constat : le tag pousse… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…

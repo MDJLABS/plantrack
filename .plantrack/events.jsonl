@@ -1891,3 +1891,6 @@
 {"ts": "2026-11-01T19:35:44+00:00", "kind": "file_touched", "text": "sortie/guide-miamboost.sh", "thread": "t23"}
 {"ts": "2026-11-01T19:35:44+00:00", "kind": "file_touched", "text": "sortie/guide-miamboost-tsc.log", "thread": "t23"}
 {"ts": "2026-11-01T19:36:06+00:00", "kind": "decision", "id": "d152", "text": "Mariella (tel, 01/11, carte q13) : 'Versions de test a part (Recommande)' — MiamBoost, S69 Francoviet, S69 Soirees recoivent chacun une instance de test Node (next start, disque reel) a une adresse protegee ; le guide commun n'existe que la (GUIDE_ACTIF=1) ; miamboost.com reste sur workerd :3100, miamboost-dev passe sur l'instance Node.", "par": "agent"}
+{"ts": "2026-11-01T19:36:08+00:00", "kind": "commit", "sha": "2a405d3", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-01T19:38:47+00:00", "kind": "file_touched", "text": "../../../root/.claude/projects/-home-mariella-plantrack/memory/pannes-corriger-en-general-et-publier.md", "thread": "t23"}
+{"ts": "2026-11-01T19:39:05+00:00", "kind": "decision", "id": "d153", "text": "Mariella (tel, 01/11) : 'quand tu mets a jour sur pypi, mets aussi a jour sur github' — toujours les deux ensemble. Constat : le tag pousse publie PyPI automatiquement (publish.yml) ; v1.9.31, v1.9.32 et v1.9.33 sont bien sur PyPI ET GitHub (d127 'sans PyPI' etait inexact).", "par": "agent"}
