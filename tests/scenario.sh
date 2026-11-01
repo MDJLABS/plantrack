@@ -456,6 +456,11 @@ check_not "update : un depot sans guide de test n en recoit pas" "guide de test"
 mkdir -p "$TMP8/src/lib/guide"
 git -C "$(dirname "$PT")" show v1.9.5:.claude/hooks/plantrack_guide/lib/guide/types.ts > "$TMP8/src/lib/guide/types.ts"
 echo miens > "$TMP8/src/lib/guide/scenarios.ts"
+# d151 : ancien guide (sans les reglages du site) : le moteur commun le casserait, il est laisse
+out=$(CLAUDE_PROJECT_DIR="$TMP8" python3 "$PT" update 2>&1)
+check "update : un ancien guide (avant d138) est laisse tel quel" "ancien guide" "$out"
+check_not "update : rien recopie dans l ancien guide" "fichier(s) du moteur mis a jour" "$out"
+echo miens > "$TMP8/src/lib/guide/guide-reglages-serveur.ts"
 out=$(CLAUDE_PROJECT_DIR="$TMP8" python3 "$PT" update 2>&1)
 check "update : le moteur du guide de test est mis a jour" "fichier(s) du moteur mis a jour" "$out"
 check "update : types.ts remplace par la version PlanTrack" "ok" \
@@ -473,6 +478,40 @@ check "update : son fichier retouche est garde" "retouche du site" "$(tail -1 "$
 check "update : aucun fichier du moteur rajoute chez lui" "absent" \
   "$([ -f "$TMP8/src/components/guide/GuideDeTest.tsx" ] && echo present || echo absent)"
 rm -rf "$TMP8"
+
+# d151 : un projet NEUF qui est un site Next recoit le guide (moteur + fichiers du site)
+TMP8b=$(mktemp -d); git -C "$TMP8b" init -q
+printf '{"dependencies":{"next":"15.0.0"}}' > "$TMP8b/package.json"
+printf '{"compilerOptions":{"paths":{"@/*": ["./src/*"]}}}' > "$TMP8b/tsconfig.json"
+out=$(CLAUDE_PROJECT_DIR="$TMP8b" python3 "$PT" init 2>&1)
+check "init : un site Next neuf recoit le guide" "guide de test pose dans src/lib/guide" "$out"
+check "init : moteur pose sous l alias @/" "ok" \
+  "$(cmp -s "$TMP8b/src/lib/guide/types.ts" "$(dirname "$PT")/plantrack_guide/lib/guide/types.ts" && echo ok)"
+check "init : porte admin fermee par defaut" "async () => false" "$(cat "$TMP8b/src/lib/guide/guide-reglages-serveur.ts")"
+echo "// mes parcours" >> "$TMP8b/src/lib/guide/scenarios.ts"
+out=$(CLAUDE_PROJECT_DIR="$TMP8b" python3 "$PT" init 2>&1)
+check_not "init : le guide n est pose qu une fois" "guide de test pose" "$out"
+check "init : les parcours du site restent a lui" "mes parcours" "$(cat "$TMP8b/src/lib/guide/scenarios.ts")"
+rm -rf "$TMP8b"
+# un projet neuf sans Next : rien ; Next arrive ensuite -> le guide est pose a la mise a jour suivante
+TMP8c=$(mktemp -d); git -C "$TMP8c" init -q
+out=$(CLAUDE_PROJECT_DIR="$TMP8c" python3 "$PT" init 2>&1)
+check_not "init : pas de guide sans site Next" "guide de test" "$out"
+mkdir -p "$TMP8c/apps/web"
+printf '{"dependencies":{"next":"15.0.0"}}' > "$TMP8c/apps/web/package.json"
+printf '{"compilerOptions":{"paths":{"@/*": ["./*"]}}}' > "$TMP8c/apps/web/tsconfig.json"
+out=$(CLAUDE_PROJECT_DIR="$TMP8c" python3 "$PT" init 2>&1)
+check "init : Next arrive apres, le guide est pose (monorepo)" "guide de test pose dans apps/web/lib/guide" "$out"
+rm -rf "$TMP8c"
+# un depot DEJA equipe (sans la marque d151) ne recoit jamais le guide par surprise
+TMP8d=$(mktemp -d); git -C "$TMP8d" init -q
+CLAUDE_PROJECT_DIR="$TMP8d" python3 "$PT" init >/dev/null 2>&1
+python3 -c "import json,sys;p=sys.argv[1];d=json.load(open(p));d.pop('_guide');json.dump(d,open(p,'w'))" "$TMP8d/.plantrack/injections.json"
+printf '{"dependencies":{"next":"15.0.0"}}' > "$TMP8d/package.json"
+printf '{"compilerOptions":{"paths":{"@/*": ["./*"]}}}' > "$TMP8d/tsconfig.json"
+out=$(CLAUDE_PROJECT_DIR="$TMP8d" python3 "$PT" init 2>&1)
+check_not "init : un depot deja equipe ne recoit pas le guide par surprise" "guide de test" "$out$(ls "$TMP8d")"
+rm -rf "$TMP8d"
 
 # 24. garde-fou surcouches — un outil (GSD...) regenere CLAUDE.md sans la reference
 TMP9=$(mktemp -d)

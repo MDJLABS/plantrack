@@ -1835,18 +1835,107 @@ def cmd_init(args):
                     + "\n".join(missing) + "\n")
         print(f".gitignore : {len(missing)} entree(s) PlanTrack ajoutee(s).")
 
-    sync_guide()
-    register_root()
     if not os.path.exists(INJECTIONS):
         os.makedirs(PT_DIR, exist_ok=True)
+        # d151 : une PREMIERE installation promet le guide de test au site Next qui viendra ;
+        # les depots deja equipes n'ont pas cette marque et ne recoivent rien par surprise
         with open(INJECTIONS, "w", encoding="utf-8") as f:
-            json.dump({"_depuis": now()}, f, indent=1, sort_keys=True)
+            json.dump({"_depuis": now(), "_guide": "a_poser"}, f, indent=1, sort_keys=True)
+    sync_guide()
+    register_root()
     install_post_commit_hook()
     install_git_hook()  # d'office : doctor le compte en panne, chaque nouveau depot sortait en defaut
     print("[PlanTrack] installation terminee. Redemarre l'agent puis verifie avec /hooks."
           if complete else
           "[PlanTrack] installation INCOMPLETE — fusionne le bloc ci-dessus a la main, "
           "puis verifie avec `plantrack doctor`.")
+
+
+GUIDE_BASES = ("", "src", "app", os.path.join("apps", "web"), os.path.join("apps", "web", "src"))
+
+# fichiers PROPRES au site, poses une seule fois a la premiere installation (d151), jamais
+# ecrases ensuite : le site les remplit (scenarios) et branche sa propre porte admin
+GUIDE_SITE = {
+    "lib/guide/scenarios.ts": '''/* Guide de test — parcours PROPRES a ce site (jamais ecrases par PlanTrack).
+ * Ajouter un parcours : une cle -> { id, titre, date, page, url, etapes: [...] } (cf. types.ts). */
+import type { GuideScenario } from "./types";
+
+export const SCENARIOS: Record<string, GuideScenario> = {};
+''',
+    "lib/guide/guide-reglages.ts": '''/* Guide de test — reglages CLIENT propres a ce site (jamais ecrases par PlanTrack). */
+import type { ReglagesGuideClient } from "./types";
+
+export const reglagesGuide: ReglagesGuideClient = {};
+''',
+    "lib/guide/guide-reglages-serveur.ts": '''/* Guide de test — reglages SERVEUR propres a ce site (jamais ecrases par PlanTrack).
+ *
+ * A BRANCHER : `estAdmin` doit dire si la requete courante est celle d'un admin du site
+ * (session + role). Tant qu'il rend `false`, le guide reste ferme pour tout le monde.
+ * Le guide ne s'allume en plus que si GUIDE_ACTIF=1 est pose cote serveur (site de test).
+ * Ne leve jamais : toute erreur retombe sur `false`.
+ */
+import type { ReglagesGuideServeur } from "./types";
+
+export const reglagesGuideServeur: ReglagesGuideServeur = {
+  estAdmin: async () => false,
+};
+''',
+}
+
+
+def base_guide_next():
+    """Ou poser le guide dans un site Next : le dossier vise par l'alias `@/` du tsconfig,
+    a la racine ou dans apps/web. None si ce n'est pas un site Next ou si l'alias manque."""
+    for app in ("", os.path.join("apps", "web")):
+        try:
+            pkg = json.load(open(os.path.join(ROOT, app, "package.json"), encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        deps = {**pkg.get("dependencies", {}), **pkg.get("devDependencies", {})}
+        if "next" not in deps:
+            continue
+        try:
+            ts = open(os.path.join(ROOT, app, "tsconfig.json"), encoding="utf-8").read()
+        except OSError:
+            return None
+        m = re.search(r'"@/\*"\s*:\s*\[\s*"(?:\./)?([^"*]*)\*"', ts)
+        if not m:
+            return None
+        base = os.path.normpath(os.path.join(app, m.group(1).strip("/")))
+        base = "" if base == "." else base
+        return base if base in GUIDE_BASES else None
+    return None
+
+
+def poser_guide(src):
+    """d151 : un projet equipe pour la premiere fois recoit le guide de test des qu'il est un
+    site Next — tout de suite a l'init, ou a une mise a jour plus tard si Next arrive apres."""
+    try:
+        etat = json.load(open(INJECTIONS, encoding="utf-8"))
+    except (OSError, ValueError):
+        return
+    if etat.get("_guide") != "a_poser":
+        return
+    base = base_guide_next()
+    if base is None:
+        return
+    for dirpath, _, files in os.walk(src):
+        for name in files:
+            s = os.path.join(dirpath, name)
+            d = os.path.join(ROOT, base, os.path.relpath(s, src))
+            os.makedirs(os.path.dirname(d), exist_ok=True)
+            shutil.copy(s, d)
+    for rel, texte in GUIDE_SITE.items():
+        d = os.path.join(ROOT, base, rel)
+        if not os.path.exists(d):
+            with open(d, "w", encoding="utf-8") as f:
+                f.write(texte)
+    etat["_guide"] = "pose"
+    with open(INJECTIONS, "w", encoding="utf-8") as f:
+        json.dump(etat, f, indent=1, sort_keys=True)
+    ou = os.path.join(base, "lib", "guide") if base else os.path.join("lib", "guide")
+    print(f"guide de test pose dans {ou} — reste a le monter dans le layout "
+          "(<GuideDeTestLazy />) et a brancher estAdmin (guide-reglages-serveur.ts).")
 
 
 def sync_guide():
@@ -1864,8 +1953,15 @@ def sync_guide():
     # b31 : les sites rangent leur code sous app/ (prolearn, openstyle) ou dans un monorepo
     # (projob : apps/web, mizzzen : apps/web/src) — chercher seulement a la racine et sous
     # src/ laissait ces quatre sites hors de toute mise a jour du moteur.
-    for base in ("", "src", "app", os.path.join("apps", "web"), os.path.join("apps", "web", "src")):
-        if not os.path.exists(os.path.join(ROOT, base, "lib", "guide", "types.ts")):
+    bases = [b for b in GUIDE_BASES if os.path.exists(os.path.join(ROOT, b, "lib", "guide", "types.ts"))]
+    if not bases:
+        poser_guide(src)
+    for base in bases:
+        # ancien guide (envoi par le poste, avant d138) : le moteur commun importe les
+        # reglages du site, que ce guide n'a pas — le recopier casserait la construction
+        if not os.path.exists(os.path.join(ROOT, base, "lib", "guide", "guide-reglages-serveur.ts")):
+            print("guide de test : ancien guide (avant le moteur commun), laisse tel quel — "
+                  "portage a faire (guide-reglages-serveur.ts absent).")
             continue
         propres = []
         for dirpath, _, files in os.walk(src):
