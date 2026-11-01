@@ -14,15 +14,12 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [68 commits]
+FIL ACTIF — t23 : guides de test automatiques (d100) [69 commits]
   fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-wise-sedgewick.md, ../../../tmp/claude-0/-home-mariella-plantrack/2aaa6d22-a7fa-439b-aa00-91055011f980/scratchpad/carte.json, sortie/carte-q12.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-purrfect-quokka.md, ../../../tmp/claude-0/-home-mariella-plantrack/9a5220ec-bb69-4fb6-b5a3-2be6836c185a/scratchpad/acc, backup/code/cloudflare/access-prolearn-dev-2026-11-01.json
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
   t5 : travaux sur main — reprise : retour au travail courant apres la faille
-
-BUGS NON CORRIGES (personne ne s'en est occupe) :
-  b29 (open) [t23] Essai guide ProLearn (31/10, tel Mariella) : erreur 'Hydration failed' en dev sur /login?guide=essai-gestes — diff dans le MetadataWrapper … (agent) [4 tentatives, derniere: Jeton de service Access temporaire (cree puis revoque, poli…]
 
 BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b24 (to_verify) [t22] mdjlabs-site : la synchro du moteur de guide a ecrase guide-verdict.ts — guide-envoi.ts et ses tests importent compteRenduMarkdown et prog.… (agent) [3 tentatives, derniere: Re-ecrasement du 28/10 19h25 : la ronde de mdjlabs a lance …]
@@ -186,6 +183,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d146 : Mariella (tel, 31/10, plan approuve apres relance auto) : 'Rien a faire : j'attends tes essais' — attente de ses verdicts des guides (d142,… (agent)
   d147 : Mariella (tel, 01/11, carte q11) : 'Je fais l'essai (Recommande)' — elle teste ProLearn en fenetre privee pour b29 (Hydration failed) ; pla… (agent)
   d148 : Mariella (tel, 01/11, plan approuve apres relance auto) : 'Rien a faire : j'attends toujours ton essai en fenetre privee' — b29/q11 restent… (agent)
+  d149 : Mariella (tel, 01/11, carte Message rouge) : b29 classe (wont_fix) — 'Hydration failed' sur ProLearn /login reproduit par elle en fenetre p… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
