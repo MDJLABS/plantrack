@@ -1886,3 +1886,8 @@
 {"ts": "2026-11-01T19:21:17+00:00", "kind": "file_touched", "text": "sortie/carte-d151.log", "thread": "t23"}
 {"ts": "2026-11-01T19:21:22+00:00", "kind": "question", "id": "q13", "text": "Guide de test sur MiamBoost/S69 x2 (Cloudflare, sans disque) : versions de test a part (reco) / garder l'ancien guide / guide qui note sur Cloudflare ? (carte du 01/11, d151)"}
 {"ts": "2026-11-01T19:21:22+00:00", "kind": "piege", "id": "pg22", "text": "Sites Cloudflare (OpenNext/workerd : S69 x2, MiamBoost) : le moteur commun du guide (guide-actions.ts, node:fs sur .planning/) n'y peut rien ecrire — il faut une instance Node (next start/dev) ; et miamboost-dev.mdjlabs.com et miamboost.com partagent le meme processus (:3100)."}
+{"ts": "2026-11-01T19:21:23+00:00", "kind": "commit", "sha": "43f5505", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-01T19:33:56+00:00", "kind": "answer", "id": "q13", "text": "Versions de test a part", "canal": "telephone : Versions de test à part (Recommandé)"}
+{"ts": "2026-11-01T19:35:44+00:00", "kind": "file_touched", "text": "sortie/guide-miamboost.sh", "thread": "t23"}
+{"ts": "2026-11-01T19:35:44+00:00", "kind": "file_touched", "text": "sortie/guide-miamboost-tsc.log", "thread": "t23"}
+{"ts": "2026-11-01T19:36:06+00:00", "kind": "decision", "id": "d152", "text": "Mariella (tel, 01/11, carte q13) : 'Versions de test a part (Recommande)' — MiamBoost, S69 Francoviet, S69 Soirees recoivent chacun une instance de test Node (next start, disque reel) a une adresse protegee ; le guide commun n'existe que la (GUIDE_ACTIF=1) ; miamboost.com reste sur workerd :3100, miamboost-dev passe sur l'instance Node.", "par": "agent"}
