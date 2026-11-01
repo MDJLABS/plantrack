@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [65 commits]
-  fichiers recemment ecrits : ../prolearn/app/components/creator-studio/state/reducer.ts, ../prolearn/app/components/creator-studio/state/__tests__/hydrate-sans-audio.test.ts, ../../../tmp/claude-0/-home-mariella-plantrack/0903f074-7a8f-46a8-82a6-d94b9a64bf16/scratchpad/carte6.json, ../../../root/.claude/plans/contexte-reconstruit-par-le-valiant-sutherland.md, sortie/carte-b29.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-purrfect-glade.md
+FIL ACTIF — t23 : guides de test automatiques (d100) [66 commits]
+  fichiers recemment ecrits : ../prolearn/app/components/creator-studio/state/__tests__/hydrate-sans-audio.test.ts, ../../../tmp/claude-0/-home-mariella-plantrack/0903f074-7a8f-46a8-82a6-d94b9a64bf16/scratchpad/carte6.json, ../../../root/.claude/plans/contexte-reconstruit-par-le-valiant-sutherland.md, sortie/carte-b29.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-purrfect-glade.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-wise-sedgewick.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -185,6 +185,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d145 : Mariella (tel, 31/10 soir, carte Suite) : 'Je continue mes essais (Recommande)' apres la correction du studio ProLearn (b4 ProLearn) — j'at… (agent)
   d146 : Mariella (tel, 31/10, plan approuve apres relance auto) : 'Rien a faire : j'attends tes essais' — attente de ses verdicts des guides (d142,… (agent)
   d147 : Mariella (tel, 01/11, carte q11) : 'Je fais l'essai (Recommande)' — elle teste ProLearn en fenetre privee pour b29 (Hydration failed) ; pla… (agent)
+  d148 : Mariella (tel, 01/11, plan approuve apres relance auto) : 'Rien a faire : j'attends toujours ton essai en fenetre privee' — b29/q11 restent… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…

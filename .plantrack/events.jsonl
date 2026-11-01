@@ -1841,3 +1841,6 @@
 {"ts": "2026-10-31T22:34:58+00:00", "kind": "file_touched", "text": "sortie/carte-b29.log", "thread": "t23"}
 {"ts": "2026-11-01T13:21:08+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-purrfect-glade.md", "thread": "t23"}
 {"ts": "2026-11-01T17:54:02+00:00", "kind": "decision", "id": "d147", "text": "Mariella (tel, 01/11, carte q11) : 'Je fais l'essai (Recommande)' — elle teste ProLearn en fenetre privee pour b29 (Hydration failed) ; plan d'attente approuve, q11 reste ouverte jusqu'a son resultat, aucune autre carte (d23).", "par": "agent"}
+{"ts": "2026-11-01T17:54:02+00:00", "kind": "commit", "sha": "849c7a8", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-01T18:35:10+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-wise-sedgewick.md", "thread": "t23"}
+{"ts": "2026-11-01T18:37:49+00:00", "kind": "decision", "id": "d148", "text": "Mariella (tel, 01/11, plan approuve apres relance auto) : 'Rien a faire : j'attends toujours ton essai en fenetre privee' — b29/q11 restent ouverts jusqu'a son resultat ; voyant doctor = vieux commit journal eba6bd5 sans fil (30/10), sans consequence ; aucune carte (d23).", "par": "agent"}
