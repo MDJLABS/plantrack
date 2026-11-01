@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [77 commits]
-  fichiers recemment ecrits : ../miamboost/package.json, ../../../tmp/claude-0/-home-mariella-plantrack/50d4eaf4-b1c3-4483-9db5-0fb6dea3a120/scratchpad/carte.json, sortie/carte-d151.log, sortie/guide-miamboost.sh, sortie/guide-miamboost-tsc.log, ../../../root/.claude/projects/-home-mariella-plantrack/memory/pannes-corriger-en-general-et-publier.md
+FIL ACTIF — t23 : guides de test automatiques (d100) [78 commits]
+  fichiers recemment ecrits : ../Clients/s69-francoviet/lib/auth.ts, ../Clients/s69-soirees/lib/auth.ts, sortie/miamboost-guide-essai.log, ../../../etc/systemd/system/miamboost-guide.service, ../Clients/s69-francoviet/.dev.vars, ../Clients/s69-soirees/.dev.vars
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -191,6 +191,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d151 : Mariella (tel, 01/11, plan approuve) : guide de test partout — publier la derniere version du moteur (tag v1.9.32, GitHub seul, d127), mett… (agent)
   d152 : Mariella (tel, 01/11, carte q13) : 'Versions de test a part (Recommande)' — MiamBoost, S69 Francoviet, S69 Soirees recoivent chacun une ins… (agent)
   d153 : Mariella (tel, 01/11) : 'quand tu mets a jour sur pypi, mets aussi a jour sur github' — toujours les deux ensemble. Constat : le tag pousse… (agent)
+  d154 : d152 livre (01/11, choix Mariella tel q13 'Versions de test a part') : versions de test Node (next dev, GUIDE_ACTIF=1, portier-reveil, Stop… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
@@ -202,5 +203,6 @@ Pieges connus :
   pg20 : Un sous-agent a qui on dit 'ne lis aucun .env' peut quand meme grep apps/web/.e…
   pg21 : Enchainer git add/commit ET le lancement d'un build (meme detache par setsid no…
   pg22 : Sites Cloudflare (OpenNext/workerd : S69 x2, MiamBoost) : le moteur commun du g…
+  pg23 : next dev d'un site OpenNext avec une liaison 'ai' (ou remote) dans wrangler.jso…
 ```
 <!-- plantrack:state-end -->
