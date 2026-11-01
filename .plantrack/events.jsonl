@@ -1915,3 +1915,5 @@
 {"ts": "2026-11-01T19:55:46+00:00", "kind": "attempt", "id": "a52", "bug": "b37", "hypothesis": "Cause trouvee (reproduite) : dans 'diff <(cat A) B', la parenthese fermante coupe la commande et B (un .tsx) devient le 1er mot d'un segment ; _script le lit comme un script lance, et un commentaire 'next build' dans le fichier le classe next-build. Correctif : un chemin lance directement (sans bash/sh) n'est lu comme script que s'il est executable (sinon le shell ne pourrait pas le lancer) ou ecrit par un heredoc de la commande.", "session": "50d4eaf4-b1c3-4483-9db5-0fb6dea3a120", "actor": "claude-code"}
 {"ts": "2026-11-01T19:58:01+00:00", "kind": "file_touched", "text": "../../../usr/local/bin/kvm-lourd", "thread": "t23"}
 {"ts": "2026-11-01T19:58:13+00:00", "kind": "bug_status", "id": "b37", "status": "to_verify"}
+{"ts": "2026-11-01T19:58:13+00:00", "kind": "commit", "sha": "9c298d5", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-01T19:58:18+00:00", "kind": "question", "id": "q14", "text": "Essai des 3 versions de test du guide (miamboost-dev, s69-francoviet-dev, s69-soirees-dev) : carte envoyee le 01/11, en attente de ses retours"}

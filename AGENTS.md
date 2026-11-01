@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [79 commits]
+FIL ACTIF — t23 : guides de test automatiques (d100) [80 commits]
   fichiers recemment ecrits : ../../../etc/systemd/system/miamboost-guide.service, ../Clients/s69-francoviet/.dev.vars, ../Clients/s69-soirees/.dev.vars, ../../../tmp/claude-0/-home-mariella-plantrack/50d4eaf4-b1c3-4483-9db5-0fb6dea3a120/scratchpad/carte2.json, sortie/carte-d152.log, ../../../usr/local/bin/kvm-lourd
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -202,5 +202,8 @@ Pieges connus :
   pg21 : Enchainer git add/commit ET le lancement d'un build (meme detache par setsid no…
   pg22 : Sites Cloudflare (OpenNext/workerd : S69 x2, MiamBoost) : le moteur commun du g…
   pg23 : next dev d'un site OpenNext avec une liaison 'ai' (ou remote) dans wrangler.jso…
+
+Questions en attente (reponds via !answer qN ...) :
+  q14 : Essai des 3 versions de test du guide (miamboost-dev, s69-francoviet-dev, s69-s…
 ```
 <!-- plantrack:state-end -->
