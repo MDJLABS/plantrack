@@ -1917,3 +1917,5 @@
 {"ts": "2026-11-01T19:58:13+00:00", "kind": "bug_status", "id": "b37", "status": "to_verify"}
 {"ts": "2026-11-01T19:58:13+00:00", "kind": "commit", "sha": "9c298d5", "ctype": "chore", "thread": "t23"}
 {"ts": "2026-11-01T19:58:18+00:00", "kind": "question", "id": "q14", "text": "Essai des 3 versions de test du guide (miamboost-dev, s69-francoviet-dev, s69-soirees-dev) : carte envoyee le 01/11, en attente de ses retours"}
+{"ts": "2026-11-01T19:58:18+00:00", "kind": "commit", "sha": "0124998", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-01T21:17:44+00:00", "kind": "answer", "id": "q14", "text": "Mariella fait l'essai des 3 versions de test", "canal": "telephone : Je fais l'essai (Recommandé)"}
