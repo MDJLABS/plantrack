@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [69 commits]
+FIL ACTIF — t23 : guides de test automatiques (d100) [70 commits]
   fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-wise-sedgewick.md, ../../../tmp/claude-0/-home-mariella-plantrack/2aaa6d22-a7fa-439b-aa00-91055011f980/scratchpad/carte.json, sortie/carte-q12.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-purrfect-quokka.md, ../../../tmp/claude-0/-home-mariella-plantrack/9a5220ec-bb69-4fb6-b5a3-2be6836c185a/scratchpad/acc, backup/code/cloudflare/access-prolearn-dev-2026-11-01.json
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -184,6 +184,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d147 : Mariella (tel, 01/11, carte q11) : 'Je fais l'essai (Recommande)' — elle teste ProLearn en fenetre privee pour b29 (Hydration failed) ; pla… (agent)
   d148 : Mariella (tel, 01/11, plan approuve apres relance auto) : 'Rien a faire : j'attends toujours ton essai en fenetre privee' — b29/q11 restent… (agent)
   d149 : Mariella (tel, 01/11, carte Message rouge) : b29 classe (wont_fix) — 'Hydration failed' sur ProLearn /login reproduit par elle en fenetre p… (agent)
+  d150 : Mariella (tel, 01/11, carte Suite) : 'Je verifie les corrections (Recommande)' apres classement de b29 — j'attends ses verdicts sur les 11 … (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
