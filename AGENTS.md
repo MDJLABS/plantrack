@@ -14,15 +14,15 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [67 commits]
-  fichiers recemment ecrits : ../prolearn/app/components/creator-studio/state/__tests__/hydrate-sans-audio.test.ts, ../../../tmp/claude-0/-home-mariella-plantrack/0903f074-7a8f-46a8-82a6-d94b9a64bf16/scratchpad/carte6.json, ../../../root/.claude/plans/contexte-reconstruit-par-le-valiant-sutherland.md, sortie/carte-b29.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-purrfect-glade.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-wise-sedgewick.md
+FIL ACTIF — t23 : guides de test automatiques (d100) [68 commits]
+  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-wise-sedgewick.md, ../../../tmp/claude-0/-home-mariella-plantrack/2aaa6d22-a7fa-439b-aa00-91055011f980/scratchpad/carte.json, sortie/carte-q12.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-purrfect-quokka.md, ../../../tmp/claude-0/-home-mariella-plantrack/9a5220ec-bb69-4fb6-b5a3-2be6836c185a/scratchpad/acc, backup/code/cloudflare/access-prolearn-dev-2026-11-01.json
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
   t5 : travaux sur main — reprise : retour au travail courant apres la faille
 
 BUGS NON CORRIGES (personne ne s'en est occupe) :
-  b29 (open) [t23] Essai guide ProLearn (31/10, tel Mariella) : erreur 'Hydration failed' en dev sur /login?guide=essai-gestes — diff dans le MetadataWrapper … (agent) [2 tentatives, derniere: Vu sur ordinateur (q9). Sur ordinateur, cause la plus proba…]
+  b29 (open) [t23] Essai guide ProLearn (31/10, tel Mariella) : erreur 'Hydration failed' en dev sur /login?guide=essai-gestes — diff dans le MetadataWrapper … (agent) [4 tentatives, derniere: Jeton de service Access temporaire (cree puis revoque, poli…]
 
 BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b24 (to_verify) [t22] mdjlabs-site : la synchro du moteur de guide a ecrase guide-verdict.ts — guide-envoi.ts et ses tests importent compteRenduMarkdown et prog.… (agent) [3 tentatives, derniere: Re-ecrasement du 28/10 19h25 : la ronde de mdjlabs a lance …]
@@ -196,9 +196,5 @@ Pieges connus :
   pg19 : Moteur guide (guide-visite.ts, commun) importe ./scenarios.ts et ./types.ts ave…
   pg20 : Un sous-agent a qui on dit 'ne lis aucun .env' peut quand meme grep apps/web/.e…
   pg21 : Enchainer git add/commit ET le lancement d'un build (meme detache par setsid no…
-
-Questions en attente (reponds via !answer qN ...) :
-  q11 : b29 ProLearn (Hydration failed sur /login, vu sur ordinateur) : rien ne le repr…
-  q12 : b29 bloque : j'attends le resultat de l'essai de Mariella en fenetre privee sur…
 ```
 <!-- plantrack:state-end -->
