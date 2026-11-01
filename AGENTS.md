@@ -14,12 +14,15 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [70 commits]
-  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-wise-sedgewick.md, ../../../tmp/claude-0/-home-mariella-plantrack/2aaa6d22-a7fa-439b-aa00-91055011f980/scratchpad/carte.json, sortie/carte-q12.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-purrfect-quokka.md, ../../../tmp/claude-0/-home-mariella-plantrack/9a5220ec-bb69-4fb6-b5a3-2be6836c185a/scratchpad/acc, backup/code/cloudflare/access-prolearn-dev-2026-11-01.json
+FIL ACTIF — t23 : guides de test automatiques (d100) [75 commits]
+  fichiers recemment ecrits : ../miamboost/src/lib/guide/guide-reglages-serveur.ts, sortie/tests-d151.log, pyproject.toml, ../miamboost/package.json, ../../../tmp/claude-0/-home-mariella-plantrack/50d4eaf4-b1c3-4483-9db5-0fb6dea3a120/scratchpad/carte.json, sortie/carte-d151.log
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
   t5 : travaux sur main — reprise : retour au travail courant apres la faille
+
+BUGS NON CORRIGES (personne ne s'en est occupe) :
+  b37 (open) [t23] kvm-lourd (01/11) : une commande de lecture (diff/grep/ls dans prolearn) classee next-build et mise en file 8/8 — recurrence b35/b36 (agent)
 
 BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b24 (to_verify) [t22] mdjlabs-site : la synchro du moteur de guide a ecrase guide-verdict.ts — guide-envoi.ts et ses tests importent compteRenduMarkdown et prog.… (agent) [3 tentatives, derniere: Re-ecrasement du 28/10 19h25 : la ronde de mdjlabs a lance …]
@@ -185,6 +188,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d148 : Mariella (tel, 01/11, plan approuve apres relance auto) : 'Rien a faire : j'attends toujours ton essai en fenetre privee' — b29/q11 restent… (agent)
   d149 : Mariella (tel, 01/11, carte Message rouge) : b29 classe (wont_fix) — 'Hydration failed' sur ProLearn /login reproduit par elle en fenetre p… (agent)
   d150 : Mariella (tel, 01/11, carte Suite) : 'Je verifie les corrections (Recommande)' apres classement de b29 — j'attends ses verdicts sur les 11 … (agent)
+  d151 : Mariella (tel, 01/11, plan approuve) : guide de test partout — publier la derniere version du moteur (tag v1.9.32, GitHub seul, d127), mett… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
@@ -195,5 +199,9 @@ Pieges connus :
   pg19 : Moteur guide (guide-visite.ts, commun) importe ./scenarios.ts et ./types.ts ave…
   pg20 : Un sous-agent a qui on dit 'ne lis aucun .env' peut quand meme grep apps/web/.e…
   pg21 : Enchainer git add/commit ET le lancement d'un build (meme detache par setsid no…
+  pg22 : Sites Cloudflare (OpenNext/workerd : S69 x2, MiamBoost) : le moteur commun du g…
+
+Questions en attente (reponds via !answer qN ...) :
+  q13 : Guide de test sur MiamBoost/S69 x2 (Cloudflare, sans disque) : versions de test…
 ```
 <!-- plantrack:state-end -->
