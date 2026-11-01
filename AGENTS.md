@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [81 commits]
-  fichiers recemment ecrits : ../../../etc/systemd/system/miamboost-guide.service, ../Clients/s69-francoviet/.dev.vars, ../Clients/s69-soirees/.dev.vars, ../../../tmp/claude-0/-home-mariella-plantrack/50d4eaf4-b1c3-4483-9db5-0fb6dea3a120/scratchpad/carte2.json, sortie/carte-d152.log, ../../../usr/local/bin/kvm-lourd
+FIL ACTIF — t23 : guides de test automatiques (d100) [82 commits]
+  fichiers recemment ecrits : ../Clients/s69-soirees/.dev.vars, ../../../tmp/claude-0/-home-mariella-plantrack/50d4eaf4-b1c3-4483-9db5-0fb6dea3a120/scratchpad/carte2.json, sortie/carte-d152.log, ../../../usr/local/bin/kvm-lourd, ../../../tmp/claude-0/-home-mariella-plantrack/a8fa34ed-a2e6-4cad-84fe-f9fde4086221/scratchpad/carte.json, ../../../etc/systemd/system/miamboost-guide.service.d/domaines.conf
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -34,6 +34,7 @@ BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b35 (to_verify) [t23] kvm-lourd (31/10, install guide OpenStyle) : une commande 'git add ...' a ete classee 'next-build' et mise en file derriere un build Mizzze… (agent) [1 tentatives, derniere: Diagnostic, aucun changement de code : les commandes mises …]
   b36 (to_verify) [t23] Recurrence de b35 (31/10, session ProJob guide commun) : un simple 'git add <fichiers>' (etape 10 du portage guide) a ete classe 'next-buil… (agent) [1 tentatives, derniere: Meme cause que b35 : la commande de l'etape 10 contenait au…]
   b37 (to_verify) [t23] kvm-lourd (01/11) : une commande de lecture (diff/grep/ls dans prolearn) classee next-build et mise en file 8/8 — recurrence b35/b36 (agent) [1 tentatives, derniere: Cause trouvee (reproduite) : dans 'diff <(cat A) B', la par…]
+  b38 (to_verify) [t23] Essai versions de test (01/11 soir, tel Mariella) : 's69 soirees mene vers le site s69 dev il me semble, et les 2 autres liens ne fonctionn… (agent) [1 tentatives, derniere: MiamBoost : miamboost-dev.mdjlabs.com classe en domaine de …]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
@@ -202,5 +203,6 @@ Pieges connus :
   pg21 : Enchainer git add/commit ET le lancement d'un build (meme detache par setsid no…
   pg22 : Sites Cloudflare (OpenNext/workerd : S69 x2, MiamBoost) : le moteur commun du g…
   pg23 : next dev d'un site OpenNext avec une liaison 'ai' (ou remote) dans wrangler.jso…
+  pg24 : systemd : EnvironmentFile= l'emporte sur Environment= pour une meme variable — …
 ```
 <!-- plantrack:state-end -->
