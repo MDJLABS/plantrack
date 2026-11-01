@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [66 commits]
+FIL ACTIF — t23 : guides de test automatiques (d100) [67 commits]
   fichiers recemment ecrits : ../prolearn/app/components/creator-studio/state/__tests__/hydrate-sans-audio.test.ts, ../../../tmp/claude-0/-home-mariella-plantrack/0903f074-7a8f-46a8-82a6-d94b9a64bf16/scratchpad/carte6.json, ../../../root/.claude/plans/contexte-reconstruit-par-le-valiant-sutherland.md, sortie/carte-b29.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-purrfect-glade.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-wise-sedgewick.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -199,5 +199,6 @@ Pieges connus :
 
 Questions en attente (reponds via !answer qN ...) :
   q11 : b29 ProLearn (Hydration failed sur /login, vu sur ordinateur) : rien ne le repr…
+  q12 : b29 bloque : j'attends le resultat de l'essai de Mariella en fenetre privee sur…
 ```
 <!-- plantrack:state-end -->

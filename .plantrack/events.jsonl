@@ -1844,3 +1844,5 @@
 {"ts": "2026-11-01T17:54:02+00:00", "kind": "commit", "sha": "849c7a8", "ctype": "chore", "thread": "t23"}
 {"ts": "2026-11-01T18:35:10+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-wise-sedgewick.md", "thread": "t23"}
 {"ts": "2026-11-01T18:37:49+00:00", "kind": "decision", "id": "d148", "text": "Mariella (tel, 01/11, plan approuve apres relance auto) : 'Rien a faire : j'attends toujours ton essai en fenetre privee' — b29/q11 restent ouverts jusqu'a son resultat ; voyant doctor = vieux commit journal eba6bd5 sans fil (30/10), sans consequence ; aucune carte (d23).", "par": "agent"}
+{"ts": "2026-11-01T18:37:49+00:00", "kind": "commit", "sha": "866feb5", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-01T18:38:06+00:00", "kind": "question", "id": "q12", "text": "b29 bloque : j'attends le resultat de l'essai de Mariella en fenetre privee sur ProLearn (/login?guide=essai-gestes) — le message rouge 'Hydration failed' revient-il ? Non reproductible cote serveur (UA iPhone/Android/desktop : 0 erreur)."}
