@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [88 commits]
-  fichiers recemment ecrits : sortie/carte-soirees-2.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-quiet-shannon.md, ../Clients/s69-soirees/components/cart/SoireeForm.tsx, ../Clients/s69-soirees/components/reservation/TurnstileWidget.tsx, sortie/carte-captcha.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-quizzical-sprout.md
+FIL ACTIF — t23 : guides de test automatiques (d100) [89 commits]
+  fichiers recemment ecrits : ../Clients/s69-soirees/components/cart/SoireeForm.tsx, ../Clients/s69-soirees/components/reservation/TurnstileWidget.tsx, sortie/carte-captcha.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-quizzical-sprout.md, sortie/carte-suite-soirees.json, sortie/carte-saturation.json
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -214,5 +214,6 @@ Pieges connus :
 
 Questions en attente (reponds via !answer qN ...) :
   q15 : Guide Soirées pret (s69-soirees 1db1d2a) : Mariella fait-elle l'essai sur https…
+  q17 : Saturation serveur : PlanTrack chef d'orchestre — coder tout (pause des session…
 ```
 <!-- plantrack:state-end -->
