@@ -1975,3 +1975,29 @@
 {"ts": "2026-11-02T16:48:18+00:00", "kind": "question", "id": "q17", "text": "Saturation serveur : PlanTrack chef d'orchestre — coder tout (pause des sessions via hook PreToolUse, gel cgroup des gros calculs, file auto) ou outil existant (nohang, systemd-oomd, task-spooler) ? Carte envoyee 02/11."}
 {"ts": "2026-11-02T16:48:21+00:00", "kind": "commit", "sha": "da20879", "ctype": "chore", "thread": "t23"}
 {"ts": "2026-11-02T16:50:23+00:00", "kind": "decision", "id": "d158", "text": "Mariella (tel, appels 10035/10038, 02/11) : exigence saturation — PlanTrack coordinateur : une session EN COURS de travail peut etre mise en pause pour ceder le serveur a une autre session au travail plus gros/urgent, puis reprend seule quand la charge redescend (file d'attente facon imprimante, mais entre plusieurs sessions en parallele). Approche (coder tout vs outil) en attente de sa carte.", "par": "agent"}
+{"ts": "2026-11-02T16:50:23+00:00", "kind": "commit", "sha": "73c5775", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-02T18:23:50+00:00", "kind": "answer", "id": "q17", "text": "On code tout a 100 % : PlanTrack coordinateur", "canal": "tel : On code tout à 100 % (Recommandé)"}
+{"ts": "2026-11-02T18:23:50+00:00", "kind": "decision", "id": "d159", "text": "Mariella (tel, 02/11, carte Saturation) : 'On code tout a 100 % (Recommande)' — PlanTrack chef d'orchestre de la charge serveur (pause des sessions entre deux etapes, gel/degel des gros calculs, file auto, priorites), en s'appuyant sur kvm-lourd/menage-serveur existants ; earlyoom reste le dernier filet. Plan a faire valider avant code.", "par": "agent"}
+{"ts": "2026-11-02T18:26:28+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-quizzical-sprout.md", "thread": "t23"}
+{"ts": "2026-11-02T18:36:40+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-02T18:36:49+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-02T18:36:50+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-02T18:36:54+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-02T18:36:55+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-02T18:37:04+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-02T18:37:33+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-02T19:11:22+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t23"}
+{"ts": "2026-11-02T19:13:51+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-02T19:15:55+00:00", "kind": "file_touched", "text": "sortie/scenario-orchestre.log", "thread": "t23"}
+{"ts": "2026-11-02T19:16:43+00:00", "kind": "file_touched", "text": "../../../etc/systemd/system/plantrack-orchestre.service", "thread": "t23"}
+{"ts": "2026-11-02T19:27:50+00:00", "kind": "file_touched", "text": "sortie/scenario-orchestre.log", "thread": "t23"}
+{"ts": "2026-11-02T19:27:50+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t23"}
+{"ts": "2026-11-02T19:48:19+00:00", "kind": "commit", "sha": "41ce6a0", "ctype": "feat", "thread": "t23"}
+{"ts": "2026-11-02T19:49:07+00:00", "kind": "commit", "sha": "74ba41a", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-02T19:49:35+00:00", "kind": "file_touched", "text": "sortie/essai-orchestre.sh", "thread": "t23"}
+{"ts": "2026-11-02T19:50:30+00:00", "kind": "file_touched", "text": "sortie/essai-orchestre.log", "thread": "t23"}
+{"ts": "2026-11-02T19:50:54+00:00", "kind": "commit", "sha": "2c64c3e", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-02T19:50:57+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t23"}
+{"ts": "2026-11-02T19:51:07+00:00", "kind": "decision", "id": "d160", "text": "Chef d'orchestre de la charge LIVRE (d159, plan valide par Mariella tel) : v1.9.34 (GitHub seul, pas de cle PyPI, d127). plantrack-orchestre.service (boucle 10 s, ExecStopPost tout-reprendre) : feu vert/orange/rouge (RAM dispo 15/8 %, PSI), rangs humain/agent/fond, pause entre deux etapes par le hook PreToolUse '*' (timeout 600, attente 540 s max), gel SIGSTOP des commandes en cours, reprise au vert, pause 30 min max, menage-serveur au orange/rouge, bulle si rouge > 10 min, pic appris par projet (historique.jsonl). kvm-lourd retient le rang fond hors vert (retenu_par_orchestre, source /root/kvm-lourd 4552f8f realignee). Bilan du dimanche : pauses + kills earlyoom (46 sur les 7 derniers jours au 02/11). Essai controle 02/11 20h49 (registre a part, vrai mangeur 1,2 Go) : rouge, une session gelee (T), reprise apres 37 s (S).", "par": "agent"}
+{"ts": "2026-11-02T19:51:08+00:00", "kind": "piege", "id": "pg27", "text": "pgrep/pkill -f 'bash tests/scenario.sh' se reconnait lui-meme dans une boucle d'attente 'until ! pgrep -f ...' (le motif est dans sa propre ligne de commande) : la boucle ne finit jamais et un pkill sur ce motif tue le shell appelant (exit 144). Attendre un pid precis ou un marqueur de fin dans le journal."}
+{"ts": "2026-11-02T19:51:08+00:00", "kind": "piege", "id": "pg28", "text": "Orchestre : le hook-pretool reinscrit la session sur le premier ancetre claude/codex — dans un test lance depuis une session Claude, une fausse fiche est reecrite sur le VRAI claude (toujours vivant). Reecrire la fiche apres tout appel de hook dans les tests."}

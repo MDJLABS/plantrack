@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [90 commits]
-  fichiers recemment ecrits : ../Clients/s69-soirees/components/cart/SoireeForm.tsx, ../Clients/s69-soirees/components/reservation/TurnstileWidget.tsx, sortie/carte-captcha.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-quizzical-sprout.md, sortie/carte-suite-soirees.json, sortie/carte-saturation.json
+FIL ACTIF — t23 : guides de test automatiques (d100) [94 commits]
+  fichiers recemment ecrits : ../../../etc/systemd/system/plantrack-orchestre.service, sortie/scenario-orchestre.log, tests/scenario.sh, sortie/essai-orchestre.sh, sortie/essai-orchestre.log, pyproject.toml
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -197,6 +197,8 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d156 : Mariella (tel, 02/11, carte Suite) : 'Ecrire le guide Soirees (Recommande)' — scenario de test avec gestes (d100) pour la page /soirees dan… (agent)
   d157 : Mariella (tel, 02/11) : b40 -> 'Je refais l'essai (Recommande)' ; attente de son verdict par le guide (s69-soirees 3c92781) (agent)
   d158 : Mariella (tel, appels 10035/10038, 02/11) : exigence saturation — PlanTrack coordinateur : une session EN COURS de travail peut etre mise e… (agent)
+  d159 : Mariella (tel, 02/11, carte Saturation) : 'On code tout a 100 % (Recommande)' — PlanTrack chef d'orchestre de la charge serveur (pause des … (agent)
+  d160 : Chef d'orchestre de la charge LIVRE (d159, plan valide par Mariella tel) : v1.9.34 (GitHub seul, pas de cle PyPI, d127). plantrack-orchestr… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
@@ -212,9 +214,10 @@ Pieges connus :
   pg24 : systemd : EnvironmentFile= l'emporte sur Environment= pour une meme variable — …
   pg25 : tsc --noEmit -p . sur s69-soirees (et probablement les autres sites S69/MiamBoo…
   pg26 : Versions de test S69 (next dev, d152) : wrangler.jsonc met MIAMBOOST_API_BASE s…
+  pg27 : pgrep/pkill -f 'bash tests/scenario.sh' se reconnait lui-meme dans une boucle d…
+  pg28 : Orchestre : le hook-pretool reinscrit la session sur le premier ancetre claude/…
 
 Questions en attente (reponds via !answer qN ...) :
   q15 : Guide Soirées pret (s69-soirees 1db1d2a) : Mariella fait-elle l'essai sur https…
-  q17 : Saturation serveur : PlanTrack chef d'orchestre — coder tout (pause des session…
 ```
 <!-- plantrack:state-end -->
