@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [89 commits]
+FIL ACTIF — t23 : guides de test automatiques (d100) [90 commits]
   fichiers recemment ecrits : ../Clients/s69-soirees/components/cart/SoireeForm.tsx, ../Clients/s69-soirees/components/reservation/TurnstileWidget.tsx, sortie/carte-captcha.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-quizzical-sprout.md, sortie/carte-suite-soirees.json, sortie/carte-saturation.json
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -196,6 +196,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d155 : Mariella (tel, 02/11, carte Memoire) : 'Arreter ProRent dev (Recommande)' — swap vide (3,1 Go -> 0) puis prorent-dev.service arrete (stop, … (agent)
   d156 : Mariella (tel, 02/11, carte Suite) : 'Ecrire le guide Soirees (Recommande)' — scenario de test avec gestes (d100) pour la page /soirees dan… (agent)
   d157 : Mariella (tel, 02/11) : b40 -> 'Je refais l'essai (Recommande)' ; attente de son verdict par le guide (s69-soirees 3c92781) (agent)
+  d158 : Mariella (tel, appels 10035/10038, 02/11) : exigence saturation — PlanTrack coordinateur : une session EN COURS de travail peut etre mise e… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…

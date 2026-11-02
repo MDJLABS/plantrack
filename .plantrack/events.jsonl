@@ -1973,3 +1973,5 @@
 {"ts": "2026-11-02T16:43:16+00:00", "kind": "file_touched", "text": "sortie/carte-suite-soirees.json", "thread": "t23"}
 {"ts": "2026-11-02T16:48:12+00:00", "kind": "file_touched", "text": "sortie/carte-saturation.json", "thread": "t23"}
 {"ts": "2026-11-02T16:48:18+00:00", "kind": "question", "id": "q17", "text": "Saturation serveur : PlanTrack chef d'orchestre — coder tout (pause des sessions via hook PreToolUse, gel cgroup des gros calculs, file auto) ou outil existant (nohang, systemd-oomd, task-spooler) ? Carte envoyee 02/11."}
+{"ts": "2026-11-02T16:48:21+00:00", "kind": "commit", "sha": "da20879", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-02T16:50:23+00:00", "kind": "decision", "id": "d158", "text": "Mariella (tel, appels 10035/10038, 02/11) : exigence saturation — PlanTrack coordinateur : une session EN COURS de travail peut etre mise en pause pour ceder le serveur a une autre session au travail plus gros/urgent, puis reprend seule quand la charge redescend (file d'attente facon imprimante, mais entre plusieurs sessions en parallele). Approche (coder tout vs outil) en attente de sa carte.", "par": "agent"}
