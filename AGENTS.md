@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [84 commits]
-  fichiers recemment ecrits : ../Clients/s69-soirees/components/SiteFooter.tsx, ../Clients/s69-soirees/components/cart/PaiementClient.tsx, ../Clients/s69-soirees/lib/guide/scenarios.ts, ../../../root/.claude/plans/contexte-reconstruit-par-le-melodic-nova.md, ../../../tmp/claude-0/-home-mariella-plantrack/f44c8a86-f19e-4d00-ae83-d00ebfb3b71b/scratchpad/carte-soirees.json, sortie/carte-soirees.log
+FIL ACTIF — t23 : guides de test automatiques (d100) [85 commits]
+  fichiers recemment ecrits : ../Clients/s69-soirees/components/cart/PaiementClient.tsx, ../Clients/s69-soirees/lib/guide/scenarios.ts, ../../../root/.claude/plans/contexte-reconstruit-par-le-melodic-nova.md, ../../../tmp/claude-0/-home-mariella-plantrack/f44c8a86-f19e-4d00-ae83-d00ebfb3b71b/scratchpad/carte-soirees.json, sortie/carte-soirees.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-indexed-sifakis.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -35,6 +35,7 @@ BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b36 (to_verify) [t23] Recurrence de b35 (31/10, session ProJob guide commun) : un simple 'git add <fichiers>' (etape 10 du portage guide) a ete classe 'next-buil… (agent) [1 tentatives, derniere: Meme cause que b35 : la commande de l'etape 10 contenait au…]
   b37 (to_verify) [t23] kvm-lourd (01/11) : une commande de lecture (diff/grep/ls dans prolearn) classee next-build et mise en file 8/8 — recurrence b35/b36 (agent) [1 tentatives, derniere: Cause trouvee (reproduite) : dans 'diff <(cat A) B', la par…]
   b38 (to_verify) [t23] Essai versions de test (01/11 soir, tel Mariella) : 's69 soirees mene vers le site s69 dev il me semble, et les 2 autres liens ne fonctionn… (agent) [1 tentatives, derniere: MiamBoost : miamboost-dev.mdjlabs.com classe en domaine de …]
+  b39 (to_verify) [t23] Essai guide Soirees (02/11 11h, tel Mariella) : la page /soirees de la version de test s69-soirees affiche 'canal MiamBoost non configure (… (agent) [1 tentatives, derniere: Version de test branchee sur la preprod MiamBoost locale : …]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
@@ -207,6 +208,7 @@ Pieges connus :
   pg23 : next dev d'un site OpenNext avec une liaison 'ai' (ou remote) dans wrangler.jso…
   pg24 : systemd : EnvironmentFile= l'emporte sur Environment= pour une meme variable — …
   pg25 : tsc --noEmit -p . sur s69-soirees (et probablement les autres sites S69/MiamBoo…
+  pg26 : Versions de test S69 (next dev, d152) : wrangler.jsonc met MIAMBOOST_API_BASE s…
 
 Questions en attente (reponds via !answer qN ...) :
   q15 : Guide Soirées pret (s69-soirees 1db1d2a) : Mariella fait-elle l'essai sur https…
