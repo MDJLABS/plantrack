@@ -5,7 +5,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/pt.py\" hook-prompt"
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/pt.py\" hook-prompt",
+            "timeout": 600
           }
         ]
       },
@@ -62,11 +63,12 @@
         ]
       },
       {
-        "matcher": "Bash",
+        "matcher": "*",
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/pt.py\" hook-pretool"
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/pt.py\" hook-pretool",
+            "timeout": 600
           }
         ]
       }

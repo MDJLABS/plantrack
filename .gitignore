@@ -8,3 +8,6 @@ __pycache__/
 .plantrack/incidents.log
 .planning/scenario.log
 .plantrack/sante.jsonl
+.plantrack/ronde.log
+.plantrack/battement
+.plantrack/souffle.log

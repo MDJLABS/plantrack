@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "r=\"$(git rev-parse --show-toplevel 2>/dev/null || pwd)\"; PLANTRACK_ROOT=\"$r\" exec python3 \"$r/.claude/hooks/pt.py\" hook-prompt"
+            "command": "r=\"$(git rev-parse --show-toplevel 2>/dev/null)\" && [ -f \"$r/.codex/hooks.json\" ] && [ -f \"$r/.claude/hooks/pt.py\" ] || exit 0; PLANTRACK_ROOT=\"$r\" exec python3 \"$r/.claude/hooks/pt.py\" hook-prompt"
           }
         ]
       }
@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "r=\"$(git rev-parse --show-toplevel 2>/dev/null || pwd)\"; PLANTRACK_ROOT=\"$r\" exec python3 \"$r/.claude/hooks/pt.py\" hook-filelog"
+            "command": "r=\"$(git rev-parse --show-toplevel 2>/dev/null)\" && [ -f \"$r/.codex/hooks.json\" ] && [ -f \"$r/.claude/hooks/pt.py\" ] || exit 0; PLANTRACK_ROOT=\"$r\" exec python3 \"$r/.claude/hooks/pt.py\" hook-filelog"
           }
         ]
       }
@@ -27,7 +27,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "r=\"$(git rev-parse --show-toplevel 2>/dev/null || pwd)\"; PLANTRACK_ROOT=\"$r\" exec python3 \"$r/.claude/hooks/pt.py\" hook-context"
+            "command": "r=\"$(git rev-parse --show-toplevel 2>/dev/null)\" && [ -f \"$r/.codex/hooks.json\" ] && [ -f \"$r/.claude/hooks/pt.py\" ] || exit 0; PLANTRACK_ROOT=\"$r\" exec python3 \"$r/.claude/hooks/pt.py\" hook-context"
           }
         ]
       }
@@ -37,7 +37,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "r=\"$(git rev-parse --show-toplevel 2>/dev/null || pwd)\"; PLANTRACK_ROOT=\"$r\" exec python3 \"$r/.claude/hooks/pt.py\" hook-precompact"
+            "command": "r=\"$(git rev-parse --show-toplevel 2>/dev/null)\" && [ -f \"$r/.codex/hooks.json\" ] && [ -f \"$r/.claude/hooks/pt.py\" ] || exit 0; PLANTRACK_ROOT=\"$r\" exec python3 \"$r/.claude/hooks/pt.py\" hook-precompact"
           }
         ]
       }
