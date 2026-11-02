@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [82 commits]
-  fichiers recemment ecrits : ../Clients/s69-soirees/.dev.vars, ../../../tmp/claude-0/-home-mariella-plantrack/50d4eaf4-b1c3-4483-9db5-0fb6dea3a120/scratchpad/carte2.json, sortie/carte-d152.log, ../../../usr/local/bin/kvm-lourd, ../../../tmp/claude-0/-home-mariella-plantrack/a8fa34ed-a2e6-4cad-84fe-f9fde4086221/scratchpad/carte.json, ../../../etc/systemd/system/miamboost-guide.service.d/domaines.conf
+FIL ACTIF — t23 : guides de test automatiques (d100) [83 commits]
+  fichiers recemment ecrits : sortie/carte-d152.log, ../../../usr/local/bin/kvm-lourd, ../../../tmp/claude-0/-home-mariella-plantrack/a8fa34ed-a2e6-4cad-84fe-f9fde4086221/scratchpad/carte.json, ../../../etc/systemd/system/miamboost-guide.service.d/domaines.conf, ../../../tmp/claude-0/-home-mariella-plantrack/a8fa34ed-a2e6-4cad-84fe-f9fde4086221/scratchpad/carte-b38.json, ../../../tmp/claude-0/-home-mariella-plantrack/a8fa34ed-a2e6-4cad-84fe-f9fde4086221/scratchpad/carte-ram.json
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -191,6 +191,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d152 : Mariella (tel, 01/11, carte q13) : 'Versions de test a part (Recommande)' — MiamBoost, S69 Francoviet, S69 Soirees recoivent chacun une ins… (agent)
   d153 : Mariella (tel, 01/11) : 'quand tu mets a jour sur pypi, mets aussi a jour sur github' — toujours les deux ensemble. Constat : le tag pousse… (agent)
   d154 : d152 livre (01/11, choix Mariella tel q13 'Versions de test a part') : versions de test Node (next dev, GUIDE_ACTIF=1, portier-reveil, Stop… (agent)
+  d155 : Mariella (tel, 02/11, carte Memoire) : 'Arreter ProRent dev (Recommande)' — swap vide (3,1 Go -> 0) puis prorent-dev.service arrete (stop, … (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
