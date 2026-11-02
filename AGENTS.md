@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [94 commits]
-  fichiers recemment ecrits : ../../../etc/systemd/system/plantrack-orchestre.service, sortie/scenario-orchestre.log, tests/scenario.sh, sortie/essai-orchestre.sh, sortie/essai-orchestre.log, pyproject.toml
+FIL ACTIF — t23 : guides de test automatiques (d100) [95 commits]
+  fichiers recemment ecrits : sortie/scenario-orchestre.log, tests/scenario.sh, sortie/essai-orchestre.sh, sortie/essai-orchestre.log, pyproject.toml, sortie/carte-orchestre.json
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -199,6 +199,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d158 : Mariella (tel, appels 10035/10038, 02/11) : exigence saturation — PlanTrack coordinateur : une session EN COURS de travail peut etre mise e… (agent)
   d159 : Mariella (tel, 02/11, carte Saturation) : 'On code tout a 100 % (Recommande)' — PlanTrack chef d'orchestre de la charge serveur (pause des … (agent)
   d160 : Chef d'orchestre de la charge LIVRE (d159, plan valide par Mariella tel) : v1.9.34 (GitHub seul, pas de cle PyPI, d127). plantrack-orchestr… (agent)
+  d161 : Mariella (tel, 02/11 soir, carte Suite) : 'Laisser tourner (Recommande)' — le chef d'orchestre (d159, v1.9.34) tourne une semaine ; verdict… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
