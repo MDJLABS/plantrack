@@ -1931,3 +1931,15 @@
 {"ts": "2026-11-01T21:26:52+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/a8fa34ed-a2e6-4cad-84fe-f9fde4086221/scratchpad/carte-b38.json", "thread": "t23"}
 {"ts": "2026-11-02T00:43:34+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/a8fa34ed-a2e6-4cad-84fe-f9fde4086221/scratchpad/carte-ram.json", "thread": "t23"}
 {"ts": "2026-11-02T00:44:46+00:00", "kind": "decision", "id": "d155", "text": "Mariella (tel, 02/11, carte Memoire) : 'Arreter ProRent dev (Recommande)' — swap vide (3,1 Go -> 0) puis prorent-dev.service arrete (stop, pas disable : revient au redemarrage ou par systemctl start prorent-dev). Versions de test du guide gardees (portier 15 min).", "par": "agent"}
+{"ts": "2026-11-02T00:44:46+00:00", "kind": "commit", "sha": "515d14d", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-02T00:45:06+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/a8fa34ed-a2e6-4cad-84fe-f9fde4086221/scratchpad/carte-suite2.json", "thread": "t23"}
+{"ts": "2026-11-02T01:35:58+00:00", "kind": "decision", "id": "d156", "text": "Mariella (tel, 02/11, carte Suite) : 'Ecrire le guide Soirees (Recommande)' — scenario de test avec gestes (d100) pour la page /soirees dans s69-soirees (branche soirees), lib/guide/scenarios.ts ; vrais sites inchanges.", "par": "agent"}
+{"ts": "2026-11-02T01:40:40+00:00", "kind": "file_touched", "text": "../Clients/s69-soirees/components/SiteFooter.tsx", "thread": "t23"}
+{"ts": "2026-11-02T01:40:41+00:00", "kind": "file_touched", "text": "../Clients/s69-soirees/components/cart/PaiementClient.tsx", "thread": "t23"}
+{"ts": "2026-11-02T01:40:44+00:00", "kind": "file_touched", "text": "../Clients/s69-soirees/components/cart/PaiementClient.tsx", "thread": "t23"}
+{"ts": "2026-11-02T01:41:14+00:00", "kind": "file_touched", "text": "../Clients/s69-soirees/lib/guide/scenarios.ts", "thread": "t23"}
+{"ts": "2026-11-02T01:44:58+00:00", "kind": "piege", "id": "pg25", "text": "tsc --noEmit -p . sur s69-soirees (et probablement les autres sites S69/MiamBoost) plante en FATAL ERROR heap out of memory meme avec assez de RAM systeme libre (kvm-lourd estimait 1,5 Go, 4,7 Go dispo) : c'est la limite par defaut du heap V8 de node, pas un manque de RAM machine. Contournement : --max-old-space-size plus eleve, ou se rabattre sur une relecture manuelle des types (comme prevu par la consigne si tsc depasse 15 min)."}
+{"ts": "2026-11-02T09:38:33+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-melodic-nova.md", "thread": "t23"}
+{"ts": "2026-11-02T11:03:08+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/f44c8a86-f19e-4d00-ae83-d00ebfb3b71b/scratchpad/carte-soirees.json", "thread": "t23"}
+{"ts": "2026-11-02T11:03:11+00:00", "kind": "question", "id": "q15", "text": "Guide Soirées pret (s69-soirees 1db1d2a) : Mariella fait-elle l'essai sur https://s69-soirees-dev.mdjlabs.com/soirees ?"}
+{"ts": "2026-11-02T11:03:11+00:00", "kind": "file_touched", "text": "sortie/carte-soirees.log", "thread": "t23"}

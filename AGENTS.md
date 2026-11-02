@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [83 commits]
-  fichiers recemment ecrits : sortie/carte-d152.log, ../../../usr/local/bin/kvm-lourd, ../../../tmp/claude-0/-home-mariella-plantrack/a8fa34ed-a2e6-4cad-84fe-f9fde4086221/scratchpad/carte.json, ../../../etc/systemd/system/miamboost-guide.service.d/domaines.conf, ../../../tmp/claude-0/-home-mariella-plantrack/a8fa34ed-a2e6-4cad-84fe-f9fde4086221/scratchpad/carte-b38.json, ../../../tmp/claude-0/-home-mariella-plantrack/a8fa34ed-a2e6-4cad-84fe-f9fde4086221/scratchpad/carte-ram.json
+FIL ACTIF — t23 : guides de test automatiques (d100) [84 commits]
+  fichiers recemment ecrits : ../Clients/s69-soirees/components/SiteFooter.tsx, ../Clients/s69-soirees/components/cart/PaiementClient.tsx, ../Clients/s69-soirees/lib/guide/scenarios.ts, ../../../root/.claude/plans/contexte-reconstruit-par-le-melodic-nova.md, ../../../tmp/claude-0/-home-mariella-plantrack/f44c8a86-f19e-4d00-ae83-d00ebfb3b71b/scratchpad/carte-soirees.json, sortie/carte-soirees.log
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -192,6 +192,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d153 : Mariella (tel, 01/11) : 'quand tu mets a jour sur pypi, mets aussi a jour sur github' — toujours les deux ensemble. Constat : le tag pousse… (agent)
   d154 : d152 livre (01/11, choix Mariella tel q13 'Versions de test a part') : versions de test Node (next dev, GUIDE_ACTIF=1, portier-reveil, Stop… (agent)
   d155 : Mariella (tel, 02/11, carte Memoire) : 'Arreter ProRent dev (Recommande)' — swap vide (3,1 Go -> 0) puis prorent-dev.service arrete (stop, … (agent)
+  d156 : Mariella (tel, 02/11, carte Suite) : 'Ecrire le guide Soirees (Recommande)' — scenario de test avec gestes (d100) pour la page /soirees dan… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
@@ -205,5 +206,9 @@ Pieges connus :
   pg22 : Sites Cloudflare (OpenNext/workerd : S69 x2, MiamBoost) : le moteur commun du g…
   pg23 : next dev d'un site OpenNext avec une liaison 'ai' (ou remote) dans wrangler.jso…
   pg24 : systemd : EnvironmentFile= l'emporte sur Environment= pour une meme variable — …
+  pg25 : tsc --noEmit -p . sur s69-soirees (et probablement les autres sites S69/MiamBoo…
+
+Questions en attente (reponds via !answer qN ...) :
+  q15 : Guide Soirées pret (s69-soirees 1db1d2a) : Mariella fait-elle l'essai sur https…
 ```
 <!-- plantrack:state-end -->
