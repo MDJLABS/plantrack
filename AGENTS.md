@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [85 commits]
-  fichiers recemment ecrits : ../Clients/s69-soirees/components/cart/PaiementClient.tsx, ../Clients/s69-soirees/lib/guide/scenarios.ts, ../../../root/.claude/plans/contexte-reconstruit-par-le-melodic-nova.md, ../../../tmp/claude-0/-home-mariella-plantrack/f44c8a86-f19e-4d00-ae83-d00ebfb3b71b/scratchpad/carte-soirees.json, sortie/carte-soirees.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-indexed-sifakis.md
+FIL ACTIF — t23 : guides de test automatiques (d100) [86 commits]
+  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-indexed-sifakis.md, ../../../tmp/claude-0/-home-mariella-plantrack/27a88b8d-b064-43b5-9897-c4fd8f8f958e/scratchpad/carte.json, sortie/carte-soirees-2.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-quiet-shannon.md, ../Clients/s69-soirees/components/cart/SoireeForm.tsx, ../Clients/s69-soirees/components/reservation/TurnstileWidget.tsx
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -36,6 +36,7 @@ BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b37 (to_verify) [t23] kvm-lourd (01/11) : une commande de lecture (diff/grep/ls dans prolearn) classee next-build et mise en file 8/8 — recurrence b35/b36 (agent) [1 tentatives, derniere: Cause trouvee (reproduite) : dans 'diff <(cat A) B', la par…]
   b38 (to_verify) [t23] Essai versions de test (01/11 soir, tel Mariella) : 's69 soirees mene vers le site s69 dev il me semble, et les 2 autres liens ne fonctionn… (agent) [1 tentatives, derniere: MiamBoost : miamboost-dev.mdjlabs.com classe en domaine de …]
   b39 (to_verify) [t23] Essai guide Soirees (02/11 11h, tel Mariella) : la page /soirees de la version de test s69-soirees affiche 'canal MiamBoost non configure (… (agent) [1 tentatives, derniere: Version de test branchee sur la preprod MiamBoost locale : …]
+  b40 (to_verify) [t23] Essai guide Soirees (02/11 11h23, tel Mariella) : 'probleme sur les captcha cloudflare, il y en a 3 dans la page, beaucoup trop ; un seul s… (agent) [1 tentatives, derniere: s69-soirees 3c92781 : TurnstileWidget monte seulement a l'e…]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
