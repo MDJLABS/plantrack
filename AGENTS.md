@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [95 commits]
+FIL ACTIF — t23 : guides de test automatiques (d100) [96 commits]
   fichiers recemment ecrits : sortie/scenario-orchestre.log, tests/scenario.sh, sortie/essai-orchestre.sh, sortie/essai-orchestre.log, pyproject.toml, sortie/carte-orchestre.json
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -200,6 +200,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d159 : Mariella (tel, 02/11, carte Saturation) : 'On code tout a 100 % (Recommande)' — PlanTrack chef d'orchestre de la charge serveur (pause des … (agent)
   d160 : Chef d'orchestre de la charge LIVRE (d159, plan valide par Mariella tel) : v1.9.34 (GitHub seul, pas de cle PyPI, d127). plantrack-orchestr… (agent)
   d161 : Mariella (tel, 02/11 soir, carte Suite) : 'Laisser tourner (Recommande)' — le chef d'orchestre (d159, v1.9.34) tourne une semaine ; verdict… (agent)
+  d162 : Mariella (tel, 02/11 21h, carte Suite renvoyee) : 'Je fais l'essai (Recommande)' — essai des captchas Soirees (b40, s69-soirees 3c92781) su… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…

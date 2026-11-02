@@ -2004,3 +2004,5 @@
 {"ts": "2026-11-02T19:51:09+00:00", "kind": "commit", "sha": "75c2630", "ctype": "chore", "thread": "t23"}
 {"ts": "2026-11-02T19:51:24+00:00", "kind": "file_touched", "text": "sortie/carte-orchestre.json", "thread": "t23"}
 {"ts": "2026-11-02T19:52:11+00:00", "kind": "decision", "id": "d161", "text": "Mariella (tel, 02/11 soir, carte Suite) : 'Laisser tourner (Recommande)' — le chef d'orchestre (d159, v1.9.34) tourne une semaine ; verdict au bilan du dimanche (pauses, kills earlyoom, objectif zero). Veille silencieuse d'ici la (d23).", "par": "agent"}
+{"ts": "2026-11-02T19:52:12+00:00", "kind": "commit", "sha": "cb26d6c", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-02T20:08:57+00:00", "kind": "decision", "id": "d162", "text": "Mariella (tel, 02/11 21h, carte Suite renvoyee) : 'Je fais l'essai (Recommande)' — essai des captchas Soirees (b40, s69-soirees 3c92781) sur https://s69-soirees-dev.mdjlabs.com/soirees ; son verdict arrive par le guide.", "par": "agent"}
