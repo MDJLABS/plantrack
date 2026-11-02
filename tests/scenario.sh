@@ -1415,7 +1415,7 @@ check_exit "commande deja enveloppee : aucune sortie" "" "$out"
 # 16/10 : un build range dans un script (lu depuis le dossier de l'agent) va en file ;
 # le heredoc qui ecrit ce script, lui, ne lance rien. Vrai kvm-lourd, s'il est installe.
 if KR=$(command -v kvm-lourd); then
-  mkdir -p "$TMP/kvmagent/sortie"; printf '#!/bin/bash\ncd android && gradle assembleDebug\n' > "$TMP/kvmagent/sortie/b.sh"
+  mkdir -p "$TMP/kvmagent/sortie"; printf '#!/bin/bash\ncd android && gradle assembleDebug\n' > "$TMP/kvmagent/sortie/b.sh"; chmod +x "$TMP/kvmagent/sortie/b.sh"
   in="{\"cwd\":\"$TMP/kvmagent\",\"tool_input\":{\"command\":\"sortie/b.sh 2>&1 | tail -3\"}}"
   out=$(cd /tmp && pre "" "$(dirname "$KR"):/usr/bin:/bin")
   check "script local contenant gradle : envoye en file" "--type=gradle" "$out"
@@ -1652,6 +1652,67 @@ out=$(printf '{"jeton":"%s","guide":"g1","verdicts":[{"pt":"s1","verdict":"ok"},
 check "guide-resultat : etape inconnue signalee sans bloquer le reste" "etapes inconnues ignorees" "$out"
 check "guide-resultat : le verdict connu est quand meme compte" "Guide g1 : 1 ok, 0 pas ok" "$out"
 rm -rf "$TMP18"
+
+# Chef d'orchestre de la charge (d159) : feu, rangs, pause et gel, reprise, fail-open
+TO="$TMP/orch"; OD="$TO/etat"; OP="$TO/proc"
+mkdir -p "$OD" "$OP/pressure"
+memoire() { printf 'MemTotal: 16000000 kB\nMemAvailable: %s kB\nSwapTotal: 4000000 kB\nSwapFree: 2000000 kB\n' "$1" > "$OP/meminfo"; }
+printf 'some avg10=0.00 avg60=0 avg300=0 total=0\nfull avg10=0.00 avg60=0 avg300=0 total=0\n' > "$OP/pressure/memory"
+cp "$OP/pressure/memory" "$OP/pressure/cpu"
+O() { PLANTRACK_ORCHESTRE="$OD" PLANTRACK_PROC="$OP" ORCH_CALME=0 ORCH_PAS=0 ORCH_ALERTE=true python3 "$PT" "$@"; }
+cp /bin/bash "$TO/claude"   # comm = claude : une fausse session, avec une commande en cours
+lancer() { "$TO/claude" -c 'bash -c "sleep 300; true # shell-snapshots" & wait' >/dev/null 2>&1 & echo $!; }
+pa=$(lancer); pb=$(lancer); pc=$(lancer); sleep 0.5
+fiche() { printf '{"sid":"%s","pid":%s,"projet":"p%s","vu":%s,"debut":%s%s}' "$1" "$2" "$1" "$(date +%s)" "$(date +%s)" "$3" > "$OD/sessions/$1.json"; }
+mkdir -p "$OD/sessions"
+fiche sa "$pa" ""; fiche sb "$pb" ""; fiche sc "$pc" ",\"humain\":$(date +%s)"
+etat_proc() { awk '{print $3}' "/proc/$(pgrep -P "$1" -f shell-snapshots | head -1)/stat"; }
+memoire 8000000; O orchestre --tour
+out=$(O orchestre)
+check "orchestre : feu vert au calme" "feu vert" "$out"
+check "orchestre : 3 sessions, la relayee de Mariella est humaine" "humain 1, agent 0, fond 2" "$out"
+memoire 500000; O orchestre --tour
+out=$(O orchestre)
+check "orchestre : feu rouge sous 8 % de memoire" "feu rouge" "$out"
+check "orchestre : une seule session en pause (la plus grosse continue)" "en pause : 1" "$out"
+enpause=$(python3 -c 'import json,sys; print(" ".join(json.load(open(sys.argv[1]))["pauses"]))' "$OD/etat.json")
+check_not "orchestre : la session humaine n'est jamais mise en pause" "sc" "$enpause"
+[ "$enpause" = sa ] && pz=$pa || pz=$pb
+check_exit "orchestre : la commande en cours de la session en pause est gelee" "T" "$(etat_proc "$pz")"
+O orchestre --tour
+check "orchestre : toujours une session de fond au travail" "en pause : 1" "$(O orchestre)"
+# le hook d'une session en pause attend, puis le dit a l'agent
+out=$(echo "{\"session_id\":\"$enpause\",\"tool_name\":\"Read\",\"tool_input\":{}}" \
+  | PLANTRACK_ORCHESTRE="$OD" ORCH_ATTENTE=1 ORCH_SOMME=0.2 python3 "$PT" hook-pretool)
+check "orchestre : hook d'une session en pause : attend puis previent" "te garde en pause" "$out"
+out=$(echo '{"session_id":"sc","tool_name":"Read","tool_input":{}}' \
+  | PLANTRACK_ORCHESTRE="$OD" ORCH_ATTENTE=1 ORCH_SOMME=0.2 python3 "$PT" hook-pretool)
+check_exit "orchestre : session libre : hook muet" "" "$out"
+memoire 8000000; O orchestre --tour
+check "orchestre : retour au vert, la session reprend" "en pause : 0" "$(O orchestre)"
+check_exit "orchestre : sa commande est degelee" "S" "$(etat_proc "$pz")"
+check "orchestre : journal pause + reprise" "reprise" "$(cat "$OD/journal.log")"
+# arret du service : personne ne reste gele
+memoire 500000; O orchestre --tour; O orchestre --tout-reprendre
+check_exit "orchestre : tout-reprendre degele" "0" "$(python3 -c 'import json,sys; print(len(json.load(open(sys.argv[1]))["pauses"]))' "$OD/etat.json")"
+# fail-open : orchestre muet (etat vieux) = aucune attente
+python3 -c 'import json,sys; e=json.load(open(sys.argv[1])); e["ts"]=0; e["pauses"]={"sa":{"ts":0}}; json.dump(e,open(sys.argv[1],"w"))' "$OD/etat.json"
+debut=$(date +%s)
+out=$(echo '{"session_id":"sa","tool_name":"Read","tool_input":{}}' | PLANTRACK_ORCHESTRE="$OD" python3 "$PT" hook-pretool)
+check_exit "orchestre muet : hook muet et immediat" "0" "$(( $(date +%s) - debut > 2 ))"
+check "orchestre muet : l'etat le dit" "muet" "$(O orchestre)"
+# fail-open : orchestre non installe = aucune fiche ecrite, rien ne change
+out=$(echo '{"session_id":"zz","tool_name":"Read","tool_input":{}}' | PLANTRACK_ORCHESTRE="$TO/absent" python3 "$PT" hook-pretool); rc=$?
+check_exit "orchestre absent : hook code 0, muet" "0:" "$rc:$out"
+# une session finie laisse son pic dans l'historique (apprentissage) ; le hook ci-dessus
+# a reinscrit sa sur le vrai claude qui lance ce test : on remet sa fausse session
+fiche sa "$pa" ""
+memoire 8000000; O orchestre --tour; kill "$pa" "$pb" "$pc" 2>/dev/null; pkill -f "sleep 300; true # shell-snapshots"; sleep 0.3
+O orchestre --tour
+check "orchestre : pic d'une session finie appris" '"projet": "psa"' "$(cat "$OD/historique.jsonl" 2>/dev/null)"
+out=$(PLANTRACK_ORCHESTRE="$OD" python3 -c 'import importlib.util as u,sys; sp=u.spec_from_file_location("pt",sys.argv[1]); m=u.module_from_spec(sp); sys.argv=["pt"]; sp.loader.exec_module(m); print(m.orch_bilan(7))' "$PT")
+check "orchestre : le bilan du dimanche compte les pauses" "mise(s) en pause" "$out"
+pkill -CONT -f "sleep 300; true # shell-snapshots" 2>/dev/null; pkill -f "sleep 300; true # shell-snapshots" 2>/dev/null
 
 echo
 [ "$fail" = 0 ] && echo "TOUS LES TESTS PASSENT" || { echo "DES TESTS ECHOUENT"; exit 1; }

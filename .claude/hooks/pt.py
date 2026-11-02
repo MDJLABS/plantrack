@@ -25,6 +25,7 @@ import re
 import secrets
 import shlex
 import shutil
+import signal
 import subprocess
 import sys
 import tempfile
@@ -1080,6 +1081,7 @@ CLI humaine : plantrack status | bugs | inbox | verify <id> | reject <id> -m ...
               plantrack ronde   met le coeur du projet a niveau (lancee seule a l'ouverture, toutes les 4 h au plus)
               plantrack bilan [--all] [--jours N]   ce qui a avance, ce qui attend ton avis
               plantrack releve [--rapport]   releve de sante de la flotte (bulle sur panne neuve) | rapport final
+              plantrack orchestre [--boucle|--tour|--tout-reprendre]   charge du serveur : feu, sessions, pauses
               plantrack attentes [plus-tard]   ce qui attend ton avis depuis plus de 7 jours (tri groupe)"""
 
 
@@ -1229,12 +1231,476 @@ def cmd_respirer(args):
             trace(f"respirer {racine}", e)
 
 
+# --- Chef d'orchestre de la charge (d159, plan valide par Mariella le 02/11) ---------
+# Feu tricolore en direct (PSI + MemAvailable), rang de chaque session, pause entre
+# deux etapes (le hook PreToolUse attend) et gel des commandes en cours (SIGSTOP),
+# reprise dans l'ordre quand le serveur respire. Fail-open partout : dossier absent ou
+# etat.json muet depuis ORCH_FRAIS = tout passe comme avant ; earlyoom reste le filet.
+ORCH_DIR = os.environ.get("PLANTRACK_ORCHESTRE") or "/var/lib/plantrack-orchestre"
+ORCH_PROC = os.environ.get("PLANTRACK_PROC") or "/proc"   # meminfo + pressure (tests)
+ORCH_FRAIS = 60                                            # etat plus vieux : orchestre muet
+ORCH_ATTENTE = int(os.environ.get("ORCH_ATTENTE") or 540)  # sous le timeout 600 des hooks
+ORCH_PAUSE_MAX = int(os.environ.get("ORCH_PAUSE_MAX") or 1800)  # une pause ne depasse jamais 30 min
+ORCH_HUMAIN = 600        # prompt de Mariella plus recent : rang humain, jamais en pause
+ORCH_FOND = 7200         # aucun prompt de Mariella depuis 2 h : rang fond
+ORCH_CALME = int(os.environ.get("ORCH_CALME") or 60)       # sous le seuil depuis : le feu baisse
+ORCH_PAS = int(os.environ.get("ORCH_PAS") or 30)           # entre deux pauses, deux reprises
+ORCH_TOUR = 10                                             # periode de la boucle
+ORCH_ROUGE_DISPO = float(os.environ.get("ORCH_ROUGE_DISPO") or 8)     # % de RAM disponible
+ORCH_ORANGE_DISPO = float(os.environ.get("ORCH_ORANGE_DISPO") or 15)
+ORCH_ROUGE_PSI = float(os.environ.get("ORCH_ROUGE_PSI") or 5)         # PSI memoire full avg10
+ORCH_ORANGE_PSI = float(os.environ.get("ORCH_ORANGE_PSI") or 10)      # PSI memoire some avg10
+ORCH_ALERTE_DELAI = 600  # rouge depuis 10 min malgre les pauses : une bulle
+ORCH_ALERTE = os.environ.get("ORCH_ALERTE") or "node /home/mariella/bcc/hook/repondre.ts --ton probleme"
+ORCH_JAMAIS = {"systemd", "sshd", "cloudflared", "dockerd", "containerd", "earlyoom"}
+RANGS = ("humain", "agent", "fond")
+# relais bcc d'un message ou d'un appel de Mariella : c'est elle qui parle
+ORCH_RELAIS_HUMAIN = re.compile(r"Mariella (t'a ecrit|a repondu)|\[appel \d+")
+
+
+def orch_ecrire(chemin, obj):
+    tmp = f"{chemin}.{os.getpid()}.tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(obj, f, ensure_ascii=False)
+    os.replace(tmp, chemin)
+
+
+def orch_lire(chemin, defaut=None):
+    try:
+        with open(chemin, encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return defaut
+
+
+def orch_etat_frais():
+    """etat.json s'il a moins de ORCH_FRAIS secondes, sinon None (orchestre muet)."""
+    e = orch_lire(os.path.join(ORCH_DIR, "etat.json"))
+    if isinstance(e, dict) and time.time() - e.get("ts", 0) <= ORCH_FRAIS:
+        return e
+    return None
+
+
+def orch_stat(pid):
+    """(comm, ppid) depuis /proc/<pid>/stat, ou None."""
+    try:
+        with open(f"/proc/{pid}/stat", "rb") as f:
+            s = f.read().decode(errors="replace")
+        return s[s.index("(") + 1:s.rindex(")")], int(s.rsplit(")", 1)[1].split()[1])
+    except (OSError, ValueError, IndexError):
+        return None
+
+
+def orch_zombie(pid):
+    """Une session finie mais pas encore ramassee par son pere garde son nom : elle est morte."""
+    try:
+        with open(f"/proc/{pid}/stat", "rb") as f:
+            return f.read().decode(errors="replace").rsplit(")", 1)[1].split()[0] in ("Z", "X")
+    except (OSError, IndexError):
+        return True
+
+
+def orch_pid_session():
+    """Le processus claude (ou codex) qui a lance ce hook : son premier ancetre de ce nom."""
+    pid = os.getppid()
+    for _ in range(8):
+        st = orch_stat(pid)
+        if not st:
+            return None
+        if st[0] in ("claude", "codex"):
+            return pid
+        pid = st[1]
+        if pid <= 1:
+            return None
+    return None
+
+
+def orch_terminal(pid):
+    try:
+        return os.readlink(f"/proc/{pid}/fd/0").startswith("/dev/pts/")
+    except OSError:
+        return False
+
+
+def orch_inscrire(data, prompt=None):
+    """Registre des sessions : une fiche par session_id, rafraichie a chaque hook.
+    prompt (UserPromptSubmit) : venu d'un terminal ou relaye de Mariella par bcc = humain.
+    Rend le session_id, ou None (orchestre non installe, entree sans session)."""
+    try:
+        if not os.path.isdir(ORCH_DIR):
+            return None
+        sid = re.sub(r"[^A-Za-z0-9_-]", "", str(data.get("session_id") or ""))[:80]
+        if not sid:
+            return None
+        dossier = os.path.join(ORCH_DIR, "sessions")
+        os.makedirs(dossier, exist_ok=True)
+        chemin = os.path.join(dossier, sid + ".json")
+        fiche = orch_lire(chemin, {}) or {}
+        pid = orch_pid_session() or fiche.get("pid")
+        maintenant = time.time()
+        terminal = orch_terminal(pid) if pid else False
+        fiche.update(sid=sid, pid=pid, terminal=terminal, vu=maintenant,
+                     projet=os.path.basename(os.environ.get("CLAUDE_PROJECT_DIR")
+                                             or data.get("cwd") or ROOT))
+        fiche.setdefault("debut", maintenant)
+        if prompt is not None and (terminal or ORCH_RELAIS_HUMAIN.search(prompt)):
+            fiche["humain"] = maintenant
+        orch_ecrire(chemin, fiche)
+        return sid
+    except Exception as e:
+        trace("orchestre : inscription", e)
+        return None
+
+
+def orch_rang(fiche, maintenant):
+    h = fiche.get("humain")
+    if h and maintenant - h < ORCH_HUMAIN:
+        return "humain"
+    if h and maintenant - h < ORCH_FOND:
+        return "agent"
+    return "fond"
+
+
+def orch_attendre(sid, retenu):
+    """Fait patienter le hook tant que retenu(etat) est vrai, au plus ORCH_ATTENTE.
+    Rend la duree d'attente (s) et si la session est toujours retenue."""
+    if not sid:
+        return 0, False
+    debut = time.time()
+    while True:
+        e = orch_etat_frais()
+        if not e or not retenu(e):
+            return time.time() - debut, False
+        if time.time() - debut >= ORCH_ATTENTE:
+            return time.time() - debut, True
+        time.sleep(float(os.environ.get("ORCH_SOMME") or 5))
+
+
+def orch_mesure():
+    with open(os.path.join(ORCH_PROC, "meminfo"), encoding="utf-8") as f:
+        mi = {l.split(":")[0]: int(l.split()[1]) * 1024 for l in f if ":" in l and len(l.split()) > 1}
+    total = mi.get("MemTotal") or 1
+    m = {"total": total, "dispo_o": mi.get("MemAvailable", 0),
+         "dispo": round(100 * mi.get("MemAvailable", 0) / total, 1)}
+    st = mi.get("SwapTotal", 0)
+    m["swap"] = round(100 * (st - mi.get("SwapFree", 0)) / st, 1) if st else 0.0
+    for res in ("memory", "cpu"):
+        try:
+            with open(os.path.join(ORCH_PROC, "pressure", res), encoding="utf-8") as f:
+                for l in f:
+                    k, *kv = l.split()
+                    m[f"psi_{res}_{k}"] = float(dict(x.split("=", 1) for x in kv).get("avg10", 0))
+        except (OSError, ValueError):
+            pass
+    return m
+
+
+def orch_niveau(m):
+    if m["dispo"] < ORCH_ROUGE_DISPO or m.get("psi_memory_full", 0) > ORCH_ROUGE_PSI:
+        return "rouge"
+    if m["dispo"] < ORCH_ORANGE_DISPO or m.get("psi_memory_some", 0) > ORCH_ORANGE_PSI:
+        return "orange"
+    return "vert"
+
+
+def orch_arbre():
+    """(enfants par pid, rss par pid) de tout /proc, lu une seule fois par tour."""
+    enfants, rss = {}, {}
+    page = os.sysconf("SC_PAGE_SIZE")
+    for p in filter(str.isdigit, os.listdir("/proc")):
+        st = orch_stat(p)
+        if not st:
+            continue
+        enfants.setdefault(st[1], []).append(int(p))
+        try:
+            with open(f"/proc/{p}/statm") as f:
+                rss[int(p)] = int(f.read().split()[1]) * page
+        except (OSError, ValueError, IndexError):
+            pass
+    return enfants, rss
+
+
+def orch_descendants(pid, enfants):
+    vus, pile = [], [pid]
+    while pile:
+        for c in enfants.get(pile.pop(), []):
+            if c not in vus:
+                vus.append(c)
+                pile.append(c)
+    return vus
+
+
+def orch_geler(pid, enfants):
+    """SIGSTOP des commandes en cours de la session (sous-arbres dont la cmdline porte
+    shell-snapshots, comme commande_en_cours). Jamais la session elle-meme ni ses hooks,
+    jamais un processus systeme de ORCH_JAMAIS. Rend les pids geles."""
+    geles = []
+    for d in orch_descendants(pid, enfants):
+        try:
+            with open(f"/proc/{d}/cmdline", "rb") as f:
+                if b"shell-snapshots" not in f.read():
+                    continue
+        except OSError:
+            continue
+        for p in [d] + orch_descendants(d, enfants):
+            st = orch_stat(p)
+            if p in geles or not st or st[0] in ORCH_JAMAIS:
+                continue
+            try:
+                os.kill(p, signal.SIGSTOP)
+                geles.append(p)
+            except OSError:
+                pass
+    return geles
+
+
+def orch_degeler(pids):
+    for p in pids:
+        try:
+            os.kill(p, signal.SIGCONT)
+        except OSError:
+            pass
+
+
+def orch_journal(texte):
+    try:
+        with open(os.path.join(ORCH_DIR, "journal.log"), "a", encoding="utf-8") as f:
+            f.write(f"{datetime.now().isoformat(timespec='seconds')} {texte}\n")
+    except OSError:
+        pass
+
+
+def orch_estimation(projet):
+    """Ce qu'une session de ce projet consomme d'habitude : 1,2 x mediane des 10
+    derniers pics (meme regle que kvm-lourd). 0 si on ne sait pas encore."""
+    pics = []
+    try:
+        with open(os.path.join(ORCH_DIR, "historique.jsonl"), encoding="utf-8") as f:
+            for l in f:
+                try:
+                    h = json.loads(l)
+                except ValueError:
+                    continue
+                if h.get("projet") == projet and h.get("pic"):
+                    pics.append(h["pic"])
+    except OSError:
+        return 0
+    pics = sorted(pics[-10:])
+    return int(1.2 * pics[len(pics) // 2]) if pics else 0
+
+
+def orch_sessions(maintenant, enfants, rss, etat):
+    """Fiches des sessions vivantes, avec rang et poids (RSS de tout l'arbre). Une
+    session finie est retiree et son pic entre dans l'historique (apprentissage)."""
+    vivantes = {}
+    dossier = os.path.join(ORCH_DIR, "sessions")
+    connues = etat.get("sessions", {})
+    for nom in (os.listdir(dossier) if os.path.isdir(dossier) else []):
+        if not nom.endswith(".json"):
+            continue
+        chemin = os.path.join(dossier, nom)
+        fiche = orch_lire(chemin)
+        pid = (fiche or {}).get("pid")
+        st = orch_stat(pid) if pid else None
+        if not fiche or not st or st[0] not in ("claude", "codex") or orch_zombie(pid) \
+                or maintenant - fiche.get("vu", 0) > 86400:
+            k = connues.get((fiche or {}).get("sid"))
+            if k and k.get("pic"):
+                with open(os.path.join(ORCH_DIR, "historique.jsonl"), "a", encoding="utf-8") as f:
+                    f.write(json.dumps({"projet": k.get("projet"), "pic": k["pic"],
+                                        "duree": int(maintenant - (fiche or {}).get("debut", maintenant)),
+                                        "fin": int(maintenant)}) + "\n")
+            try:
+                os.remove(chemin)
+            except OSError:
+                pass
+            continue
+        poids = rss.get(pid, 0) + sum(rss.get(d, 0) for d in orch_descendants(pid, enfants))
+        pic = max(poids, (connues.get(fiche["sid"]) or {}).get("pic", 0))
+        vivantes[fiche["sid"]] = {"pid": pid, "projet": fiche.get("projet"), "poids": poids,
+                                  "pic": pic, "rang": orch_rang(fiche, maintenant)}
+    return vivantes
+
+
+def orch_alerter(texte):
+    try:
+        subprocess.Popen(shlex.split(ORCH_ALERTE) + [texte], stdin=subprocess.DEVNULL,
+                         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                         start_new_session=True)
+    except OSError as e:
+        trace("orchestre : alerte", e)
+
+
+def orch_reprendre(etat, sid, motif):
+    p = etat["pauses"].pop(sid, None)
+    if p:
+        orch_degeler(p.get("geles", []))
+        orch_journal(f"reprise {sid[:8]} ({p.get('projet')}) apres "
+                     f"{int(time.time() - p['ts'])} s — {motif}")
+
+
+def orch_tour(etat, maintenant):
+    """Un tour du chef d'orchestre. Modifie et rend etat (ecrit par l'appelant)."""
+    m = orch_mesure()
+    brut = orch_niveau(m)
+    if brut == "rouge":
+        etat["vu_rouge"] = maintenant
+    if brut != "vert":
+        etat["vu_orange"] = maintenant
+    # le feu monte tout de suite, il ne redescend qu'apres ORCH_CALME sous le seuil
+    feu = ("rouge" if brut == "rouge" or maintenant - etat.get("vu_rouge", -1e12) < ORCH_CALME else
+           "orange" if brut != "vert" or maintenant - etat.get("vu_orange", -1e12) < ORCH_CALME
+           else "vert")
+    if feu != etat.get("feu"):
+        orch_journal(f"feu {feu} (memoire disponible {m['dispo']} %, swap {m['swap']} %, "
+                     f"pression {m.get('psi_memory_some', 0)} %)")
+        etat["feu_depuis"] = maintenant
+        etat.pop("alerte_feu", None)
+    etat["feu"], etat["mesure"] = feu, m
+    enfants, rss = orch_arbre()
+    sessions = orch_sessions(maintenant, enfants, rss, etat)
+    pauses = etat.setdefault("pauses", {})
+    for sid in list(pauses):
+        if sid not in sessions:
+            orch_reprendre(etat, sid, "session terminee")
+        elif maintenant - pauses[sid]["ts"] > ORCH_PAUSE_MAX:
+            orch_reprendre(etat, sid, "30 minutes de pause au plus")
+            etat.setdefault("repit", {})[sid] = maintenant  # ne la regele pas aussitot
+    repit = {s: t for s, t in etat.get("repit", {}).items() if maintenant - t < ORCH_PAUSE_MAX}
+    etat["repit"] = repit
+    if maintenant - etat.get("geste", 0) >= ORCH_PAS:
+        if feu == "rouge":
+            cand = [(s, f) for s, f in sessions.items()
+                    if s not in pauses and s not in repit and f["rang"] != "humain"]
+            # on garde toujours au moins une session au travail : la plus prioritaire,
+            # et a rang egal la plus grosse (Mariella, 02/11 : elle laisse la place a
+            # celle qui fait le plus gros travail)
+            if len(cand) >= 2:
+                cand.sort(key=lambda sf: (-RANGS.index(sf[1]["rang"]), sf[1]["poids"]))
+                sid, f = cand[0]
+                geles = orch_geler(f["pid"], enfants)
+                pauses[sid] = {"ts": maintenant, "projet": f["projet"], "rang": f["rang"],
+                               "geles": geles}
+                etat["geste"] = maintenant
+                etat["nb_pauses"] = etat.get("nb_pauses", 0) + 1
+                orch_journal(f"pause {sid[:8]} ({f['projet']}, {f['rang']}, "
+                             f"{f['poids'] // 2**20} Mo) — {len(geles)} processus geles")
+        elif feu == "vert" and pauses:
+            orch_reprendre(etat, min(pauses, key=lambda s: pauses[s]["ts"]), "le serveur respire")
+            etat["geste"] = maintenant
+    if feu != "vert" and maintenant - etat.get("menage", 0) > 300:
+        etat["menage"] = maintenant   # range tout de suite ce qui ne sert pas (d66, d115)
+        if os.path.exists("/etc/systemd/system/menage-serveur.service"):
+            try:
+                systemctl(["start", "--no-block", "menage-serveur.service"], detache=True)
+            except OSError as e:
+                trace("orchestre : menage", e)
+    if feu == "rouge" and maintenant - etat.get("feu_depuis", maintenant) > ORCH_ALERTE_DELAI \
+            and not etat.get("alerte_feu") and maintenant - etat.get("alerte", 0) > 6 * 3600:
+        etat["alerte"] = etat["alerte_feu"] = maintenant
+        orch_alerter(f"Le serveur sature depuis plus de 10 minutes malgré les pauses : "
+                     f"{m['dispo']} % de mémoire libre, {len(pauses)} session(s) en pause. "
+                     f"Ce qui consomme le plus : "
+                     + ", ".join(f"{f['projet']} ({f['poids'] // 2**20} Mo)" for f in
+                                 sorted(sessions.values(), key=lambda f: -f["poids"])[:3]))
+    etat["sessions"] = {s: {k: f[k] for k in ("projet", "rang", "poids", "pic")}
+                        for s, f in sessions.items()}
+    etat["ts"] = maintenant
+    return etat
+
+
+def orch_resume(e):
+    """Etat du serveur en mots simples (plantrack orchestre)."""
+    if not e:
+        return "chef d'orchestre muet : aucune mesure recente (service plantrack-orchestre arrete ?)."
+    m = e.get("mesure", {})
+    ss = e.get("sessions", {})
+    pauses = e.get("pauses", {})
+    lignes = [f"feu {e.get('feu')} — memoire disponible {m.get('dispo')} %, swap {m.get('swap')} %, "
+              f"pression memoire {m.get('psi_memory_some', 0)} %",
+              f"sessions : {len(ss)} ("
+              + ", ".join(f"{r} {sum(1 for f in ss.values() if f['rang'] == r)}" for r in RANGS)
+              + f"), en pause : {len(pauses)}"]
+    for s, f in sorted(ss.items(), key=lambda sf: -sf[1]["poids"]):
+        etat = " — EN PAUSE" if s in pauses else ""
+        lignes.append(f"  {s[:8]} {f['projet']} [{f['rang']}] {f['poids'] // 2**20} Mo{etat}")
+    return "\n".join(lignes)
+
+
+def orch_bilan(jours):
+    """Ligne du bilan du dimanche (d159) : combien de pauses, et si le garde-fou earlyoom a
+    encore du tuer un programme (objectif : zero). None si l'orchestre n'a jamais tourne."""
+    try:
+        with open(os.path.join(ORCH_DIR, "journal.log"), encoding="utf-8") as f:
+            lignes = f.read().splitlines()
+    except OSError:
+        return None
+    depuis = (datetime.now() - timedelta(days=jours)).isoformat(timespec="seconds")
+    pauses = sum(1 for l in lignes if l[:19] >= depuis and l[20:].startswith("pause "))
+    try:
+        p = subprocess.run(["journalctl", "-u", "earlyoom", "--since", f"-{jours}d", "--no-pager", "-q"],
+                           capture_output=True, text=True, timeout=30)
+        tues = sum(1 for l in p.stdout.splitlines() if "sending sig" in l.lower())
+    except (OSError, subprocess.SubprocessError):
+        tues = None
+    texte = (f"• Charge du serveur : {pauses} mise(s) en pause par le chef d'orchestre"
+             if pauses else "• Charge du serveur : aucune session mise en pause")
+    if tues is not None:
+        texte += (", le garde-fou n'a rien eu a tuer" if not tues else
+                  f", mais le garde-fou a du tuer {tues} programme(s)")
+    return texte + "."
+
+
+def cmd_orchestre(args):
+    """plantrack orchestre [--boucle | --tour | --tout-reprendre] — sans option : l'etat."""
+    chemin = os.path.join(ORCH_DIR, "etat.json")
+    if "--boucle" in args or "--tour" in args:
+        import fcntl   # Linux seulement : le reste de PlanTrack ne doit pas en dependre
+        os.makedirs(os.path.join(ORCH_DIR, "sessions"), exist_ok=True)
+        verrou = open(os.path.join(ORCH_DIR, "verrou"), "w")
+        try:
+            fcntl.flock(verrou, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except OSError:
+            sys.exit("[PlanTrack] un chef d'orchestre tourne deja.")
+        while True:
+            etat = orch_lire(chemin, {}) or {}
+            try:
+                orch_ecrire(chemin, orch_tour(etat, time.time()))
+            except Exception as e:
+                trace("orchestre : tour", e)
+            if "--tour" in args:
+                return
+            time.sleep(ORCH_TOUR)
+    if "--tout-reprendre" in args:   # arret du service : personne ne reste gele
+        etat = orch_lire(chemin, {}) or {}
+        for sid in list(etat.get("pauses", {})):
+            orch_reprendre(etat, sid, "arret du chef d'orchestre")
+        if os.path.isdir(ORCH_DIR):
+            orch_ecrire(chemin, etat)
+        return
+    print(orch_resume(orch_etat_frais()))
+
+
 def hook_prompt():
     """UserPromptSubmit. Les commandes '!' sont capturees puis le prompt est
     rejete (exit 2) : l'agent ne les voit jamais, son contexte reste propre."""
     data = read_hook_input()
     battre(journal_root(ROOT))
     prompt = (data.get("prompt") or "").strip()
+    sid = orch_inscrire(data, prompt)
+    if sid and not prompt.startswith("!"):
+        # travail de fond : il ne demarre pas quand le serveur chauffe, ni quand ce qu'il
+        # consomme d'habitude ferait passer la memoire sous le seuil orange (anticipation)
+        fiche = orch_lire(os.path.join(ORCH_DIR, "sessions", sid + ".json"), {}) or {}
+        if orch_rang(fiche, time.time()) == "fond":
+            besoin = orch_estimation(fiche.get("projet"))
+
+            def retenu(e):
+                m = e.get("mesure", {})
+                apres = m.get("dispo_o", 0) - besoin
+                return e.get("feu") != "vert" or \
+                    (besoin and 100 * apres / (m.get("total") or 1) < ORCH_ORANGE_DISPO)
+            orch_attendre(sid, retenu)
     if not prompt.startswith("!"):
         sys.exit(0)
     try:
@@ -1308,21 +1774,39 @@ def bash_deny(cwd):
     return False
 
 
+def orch_noter(note):
+    """Sortie PreToolUse sans reecriture : juste le mot de l'orchestre, s'il y en a un."""
+    if note:
+        print(json.dumps({"hookSpecificOutput": {"hookEventName": "PreToolUse",
+                                                 "additionalContext": note}}, ensure_ascii=False))
+
+
 def hook_pretool():
-    """PreToolUse sur Bash : une commande lourde (build, gradle...) part dans la
+    """PreToolUse (tous les outils) : une session mise en pause par le chef d'orchestre
+    attend ici. Sur Bash, une commande lourde (build, gradle...) part dans la
     file kvm-lourd du KVM, en arriere-plan, pour ne plus saturer la RAM a
     plusieurs agents. Toute la logique (quoi est lourd, combien) reste dans
     kvm-lourd ; ici on ne fait que reecrire. Fail-open : kvm-lourd absent, lent
     ou en erreur = la commande passe telle quelle. Jamais de permissionDecision :
     la reecriture ne doit pas faire sauter une demande d'autorisation."""
+    note = ""
     try:
         data = read_hook_input()
         battre(journal_root(ROOT))
+        # chef d'orchestre (d159) : une session mise en pause attend ici, entre deux etapes
+        sid = orch_inscrire(data)
+        attendu, encore = orch_attendre(sid, lambda e: sid in e.get("pauses", {}))
+        if encore:
+            note = ("⏸ Serveur saturé : le chef d'orchestre PlanTrack te garde en pause. "
+                    "Continue normalement ; l'attente reprendra à l'étape suivante si besoin.")
+        elif attendu >= 5:
+            note = (f"⏸ Pause de {int(attendu)} s : le serveur saturait, PlanTrack a laissé "
+                    "passer une session prioritaire. Tu reprends là où tu étais.")
         ti = data.get("tool_input") or {}
-        cmd = ti.get("command") or ""
+        cmd = ti.get("command") if data.get("tool_name") in (None, "Bash") else ""
         chemin = shutil.which("kvm-lourd")
         if not cmd or not chemin or bash_deny(data.get("cwd")):
-            return
+            return orch_noter(note)
         # b17 : kvm-lourd est charge dans CE processus. Lance a part (`kvm-lourd classe`),
         # un second Python demarrait dans un cgroup sature, depassait le delai, et la
         # commande lourde passait hors file pile quand la machine etouffait.
@@ -1338,13 +1822,13 @@ def hook_pretool():
             except TypeError:   # kvm-lourd d'avant le 16/10
                 t = kl.classe(cmd, kl.charger_types(cfg.types))
             if not t:
-                return
+                return orch_noter(note)
             # nom du projet sans `git rev-parse` (projet_par_defaut) : pas de sous-processus
             projet = os.path.basename(os.environ.get("CLAUDE_PROJECT_DIR") or data.get("cwd") or ROOT)
             est = kl.estimer(t, projet, kl.lire_historique(cfg.etat / "historique.jsonl"))
         except Exception as e:
             trace("hook-pretool : kvm-lourd classe", e)
-            return
+            return orch_noter(note)
         type_ = t.nom
         go = f"{est / 2**30:.1f}".replace(".", ",")
         print(json.dumps({"hookSpecificOutput": {
@@ -1352,12 +1836,13 @@ def hook_pretool():
             "updatedInput": {**ti, "run_in_background": True,
                              "command": f"kvm-lourd run --qui=agent --type={type_} -- "
                                         f"bash -c {shlex.quote(cmd)}"},
-            "additionalContext": f"⏳ Commande passée par la file kvm-lourd ({type_}, ~{go} Go "
+            "additionalContext": (note + "\n" if note else "") + f"⏳ Commande passée par la file kvm-lourd ({type_}, ~{go} Go "
                                  "estimés), en arrière-plan : tu seras notifié à la fin. Ne la "
                                  "relance pas ; `kvm-lourd status` montre la file."}},
             ensure_ascii=False))
     except Exception as e:
         trace("hook-pretool", e)
+        orch_noter(note)
 
 
 def note_injection():
@@ -1537,11 +2022,15 @@ WRAPPER = '#!/bin/sh\nexec python3 "$(dirname "$0")/.claude/hooks/pt.py" "$@"\n'
 
 SETTINGS = {"hooks": {
     "UserPromptSubmit": [{"hooks": [
-        {"type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/pt.py\" hook-prompt"}]}],
+        {"type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/pt.py\" hook-prompt",
+         "timeout": 600}]}],
     "PostToolUse": [{"matcher": "Edit|Write|MultiEdit|NotebookEdit|Bash", "hooks": [
         {"type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/pt.py\" hook-filelog"}]}],
-    "PreToolUse": [{"matcher": "Bash", "hooks": [
-        {"type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/pt.py\" hook-pretool"}]}],
+    # tous les outils : une session mise en pause par le chef d'orchestre attend ici (d159) ;
+    # 600 s couvre ORCH_ATTENTE (540 s)
+    "PreToolUse": [{"matcher": "*", "hooks": [
+        {"type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/pt.py\" hook-pretool",
+         "timeout": 600}]}],
     "SessionStart": [{"hooks": [
         {"type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/pt.py\" hook-context"}]}],
     "PreCompact": [{"hooks": [
@@ -1755,6 +2244,15 @@ def write_hooks_file(path, obj, label, hint=""):
                             and c.get("matcher") != e["matcher"]:
                         c["matcher"] = e["matcher"]
                         added += 1
+            # meme raison pour le delai (d159) : une attente de l'orchestre depasserait l'ancien
+            for h in e["hooks"]:
+                if "timeout" not in h:
+                    continue
+                for c in cur:
+                    for ch in c.get("hooks", []):
+                        if ch.get("command") == h["command"] and ch.get("timeout") != h["timeout"]:
+                            ch["timeout"] = h["timeout"]
+                            added += 1
     if not added:
         print(f"{label} deja en place.")
         return True
@@ -2480,6 +2978,8 @@ def cmd_bilan(args, st):
         if p.stdout.strip():
             lignes.append("• " + p.stdout.strip())
     if s := sante_resume(jours):
+        lignes.append(s)
+    if s := orch_bilan(jours):
         lignes.append(s)
     if lignes:
         print(f"Bilan PlanTrack des {jours} derniers jours :\n" + "\n".join(lignes))
@@ -3250,6 +3750,8 @@ def cli(argv):
         cmd_ronde()
     elif cmd == "respirer":
         cmd_respirer(args)
+    elif cmd == "orchestre":
+        cmd_orchestre(args)
     elif cmd == "attentes":
         print(cmd_attentes(args, st))
     elif cmd == "bugs":
