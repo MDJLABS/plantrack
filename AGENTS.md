@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [87 commits]
-  fichiers recemment ecrits : ../../../tmp/claude-0/-home-mariella-plantrack/27a88b8d-b064-43b5-9897-c4fd8f8f958e/scratchpad/carte.json, sortie/carte-soirees-2.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-quiet-shannon.md, ../Clients/s69-soirees/components/cart/SoireeForm.tsx, ../Clients/s69-soirees/components/reservation/TurnstileWidget.tsx, sortie/carte-captcha.log
+FIL ACTIF — t23 : guides de test automatiques (d100) [88 commits]
+  fichiers recemment ecrits : sortie/carte-soirees-2.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-quiet-shannon.md, ../Clients/s69-soirees/components/cart/SoireeForm.tsx, ../Clients/s69-soirees/components/reservation/TurnstileWidget.tsx, sortie/carte-captcha.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-quizzical-sprout.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -195,6 +195,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d154 : d152 livre (01/11, choix Mariella tel q13 'Versions de test a part') : versions de test Node (next dev, GUIDE_ACTIF=1, portier-reveil, Stop… (agent)
   d155 : Mariella (tel, 02/11, carte Memoire) : 'Arreter ProRent dev (Recommande)' — swap vide (3,1 Go -> 0) puis prorent-dev.service arrete (stop, … (agent)
   d156 : Mariella (tel, 02/11, carte Suite) : 'Ecrire le guide Soirees (Recommande)' — scenario de test avec gestes (d100) pour la page /soirees dan… (agent)
+  d157 : Mariella (tel, 02/11) : b40 -> 'Je refais l'essai (Recommande)' ; attente de son verdict par le guide (s69-soirees 3c92781) (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
@@ -213,6 +214,5 @@ Pieges connus :
 
 Questions en attente (reponds via !answer qN ...) :
   q15 : Guide Soirées pret (s69-soirees 1db1d2a) : Mariella fait-elle l'essai sur https…
-  q16 : b40 captchas Soirees corriges (s69-soirees 3c92781) : Mariella refait-elle l'es…
 ```
 <!-- plantrack:state-end -->
