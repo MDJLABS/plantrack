@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [96 commits]
-  fichiers recemment ecrits : sortie/scenario-orchestre.log, tests/scenario.sh, sortie/essai-orchestre.sh, sortie/essai-orchestre.log, pyproject.toml, sortie/carte-orchestre.json
+FIL ACTIF — t23 : guides de test automatiques (d100) [97 commits]
+  fichiers recemment ecrits : sortie/essai-orchestre.sh, sortie/essai-orchestre.log, pyproject.toml, sortie/carte-orchestre.json, ../../../root/.claude/plans/contexte-reconstruit-par-le-elegant-pond.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-compiled-flurry.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -201,6 +201,10 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d160 : Chef d'orchestre de la charge LIVRE (d159, plan valide par Mariella tel) : v1.9.34 (GitHub seul, pas de cle PyPI, d127). plantrack-orchestr… (agent)
   d161 : Mariella (tel, 02/11 soir, carte Suite) : 'Laisser tourner (Recommande)' — le chef d'orchestre (d159, v1.9.34) tourne une semaine ; verdict… (agent)
   d162 : Mariella (tel, 02/11 21h, carte Suite renvoyee) : 'Je fais l'essai (Recommande)' — essai des captchas Soirees (b40, s69-soirees 3c92781) su… (agent)
+  d163 : Mariella (tel, 02/11 22h, plan approuve apres relance auto) : 'Rien a faire : j'attends ton essai des captchas Soirees' — b40/q15 restent e… (agent)
+  d164 : Mariella (tel, 02/11 22h, carte Suite) : 'Je fais l essai (Recommande)' — essai captchas Soirees (b40, s69-soirees 3c92781) ; verdict atten… (agent)
+  d165 : Mariella (tel, 02/11 22h, carte Pendant ton essai) : 'Attendre mon verdict (Recommande)' — aucun nouveau chantier, veille silencieuse jusqu… (agent)
+  d166 : Mariella (tel, 03/11, plan approuve apres relance auto) : 'Rien a faire : j'attends ton verdict sur les captchas Soirees' — b40/q15 en atte… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
