@@ -2034,3 +2034,31 @@
 {"ts": "2026-11-03T22:15:09+00:00", "kind": "file_touched", "text": "sortie/carte-suite-0311c.log", "thread": "t23"}
 {"ts": "2026-11-03T22:19:05+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-ethereal-waffle.md", "thread": "t23"}
 {"ts": "2026-11-03T22:24:08+00:00", "kind": "decision", "id": "d171", "text": "Mariella (tel, 03/11 22h18, carte Suite) : 'Je fais l'essai (Recommande)' — attente du verdict captchas Soirees (b40/q15, s69-soirees 3c92781), veille silencieuse (d23)", "par": "agent"}
+{"ts": "2026-11-03T22:24:13+00:00", "kind": "commit", "sha": "5323fc5", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-03T22:24:27+00:00", "kind": "file_touched", "text": "sortie/carte-suite-0311d.json", "thread": "t23"}
+{"ts": "2026-11-03T22:24:27+00:00", "kind": "file_touched", "text": "sortie/carte-suite-0311d.log", "thread": "t23"}
+{"ts": "2026-11-03T22:31:07+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-goofy-puffin.md", "thread": "t23"}
+{"ts": "2026-11-03T22:33:09+00:00", "kind": "decision", "id": "d172", "text": "Mariella (tel, 03/11 22h25, plan approuve) : guide de test — chaque ko/remarque reveille la session tout de suite (route locale bcc /guide/point -> remettre, loopback seul, jamais plantrack check), ok joints au message suivant ou au bilan, resume si guide ferme avant la fin ; la carte du guide ne cache jamais la cible (bascule haut/coin oppose, sinon defilement).", "par": "agent"}
+{"ts": "2026-11-03T22:34:08+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/26ba1f4b-755f-4fe5-acad-285c3c8ebab4/scratchpad/t.txt", "thread": "t23"}
+{"ts": "2026-11-03T22:35:52+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/26ba1f4b-755f-4fe5-acad-285c3c8ebab4/scratchpad/carte.json", "thread": "t23"}
+{"ts": "2026-11-03T22:48:48+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-floating-token.md", "thread": "t23"}
+{"ts": "2026-11-03T22:50:34+00:00", "kind": "file_touched", "text": "../bcc/server/api.ts", "thread": "t23"}
+{"ts": "2026-11-03T22:50:35+00:00", "kind": "file_touched", "text": "../bcc/server/api.ts", "thread": "t23"}
+{"ts": "2026-11-03T22:50:39+00:00", "kind": "file_touched", "text": "../bcc/server/api.ts", "thread": "t23"}
+{"ts": "2026-11-03T22:50:45+00:00", "kind": "file_touched", "text": "../bcc/tests/api.test.ts", "thread": "t23"}
+{"ts": "2026-11-03T22:52:40+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/lib/guide/guide-avertir.ts", "thread": "t23"}
+{"ts": "2026-11-03T22:53:04+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/lib/guide/guide-actions.ts", "thread": "t23"}
+{"ts": "2026-11-03T22:53:10+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/lib/guide/guide-actions.ts", "thread": "t23"}
+{"ts": "2026-11-03T22:53:12+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/lib/guide/guide-actions.ts", "thread": "t23"}
+{"ts": "2026-11-03T22:53:47+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/lib/guide/guide-geometry.ts", "thread": "t23"}
+{"ts": "2026-11-03T22:54:03+00:00", "kind": "file_touched", "text": "../bcc/server/api.ts", "thread": "t23"}
+{"ts": "2026-11-03T22:56:28+00:00", "kind": "file_touched", "text": "tests/guide/avertir.test.ts", "thread": "t23"}
+{"ts": "2026-11-03T22:56:33+00:00", "kind": "commit", "sha": "01e5810", "ctype": "feat", "thread": "t23"}
+{"ts": "2026-11-03T22:58:55+00:00", "kind": "file_touched", "text": "../mdjlabs-site/lib/guide/guide-geometry.ts", "thread": "t23"}
+{"ts": "2026-11-03T22:59:26+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t23"}
+{"ts": "2026-11-03T22:59:30+00:00", "kind": "commit", "sha": "31e3fa0", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-03T22:59:59+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/b64c3f19-0c2f-42a6-84af-99c112d16606/scratchpad/old.tsx", "thread": "t23"}
+{"ts": "2026-11-03T23:00:31+00:00", "kind": "file_touched", "text": "../bcc/sortie/relance-d172.log", "thread": "t23"}
+{"ts": "2026-11-03T23:01:19+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/b64c3f19-0c2f-42a6-84af-99c112d16606/scratchpad/carte.json", "thread": "t23"}
+{"ts": "2026-11-03T23:19:26+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-peaceful-lollipop.md", "thread": "t23"}
+{"ts": "2026-11-03T23:19:54+00:00", "kind": "decision", "id": "d173", "text": "Mariella (tel, 04/11, plan approuve apres relance auto) : rien a faire, attente de son verdict sur les captchas Soirees (b40/q15, s69-soirees 3c92781) ; d172 livre (v1.9.35), veille silencieuse.", "par": "agent"}
