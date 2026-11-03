@@ -112,3 +112,57 @@ export function resolveTarget(
   }
   return null;
 }
+
+/**
+ * Où ranger la CARTE du guide pour qu'elle ne cache jamais la zone qu'elle montre (d172,
+ * Mariella 03/11 : « s'il me montre un endroit qui se trouve derrière lui, le cadre du
+ * guide doit se déplacer sur une autre partie de la page »).
+ *
+ * Au pouce, la carte occupe toute la largeur : en bas (sa place) ou en haut. Ailleurs,
+ * elle tient dans un coin : bas-droite (sa place), puis les trois autres. Elle revient à
+ * sa place dès qu'elle y est libre ; sinon elle GARDE la place actuelle tant qu'elle ne
+ * recouvre pas la zone — pas de saut d'un coin à l'autre pour rien. Sinon, on prend la place
+ * qui la recouvre le moins (la place d'origine d'abord, à égalité). `couvre` reste vrai
+ * si même la meilleure place recouvre encore la zone : à l'appelant de faire défiler.
+ */
+export type PlaceCarte = "bas" | "haut" | "bd" | "bg" | "hd" | "hg";
+
+const ORDRE_POUCE: PlaceCarte[] = ["bas", "haut"];
+const ORDRE_COINS: PlaceCarte[] = ["bd", "bg", "hd", "hg"];
+/** Écart laissé entre la carte et le bord de l'écran — le même que `carteStyle`. */
+export const BORD_CARTE = 16;
+
+/** Le rectangle qu'occuperait la carte à cette place. */
+export function rectCarte(place: PlaceCarte, carte: Size, ecran: Size): Rect {
+  if (place === "bas") return { x: 0, y: ecran.h - carte.h, w: ecran.w, h: carte.h };
+  if (place === "haut") return { x: 0, y: 0, w: ecran.w, h: carte.h };
+  const x = place === "bd" || place === "hd" ? ecran.w - BORD_CARTE - carte.w : BORD_CARTE;
+  const y = place === "bd" || place === "bg" ? ecran.h - BORD_CARTE - carte.h : BORD_CARTE;
+  return { x, y, w: carte.w, h: carte.h };
+}
+
+/** Surface commune à deux rectangles (0 s'ils ne se touchent pas). */
+export function chevauchement(a: Rect, b: Rect): number {
+  const w = Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x);
+  const h = Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y);
+  return w > 0 && h > 0 ? w * h : 0;
+}
+
+export function placerCarte(
+  cible: Rect | null, carte: Size, ecran: Size, pouce: boolean, actuelle: PlaceCarte,
+): { place: PlaceCarte; couvre: boolean } {
+  const ordre = pouce ? ORDRE_POUCE : ORDRE_COINS;
+  const depart = ordre.includes(actuelle) ? actuelle : ordre[0];
+  if (!cible) return { place: depart, couvre: false };
+  // Le cadre de surlignage déborde de 4 px autour de la zone (GuideDeTest.tsx) : il
+  // compte, sinon la carte se poserait pile sur la bordure qui montre la zone.
+  const zone = { x: cible.x - 6, y: cible.y - 6, w: cible.w + 12, h: cible.h + 12 };
+  const gene = (p: PlaceCarte) => chevauchement(zone, rectCarte(p, carte, ecran));
+  // Retour à sa place dès que la voie y est libre ; sinon on reste où l'on est tant que
+  // ça ne gêne pas (pas de saut à chaque pixel de défilement).
+  if (gene(ordre[0]) === 0) return { place: ordre[0], couvre: false };
+  if (gene(depart) === 0) return { place: depart, couvre: false };
+  let meilleure = ordre[0];
+  for (const p of ordre) if (gene(p) < gene(meilleure)) meilleure = p;
+  return { place: meilleure, couvre: gene(meilleure) > 0 };
+}

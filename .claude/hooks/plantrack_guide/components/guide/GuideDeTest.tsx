@@ -83,7 +83,7 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import { usePathname, useRouter } from "next/navigation";
-import { resolveTarget, type Rect } from "@/lib/guide/guide-geometry";
+import { BORD_CARTE, placerCarte, resolveTarget, type PlaceCarte, type Rect } from "@/lib/guide/guide-geometry";
 import {
   accederLocalStorage, avancer, chargerProgression, marquerJoue, noterMotif, oublierProgression,
   oublierToutesLesProgressions, progressionDepuisServeur, reculer, sauverProgression, serveurPrime,
@@ -92,7 +92,7 @@ import {
 import { indexDePoint, SCENARIOS } from "@/lib/guide/scenarios";
 import { verdictScenario } from "@/lib/guide/guide-verdict";
 import { construireCompteRendu } from "@/lib/guide/guide-compte-rendu";
-import { consignerGuide, consignerPoint } from "@/lib/guide/guide-actions";
+import { consignerGuide, consignerPoint, guideInterrompu } from "@/lib/guide/guide-actions";
 import { reglagesGuide } from "@/lib/guide/guide-reglages";
 import { surLaPage } from "@/lib/guide/guide-visite";
 import { GuideCurseur } from "./GuideCurseur";
@@ -306,6 +306,10 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer }: 
     return () => window.removeEventListener("resize", onResize);
   }, []);
   const mobile = largeurEcran < SEUIL_ORDINATEUR;
+  // d172 : la carte ne cache jamais la zone qu'elle montre — elle change de côté (en haut
+  // au pouce, un autre coin ailleurs) et revient dès que la voie est libre (`placerCarte`).
+  const [place, setPlace] = useState<PlaceCarte>(mobile ? "bas" : "bd");
+  const defileRef = useRef<string | null>(null);
   // Menu « ⋯ » (design validé) : regroupe les commandes auparavant en icônes séparées
   // (rejouer/recommencer/replier/fermer) — mêmes actions, même sémantique, cf. plus bas.
   const [menuOuvert, setMenuOuvert] = useState(false);
@@ -487,6 +491,23 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer }: 
     return () => cancelAnimationFrame(raf);
   }, [etape]);
 
+  // d172 : la carte s'écarte de la zone montrée. Mesurée (bulleRef), jamais supposée.
+  // Si même la meilleure place la recouvre (zone trop grande), la page défile UNE fois par
+  // point pour que le haut de la zone reste visible hors de la carte.
+  useEffect(() => {
+    const b = bulleRef.current?.getBoundingClientRect();
+    if (!b) return;
+    const ecran = { w: window.innerWidth, h: window.innerHeight };
+    const { place: p, couvre } = placerCarte(cible, { w: b.width, h: b.height }, ecran, mobile, place);
+    if (p !== place) setPlace(p);
+    if (couvre && cible && defileRef.current !== etape.id) {
+      defileRef.current = etape.id;
+      const enHautP = p === "haut" || p === "hd" || p === "hg";
+      const dy = enHautP ? cible.y + cible.h - (ecran.h - BORD_CARTE) : cible.y - BORD_CARTE;
+      if (Math.abs(dy) > 4) window.scrollBy({ top: dy, behavior: "smooth" });
+    }
+  }, [cible, mobile, place, etape.id]);
+
   // Amener la zone à l'écran au changement d'étape — sinon la bulle parle d'une ligne
   // que Mariella ne voit pas.
   useEffect(() => {
@@ -525,14 +546,17 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer }: 
   // Carte posée par POSTURE (design validé), plus par rapport à la cible surlignée —
   // cf. bandeau de tête. Lu directement en render comme l'ancien `pos`, pour la même
   // raison (client only, après hydratation/portail).
+  const enHaut = place === "haut" || place === "hd" || place === "hg";
   const carteStyle: CSSProperties = mobile
     ? {
-        position: "fixed", left: 0, right: 0, bottom: 0,
+        position: "fixed", left: 0, right: 0, ...(enHaut ? { top: 0 } : { bottom: 0 }),
         width: "auto", maxWidth: "100%", maxHeight: "75vh", overflowY: "auto",
-        borderRadius: "14px 14px 0 0", boxSizing: "border-box",
+        borderRadius: enHaut ? "0 0 14px 14px" : "14px 14px 0 0", boxSizing: "border-box",
       }
     : {
-        position: "fixed", right: 16, bottom: 16,
+        position: "fixed",
+        ...(place === "bg" || place === "hg" ? { left: BORD_CARTE } : { right: BORD_CARTE }),
+        ...(enHaut ? { top: BORD_CARTE } : { bottom: BORD_CARTE }),
         width: 420, maxHeight: "80vh", overflowY: "auto",
         borderRadius: 10, boxSizing: "border-box",
       };
@@ -550,7 +574,9 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer }: 
     // jamais bloquant pour l'affichage local, qui reste la source immédiate de vérité pour
     // CETTE page. Un "ko" sans motif est reconfirmé (avec le motif) par `confirmerMotif`
     // ci-dessous : deux écritures pour ce cas, l'une écrase l'autre, jamais destructeur.
-    void consignerPoint(scenario.id, etape.id, val);
+    // Un "ko" n'avertit la session qu'à la confirmation du motif (`confirmerMotif`) : un
+    // seul message, avec sa remarque, plutôt que deux (d172).
+    void consignerPoint(scenario.id, etape.id, val, undefined, val === "ok");
     if (val === "ko") {
       // Le "ko" est acquis tout de suite (`maj`), mais n'avance PAS encore : le petit champ
       // de motif (#guide-motif) s'ouvre, et c'est sa confirmation (`confirmerMotif`) qui fait
@@ -730,7 +756,7 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer }: 
                 <button
                   id="guide-fermer"
                   role="menuitem"
-                  onClick={() => { setMenuOuvert(false); onFermer(); }}
+                  onClick={() => { setMenuOuvert(false); void guideInterrompu(scenario.id); onFermer(); }}
                   style={menuItemStyle}
                 >Fermer</button>
               </div>

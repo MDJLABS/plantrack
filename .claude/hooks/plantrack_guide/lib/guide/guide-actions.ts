@@ -28,6 +28,7 @@ import { calculerStatut, faitsPour, type EtatScenarioStocke, type EtatStocke, ty
 import { verdictScenario } from "./guide-verdict";
 import { getScenario, SCENARIOS } from "./scenarios.ts";
 import { reglagesGuideServeur } from "./guide-reglages-serveur.ts";
+import { avertirSession, texteAvis } from "./guide-avertir";
 
 /**
  * Double porte (revue de sécurité du 31/10) : un rôle « admin » du SITE n'est pas forcément
@@ -186,7 +187,7 @@ export async function etatGuides(): Promise<EtatGuides | null> {
  * incohérence inutile dans le registre lui-même.
  */
 export async function consignerPoint(
-  scenarioId: string, stepId: string, v: StepVerdict, note?: string,
+  scenarioId: string, stepId: string, v: StepVerdict, note?: string, avertir = true,
 ): Promise<{ error: string | null }> {
   if (!(await porteAdmin())) return { error: "hors session admin" };
 
@@ -217,6 +218,34 @@ export async function consignerPoint(
     // (`GuideDeTest.tsx`) reçoit une erreur à afficher, jamais une exception non attrapée.
     return { error: "écriture du registre impossible" };
   }
+
+  // d172 : un « pas ok » ou une remarque part TOUT DE SUITE à la session — un point raté
+  // peut bloquer la suite de l'essai. Le clic « ko » lui-même passe `avertir = false` : c'est
+  // la confirmation de son motif (`confirmerMotif`, GuideDeTest.tsx) qui avertit, une fois.
+  if (avertir && (v === "ko" || propre)) {
+    await avertirSession(racine, texteAvis(scenario, suivant.verdicts, "point", stepId));
+  }
+  return { error: null };
+}
+
+/**
+ * Le guide est fermé avant la fin (bouton Fermer de la carte) : la session reçoit où
+ * Mariella s'est arrêtée et ce qu'elle a déjà répondu (d172). Rien si aucun point n'a été
+ * jugé, ni si la visite est déjà consignée — `consignerGuide` a alors tout dit.
+ */
+export async function guideInterrompu(scenarioId: string): Promise<{ error: string | null }> {
+  if (!(await porteAdmin())) return { error: "hors session admin" };
+  const scenario = getScenario(scenarioId);
+  if (!scenario) return { error: "scénario inconnu" };
+  const racine = await racineDuDepot();
+  if (!racine) return { error: "dossier .planning introuvable" };
+
+  const entree = (await lireEtat(racine))[scenarioId];
+  if (!entree || entree.date !== scenario.date || entree.fini) return { error: null };
+  const repondus = scenario.etapes.filter((e) => entree.verdicts[e.id]).length;
+  if (repondus === 0 || repondus === scenario.etapes.length) return { error: null };
+
+  await avertirSession(racine, texteAvis(scenario, entree.verdicts, "arret"));
   return { error: null };
 }
 
@@ -284,6 +313,7 @@ export async function consignerGuide(
 
   await ecrireCompteRendu(racine, scenario, resultat, quand);
   await reglagesGuideServeur.apresConsigne?.(resultat);
+  await avertirSession(racine, texteAvis(scenario, suivant.verdicts, "fin"));
 
   return { error: null, statut: bilan.statut };
 }

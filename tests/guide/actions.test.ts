@@ -27,6 +27,8 @@ async function step(n: string, fn: () => Promise<void> | void) {
 
 // Racine temporaire AVANT d'importer guide-actions.ts : racineDuDepot() lit process.cwd()
 // à chaque appel, mais autant partir d'un dossier propre dès le départ.
+// d172 : jamais de message au vrai poste depuis ces tests (cf. avertir.test.ts).
+process.env.GUIDE_AVERTIR = "0";
 const racine = await mkdtemp(join(tmpdir(), "plantrack-guide-actions-"));
 await mkdir(join(racine, ".planning"), { recursive: true });
 process.chdir(racine);
