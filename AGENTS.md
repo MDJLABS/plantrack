@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [105 commits]
-  fichiers recemment ecrits : ../mdjlabs-site/lib/guide/guide-geometry.ts, pyproject.toml, ../../../tmp/claude-0/-home-mariella-plantrack/b64c3f19-0c2f-42a6-84af-99c112d16606/scratchpad/old.tsx, ../bcc/sortie/relance-d172.log, ../../../tmp/claude-0/-home-mariella-plantrack/b64c3f19-0c2f-42a6-84af-99c112d16606/scratchpad/carte.json, ../../../root/.claude/plans/contexte-reconstruit-par-le-peaceful-lollipop.md
+FIL ACTIF — t23 : guides de test automatiques (d100) [106 commits]
+  fichiers recemment ecrits : ../../../tmp/claude-0/-home-mariella-plantrack/b64c3f19-0c2f-42a6-84af-99c112d16606/scratchpad/old.tsx, ../bcc/sortie/relance-d172.log, ../../../tmp/claude-0/-home-mariella-plantrack/b64c3f19-0c2f-42a6-84af-99c112d16606/scratchpad/carte.json, ../../../root/.claude/plans/contexte-reconstruit-par-le-peaceful-lollipop.md, ../bcc/sortie/carte-suite-0411.log, ../../bccsession/.claude/plans/contexte-reconstruit-par-le-lovely-nygaard.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -212,6 +212,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d171 : Mariella (tel, 03/11 22h18, carte Suite) : 'Je fais l'essai (Recommande)' — attente du verdict captchas Soirees (b40/q15, s69-soirees 3c927… (agent)
   d172 : Mariella (tel, 03/11 22h25, plan approuve) : guide de test — chaque ko/remarque reveille la session tout de suite (route locale bcc /guide/… (agent)
   d173 : Mariella (tel, 04/11, plan approuve apres relance auto) : rien a faire, attente de son verdict sur les captchas Soirees (b40/q15, s69-soire… (agent)
+  d174 : Mariella (tel, 04/11, plan approuve) : 'envoie le lien' — lien du guide Soirees https://s69-soirees-dev.mdjlabs.com/soirees donne dans la r… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
