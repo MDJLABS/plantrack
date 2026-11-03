@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [97 commits]
-  fichiers recemment ecrits : sortie/essai-orchestre.sh, sortie/essai-orchestre.log, pyproject.toml, sortie/carte-orchestre.json, ../../../root/.claude/plans/contexte-reconstruit-par-le-elegant-pond.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-compiled-flurry.md
+FIL ACTIF — t23 : guides de test automatiques (d100) [98 commits]
+  fichiers recemment ecrits : sortie/carte-orchestre.json, ../../../root/.claude/plans/contexte-reconstruit-par-le-elegant-pond.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-compiled-flurry.md, sortie/carte-suite-0311.json, sortie/carte-suite-0311.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-linked-newell.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -205,6 +205,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d164 : Mariella (tel, 02/11 22h, carte Suite) : 'Je fais l essai (Recommande)' — essai captchas Soirees (b40, s69-soirees 3c92781) ; verdict atten… (agent)
   d165 : Mariella (tel, 02/11 22h, carte Pendant ton essai) : 'Attendre mon verdict (Recommande)' — aucun nouveau chantier, veille silencieuse jusqu… (agent)
   d166 : Mariella (tel, 03/11, plan approuve apres relance auto) : 'Rien a faire : j'attends ton verdict sur les captchas Soirees' — b40/q15 en atte… (agent)
+  d167 : Mariella (tel, 03/11 15h48, plan approuve apres sa reponse 'Je fais l'essai (Recommande)') : rien a faire, j'attends son verdict sur les ca… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
