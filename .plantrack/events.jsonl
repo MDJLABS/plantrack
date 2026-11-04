@@ -2066,3 +2066,20 @@
 {"ts": "2026-11-03T23:20:08+00:00", "kind": "file_touched", "text": "../bcc/sortie/carte-suite-0411.log", "thread": "t23"}
 {"ts": "2026-11-03T23:23:32+00:00", "kind": "file_touched", "text": "../../bccsession/.claude/plans/contexte-reconstruit-par-le-lovely-nygaard.md", "thread": "t23"}
 {"ts": "2026-11-03T23:48:03+00:00", "kind": "decision", "id": "d174", "text": "Mariella (tel, 04/11, plan approuve) : 'envoie le lien' — lien du guide Soirees https://s69-soirees-dev.mdjlabs.com/soirees donne dans la reponse (bulle repondre.ts en echec : poste injoignable) ; attente de son verdict (b40/q15, s69-soirees 3c92781)", "par": "agent"}
+{"ts": "2026-11-03T23:48:04+00:00", "kind": "commit", "sha": "77e45d7", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-04T07:31:21+00:00", "kind": "file_touched", "text": "../../bccsession/.claude/plans/contexte-reconstruit-par-le-breezy-seal.md", "thread": "t23"}
+{"ts": "2026-11-04T18:19:56+00:00", "kind": "bug", "id": "b41", "text": "Orchestre (d159) : les sessions lancees sous bccsession (telephone) ne peuvent pas s'inscrire — /var/lib/plantrack-orchestre/sessions en root 755, PermissionError a chaque hook (22 traces, releve du 04/11 6h) ; ces sessions sont invisibles du chef d'orchestre", "thread": "t23", "severity": "normal", "par": "agent"}
+{"ts": "2026-11-04T18:20:02+00:00", "kind": "attempt", "id": "a56", "bug": "b41", "hypothesis": "Dossier sessions en 1777 (bit collant) pose par l'orchestre root a chaque tour ; garde : fiche ignoree si son proprietaire n'est ni root ni l'uid du pid designe ; inscription muette si le dossier n'est pas inscriptible (avant redemarrage du service)", "session": "42f34ac2-75f5-4bad-9fa8-8cc03e2c0918", "actor": "claude-code"}
+{"ts": "2026-11-04T18:20:08+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-04T18:20:09+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-04T18:20:11+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-04T18:20:13+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-04T18:20:23+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t23"}
+{"ts": "2026-11-04T18:25:39+00:00", "kind": "file_touched", "text": "sortie/tests-b41.log", "thread": "t23"}
+{"ts": "2026-11-04T18:25:39+00:00", "kind": "file_touched", "text": "sortie/tests-avant-b41.log", "thread": "t23"}
+{"ts": "2026-11-04T18:26:14+00:00", "kind": "commit", "sha": "30743d1", "ctype": "fix", "thread": "t23"}
+{"ts": "2026-11-04T18:26:16+00:00", "kind": "commit", "sha": "d673c24", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-04T18:26:16+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t23"}
+{"ts": "2026-11-04T18:26:28+00:00", "kind": "bug_status", "id": "b41", "status": "to_verify"}
+{"ts": "2026-11-04T18:26:28+00:00", "kind": "decision", "id": "d175", "text": "b41 corrige (04/11, plan approuve par Mariella tel) : dossier des fiches de l'orchestre en 1777 pose par le service root a chaque tour, fiche crue seulement si son proprietaire est root ou le compte du pid vise (orch_meme_compte), inscription muette si dossier non inscriptible. v1.9.36 commitee + taguee en local ; push GitHub IMPOSSIBLE depuis le compte bccsession (pas d'identifiants) — a pousser depuis une session root. Effet reel au prochain redemarrage de plantrack-orchestre (root).", "par": "agent"}
+{"ts": "2026-11-04T18:26:28+00:00", "kind": "piege", "id": "pg29", "text": "tests/scenario.sh lance sous le compte bccsession : 6 echecs ronde/b20/bilan --all sans rapport avec le code — les depots temporaires n'ont pas d'identite git (fatal: empty ident name). Les memes echecs existent avant toute modif : comparer avant/apres, ne pas les prendre pour une regression."}

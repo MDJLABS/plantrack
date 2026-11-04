@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [106 commits]
-  fichiers recemment ecrits : ../../../tmp/claude-0/-home-mariella-plantrack/b64c3f19-0c2f-42a6-84af-99c112d16606/scratchpad/old.tsx, ../bcc/sortie/relance-d172.log, ../../../tmp/claude-0/-home-mariella-plantrack/b64c3f19-0c2f-42a6-84af-99c112d16606/scratchpad/carte.json, ../../../root/.claude/plans/contexte-reconstruit-par-le-peaceful-lollipop.md, ../bcc/sortie/carte-suite-0411.log, ../../bccsession/.claude/plans/contexte-reconstruit-par-le-lovely-nygaard.md
+FIL ACTIF — t23 : guides de test automatiques (d100) [109 commits]
+  fichiers recemment ecrits : ../../bccsession/.claude/plans/contexte-reconstruit-par-le-breezy-seal.md, .claude/hooks/pt.py, tests/scenario.sh, sortie/tests-b41.log, sortie/tests-avant-b41.log, pyproject.toml
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -37,6 +37,7 @@ BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b38 (to_verify) [t23] Essai versions de test (01/11 soir, tel Mariella) : 's69 soirees mene vers le site s69 dev il me semble, et les 2 autres liens ne fonctionn… (agent) [1 tentatives, derniere: MiamBoost : miamboost-dev.mdjlabs.com classe en domaine de …]
   b39 (to_verify) [t23] Essai guide Soirees (02/11 11h, tel Mariella) : la page /soirees de la version de test s69-soirees affiche 'canal MiamBoost non configure (… (agent) [1 tentatives, derniere: Version de test branchee sur la preprod MiamBoost locale : …]
   b40 (to_verify) [t23] Essai guide Soirees (02/11 11h23, tel Mariella) : 'probleme sur les captcha cloudflare, il y en a 3 dans la page, beaucoup trop ; un seul s… (agent) [1 tentatives, derniere: s69-soirees 3c92781 : TurnstileWidget monte seulement a l'e…]
+  b41 (to_verify) [t23] Orchestre (d159) : les sessions lancees sous bccsession (telephone) ne peuvent pas s'inscrire — /var/lib/plantrack-orchestre/sessions en ro… (agent) [1 tentatives, derniere: Dossier sessions en 1777 (bit collant) pose par l'orchestre…]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
@@ -213,6 +214,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d172 : Mariella (tel, 03/11 22h25, plan approuve) : guide de test — chaque ko/remarque reveille la session tout de suite (route locale bcc /guide/… (agent)
   d173 : Mariella (tel, 04/11, plan approuve apres relance auto) : rien a faire, attente de son verdict sur les captchas Soirees (b40/q15, s69-soire… (agent)
   d174 : Mariella (tel, 04/11, plan approuve) : 'envoie le lien' — lien du guide Soirees https://s69-soirees-dev.mdjlabs.com/soirees donne dans la r… (agent)
+  d175 : b41 corrige (04/11, plan approuve par Mariella tel) : dossier des fiches de l'orchestre en 1777 pose par le service root a chaque tour, fic… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
@@ -230,6 +232,7 @@ Pieges connus :
   pg26 : Versions de test S69 (next dev, d152) : wrangler.jsonc met MIAMBOOST_API_BASE s…
   pg27 : pgrep/pkill -f 'bash tests/scenario.sh' se reconnait lui-meme dans une boucle d…
   pg28 : Orchestre : le hook-pretool reinscrit la session sur le premier ancetre claude/…
+  pg29 : tests/scenario.sh lance sous le compte bccsession : 6 echecs ronde/b20/bilan --…
 
 Questions en attente (reponds via !answer qN ...) :
   q15 : Guide Soirées pret (s69-soirees 1db1d2a) : Mariella fait-elle l'essai sur https…
