@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [110 commits]
-  fichiers recemment ecrits : tests/scenario.sh, sortie/tests-b41.log, sortie/tests-avant-b41.log, pyproject.toml, ../../../tmp/claude-997/-home-mariella-plantrack/42f34ac2-75f5-4bad-9fa8-8cc03e2c0918/scratchpad/carte.json, sortie/carte-suite-b41.log
+FIL ACTIF — t23 : guides de test automatiques (d100) [111 commits]
+  fichiers recemment ecrits : pyproject.toml, ../../../tmp/claude-997/-home-mariella-plantrack/42f34ac2-75f5-4bad-9fa8-8cc03e2c0918/scratchpad/carte.json, sortie/carte-suite-b41.log, ../../bccsession/.claude/plans/contexte-reconstruit-par-le-indexed-torvalds.md, sortie/carte-suite-admin.log, ../../bccsession/.claude/plans/contexte-reconstruit-par-le-shimmering-raccoon.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -216,6 +216,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d174 : Mariella (tel, 04/11, plan approuve) : 'envoie le lien' — lien du guide Soirees https://s69-soirees-dev.mdjlabs.com/soirees donne dans la r… (agent)
   d175 : b41 corrige (04/11, plan approuve par Mariella tel) : dossier des fiches de l'orchestre en 1777 pose par le service root a chaque tour, fic… (agent)
   d176 : Mariella (tel, 04/11, via AskUserQuestion) : b41/v1.9.36 -> 'Session admin (Recommande)' : elle ouvre une session PlanTrack en mode adminis… (agent)
+  d177 : Mariella (tel, 04/11 23h30, plan approuve apres relance auto alerte charge) : rien a faire, attente de la session administrateur pour pouss… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…

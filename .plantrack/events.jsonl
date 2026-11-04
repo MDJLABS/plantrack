@@ -2088,3 +2088,8 @@
 {"ts": "2026-11-04T18:26:48+00:00", "kind": "file_touched", "text": "../../../tmp/claude-997/-home-mariella-plantrack/42f34ac2-75f5-4bad-9fa8-8cc03e2c0918/scratchpad/carte.json", "thread": "t23"}
 {"ts": "2026-11-04T18:26:48+00:00", "kind": "file_touched", "text": "sortie/carte-suite-b41.log", "thread": "t23"}
 {"ts": "2026-11-04T19:02:16+00:00", "kind": "decision", "id": "d176", "text": "Mariella (tel, 04/11, via AskUserQuestion) : b41/v1.9.36 -> 'Session admin (Recommande)' : elle ouvre une session PlanTrack en mode administrateur ; celle-ci pousse main + tag v1.9.36 sur GitHub et fait 'systemctl restart plantrack-orchestre', puis verifie 'stat -c %a /var/lib/plantrack-orchestre/sessions' = 1777. La session bccsession n'a ni sudo ni identifiants GitHub (verifie).", "par": "agent"}
+{"ts": "2026-11-04T19:02:16+00:00", "kind": "commit", "sha": "82694f4", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-04T19:15:53+00:00", "kind": "file_touched", "text": "../../bccsession/.claude/plans/contexte-reconstruit-par-le-indexed-torvalds.md", "thread": "t23"}
+{"ts": "2026-11-04T22:18:32+00:00", "kind": "file_touched", "text": "sortie/carte-suite-admin.log", "thread": "t23"}
+{"ts": "2026-11-04T22:30:59+00:00", "kind": "file_touched", "text": "../../bccsession/.claude/plans/contexte-reconstruit-par-le-shimmering-raccoon.md", "thread": "t23"}
+{"ts": "2026-11-04T22:32:41+00:00", "kind": "decision", "id": "d177", "text": "Mariella (tel, 04/11 23h30, plan approuve apres relance auto alerte charge) : rien a faire, attente de la session administrateur pour pousser v1.9.36 sur GitHub et redemarrer plantrack-orchestre (b41/q18) ; charge ~3.2 et swap plein dus aux sessions en cours (wrangler/playwright), passager.", "par": "agent"}
