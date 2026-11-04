@@ -1704,6 +1704,15 @@ check "orchestre muet : l'etat le dit" "muet" "$(O orchestre)"
 # fail-open : orchestre non installe = aucune fiche ecrite, rien ne change
 out=$(echo '{"session_id":"zz","tool_name":"Read","tool_input":{}}' | PLANTRACK_ORCHESTRE="$TO/absent" python3 "$PT" hook-pretool); rc=$?
 check_exit "orchestre absent : hook code 0, muet" "0:" "$rc:$out"
+# b41 : dossier des fiches ouvert a tous les comptes, une fiche ne vise que son compte
+check_exit "orchestre : dossier des fiches en 1777" "1777" "$(stat -c %a "$OD/sessions")"
+out=$(python3 -c 'import importlib.util as u,sys,os; sp=u.spec_from_file_location("pt",sys.argv[1]); m=u.module_from_spec(sp); f=sys.argv[2]; sys.argv=["pt"]; sp.loader.exec_module(m); print(m.orch_meme_compte(f, os.getpid()), m.orch_meme_compte(f, 1) if os.getuid() else False)' "$PT" "$OD/sessions/sb.json")
+check_exit "orchestre : fiche crue pour son compte, ignoree pour un autre" "True False" "$out"
+chmod 555 "$OD/sessions"
+out=$(echo '{"session_id":"sx","tool_name":"Read","tool_input":{}}' | PLANTRACK_ORCHESTRE="$OD" python3 "$PT" hook-pretool 2>&1); rc=$?
+[ "$(id -u)" = 0 ] && ecrit=0 || ecrit=$(ls "$OD/sessions" | grep -c '^sx')
+check_exit "orchestre : dossier ferme : hook muet, sans fiche" "0:0" "$rc:$ecrit"
+chmod 1777 "$OD/sessions"
 # une session finie laisse son pic dans l'historique (apprentissage) ; le hook ci-dessus
 # a reinscrit sa sur le vrai claude qui lance ce test : on remet sa fausse session
 fiche sa "$pa" ""

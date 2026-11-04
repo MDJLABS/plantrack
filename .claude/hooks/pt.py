@@ -1334,6 +1334,8 @@ def orch_inscrire(data, prompt=None):
             return None
         dossier = os.path.join(ORCH_DIR, "sessions")
         os.makedirs(dossier, exist_ok=True)
+        if not os.access(dossier, os.W_OK):   # service pas encore relance en 1777 (b41)
+            return None
         chemin = os.path.join(dossier, sid + ".json")
         fiche = orch_lire(chemin, {}) or {}
         pid = orch_pid_session() or fiche.get("pid")
@@ -1489,6 +1491,22 @@ def orch_estimation(projet):
     return int(1.2 * pics[len(pics) // 2]) if pics else 0
 
 
+def orch_meme_compte(chemin, pid):
+    """Le dossier des fiches est ouvert a tous (1777) : une fiche n'est crue que si son
+    proprietaire est root ou le compte du processus qu'elle designe."""
+    try:
+        proprio = os.stat(chemin).st_uid
+        if proprio == 0:
+            return True
+        with open(f"/proc/{int(pid)}/status", encoding="utf-8") as f:
+            for ligne in f:
+                if ligne.startswith("Uid:"):
+                    return int(ligne.split()[1]) == proprio
+    except (OSError, ValueError, TypeError):
+        pass
+    return False
+
+
 def orch_sessions(maintenant, enfants, rss, etat):
     """Fiches des sessions vivantes, avec rang et poids (RSS de tout l'arbre). Une
     session finie est retiree et son pic entre dans l'historique (apprentissage)."""
@@ -1514,6 +1532,8 @@ def orch_sessions(maintenant, enfants, rss, etat):
                 os.remove(chemin)
             except OSError:
                 pass
+            continue
+        if not orch_meme_compte(chemin, pid):   # une fiche ne gele que son propre compte (b41)
             continue
         poids = rss.get(pid, 0) + sum(rss.get(d, 0) for d in orch_descendants(pid, enfants))
         pic = max(poids, (connues.get(fiche["sid"]) or {}).get("pic", 0))
@@ -1657,6 +1677,10 @@ def cmd_orchestre(args):
     if "--boucle" in args or "--tour" in args:
         import fcntl   # Linux seulement : le reste de PlanTrack ne doit pas en dependre
         os.makedirs(os.path.join(ORCH_DIR, "sessions"), exist_ok=True)
+        try:   # chaque compte inscrit sa propre fiche, comme /tmp (b41)
+            os.chmod(os.path.join(ORCH_DIR, "sessions"), 0o1777)
+        except OSError:
+            pass
         verrou = open(os.path.join(ORCH_DIR, "verrou"), "w")
         try:
             fcntl.flock(verrou, fcntl.LOCK_EX | fcntl.LOCK_NB)
