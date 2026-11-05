@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [119 commits]
+FIL ACTIF — t23 : guides de test automatiques (d100) [120 commits]
   fichiers recemment ecrits : deploiement/guide-relais-mdjlabs.py, deploiement/plantrack-guide-relais.service, deploiement/plantrack-guide-relais.timer, docs/session-admin-guide-05-11.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-immutable-kite.md, sortie/rebuild-guide-05-11.sh
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -244,6 +244,5 @@ Pieges connus :
 
 Questions en attente (reponds via !answer qN ...) :
   q15 : Guide Soirées pret (s69-soirees 1db1d2a) : Mariella fait-elle l'essai sur https…
-  q18 : v1.9.36 (b41) a pousser sur GitHub et service plantrack-orchestre a redemarrer …
 ```
 <!-- plantrack:state-end -->

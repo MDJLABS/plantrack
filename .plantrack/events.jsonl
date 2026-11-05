@@ -2133,3 +2133,5 @@
 {"ts": "2026-11-05T21:42:08+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-immutable-kite.md", "thread": "t23"}
 {"ts": "2026-11-05T21:57:46+00:00", "kind": "file_touched", "text": "sortie/rebuild-guide-05-11.sh", "thread": "t23"}
 {"ts": "2026-11-05T21:58:27+00:00", "kind": "decision", "id": "d182", "text": "05/11 soir, session root (bcc d312, choix Mariella 'Relancer avec les droits') : v1.9.36+v1.9.37 poussees sur GitHub (main+tags, PyPI toujours sans cle d127) ; tests avertir 16 ok ; S69 Soirees moteur v1.9.37 commite (be21991) ; relais mdjlabs installe (timer actif, repere pose a 18, mdjlabs-site inscrit au poste) ; rebuild ProJob/OpenStyle/Mizzzen lance en file kvm-lourd (sortie/rebuild-guide-05-11.log)", "par": "agent"}
+{"ts": "2026-11-05T21:58:28+00:00", "kind": "commit", "sha": "a12ada7", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-05T21:58:33+00:00", "kind": "answer", "id": "q18", "text": "Fait le 05/11 en session root : v1.9.36/v1.9.37 poussees, orchestre deja relance (d178)", "canal": "bcc (fil, 05/11) : ok réveille les projets et continue sur nos taches"}
