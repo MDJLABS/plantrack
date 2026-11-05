@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [120 commits]
-  fichiers recemment ecrits : deploiement/guide-relais-mdjlabs.py, deploiement/plantrack-guide-relais.service, deploiement/plantrack-guide-relais.timer, docs/session-admin-guide-05-11.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-immutable-kite.md, sortie/rebuild-guide-05-11.sh
+FIL ACTIF — t23 : guides de test automatiques (d100) [121 commits]
+  fichiers recemment ecrits : deploiement/plantrack-guide-relais.timer, docs/session-admin-guide-05-11.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-immutable-kite.md, sortie/rebuild-guide-05-11.sh, sortie/carte-essai-prolearn.json, sortie/carte-essai-prolearn.log
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -222,6 +222,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d180 : mdjlabs (choix Mariella tel 05/11, carte 'Le relais (Recommande)') : relais deploiement/guide-relais-mdjlabs.py + plantrack-guide-relais.ti… (agent)
   d181 : Mariella (tel, 05/11, carte Suite) : 'Session admin (Recommande)' — elle ouvre une session PlanTrack administrateur qui deroule docs/sessio… (agent)
   d182 : 05/11 soir, session root (bcc d312, choix Mariella 'Relancer avec les droits') : v1.9.36+v1.9.37 poussees sur GitHub (main+tags, PyPI toujo… (agent)
+  d183 : 05/11 23h22 : rebuilds d182 — ProJob et Mizzzen relances avec le moteur v1.9.37 (actifs) ; OpenStyle BUILD ECHOUE sur sa propre modif paiem… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
