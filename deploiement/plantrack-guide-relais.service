@@ -1,0 +1,9 @@
+[Unit]
+Description=PlanTrack - relais du guide de test mdjlabs (D1 Cloudflare -> session)
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /home/mariella/plantrack/deploiement/guide-relais-mdjlabs.py
+Nice=10
+TimeoutStartSec=90
