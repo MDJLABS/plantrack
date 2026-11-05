@@ -2093,3 +2093,6 @@
 {"ts": "2026-11-04T22:18:32+00:00", "kind": "file_touched", "text": "sortie/carte-suite-admin.log", "thread": "t23"}
 {"ts": "2026-11-04T22:30:59+00:00", "kind": "file_touched", "text": "../../bccsession/.claude/plans/contexte-reconstruit-par-le-shimmering-raccoon.md", "thread": "t23"}
 {"ts": "2026-11-04T22:32:41+00:00", "kind": "decision", "id": "d177", "text": "Mariella (tel, 04/11 23h30, plan approuve apres relance auto alerte charge) : rien a faire, attente de la session administrateur pour pousser v1.9.36 sur GitHub et redemarrer plantrack-orchestre (b41/q18) ; charge ~3.2 et swap plein dus aux sessions en cours (wrangler/playwright), passager.", "par": "agent"}
+{"ts": "2026-11-04T22:32:41+00:00", "kind": "commit", "sha": "2d892d3", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-05T15:01:29+00:00", "kind": "file_touched", "text": "../../bccsession/.claude/plans/contexte-reconstruit-par-le-dapper-lobster.md", "thread": "t23"}
+{"ts": "2026-11-05T15:06:04+00:00", "kind": "decision", "id": "d178", "text": "Mariella (tel, 05/11, plan approuve apres relance auto) : rien a faire — orchestre deja redemarre (05/11 07:24, apres d673c24) ; reste seulement le push GitHub de v1.9.36 (main + tag) par la session administrateur (d176). Veille silencieuse, pas d'autre carte.", "par": "agent"}
