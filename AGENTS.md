@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [117 commits]
+FIL ACTIF — t23 : guides de test automatiques (d100) [118 commits]
   fichiers recemment ecrits : sortie/tsc-guide.log, pyproject.toml, deploiement/guide-relais-mdjlabs.py, deploiement/plantrack-guide-relais.service, deploiement/plantrack-guide-relais.timer, docs/session-admin-guide-05-11.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -220,6 +220,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d178 : Mariella (tel, 05/11, plan approuve apres relance auto) : rien a faire — orchestre deja redemarre (05/11 07:24, apres d673c24) ; reste seul… (agent)
   d179 : Guide de test : la carte de fin dit la verite sur l'envoi a la session (plan approuve par Mariella tel 05/11 'On y va', demande 'qu'ils s'e… (agent)
   d180 : mdjlabs (choix Mariella tel 05/11, carte 'Le relais (Recommande)') : relais deploiement/guide-relais-mdjlabs.py + plantrack-guide-relais.ti… (agent)
+  d181 : Mariella (tel, 05/11, carte Suite) : 'Session admin (Recommande)' — elle ouvre une session PlanTrack administrateur qui deroule docs/sessio… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
