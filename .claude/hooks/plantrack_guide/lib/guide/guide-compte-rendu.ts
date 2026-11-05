@@ -1,6 +1,11 @@
 /* ==============================================================================
  * Guide de test — COMPTE-RENDU BRUT (texte copié dans le presse-papier).
  *
+ * Depuis le 05/11, ce n'est plus le chemin normal : le retour de fin part tout seul à la
+ * session (`consignerGuide` → `avertirSession`, 3 essais). Ce texte ne sert plus qu'en
+ * SECOURS, quand l'envoi a raté — l'écran de fin ne montre le bouton Copier qu'alors.
+ * Historique ci-dessous.
+ *
  * Décision Mariella (round de correction 1, lot 2.3, 2026-07-25) : pas de stockage
  * serveur pour l'instant (cf. `.claude/rules/guide-de-test.md` § « Ce qui n'est pas
  * encore porté »). À la place, l'écran de bilan de `GuideDeTest.tsx` porte un bouton qui

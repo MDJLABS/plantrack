@@ -257,7 +257,7 @@ export async function guideInterrompu(scenarioId: string): Promise<{ error: stri
  */
 export async function consignerGuide(
   scenarioId: string,
-): Promise<{ error: string | null; statut: "en-cours" | "valide" | "a-revoir" | null }> {
+): Promise<{ error: string | null; statut: "en-cours" | "valide" | "a-revoir" | null; envoye?: boolean }> {
   if (!(await porteAdmin())) return { error: "hors session admin", statut: null };
 
   const scenario = getScenario(scenarioId);
@@ -313,7 +313,34 @@ export async function consignerGuide(
 
   await ecrireCompteRendu(racine, scenario, resultat, quand);
   await reglagesGuideServeur.apresConsigne?.(resultat);
-  await avertirSession(racine, texteAvis(scenario, suivant.verdicts, "fin"));
+  const envoye = await avertirAvecEssais(racine, texteAvis(scenario, suivant.verdicts, "fin"));
 
-  return { error: null, statut: bilan.statut };
+  return { error: null, statut: bilan.statut, envoye };
+}
+
+/** Le retour de fin ne doit pas se perdre en silence (05/11 : « qu'ils s'envoient tout seul
+ *  à la session sans copier-coller ») : 3 essais espacés avant d'avouer l'échec à la carte. */
+async function avertirAvecEssais(racine: string, texte: string): Promise<boolean> {
+  for (let i = 0; i < 3; i++) {
+    if (await avertirSession(racine, texte)) return true;
+    if (process.env.GUIDE_AVERTIR === "0") return false;
+    if (i < 2) await new Promise((r) => setTimeout(r, 1_000 * (i + 1)));
+  }
+  return false;
+}
+
+/**
+ * Bouton « Réessayer » de la carte de fin : renvoie le retour de fin d'une visite déjà
+ * consignée, reconstruit depuis le registre (jamais depuis le navigateur).
+ */
+export async function renvoyerGuide(scenarioId: string): Promise<{ error: string | null; envoye: boolean }> {
+  if (!(await porteAdmin())) return { error: "hors session admin", envoye: false };
+  const scenario = getScenario(scenarioId);
+  if (!scenario) return { error: "scénario inconnu", envoye: false };
+  const racine = await racineDuDepot();
+  if (!racine) return { error: "dossier .planning introuvable", envoye: false };
+
+  const entree = (await lireEtat(racine))[scenarioId];
+  if (!entree || entree.date !== scenario.date || !entree.fini) return { error: "visite pas terminée", envoye: false };
+  return { error: null, envoye: await avertirAvecEssais(racine, texteAvis(scenario, entree.verdicts, "fin")) };
 }

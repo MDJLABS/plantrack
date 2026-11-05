@@ -47,7 +47,7 @@ const racine = await mkdtemp(join(tmpdir(), "plantrack-guide-avertir-"));
 await mkdir(join(racine, ".planning"), { recursive: true });
 process.chdir(racine);
 
-const { consignerPoint, consignerGuide, guideInterrompu } = await import(
+const { consignerPoint, consignerGuide, guideInterrompu, renvoyerGuide } = await import(
   "../../.claude/hooks/plantrack_guide/lib/guide/guide-actions.ts"
 );
 const { placerCarte } = await import("../../.claude/hooks/plantrack_guide/lib/guide/guide-geometry.ts");
@@ -90,6 +90,7 @@ await step("guide terminé → bilan", async () => {
   assert.equal(r.statut, "a-revoir");
   assert.equal(recus.length, 4);
   assert.match(recus[3]!.corps.texte, /terminé : 4 ok, 2 pas ok/);
+  assert.equal(r.envoye, true); // la carte de fin peut dire « ✓ Envoyé à ta session »
 });
 
 await step("guide déjà consigné → la fermeture ne redit rien", async () => {
@@ -97,10 +98,30 @@ await step("guide déjà consigné → la fermeture ne redit rien", async () => 
   assert.equal(recus.length, 4);
 });
 
+await step("bouton Réessayer → le bilan repart, reconstruit du registre", async () => {
+  const r = await renvoyerGuide("temoin-principal");
+  assert.deepEqual(r, { error: null, envoye: true });
+  assert.equal(recus.length, 5);
+  assert.match(recus[4]!.corps.texte, /terminé : 4 ok, 2 pas ok/);
+});
+
+await step("Réessayer sur une visite pas terminée → refusé, rien n'est envoyé", async () => {
+  await consignerPoint("temoin-second", "q1", "ok");
+  const r = await renvoyerGuide("temoin-second");
+  assert.equal(r.envoye, false);
+  assert.ok(r.error);
+  assert.equal(recus.length, 5);
+});
+
 await step("poste éteint → jamais d'erreur pour le guide", async () => {
   process.env.BCC_PORT = "1";
   const r = await consignerPoint("temoin-second", "q1", "ko", "x");
   assert.equal(r.error, null);
+});
+
+await step("poste éteint au bilan → envoye = faux, après 3 essais", async () => {
+  const r = await renvoyerGuide("temoin-principal");
+  assert.deepEqual(r, { error: null, envoye: false });
 });
 
 const ecranTel = { w: 390, h: 844 };

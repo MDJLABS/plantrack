@@ -92,7 +92,7 @@ import {
 import { indexDePoint, SCENARIOS } from "@/lib/guide/scenarios";
 import { verdictScenario } from "@/lib/guide/guide-verdict";
 import { construireCompteRendu } from "@/lib/guide/guide-compte-rendu";
-import { consignerGuide, consignerPoint, guideInterrompu } from "@/lib/guide/guide-actions";
+import { consignerGuide, consignerPoint, guideInterrompu, renvoyerGuide } from "@/lib/guide/guide-actions";
 import { reglagesGuide } from "@/lib/guide/guide-reglages";
 import { surLaPage } from "@/lib/guide/guide-visite";
 import { GuideCurseur } from "./GuideCurseur";
@@ -340,6 +340,9 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer }: 
   // complet (cf. l'effet de bascule plus bas) : garde contre un double appel (changement de
   // point qui ne modifie pas le statut final, double rendu StrictMode…).
   const consigneRef = useRef<string | null>(null);
+  // Envoi du retour de fin à la session (05/11) : la carte dit la vérité — parti, en
+  // cours, ou raté (le copier-coller ne reparaît qu'alors, en secours).
+  const [envoi, setEnvoi] = useState<"envoi" | "envoye" | "echec">("envoi");
 
   // Reprise « là où elle s'est arrêtée » — lue APRÈS montage (localStorage n'existe pas
   // au rendu serveur).
@@ -407,9 +410,19 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer }: 
     setEcranBilan(true);
     if (consigneRef.current !== scenario.id) {
       consigneRef.current = scenario.id;
-      void consignerGuide(scenario.id);
+      setEnvoi("envoi");
+      void consignerGuide(scenario.id)
+        .then((r) => setEnvoi(!r.error && r.envoye ? "envoye" : "echec"))
+        .catch(() => setEnvoi("echec"));
     }
   }, [charge, bilan.statut, scenario.id]);
+
+  const renvoyer = () => {
+    setEnvoi("envoi");
+    void renvoyerGuide(scenario.id)
+      .then((r) => setEnvoi(!r.error && r.envoye ? "envoye" : "echec"))
+      .catch(() => setEnvoi("echec"));
+  };
 
   const maj = useCallback((p: GuideProgress) => {
     setProg(p);
@@ -884,8 +897,28 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer }: 
               </ul>
             )}
 
-            <p style={{ margin: "0 0 8px", color: C.doux }}>
-              Copie le compte-rendu ci-dessous, puis colle-le une fois dans le chat.
+            <p id="guide-envoi-etat" role="status" style={{
+              margin: "0 0 8px", fontWeight: envoi === "envoi" ? 400 : 500,
+              color: envoi === "envoye" ? C.ok : envoi === "echec" ? C.ko : C.doux,
+            }}>
+              {envoi === "envoye"
+                ? "✓ Envoyé à ta session, tu n'as rien à faire."
+                : envoi === "envoi"
+                  ? "Envoi à ta session…"
+                  : "Pas pu envoyer à ta session."}
+            </p>
+            {envoi === "echec" && (
+            <>
+            <button
+              id="guide-renvoyer"
+              type="button"
+              onClick={renvoyer}
+              style={{ ...btn, width: "100%", marginBottom: 8, borderColor: C.accent, color: C.accent }}
+            >
+              Réessayer
+            </button>
+            <p style={{ margin: "0 0 6px", color: C.doux, fontSize: 11.5 }}>
+              En dernier recours : copie le compte-rendu et colle-le dans le chat.
             </p>
             <button
               id="guide-copier-compte-rendu"
@@ -916,6 +949,8 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer }: 
                   }}
                 />
               </div>
+            )}
+            </>
             )}
 
             <div style={{ display: "flex", gap: 6 }}>
