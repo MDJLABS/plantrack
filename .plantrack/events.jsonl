@@ -2096,3 +2096,34 @@
 {"ts": "2026-11-04T22:32:41+00:00", "kind": "commit", "sha": "2d892d3", "ctype": "chore", "thread": "t23"}
 {"ts": "2026-11-05T15:01:29+00:00", "kind": "file_touched", "text": "../../bccsession/.claude/plans/contexte-reconstruit-par-le-dapper-lobster.md", "thread": "t23"}
 {"ts": "2026-11-05T15:06:04+00:00", "kind": "decision", "id": "d178", "text": "Mariella (tel, 05/11, plan approuve apres relance auto) : rien a faire — orchestre deja redemarre (05/11 07:24, apres d673c24) ; reste seulement le push GitHub de v1.9.36 (main + tag) par la session administrateur (d176). Veille silencieuse, pas d'autre carte.", "par": "agent"}
+{"ts": "2026-11-05T15:06:05+00:00", "kind": "commit", "sha": "874a60d", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-05T19:24:23+00:00", "kind": "file_touched", "text": "../../bccsession/.claude/plans/contexte-reconstruit-par-le-functional-tiger.md", "thread": "t23"}
+{"ts": "2026-11-05T20:59:11+00:00", "kind": "file_touched", "text": "../../bccsession/.claude/plans/contexte-reconstruit-par-le-spicy-karp.md", "thread": "t23"}
+{"ts": "2026-11-05T21:00:18+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/lib/guide/guide-actions.ts", "thread": "t23"}
+{"ts": "2026-11-05T21:00:19+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/lib/guide/guide-actions.ts", "thread": "t23"}
+{"ts": "2026-11-05T21:00:34+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-11-05T21:00:37+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-11-05T21:00:38+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-11-05T21:00:42+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-11-05T21:00:48+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-11-05T21:00:52+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/lib/guide/guide-compte-rendu.ts", "thread": "t23"}
+{"ts": "2026-11-05T21:01:06+00:00", "kind": "file_touched", "text": "tests/guide/avertir.test.ts", "thread": "t23"}
+{"ts": "2026-11-05T21:01:07+00:00", "kind": "file_touched", "text": "tests/guide/avertir.test.ts", "thread": "t23"}
+{"ts": "2026-11-05T21:01:27+00:00", "kind": "file_touched", "text": "../../../tmp/claude-997/-home-mariella-plantrack/84d5abfd-c253-47c6-949c-9bab51cafaa0/scratchpad/f.mjs", "thread": "t23"}
+{"ts": "2026-11-05T21:02:13+00:00", "kind": "commit", "sha": "01f830e", "ctype": "feat", "thread": "t23"}
+{"ts": "2026-11-05T21:08:35+00:00", "kind": "file_touched", "text": "sortie/carte-mdjlabs.json", "thread": "t23"}
+{"ts": "2026-11-05T21:08:35+00:00", "kind": "file_touched", "text": "sortie/carte-mdjlabs.log", "thread": "t23"}
+{"ts": "2026-11-05T21:08:52+00:00", "kind": "file_touched", "text": "sortie/carte-mdjlabs.log", "thread": "t23"}
+{"ts": "2026-11-05T21:09:14+00:00", "kind": "file_touched", "text": "sortie/tsc-guide.sh", "thread": "t23"}
+{"ts": "2026-11-05T21:09:14+00:00", "kind": "file_touched", "text": "sortie/tsc-guide.log", "thread": "t23"}
+{"ts": "2026-11-05T21:09:46+00:00", "kind": "piege", "id": "pg30", "text": "Compte bccsession (sessions du telephone) : la boucle locale est filtree — seul 127.0.0.1:8787 (bcc-proxy) repond ; tout autre port local (serveur de test ephemere, sites 3000/31x0/3200…) rend ECONNREFUSED meme hors bac a sable. Consequences : tests/guide/avertir.test.ts (faux poste sur port ephemere) echoue ici sans que le code soit en cause, et BCC_PORT de l'environnement de session (port interne) est injoignable : lancer hook/demander.ts avec BCC_PORT=8787."}
+{"ts": "2026-11-05T21:13:03+00:00", "kind": "commit", "sha": "ee53829", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-05T21:13:04+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t23"}
+{"ts": "2026-11-05T21:13:11+00:00", "kind": "decision", "id": "d179", "text": "Guide de test : la carte de fin dit la verite sur l'envoi a la session (plan approuve par Mariella tel 05/11 'On y va', demande 'qu'ils s'envoient tout seul a la session sans copier-coller'). Moteur 01f830e : consignerGuide rend envoye (3 essais espaces), action renvoyerGuide (bouton Reessayer #guide-renvoyer), etat #guide-envoi-etat, bouton Copier seulement si l'envoi a rate. Recopie et commitee dans prolearn, projob, openstyle, Mizzzen, miamboost, s69-francoviet (tsc vert, miamboost OOM). v1.9.37 taggee en local. Restent pour une session admin : push GitHub (v1.9.36 + v1.9.37), s69-soirees (fichiers root, lecture seule), reconstruction + redemarrage projob-web/openstyle-next/mizzzen-web (next start). mdjlabs : static export Cloudflare, ne peut pas prendre le moteur commun -> carte posee (relais / version de test locale / rien).", "par": "agent"}
+{"ts": "2026-11-05T21:14:06+00:00", "kind": "file_touched", "text": "deploiement/guide-relais-mdjlabs.py", "thread": "t23"}
+{"ts": "2026-11-05T21:14:18+00:00", "kind": "file_touched", "text": "deploiement/plantrack-guide-relais.service", "thread": "t23"}
+{"ts": "2026-11-05T21:14:18+00:00", "kind": "file_touched", "text": "deploiement/plantrack-guide-relais.timer", "thread": "t23"}
+{"ts": "2026-11-05T21:14:29+00:00", "kind": "commit", "sha": "8d34e13", "ctype": "feat", "thread": "t23"}
+{"ts": "2026-11-05T21:14:44+00:00", "kind": "file_touched", "text": "docs/session-admin-guide-05-11.md", "thread": "t23"}
+{"ts": "2026-11-05T21:14:48+00:00", "kind": "commit", "sha": "ee97707", "ctype": "docs", "thread": "t23"}
+{"ts": "2026-11-05T21:14:48+00:00", "kind": "decision", "id": "d180", "text": "mdjlabs (choix Mariella tel 05/11, carte 'Le relais (Recommande)') : relais deploiement/guide-relais-mdjlabs.py + plantrack-guide-relais.timer (chaque minute, root) — lit guide_verdicts de la D1 preview via /root/.config/mdj/cf-api.sh et POST /guide/point (projet /home/mariella/mdjlabs-site) ; repere avance seulement apres envoi accepte ; premier passage sans rejouer l'historique. Le site mdjlabs n'est pas modifie (son ecran de fin dit deja 'Envoye'). Installation + gestes root listes dans docs/session-admin-guide-05-11.md.", "par": "agent"}

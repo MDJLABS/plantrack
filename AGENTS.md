@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [112 commits]
-  fichiers recemment ecrits : ../../../tmp/claude-997/-home-mariella-plantrack/42f34ac2-75f5-4bad-9fa8-8cc03e2c0918/scratchpad/carte.json, sortie/carte-suite-b41.log, ../../bccsession/.claude/plans/contexte-reconstruit-par-le-indexed-torvalds.md, sortie/carte-suite-admin.log, ../../bccsession/.claude/plans/contexte-reconstruit-par-le-shimmering-raccoon.md, ../../bccsession/.claude/plans/contexte-reconstruit-par-le-dapper-lobster.md
+FIL ACTIF — t23 : guides de test automatiques (d100) [117 commits]
+  fichiers recemment ecrits : sortie/tsc-guide.log, pyproject.toml, deploiement/guide-relais-mdjlabs.py, deploiement/plantrack-guide-relais.service, deploiement/plantrack-guide-relais.timer, docs/session-admin-guide-05-11.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -218,6 +218,8 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d176 : Mariella (tel, 04/11, via AskUserQuestion) : b41/v1.9.36 -> 'Session admin (Recommande)' : elle ouvre une session PlanTrack en mode adminis… (agent)
   d177 : Mariella (tel, 04/11 23h30, plan approuve apres relance auto alerte charge) : rien a faire, attente de la session administrateur pour pouss… (agent)
   d178 : Mariella (tel, 05/11, plan approuve apres relance auto) : rien a faire — orchestre deja redemarre (05/11 07:24, apres d673c24) ; reste seul… (agent)
+  d179 : Guide de test : la carte de fin dit la verite sur l'envoi a la session (plan approuve par Mariella tel 05/11 'On y va', demande 'qu'ils s'e… (agent)
+  d180 : mdjlabs (choix Mariella tel 05/11, carte 'Le relais (Recommande)') : relais deploiement/guide-relais-mdjlabs.py + plantrack-guide-relais.ti… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
@@ -236,6 +238,7 @@ Pieges connus :
   pg27 : pgrep/pkill -f 'bash tests/scenario.sh' se reconnait lui-meme dans une boucle d…
   pg28 : Orchestre : le hook-pretool reinscrit la session sur le premier ancetre claude/…
   pg29 : tests/scenario.sh lance sous le compte bccsession : 6 echecs ronde/b20/bilan --…
+  pg30 : Compte bccsession (sessions du telephone) : la boucle locale est filtree — seul…
 
 Questions en attente (reponds via !answer qN ...) :
   q15 : Guide Soirées pret (s69-soirees 1db1d2a) : Mariella fait-elle l'essai sur https…
