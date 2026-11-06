@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [123 commits]
-  fichiers recemment ecrits : sortie/carte-essai-prolearn.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-iridescent-flute.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-prancy-puppy.md, sortie/carte-pendant-essai-prolearn.json, sortie/carte-pendant-essai-prolearn.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-glowing-scroll.md
+FIL ACTIF — t23 : guides de test automatiques (d100) [124 commits]
+  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-iridescent-flute.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-prancy-puppy.md, sortie/carte-pendant-essai-prolearn.json, sortie/carte-pendant-essai-prolearn.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-glowing-scroll.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-quiet-snowflake.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -225,6 +225,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d183 : 05/11 23h22 : rebuilds d182 — ProJob et Mizzzen relances avec le moteur v1.9.37 (actifs) ; OpenStyle BUILD ECHOUE sur sa propre modif paiem… (agent)
   d184 : Mariella (tel, 06/11 10h43, plan approuve 'On y va') : attente de ses verdicts du guide ProLearn, veille silencieuse (d23) ; tri groupe des… (agent)
   d185 : Mariella (tel, 06/11 12h25, carte Pendant ton essai) : 'Attendre mon verdict (Recommande)' — aucun chantier, veille silencieuse jusqu'au ve… (agent)
+  d186 : Mariella (tel, 06/11 13h10, plan approuve apres relance auto suite au menage) : rien a faire, attente du verdict du guide ProLearn (d185), … (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
