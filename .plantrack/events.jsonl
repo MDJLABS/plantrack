@@ -2139,3 +2139,8 @@
 {"ts": "2026-11-05T21:59:07+00:00", "kind": "file_touched", "text": "sortie/carte-essai-prolearn.json", "thread": "t23"}
 {"ts": "2026-11-05T21:59:07+00:00", "kind": "file_touched", "text": "sortie/carte-essai-prolearn.log", "thread": "t23"}
 {"ts": "2026-11-05T22:22:18+00:00", "kind": "decision", "id": "d183", "text": "05/11 23h22 : rebuilds d182 — ProJob et Mizzzen relances avec le moteur v1.9.37 (actifs) ; OpenStyle BUILD ECHOUE sur sa propre modif paiement 737fbf3 (stripe.ts TS2561 payment_method_types), ancienne version toujours servie, session OpenStyle prevenue par transmettre (d11 : pas de correction depuis le fil PlanTrack)", "par": "agent"}
+{"ts": "2026-11-05T22:22:18+00:00", "kind": "commit", "sha": "9a3853b", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-05T23:01:54+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-iridescent-flute.md", "thread": "t23"}
+{"ts": "2026-11-05T23:46:03+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-iridescent-flute.md", "thread": "t23"}
+{"ts": "2026-11-06T10:43:44+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-prancy-puppy.md", "thread": "t23"}
+{"ts": "2026-11-06T10:44:08+00:00", "kind": "decision", "id": "d184", "text": "Mariella (tel, 06/11 10h43, plan approuve 'On y va') : attente de ses verdicts du guide ProLearn, veille silencieuse (d23) ; tri groupe des attentes apres l'essai", "par": "agent"}
