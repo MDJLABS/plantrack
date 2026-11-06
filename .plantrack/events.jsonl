@@ -2144,3 +2144,8 @@
 {"ts": "2026-11-05T23:46:03+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-iridescent-flute.md", "thread": "t23"}
 {"ts": "2026-11-06T10:43:44+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-prancy-puppy.md", "thread": "t23"}
 {"ts": "2026-11-06T10:44:08+00:00", "kind": "decision", "id": "d184", "text": "Mariella (tel, 06/11 10h43, plan approuve 'On y va') : attente de ses verdicts du guide ProLearn, veille silencieuse (d23) ; tri groupe des attentes apres l'essai", "par": "agent"}
+{"ts": "2026-11-06T10:44:09+00:00", "kind": "commit", "sha": "5d230e3", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-06T10:44:20+00:00", "kind": "file_touched", "text": "sortie/carte-pendant-essai-prolearn.json", "thread": "t23"}
+{"ts": "2026-11-06T10:44:20+00:00", "kind": "file_touched", "text": "sortie/carte-pendant-essai-prolearn.log", "thread": "t23"}
+{"ts": "2026-11-06T12:25:42+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-glowing-scroll.md", "thread": "t23"}
+{"ts": "2026-11-06T12:25:56+00:00", "kind": "decision", "id": "d185", "text": "Mariella (tel, 06/11 12h25, carte Pendant ton essai) : 'Attendre mon verdict (Recommande)' — aucun chantier, veille silencieuse jusqu'au verdict du guide ProLearn (d23, d184)", "par": "agent"}
