@@ -2157,3 +2157,8 @@
 {"ts": "2026-11-06T13:58:59+00:00", "kind": "file_touched", "text": "sortie/carte-attente-1310.log", "thread": "t23"}
 {"ts": "2026-11-06T14:00:06+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-cosmic-unicorn.md", "thread": "t23"}
 {"ts": "2026-11-06T15:27:44+00:00", "kind": "decision", "id": "d187", "text": "Mariella (tel, 06/11 13h58, carte Pendant ton essai) : 'Attendre mon verdict (Recommande)' — attente du verdict du guide ProLearn, veille silencieuse (d23, d185)", "par": "agent"}
+{"ts": "2026-11-06T15:27:44+00:00", "kind": "commit", "sha": "eadf1bc", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-06T15:29:52+00:00", "kind": "file_touched", "text": "sortie/carte-attente-1358.json", "thread": "t23"}
+{"ts": "2026-11-06T15:29:52+00:00", "kind": "file_touched", "text": "sortie/carte-attente-1358.log", "thread": "t23"}
+{"ts": "2026-11-06T15:35:36+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-quizzical-shore.md", "thread": "t23"}
+{"ts": "2026-11-06T15:35:58+00:00", "kind": "decision", "id": "d188", "text": "Mariella (tel, 06/11 15h29, carte Pendant ton essai) : 'Attendre mon verdict (Recommande)' — attente du verdict du guide ProLearn, veille silencieuse (d23) ; tri des 3 attentes +7 j laisse de cote", "par": "agent"}

@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [125 commits]
-  fichiers recemment ecrits : sortie/carte-pendant-essai-prolearn.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-glowing-scroll.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-quiet-snowflake.md, sortie/carte-attente-1310.json, sortie/carte-attente-1310.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-cosmic-unicorn.md
+FIL ACTIF — t23 : guides de test automatiques (d100) [126 commits]
+  fichiers recemment ecrits : sortie/carte-attente-1310.json, sortie/carte-attente-1310.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-cosmic-unicorn.md, sortie/carte-attente-1358.json, sortie/carte-attente-1358.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-quizzical-shore.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -227,6 +227,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d185 : Mariella (tel, 06/11 12h25, carte Pendant ton essai) : 'Attendre mon verdict (Recommande)' — aucun chantier, veille silencieuse jusqu'au ve… (agent)
   d186 : Mariella (tel, 06/11 13h10, plan approuve apres relance auto suite au menage) : rien a faire, attente du verdict du guide ProLearn (d185), … (agent)
   d187 : Mariella (tel, 06/11 13h58, carte Pendant ton essai) : 'Attendre mon verdict (Recommande)' — attente du verdict du guide ProLearn, veille s… (agent)
+  d188 : Mariella (tel, 06/11 15h29, carte Pendant ton essai) : 'Attendre mon verdict (Recommande)' — attente du verdict du guide ProLearn, veille s… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
