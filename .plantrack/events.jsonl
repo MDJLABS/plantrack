@@ -2201,3 +2201,6 @@
 {"ts": "2026-11-07T12:09:31+00:00", "kind": "commit", "sha": "620d16e", "ctype": "chore", "thread": "t23"}
 {"ts": "2026-11-07T12:09:38+00:00", "kind": "file_touched", "text": "sortie/carte-compte-guide-prolearn.json", "thread": "t23"}
 {"ts": "2026-11-07T12:13:23+00:00", "kind": "answer", "id": "q19", "text": "Mariella a trouve un acces (ok c'est bon) ; seulement le guide essai-gestes (3 points) a faire aujourd'hui", "canal": "telephone : « ok c'est bon, je dois faire les 48 tests ? »"}
+{"ts": "2026-11-07T12:13:24+00:00", "kind": "commit", "sha": "383e5d1", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-07T12:13:35+00:00", "kind": "file_touched", "text": "sortie/carte-pendant-essai-0711-midi.json", "thread": "t23"}
+{"ts": "2026-11-07T12:17:59+00:00", "kind": "decision", "id": "d197", "text": "Mariella (tel, 07/11 midi, carte Pendant ton essai) : 'J'ai d'abord demande a la session prolearn de donner a l'espace admin acces a tous les dashboards. On attend qu'il le fasse et ensuite je ferais les tests' - attente, aucune modif cote prolearn (travail de sa session), b42 a revoir apres son essai", "par": "agent"}
