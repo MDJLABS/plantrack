@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [139 commits]
-  fichiers recemment ecrits : sortie/carte-suite-0711-menage.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-squishy-kite.md, ../prolearn/app/components/guide/GuideDeTest.tsx, ../prolearn/app/lib/guide/__tests__/guide-reglages.test.ts, ../prolearn/app/lib/guide/guide-reglages.ts, ../prolearn/app/tests/e2e/guide-bon-endroit.spec.ts
+FIL ACTIF — t23 : guides de test automatiques (d100) [142 commits]
+  fichiers recemment ecrits : ../prolearn/app/components/guide/GuideDeTest.tsx, ../prolearn/app/lib/guide/__tests__/guide-reglages.test.ts, ../prolearn/app/lib/guide/guide-reglages.ts, ../prolearn/app/tests/e2e/guide-bon-endroit.spec.ts, ../../../tmp/claude-0/-home-mariella-plantrack/7b59f58f-ad68-4f47-87d7-39e67fa8ec2a/scratchpad/gdt.patch, ../../../tmp/claude-0/-home-mariella-plantrack/7b59f58f-ad68-4f47-87d7-39e67fa8ec2a/scratchpad/lazy.patch
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -38,7 +38,7 @@ BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b39 (to_verify) [t23] Essai guide Soirees (02/11 11h, tel Mariella) : la page /soirees de la version de test s69-soirees affiche 'canal MiamBoost non configure (… (agent) [1 tentatives, derniere: Version de test branchee sur la preprod MiamBoost locale : …]
   b40 (to_verify) [t23] Essai guide Soirees (02/11 11h23, tel Mariella) : 'probleme sur les captcha cloudflare, il y en a 3 dans la page, beaucoup trop ; un seul s… (agent) [1 tentatives, derniere: s69-soirees 3c92781 : TurnstileWidget monte seulement a l'e…]
   b41 (to_verify) [t23] Orchestre (d159) : les sessions lancees sous bccsession (telephone) ne peuvent pas s'inscrire — /var/lib/plantrack-orchestre/sessions en ro… (agent) [1 tentatives, derniere: Dossier sessions en 1777 (bit collant) pose par l'orchestre…]
-  b42 (to_verify) [t23] Guide ProLearn essai-gestes injouable sur prolearn-dev (07/11, question Mariella 'je dois me loguer en tant que quoi ?') : estAdmin exige s… (agent) [2 tentatives, derniere: Correctif livre (prolearn dfeb954c + suite) : repli sur mdj…]
+  b42 (to_verify) [t23] Guide ProLearn essai-gestes injouable sur prolearn-dev (07/11, question Mariella 'je dois me loguer en tant que quoi ?') : estAdmin exige s… (agent) [3 tentatives, derniere: Lien visible 'Choisir un autre guide' (rouvre le panneau, g…]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)

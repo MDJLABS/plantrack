@@ -2225,3 +2225,9 @@
 {"ts": "2026-11-07T14:59:25+00:00", "kind": "file_touched", "text": "../prolearn/app/tests/e2e/guide-bon-endroit.spec.ts", "thread": "t23"}
 {"ts": "2026-11-07T15:04:57+00:00", "kind": "attempt", "id": "a58", "bug": "b42", "hypothesis": "Correctif livre (prolearn dfeb954c + suite) : repli sur mdjlabs-ressuage-niveau-2-cifm--T-D1D00001 (l'uuid donnait 404) + pas de bouton qui renvoie sur la page courante. vitest 61/61, e2e destination reelle 200 ; parcours admin non jouable en e2e (pas de compte admin de test)", "session": "7b59f58f-ad68-4f47-87d7-39e67fa8ec2a", "actor": "claude-code"}
 {"ts": "2026-11-07T15:05:04+00:00", "kind": "bug_status", "id": "b42", "status": "to_verify"}
+{"ts": "2026-11-07T15:05:04+00:00", "kind": "commit", "sha": "9134c63", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-07T16:20:59+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/7b59f58f-ad68-4f47-87d7-39e67fa8ec2a/scratchpad/gdt.patch", "thread": "t23"}
+{"ts": "2026-11-07T16:20:59+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/7b59f58f-ad68-4f47-87d7-39e67fa8ec2a/scratchpad/lazy.patch", "thread": "t23"}
+{"ts": "2026-11-07T16:22:02+00:00", "kind": "commit", "sha": "bf86bde", "ctype": "fix", "thread": "t23"}
+{"ts": "2026-11-07T16:22:54+00:00", "kind": "commit", "sha": "73f34c5", "ctype": "fix", "thread": "t23"}
+{"ts": "2026-11-07T16:48:50+00:00", "kind": "attempt", "id": "a59", "bug": "b42", "hypothesis": "Lien visible 'Choisir un autre guide' (rouvre le panneau, garde la progression) ; url ajoutee aux 8 guides du Studio et a importer-lot-a (le bouton n'apparaissait jamais sans url) ; match du scenario respecte (plus de faux hors page) ; deja sur place = meme page ET memes parametres. Moteur PlanTrack bf86bde/73f34c5, ProLearn 4ce8b226.", "session": "7b59f58f-ad68-4f47-87d7-39e67fa8ec2a", "actor": "claude-code"}
