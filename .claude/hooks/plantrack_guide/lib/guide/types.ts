@@ -82,7 +82,8 @@ export type GuideScenario = {
   /** Jamais lu par ce moteur (qui ne propose plus rien tout seul selon l'URL courante : le
    *  lanceur bas-droite remplace toute proposition spontanée). Porté UNIQUEMENT pour qu'un
    *  scénario copié depuis un site qui s'en servait encore reste assignable sans erreur de
-   *  type — compatibilité, pas comportement. */
+   *  type. Depuis le 07/11, il sert aussi au bouton « M'emmener au bon endroit » : sur une
+   *  page couverte par `match`, elle n'est pas « hors page » (cf. `GuideDeTest.tsx`). */
   match?: string;
   etapes: GuideStep[];
 };

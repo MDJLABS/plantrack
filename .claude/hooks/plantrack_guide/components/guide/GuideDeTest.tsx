@@ -100,6 +100,17 @@ import type { ResultatGeste } from "@/lib/guide/guide-geste";
 import type { VerdictStocke } from "@/lib/guide/guide-etat";
 import type { GuideScenario, GuideProgress } from "@/lib/guide/types";
 
+/** Vrai si les paramètres (`?…`) de `url` sont ceux de la page affichée (ordre ignoré). */
+function memesParametres(url: string): boolean {
+  if (typeof window === "undefined") return true;
+  const trier = (s: string) => [...new URLSearchParams(s)].map(([k, v]) => `${k}=${v}`).sort().join("&");
+  try {
+    return trier(new URL(url, window.location.href).search) === trier(window.location.search);
+  } catch {
+    return true;
+  }
+}
+
 const Z = 2147483000; // au-dessus de tout : la page a des overlays à z-index élevé (max mesuré : 1000)
 /** Seuil posture (charte mdjlabs) : < 600 → feuille collée en bas ; >= 600 → carte fixe. */
 const SEUIL_ORDINATEUR = 600;
@@ -157,6 +168,7 @@ export function GuideDeTest({
   scenario,
   verdictsServeur,
   onFermerDefinitivement,
+  onChoisirAutre,
 }: {
   /** Choisi dans le panneau du lanceur (`GuideDeTestLazy`) — jamais résolu ici. */
   scenario: GuideScenario;
@@ -167,6 +179,9 @@ export function GuideDeTest({
   /** Efface la persistance de session ET synchronise `GuideDeTestLazy` — appelé
    *  UNIQUEMENT par le ✕ « Fermer le guide », jamais par « Replier ». */
   onFermerDefinitivement: () => void;
+  /** « Choisir un autre guide » (Mariella, 07/11) : quitte CE guide sans effacer sa
+   *  progression et rouvre la liste des guides. Absent : le lien ne s'affiche pas. */
+  onChoisirAutre?: () => void;
 }) {
   const [monte, setMonte] = useState(false);
   // eslint-disable-next-line react-hooks/set-state-in-effect -- drapeau d'hydratation, cf. bandeau de tête
@@ -199,6 +214,7 @@ export function GuideDeTest({
           // pour de bon (session effacée) — l'effacement de la PROGRESSION, lui, se fait dans
           // `Visite`, qui est le seul endroit à savoir de quelle progression il s'agit.
           onTerminer={onFermerDefinitivement}
+          onChoisirAutre={onChoisirAutre}
         />
       )
       : (
@@ -272,7 +288,7 @@ function BoutonOuvrir({ scenario, onOpen, onQuitter }: {
   );
 }
 
-function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer }: {
+function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, onChoisirAutre }: {
   scenario: GuideScenario;
   /** Verdicts SERVEUR déjà connus pour ce scénario — cf. `GuideDeTest` ci-dessus. */
   verdictsServeur?: Record<string, VerdictStocke>;
@@ -284,6 +300,7 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer }: 
   /** Sortie DÉFINITIVE depuis le bilan (efface la clé de session) — distincte de `onFermer`,
    *  qui ne fait que replier vers la pastille. */
   onTerminer: () => void;
+  onChoisirAutre?: () => void;
 }) {
   const [prog, setProg] = useState<GuideProgress>(() => vide(scenario.id));
   const [cible, setCible] = useState<Rect | null>(null);
@@ -377,12 +394,22 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer }: 
   const router = useRouter();
   const urlBrute = etape.url ?? scenario.url ?? null;
   const urlPoint = urlBrute === null ? null : (reglagesGuide.resoudreUrl ?? ((u: string) => u))(urlBrute, pathname);
-  const horsPage = urlPoint !== null && !surLaPage(pathname, urlPoint);
+  // Un scénario porte souvent un `match` (toutes les pages où il est valable, ex. n'importe
+  // quel élément du Studio) plus large que son `url` (UNE page de départ) : sur une page
+  // couverte par `match`, elle n'est pas « hors page » tant que le point n'a pas sa propre
+  // `url` — sinon le bouton la chasserait d'une page où le point se joue très bien (07/11).
+  const couvertParMatch = etape.url == null && !!scenario.match && (() => {
+    try { return new RegExp(scenario.match).test(pathname); } catch { return false; }
+  })();
+  const horsPage = urlPoint !== null && !couvertParMatch && !surLaPage(pathname, urlPoint);
   // Présent quand elle n'est pas au bon endroit pour ce point, OU que la zone décrite y est
   // introuvable mais qu'une destination connue pourrait corriger ça. Plus de `?guide=` à
   // reporter dans l'URL (d138) : la visite tient par le « guide actif » en sessionStorage,
   // qui survit tout seul au changement de page.
-  const onAllerAuBonEndroit = urlPoint !== null && (horsPage || !trouvee)
+  // Jamais un bouton qui renvoie sur la page où elle est déjà (même chemin ET mêmes
+  // paramètres, `?vue=` de /dashboard compris) : un clic sans effet (b42, 07/11).
+  const dejaLa = urlPoint !== null && !horsPage && memesParametres(urlPoint);
+  const onAllerAuBonEndroit = urlPoint !== null && (horsPage || (!trouvee && !dejaLa))
     ? () => router.push(urlPoint)
     : null;
 
@@ -776,6 +803,22 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer }: 
             )}
           </div>
         </header>
+
+        {onChoisirAutre && (
+          // « Il me faut un lien dans les guides pour revenir et choisir un autre guide »
+          // (Mariella, 07/11) : visible, pas rangé dans le ⋯. La progression de CE guide est
+          // gardée (localStorage) : le rechoisir le reprend où elle s'était arrêtée.
+          <button
+            id="guide-choisir-autre"
+            onClick={() => { setMenuOuvert(false); onChoisirAutre(); }}
+            style={{
+              display: "block", minHeight: 44, margin: "-6px 0 4px", padding: 0,
+              background: "none", border: "none", cursor: "pointer",
+              color: C.cyan, font: "600 13px/1.2 var(--font-sans, var(--sans, system-ui, sans-serif))",
+              textAlign: "left", textDecoration: "underline",
+            }}
+          >&larr; Choisir un autre guide</button>
+        )}
 
         <strong style={{ display: "block", marginBottom: 10, fontSize: 14.5, fontWeight: 600, lineHeight: 1.3 }}>
           {etape.titre}

@@ -133,6 +133,14 @@ export function GuideDeTestLazy() {
     setVersion((v) => v + 1);
   };
 
+  // « Choisir un autre guide » (Mariella, 07/11) : sort du guide actif sans toucher à sa
+  // progression, et rouvre directement la liste.
+  const choisirAutre = () => {
+    effacerGuideActif(storage);
+    setPanneauOuvert(true);
+    setVersion((v) => v + 1);
+  };
+
   // Invariant 5 : hors session admin (ou réponse pas encore arrivée), rien ne se monte —
   // ni la liste, ni le chunk lourd du guide (importé seulement si un scénario est choisi).
   if (!etat) return null;
@@ -143,6 +151,7 @@ export function GuideDeTestLazy() {
         scenario={scenarioActif}
         verdictsServeur={itemActif.verdicts}
         onFermerDefinitivement={fermerDefinitivement}
+        onChoisirAutre={choisirAutre}
       />
     );
   }
