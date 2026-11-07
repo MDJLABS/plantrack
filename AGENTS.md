@@ -14,12 +14,15 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [134 commits]
-  fichiers recemment ecrits : sortie/carte-lien-prolearn.json, sortie/carte-pendant-essai-0711.json, ../../../root/.claude/plans/contexte-reconstruit-par-le-greedy-gosling.md, sortie/carte-attente-0711-matin.json, sortie/carte-pendant-essai-0711-matin.json, ../../../root/.claude/plans/contexte-reconstruit-par-le-moonlit-dusk.md
+FIL ACTIF — t23 : guides de test automatiques (d100) [135 commits]
+  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-greedy-gosling.md, sortie/carte-attente-0711-matin.json, sortie/carte-pendant-essai-0711-matin.json, ../../../root/.claude/plans/contexte-reconstruit-par-le-moonlit-dusk.md, sortie/carte-suite-0711-midi.json, sortie/carte-compte-guide-prolearn.json
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
   t5 : travaux sur main — reprise : retour au travail courant apres la faille
+
+BUGS NON CORRIGES (personne ne s'en est occupe) :
+  b42 (open) [t23] Guide ProLearn essai-gestes injouable sur prolearn-dev (07/11, question Mariella 'je dois me loguer en tant que quoi ?') : estAdmin exige s… (agent)
 
 BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b24 (to_verify) [t22] mdjlabs-site : la synchro du moteur de guide a ecrase guide-verdict.ts — guide-envoi.ts et ses tests importent compteRenduMarkdown et prog.… (agent) [3 tentatives, derniere: Re-ecrasement du 28/10 19h25 : la ronde de mdjlabs a lance …]
@@ -258,5 +261,6 @@ Pieges connus :
 
 Questions en attente (reponds via !answer qN ...) :
   q15 : Guide Soirées pret (s69-soirees 1db1d2a) : Mariella fait-elle l'essai sur https…
+  q19 : Compte pour le guide ProLearn : compte d'essai admin (reco) ou son compte promu…
 ```
 <!-- plantrack:state-end -->

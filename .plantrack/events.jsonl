@@ -2193,3 +2193,8 @@
 {"ts": "2026-11-07T09:07:23+00:00", "kind": "file_touched", "text": "sortie/carte-pendant-essai-0711-matin.json", "thread": "t23"}
 {"ts": "2026-11-07T12:03:03+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-moonlit-dusk.md", "thread": "t23"}
 {"ts": "2026-11-07T12:05:53+00:00", "kind": "decision", "id": "d196", "text": "Mariella (tel, 07/11 12h, carte Pendant ton essai) : 'donne le lien' - lien du guide ProLearn https://prolearn-dev.mdjlabs.com/login?guide=essai-gestes redonne par bulle ; veille silencieuse jusqu'a son verdict (d23)", "par": "agent"}
+{"ts": "2026-11-07T12:05:53+00:00", "kind": "commit", "sha": "40dbd2d", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-07T12:06:04+00:00", "kind": "file_touched", "text": "sortie/carte-suite-0711-midi.json", "thread": "t23"}
+{"ts": "2026-11-07T12:09:22+00:00", "kind": "file_touched", "text": "sortie/carte-compte-guide-prolearn.json", "thread": "t23"}
+{"ts": "2026-11-07T12:09:31+00:00", "kind": "bug", "id": "b42", "text": "Guide ProLearn essai-gestes injouable sur prolearn-dev (07/11, question Mariella 'je dois me loguer en tant que quoi ?') : estAdmin exige super_admin mais le seul profil super_admin de la base de test n'a pas de compte de connexion (auth.users) ; et le middleware redirige un connecte hors de /login, alors que le scenario se joue sur /login", "thread": "t23", "severity": "normal", "par": "agent"}
+{"ts": "2026-11-07T12:09:31+00:00", "kind": "question", "id": "q19", "text": "Compte pour le guide ProLearn : compte d'essai admin (reco) ou son compte promu admin ? (carte Compte du 07/11)"}
