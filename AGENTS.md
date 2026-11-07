@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [145 commits]
+FIL ACTIF — t23 : guides de test automatiques (d100) [146 commits]
   fichiers recemment ecrits : ../prolearn/app/lib/guide/guide-reglages.ts, ../prolearn/app/tests/e2e/guide-bon-endroit.spec.ts, ../../../tmp/claude-0/-home-mariella-plantrack/7b59f58f-ad68-4f47-87d7-39e67fa8ec2a/scratchpad/gdt.patch, ../../../tmp/claude-0/-home-mariella-plantrack/7b59f58f-ad68-4f47-87d7-39e67fa8ec2a/scratchpad/lazy.patch, ../prolearn/app/components/guide/GuideDeTest.tsx, ../../../tmp/claude-0/-home-mariella-plantrack/7b59f58f-ad68-4f47-87d7-39e67fa8ec2a/scratchpad/ancre.patch
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -239,6 +239,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d196 : Mariella (tel, 07/11 12h, carte Pendant ton essai) : 'donne le lien' - lien du guide ProLearn https://prolearn-dev.mdjlabs.com/login?guide=… (agent)
   d197 : Mariella (tel, 07/11 midi, carte Pendant ton essai) : 'J'ai d'abord demande a la session prolearn de donner a l'espace admin acces a tous l… (agent)
   d198 : Mariella (tel, 07/11 15h) : 'fais un menage des ressources serveur' -> ecrans d'admin prorent-dev (studio, meta, analytics, vector, imgprox… (agent)
+  d199 : Mariella (tel, 07/11 soir, carte Ancrage) : 'Je refais l'essai (Recommande)' apres correction de l'ancrage du guide (zone amenee a l'ecran … (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
