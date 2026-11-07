@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [128 commits]
-  fichiers recemment ecrits : sortie/carte-attente-1533.json, sortie/carte-attente-1533.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-groovy-pelican.md, sortie/carte-attente-1540.json, sortie/carte-attente-1540.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-cozy-rivest.md
+FIL ACTIF — t23 : guides de test automatiques (d100) [129 commits]
+  fichiers recemment ecrits : sortie/carte-attente-1540.json, sortie/carte-attente-1540.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-cozy-rivest.md, sortie/carte-attente-1626.json, sortie/carte-attente-1626.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-rosy-flask.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -230,6 +230,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d188 : Mariella (tel, 06/11 15h29, carte Pendant ton essai) : 'Attendre mon verdict (Recommande)' — attente du verdict du guide ProLearn, veille s… (agent)
   d189 : Mariella (tel, 06/11 15h36, carte Pendant ton essai) : 'Attendre mon verdict (Recommande)' — attente du verdict du guide ProLearn, veille s… (agent)
   d190 : Mariella (tel, 06/11 16h26, carte Pendant ton essai) : 'Attendre mon verdict (Recommande)' — attente du verdict du guide ProLearn, veille s… (agent)
+  d191 : Mariella (tel, 06/11 22h36) : 'donne le lien' -> lien du guide ProLearn https://prolearn-dev.mdjlabs.com/login?guide=essai-gestes donne (pl… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…

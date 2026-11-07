@@ -2172,3 +2172,8 @@
 {"ts": "2026-11-06T16:23:32+00:00", "kind": "file_touched", "text": "sortie/carte-attente-1540.log", "thread": "t23"}
 {"ts": "2026-11-06T16:28:04+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-cozy-rivest.md", "thread": "t23"}
 {"ts": "2026-11-06T20:56:19+00:00", "kind": "decision", "id": "d190", "text": "Mariella (tel, 06/11 16h26, carte Pendant ton essai) : 'Attendre mon verdict (Recommande)' — attente du verdict du guide ProLearn, veille silencieuse (d23)", "par": "agent"}
+{"ts": "2026-11-06T20:56:19+00:00", "kind": "commit", "sha": "33fcff6", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-06T20:56:30+00:00", "kind": "file_touched", "text": "sortie/carte-attente-1626.json", "thread": "t23"}
+{"ts": "2026-11-06T20:56:30+00:00", "kind": "file_touched", "text": "sortie/carte-attente-1626.log", "thread": "t23"}
+{"ts": "2026-11-06T22:40:43+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-rosy-flask.md", "thread": "t23"}
+{"ts": "2026-11-07T00:12:44+00:00", "kind": "decision", "id": "d191", "text": "Mariella (tel, 06/11 22h36) : 'donne le lien' -> lien du guide ProLearn https://prolearn-dev.mdjlabs.com/login?guide=essai-gestes donne (plan approuve) ; attente de son verdict, veille silencieuse (d23)", "par": "agent"}
