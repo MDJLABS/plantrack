@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [146 commits]
-  fichiers recemment ecrits : ../prolearn/app/lib/guide/guide-reglages.ts, ../prolearn/app/tests/e2e/guide-bon-endroit.spec.ts, ../../../tmp/claude-0/-home-mariella-plantrack/7b59f58f-ad68-4f47-87d7-39e67fa8ec2a/scratchpad/gdt.patch, ../../../tmp/claude-0/-home-mariella-plantrack/7b59f58f-ad68-4f47-87d7-39e67fa8ec2a/scratchpad/lazy.patch, ../prolearn/app/components/guide/GuideDeTest.tsx, ../../../tmp/claude-0/-home-mariella-plantrack/7b59f58f-ad68-4f47-87d7-39e67fa8ec2a/scratchpad/ancre.patch
+FIL ACTIF — t23 : guides de test automatiques (d100) [148 commits]
+  fichiers recemment ecrits : ../../../tmp/claude-0/-home-mariella-plantrack/7b59f58f-ad68-4f47-87d7-39e67fa8ec2a/scratchpad/gdt.patch, ../../../tmp/claude-0/-home-mariella-plantrack/7b59f58f-ad68-4f47-87d7-39e67fa8ec2a/scratchpad/lazy.patch, ../prolearn/app/components/guide/GuideDeTest.tsx, ../../../tmp/claude-0/-home-mariella-plantrack/7b59f58f-ad68-4f47-87d7-39e67fa8ec2a/scratchpad/ancre.patch, sortie/carte-suite.log, pyproject.toml
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -38,7 +38,6 @@ BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b39 (to_verify) [t23] Essai guide Soirees (02/11 11h, tel Mariella) : la page /soirees de la version de test s69-soirees affiche 'canal MiamBoost non configure (… (agent) [1 tentatives, derniere: Version de test branchee sur la preprod MiamBoost locale : …]
   b40 (to_verify) [t23] Essai guide Soirees (02/11 11h23, tel Mariella) : 'probleme sur les captcha cloudflare, il y en a 3 dans la page, beaucoup trop ; un seul s… (agent) [1 tentatives, derniere: s69-soirees 3c92781 : TurnstileWidget monte seulement a l'e…]
   b41 (to_verify) [t23] Orchestre (d159) : les sessions lancees sous bccsession (telephone) ne peuvent pas s'inscrire — /var/lib/plantrack-orchestre/sessions en ro… (agent) [1 tentatives, derniere: Dossier sessions en 1777 (bit collant) pose par l'orchestre…]
-  b42 (to_verify) [t23] Guide ProLearn essai-gestes injouable sur prolearn-dev (07/11, question Mariella 'je dois me loguer en tant que quoi ?') : estAdmin exige s… (agent) [5 tentatives, derniere: Retour Mariella (tel 07/11 soir) : 'ca me mene vers la bonn…]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
@@ -240,6 +239,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d197 : Mariella (tel, 07/11 midi, carte Pendant ton essai) : 'J'ai d'abord demande a la session prolearn de donner a l'espace admin acces a tous l… (agent)
   d198 : Mariella (tel, 07/11 15h) : 'fais un menage des ressources serveur' -> ecrans d'admin prorent-dev (studio, meta, analytics, vector, imgprox… (agent)
   d199 : Mariella (tel, 07/11 soir, carte Ancrage) : 'Je refais l'essai (Recommande)' apres correction de l'ancrage du guide (zone amenee a l'ecran … (agent)
+  d200 : Mariella (tel, 07/11 soir) : 'c'est bon j'ai teste un guide et ca marche' -> b42 valide ; v1.9.38 publiee sur GitHub (main + tag, PyPI touj… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
