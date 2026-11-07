@@ -2177,3 +2177,6 @@
 {"ts": "2026-11-06T20:56:30+00:00", "kind": "file_touched", "text": "sortie/carte-attente-1626.log", "thread": "t23"}
 {"ts": "2026-11-06T22:40:43+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-rosy-flask.md", "thread": "t23"}
 {"ts": "2026-11-07T00:12:44+00:00", "kind": "decision", "id": "d191", "text": "Mariella (tel, 06/11 22h36) : 'donne le lien' -> lien du guide ProLearn https://prolearn-dev.mdjlabs.com/login?guide=essai-gestes donne (plan approuve) ; attente de son verdict, veille silencieuse (d23)", "par": "agent"}
+{"ts": "2026-11-07T00:12:45+00:00", "kind": "commit", "sha": "5e78ed0", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-07T00:12:55+00:00", "kind": "file_touched", "text": "sortie/carte-lien-prolearn.json", "thread": "t23"}
+{"ts": "2026-11-07T00:32:43+00:00", "kind": "decision", "id": "d192", "text": "Mariella (tel, 07/11, carte Suite) : 'Je fais l'essai (Recommande)' — essai du guide ProLearn essai-gestes ; veille silencieuse jusqu'a son verdict (d23, d191)", "par": "agent"}
