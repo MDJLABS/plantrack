@@ -2186,3 +2186,6 @@
 {"ts": "2026-11-07T00:34:24+00:00", "kind": "commit", "sha": "ac9666f", "ctype": "chore", "thread": "t23"}
 {"ts": "2026-11-07T09:05:25+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-greedy-gosling.md", "thread": "t23"}
 {"ts": "2026-11-07T09:05:45+00:00", "kind": "decision", "id": "d194", "text": "Mariella (tel, 07/11, plan approuve apres relance auto du menage 8h25) : rien a faire, attente du verdict du guide ProLearn essai-gestes (d193), veille silencieuse (d23)", "par": "agent"}
+{"ts": "2026-11-07T09:05:45+00:00", "kind": "commit", "sha": "7e335d3", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-07T09:05:59+00:00", "kind": "file_touched", "text": "sortie/carte-attente-0711-matin.json", "thread": "t23"}
+{"ts": "2026-11-07T09:07:02+00:00", "kind": "decision", "id": "d195", "text": "Mariella (tel, 07/11 matin, carte Suite) : 'Je fais l'essai (Recommande)' - essai du guide ProLearn essai-gestes ; veille silencieuse jusqu'a son verdict (d23, d193)", "par": "agent"}
