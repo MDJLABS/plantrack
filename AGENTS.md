@@ -14,20 +14,15 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [148 commits]
-  fichiers recemment ecrits : ../../../tmp/claude-0/-home-mariella-plantrack/7b59f58f-ad68-4f47-87d7-39e67fa8ec2a/scratchpad/gdt.patch, ../../../tmp/claude-0/-home-mariella-plantrack/7b59f58f-ad68-4f47-87d7-39e67fa8ec2a/scratchpad/lazy.patch, ../prolearn/app/components/guide/GuideDeTest.tsx, ../../../tmp/claude-0/-home-mariella-plantrack/7b59f58f-ad68-4f47-87d7-39e67fa8ec2a/scratchpad/ancre.patch, sortie/carte-suite.log, pyproject.toml
+FIL ACTIF — t23 : guides de test automatiques (d100) [149 commits]
+  fichiers recemment ecrits : ../../../tmp/claude-0/-home-mariella-plantrack/7b59f58f-ad68-4f47-87d7-39e67fa8ec2a/scratchpad/lazy.patch, ../prolearn/app/components/guide/GuideDeTest.tsx, ../../../tmp/claude-0/-home-mariella-plantrack/7b59f58f-ad68-4f47-87d7-39e67fa8ec2a/scratchpad/ancre.patch, sortie/carte-suite.log, pyproject.toml, sortie/carte-suite-2.log
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
   t5 : travaux sur main — reprise : retour au travail courant apres la faille
 
 BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
-  b24 (to_verify) [t22] mdjlabs-site : la synchro du moteur de guide a ecrase guide-verdict.ts — guide-envoi.ts et ses tests importent compteRenduMarkdown et prog.… (agent) [3 tentatives, derniere: Re-ecrasement du 28/10 19h25 : la ronde de mdjlabs a lance …]
-  b25 (to_verify) [t23] guide-lien rend le jeton en clair a l'agent et guide-resultat n'a ni require_human ni garde AGENT_ENV : l'agent peut fabriquer lui-meme un … (agent) [1 tentatives, derniere: guide-lien refuse en env agent (le lien part par node bcc/h…]
-  b26 (to_verify) [t23] Moteur guide (guide-visite.ts, commun) : l'adresse du poste ou partent les resultats vient du lien (?poste=) et toute origine https est acc… (agent) [1 tentatives, derniere: validerPoste : sans liste blanche NEXT_PUBLIC_GUIDE_POSTES,…]
-  b27 (to_verify) kvm-lourd historique : entree bcc/lint du 30/10 16:19 avec duree 107869.6 s (30 h) pour un eslint de quelques minutes — la duree semble com… (agent) [2 tentatives, derniere: Duree maximale par type (lint/tests 30m, build/next-build/d…]
   b30 (to_verify) [t23] Essai guide ProLearn (31/10 06h16, tel Mariella) : apres le code Cloudflare Access (accepte a 05:16:56Z dans le registre Access), la page '… (agent) [2 tentatives, derniere: d144 : portier-reveil etendu a bcc-proxy (18787) et miamboo…]
-  b31 (to_verify) [t23] sync_guide (pt.py) ne cherche le moteur que sous ROOT et ROOT/src (lib/guide/types.ts) : les sites qui le rangent sous app/ (prolearn, open… (agent) [1 tentatives, derniere: sync_guide cherche le moteur sous ROOT, src, app, apps/web …]
   b32 (to_verify) [t23] Essai guide ProJob (31/10, tel Mariella) : 'catastrophe' — au lieu d'un guide qui joue les etapes pour elle, elle doit tout faire elle-meme… (agent) [1 tentatives, derniere: Guide design2 ProJob rendu automatique (27de37f, 16 points …]
   b33 (to_verify) [t23] ProJob design2 (essai Mariella 31/10 13h33, guide) : tableau de suivi, au clic sur 'Passer a' la liste s'affiche dans le cadre de la carte … (agent) [1 tentatives, derniere: Menu Passer a sorti du cadre qui defile : portail vers docu…]
   b34 (to_verify) [t23] ProJob design2 (essai Mariella 31/10 13h34-13h35, guide) : points 'La fiche : en-tete et les 5 etapes', 'L historique a l heure de Paris', … (agent) [1 tentatives, derniere: Bouton + : n'existe que sous 600 px, texte du point precise…]
@@ -240,6 +235,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d198 : Mariella (tel, 07/11 15h) : 'fais un menage des ressources serveur' -> ecrans d'admin prorent-dev (studio, meta, analytics, vector, imgprox… (agent)
   d199 : Mariella (tel, 07/11 soir, carte Ancrage) : 'Je refais l'essai (Recommande)' apres correction de l'ancrage du guide (zone amenee a l'ecran … (agent)
   d200 : Mariella (tel, 07/11 soir) : 'c'est bon j'ai teste un guide et ca marche' -> b42 valide ; v1.9.38 publiee sur GitHub (main + tag, PyPI touj… (agent)
+  d201 : Mariella (tel, 07/11, carte Tri des 7) : 'Valider les 5, garder ProJob (Recommande)' — b24 b25 b26 b27 b31 valides ; b33/b34 (ProJob design… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…

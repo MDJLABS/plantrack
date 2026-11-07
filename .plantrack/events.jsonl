@@ -2247,3 +2247,12 @@
 {"ts": "2026-11-07T17:24:36+00:00", "kind": "commit", "sha": "1f13334", "ctype": "release", "thread": "t23"}
 {"ts": "2026-11-07T17:24:40+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t23"}
 {"ts": "2026-11-07T17:24:48+00:00", "kind": "decision", "id": "d200", "text": "Mariella (tel, 07/11 soir) : 'c'est bon j'ai teste un guide et ca marche' -> b42 valide ; v1.9.38 publiee sur GitHub (main + tag, PyPI toujours sans cle, d127) ; les autres sites recoivent le moteur par leur ronde a l'ouverture (d51).", "par": "agent"}
+{"ts": "2026-11-07T17:24:49+00:00", "kind": "commit", "sha": "00320f5", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-07T17:25:00+00:00", "kind": "file_touched", "text": "sortie/carte-suite-2.log", "thread": "t23"}
+{"ts": "2026-11-07T17:44:15+00:00", "kind": "bug_status", "id": "b24", "status": "validated", "canal": "telephone, carte Tri des 7 (07/11) : Valider les 5, garder ProJob (Recommande)"}
+{"ts": "2026-11-07T17:44:15+00:00", "kind": "bug_status", "id": "b25", "status": "validated", "canal": "telephone, carte Tri des 7 (07/11) : Valider les 5, garder ProJob (Recommande)"}
+{"ts": "2026-11-07T17:44:15+00:00", "kind": "bug_status", "id": "b26", "status": "validated", "canal": "telephone, carte Tri des 7 (07/11) : Valider les 5, garder ProJob (Recommande)"}
+{"ts": "2026-11-07T17:44:15+00:00", "kind": "bug_status", "id": "b27", "status": "validated", "canal": "telephone, carte Tri des 7 (07/11) : Valider les 5, garder ProJob (Recommande)"}
+{"ts": "2026-11-07T17:44:16+00:00", "kind": "bug_status", "id": "b31", "status": "validated", "canal": "telephone, carte Tri des 7 (07/11) : Valider les 5, garder ProJob (Recommande)"}
+{"ts": "2026-11-07T17:44:16+00:00", "kind": "tri_plus_tard"}
+{"ts": "2026-11-07T17:44:16+00:00", "kind": "decision", "id": "d201", "text": "Mariella (tel, 07/11, carte Tri des 7) : 'Valider les 5, garder ProJob (Recommande)' — b24 b25 b26 b27 b31 valides ; b33/b34 (ProJob design2) restent en attente de son essai a l'ecran.", "par": "agent"}
