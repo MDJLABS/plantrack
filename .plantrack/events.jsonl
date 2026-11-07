@@ -2198,3 +2198,6 @@
 {"ts": "2026-11-07T12:09:22+00:00", "kind": "file_touched", "text": "sortie/carte-compte-guide-prolearn.json", "thread": "t23"}
 {"ts": "2026-11-07T12:09:31+00:00", "kind": "bug", "id": "b42", "text": "Guide ProLearn essai-gestes injouable sur prolearn-dev (07/11, question Mariella 'je dois me loguer en tant que quoi ?') : estAdmin exige super_admin mais le seul profil super_admin de la base de test n'a pas de compte de connexion (auth.users) ; et le middleware redirige un connecte hors de /login, alors que le scenario se joue sur /login", "thread": "t23", "severity": "normal", "par": "agent"}
 {"ts": "2026-11-07T12:09:31+00:00", "kind": "question", "id": "q19", "text": "Compte pour le guide ProLearn : compte d'essai admin (reco) ou son compte promu admin ? (carte Compte du 07/11)"}
+{"ts": "2026-11-07T12:09:31+00:00", "kind": "commit", "sha": "620d16e", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-07T12:09:38+00:00", "kind": "file_touched", "text": "sortie/carte-compte-guide-prolearn.json", "thread": "t23"}
+{"ts": "2026-11-07T12:13:23+00:00", "kind": "answer", "id": "q19", "text": "Mariella a trouve un acces (ok c'est bon) ; seulement le guide essai-gestes (3 points) a faire aujourd'hui", "canal": "telephone : « ok c'est bon, je dois faire les 48 tests ? »"}
