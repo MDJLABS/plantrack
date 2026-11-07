@@ -408,7 +408,7 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, on
   // qui survit tout seul au changement de page.
   // Jamais un bouton qui renvoie sur la page où elle est déjà (même chemin ET mêmes
   // paramètres, `?vue=` de /dashboard compris) : un clic sans effet (b42, 07/11).
-  const dejaLa = urlPoint !== null && !horsPage && memesParametres(urlPoint);
+  const dejaLa = urlPoint !== null && surLaPage(pathname, urlPoint) && memesParametres(urlPoint);
   const onAllerAuBonEndroit = urlPoint !== null && (horsPage || (!trouvee && !dejaLa))
     ? () => router.push(urlPoint)
     : null;
