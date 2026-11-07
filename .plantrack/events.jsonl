@@ -2180,3 +2180,6 @@
 {"ts": "2026-11-07T00:12:45+00:00", "kind": "commit", "sha": "5e78ed0", "ctype": "chore", "thread": "t23"}
 {"ts": "2026-11-07T00:12:55+00:00", "kind": "file_touched", "text": "sortie/carte-lien-prolearn.json", "thread": "t23"}
 {"ts": "2026-11-07T00:32:43+00:00", "kind": "decision", "id": "d192", "text": "Mariella (tel, 07/11, carte Suite) : 'Je fais l'essai (Recommande)' — essai du guide ProLearn essai-gestes ; veille silencieuse jusqu'a son verdict (d23, d191)", "par": "agent"}
+{"ts": "2026-11-07T00:32:43+00:00", "kind": "commit", "sha": "6769c58", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-07T00:32:58+00:00", "kind": "file_touched", "text": "sortie/carte-pendant-essai-0711.json", "thread": "t23"}
+{"ts": "2026-11-07T00:34:24+00:00", "kind": "decision", "id": "d193", "text": "Mariella (tel, 07/11, carte Pendant ton essai) : 'c'est ok' — veille silencieuse jusqu'a son verdict du guide ProLearn essai-gestes (d23, d192)", "par": "agent"}
