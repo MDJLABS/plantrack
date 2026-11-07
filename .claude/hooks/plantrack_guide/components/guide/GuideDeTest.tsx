@@ -514,11 +514,20 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, on
   useEffect(() => {
     let raf = 0;
     let dernier = "";
+    let presente = false;
     const tick = () => {
       const el = resolveTarget(etape.cibles ?? [], document, undefined, reglagesGuide.ancetresReplies ?? []);
       const r = el
         ? (({ x, y, width, height }) => ({ x, y, w: width, h: height }))(el.getBoundingClientRect())
         : null;
+      // b42 : la zone APPARAÎT (changement d'étape, ou arrivée après « M'emmener au bon
+      // endroit » une fois la page chargée) → l'amener à l'écran si elle est hors de vue.
+      // Pas à chaque image : Mariella reste libre de faire défiler la page ensuite.
+      if (el && r && !presente && (r.y < 0 || r.y + r.h > window.innerHeight)) {
+        // `inline: 'nearest'` explicite : aucun défilement HORIZONTAL provoqué par le guide.
+        el.scrollIntoView({ block: "center", inline: "nearest", behavior: "smooth" });
+      }
+      presente = !!el;
       const cle = r ? `${Math.round(r.x)},${Math.round(r.y)},${Math.round(r.w)},${Math.round(r.h)}` : "null";
       if (cle !== dernier) {
         dernier = cle;
@@ -547,14 +556,6 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, on
       if (Math.abs(dy) > 4) window.scrollBy({ top: dy, behavior: "smooth" });
     }
   }, [cible, mobile, place, etape.id]);
-
-  // Amener la zone à l'écran au changement d'étape — sinon la bulle parle d'une ligne
-  // que Mariella ne voit pas.
-  useEffect(() => {
-    const el = resolveTarget(etape.cibles ?? [], document, undefined, reglagesGuide.ancetresReplies ?? []);
-    // `inline: 'nearest'` explicite : aucun défilement HORIZONTAL provoqué par le guide.
-    el?.scrollIntoView({ block: "center", inline: "nearest", behavior: "smooth" });
-  }, [etape]);
 
   // Curseur animé : à l'entrée d'une étape qui porte un geste ET ne l'a pas déjà joué
   // (`prog.joues`), on le montre automatiquement — une étape déjà jouée (retour arrière,
