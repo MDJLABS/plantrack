@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [131 commits]
-  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-cozy-rivest.md, sortie/carte-attente-1626.json, sortie/carte-attente-1626.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-rosy-flask.md, sortie/carte-lien-prolearn.json, sortie/carte-pendant-essai-0711.json
+FIL ACTIF — t23 : guides de test automatiques (d100) [132 commits]
+  fichiers recemment ecrits : sortie/carte-attente-1626.json, sortie/carte-attente-1626.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-rosy-flask.md, sortie/carte-lien-prolearn.json, sortie/carte-pendant-essai-0711.json, ../../../root/.claude/plans/contexte-reconstruit-par-le-greedy-gosling.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -233,6 +233,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d191 : Mariella (tel, 06/11 22h36) : 'donne le lien' -> lien du guide ProLearn https://prolearn-dev.mdjlabs.com/login?guide=essai-gestes donne (pl… (agent)
   d192 : Mariella (tel, 07/11, carte Suite) : 'Je fais l'essai (Recommande)' — essai du guide ProLearn essai-gestes ; veille silencieuse jusqu'a son… (agent)
   d193 : Mariella (tel, 07/11, carte Pendant ton essai) : 'c'est ok' — veille silencieuse jusqu'a son verdict du guide ProLearn essai-gestes (d23, d… (agent)
+  d194 : Mariella (tel, 07/11, plan approuve apres relance auto du menage 8h25) : rien a faire, attente du verdict du guide ProLearn essai-gestes (d… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
