@@ -2209,3 +2209,19 @@
 {"ts": "2026-11-07T13:55:56+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-replicated-curry.md", "thread": "t23"}
 {"ts": "2026-11-07T13:57:55+00:00", "kind": "question", "id": "q20", "text": "Plan rien a faire apres alerte charge 13h15 (attente session ProLearn puis essai guide essai-gestes)", "carte": "11000"}
 {"ts": "2026-11-07T13:57:55+00:00", "kind": "decision", "id": "d198", "text": "Mariella (tel, 07/11 15h) : 'fais un menage des ressources serveur' -> ecrans d'admin prorent-dev (studio, meta, analytics, vector, imgproxy) arretes, +560 Mo dispo (3,36 -> 3,92 Go), API prorent-dev toujours debout ; swap (4 Go plein) NON revide faute de marge (dispo < swap utilise)", "par": "agent"}
+{"ts": "2026-11-07T13:57:55+00:00", "kind": "commit", "sha": "9966056", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-07T13:58:06+00:00", "kind": "file_touched", "text": "sortie/carte-suite-0711-menage.json", "thread": "t23"}
+{"ts": "2026-11-07T13:58:06+00:00", "kind": "file_touched", "text": "sortie/carte-suite-0711-menage.log", "thread": "t23"}
+{"ts": "2026-11-07T14:00:48+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-squishy-kite.md", "thread": "t23"}
+{"ts": "2026-11-07T14:01:50+00:00", "kind": "answer", "id": "q20", "text": "téléphone : Pas comme ça ; le compte admin a maintenant accès à tous les dashbaords, mais pourtant le bouton \"m'emmener au bon endroit\" ne fonctionne pas dnas le guide que j'ai essayé", "canal": "téléphone : Pas comme ça ; le compte admin a maintenant accès à tous les dashbaords, mais pourtant le bouton \"m'emmener au bon endroit\" ne fonctionne pas dnas le guide que j'ai essayé"}
+{"ts": "2026-11-07T14:01:50+00:00", "kind": "attempt", "id": "a57", "bug": "b42", "hypothesis": "Bouton M'emmener au bon endroit sans effet (Mariella 07/11 apres-midi) : resoudreUrl ProLearn replie [formation] sur /trainer/courses hors d'une formation, puis sur cette liste renvoie vers la meme page (router.push sur place). Correctif : repli sur la formation de reference d1d00000-...-0001 + pas de bouton si la destination est deja la page courante (chemin+parametres)", "session": "7b59f58f-ad68-4f47-87d7-39e67fa8ec2a", "actor": "claude-code"}
+{"ts": "2026-11-07T14:02:13+00:00", "kind": "file_touched", "text": "../prolearn/app/lib/guide/guide-reglages.ts", "thread": "t23"}
+{"ts": "2026-11-07T14:02:16+00:00", "kind": "file_touched", "text": "../prolearn/app/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-11-07T14:02:25+00:00", "kind": "file_touched", "text": "../prolearn/app/components/guide/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-11-07T14:02:29+00:00", "kind": "file_touched", "text": "../prolearn/app/lib/guide/__tests__/guide-reglages.test.ts", "thread": "t23"}
+{"ts": "2026-11-07T14:03:00+00:00", "kind": "file_touched", "text": "../prolearn/app/tests/e2e/guide-bon-endroit.spec.ts", "thread": "t23"}
+{"ts": "2026-11-07T14:03:09+00:00", "kind": "file_touched", "text": "../prolearn/app/tests/e2e/guide-bon-endroit.spec.ts", "thread": "t23"}
+{"ts": "2026-11-07T14:59:22+00:00", "kind": "file_touched", "text": "../prolearn/app/lib/guide/guide-reglages.ts", "thread": "t23"}
+{"ts": "2026-11-07T14:59:25+00:00", "kind": "file_touched", "text": "../prolearn/app/tests/e2e/guide-bon-endroit.spec.ts", "thread": "t23"}
+{"ts": "2026-11-07T15:04:57+00:00", "kind": "attempt", "id": "a58", "bug": "b42", "hypothesis": "Correctif livre (prolearn dfeb954c + suite) : repli sur mdjlabs-ressuage-niveau-2-cifm--T-D1D00001 (l'uuid donnait 404) + pas de bouton qui renvoie sur la page courante. vitest 61/61, e2e destination reelle 200 ; parcours admin non jouable en e2e (pas de compte admin de test)", "session": "7b59f58f-ad68-4f47-87d7-39e67fa8ec2a", "actor": "claude-code"}
+{"ts": "2026-11-07T15:05:04+00:00", "kind": "bug_status", "id": "b42", "status": "to_verify"}
