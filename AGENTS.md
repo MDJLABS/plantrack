@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [137 commits]
-  fichiers recemment ecrits : sortie/carte-attente-0711-matin.json, sortie/carte-pendant-essai-0711-matin.json, ../../../root/.claude/plans/contexte-reconstruit-par-le-moonlit-dusk.md, sortie/carte-suite-0711-midi.json, sortie/carte-compte-guide-prolearn.json, sortie/carte-pendant-essai-0711-midi.json
+FIL ACTIF — t23 : guides de test automatiques (d100) [138 commits]
+  fichiers recemment ecrits : sortie/carte-pendant-essai-0711-matin.json, ../../../root/.claude/plans/contexte-reconstruit-par-le-moonlit-dusk.md, sortie/carte-suite-0711-midi.json, sortie/carte-compte-guide-prolearn.json, sortie/carte-pendant-essai-0711-midi.json, ../../../root/.claude/plans/contexte-reconstruit-par-le-replicated-curry.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -240,6 +240,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d195 : Mariella (tel, 07/11 matin, carte Suite) : 'Je fais l'essai (Recommande)' - essai du guide ProLearn essai-gestes ; veille silencieuse jusqu… (agent)
   d196 : Mariella (tel, 07/11 12h, carte Pendant ton essai) : 'donne le lien' - lien du guide ProLearn https://prolearn-dev.mdjlabs.com/login?guide=… (agent)
   d197 : Mariella (tel, 07/11 midi, carte Pendant ton essai) : 'J'ai d'abord demande a la session prolearn de donner a l'espace admin acces a tous l… (agent)
+  d198 : Mariella (tel, 07/11 15h) : 'fais un menage des ressources serveur' -> ecrans d'admin prorent-dev (studio, meta, analytics, vector, imgprox… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
@@ -262,5 +263,8 @@ Pieges connus :
 
 Questions en attente (reponds via !answer qN ...) :
   q15 : Guide Soirées pret (s69-soirees 1db1d2a) : Mariella fait-elle l'essai sur https…
+
+Cartes laissees de cote (action a reprendre a la reponse : answer --carte <id>) :
+  q20 (carte 11000) : Plan rien a faire apres alerte charge 13h15 (attente session ProLearn puis essa…
 ```
 <!-- plantrack:state-end -->
