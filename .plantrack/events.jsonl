@@ -2256,3 +2256,12 @@
 {"ts": "2026-11-07T17:44:16+00:00", "kind": "bug_status", "id": "b31", "status": "validated", "canal": "telephone, carte Tri des 7 (07/11) : Valider les 5, garder ProJob (Recommande)"}
 {"ts": "2026-11-07T17:44:16+00:00", "kind": "tri_plus_tard"}
 {"ts": "2026-11-07T17:44:16+00:00", "kind": "decision", "id": "d201", "text": "Mariella (tel, 07/11, carte Tri des 7) : 'Valider les 5, garder ProJob (Recommande)' — b24 b25 b26 b27 b31 valides ; b33/b34 (ProJob design2) restent en attente de son essai a l'ecran.", "par": "agent"}
+{"ts": "2026-11-07T17:44:22+00:00", "kind": "commit", "sha": "f8b4e42", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-07T20:09:34+00:00", "kind": "bug", "id": "b43", "text": "ProJob design2 Suivi (capture Mariella 07/11 20h08, 1872px) : colonnes du tableau mal affichees — 5e colonne ecrasee, carte qui deborde (titre coupe, 'Passer a' sur 2 lignes, ascenseurs) ; demande : mettre des exemples dans chaque colonne et tester soi-meme", "thread": "t23", "severity": "normal", "par": "agent"}
+{"ts": "2026-11-07T20:11:08+00:00", "kind": "file_touched", "text": "../projob/scripts/seed-exemples-suivi.sql", "thread": "t23"}
+{"ts": "2026-11-07T20:11:34+00:00", "kind": "file_touched", "text": "../projob/scripts/seed-exemples-suivi.sql", "thread": "t23"}
+{"ts": "2026-11-07T20:12:08+00:00", "kind": "file_touched", "text": "../projob/apps/web/scripts-local-capture-suivi.mjs", "thread": "t23"}
+{"ts": "2026-11-07T20:12:28+00:00", "kind": "file_touched", "text": "../projob/apps/web/scripts-local-capture-suivi.mjs", "thread": "t23"}
+{"ts": "2026-11-07T20:52:55+00:00", "kind": "file_touched", "text": "../projob/apps/web/scripts-local-capture-suivi.mjs", "thread": "t23"}
+{"ts": "2026-11-07T20:53:18+00:00", "kind": "attempt", "id": "a62", "bug": "b43", "hypothesis": "projob 9f31a36 : bascule tableau/liste par requete de conteneur (place reelle, menu lateral deduit) a 1020 px, page Suivi elargie a 1520 px, colonnes sans defilement horizontal, titres coupes proprement, date et Passer a sur une ligne ; 9 exemples (scripts/seed-exemples-suivi.sql). Captures 1872/1280/1024/884/390 verifiees.", "session": "0066a2d6-438a-4269-8b06-b7cfcf27f48b", "actor": "claude-code"}
+{"ts": "2026-11-07T20:53:22+00:00", "kind": "bug_status", "id": "b43", "status": "to_verify"}
