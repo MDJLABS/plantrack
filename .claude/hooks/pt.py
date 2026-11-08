@@ -3508,9 +3508,9 @@ def cmd_task(args, st):
         append("task_status", id=kid, status="done", canal=de)
         print(f"tache {kid} terminee.")
     elif sub == "cancel":
-        require_human("task cancel")
+        require_human("task cancel", de)
         motif = arg_motif(args, 2)
-        append("task_status", id=kid, status="cancelled", text=motif)
+        append("task_status", id=kid, status="cancelled", text=motif, canal=de)
         append("decision", id=next_id("d"),
                text=f"tache {kid} annulee ({trunc(st['tasks'][kid]['text'], 50)}) : {motif}")
         print(f"tache {kid} annulee (decision actee : ne jamais reimplementer).")

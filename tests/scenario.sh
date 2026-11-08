@@ -165,6 +165,11 @@ out=$(prompt '!focus k3')
 check "!focus <tache> ouvre un fil rattache" "tache k3" "$out"
 out=$(ctx startup)
 check "le bloc reinjecte porte la tache du fil actif" "[k3]" "$out"
+H task add p1 Export CSV >/dev/null
+out=$(python3 "$PT" task cancel k4 -m "inutile" 2>&1)
+check "task cancel refuse a l agent sans --de" "reserve a l'humain" "$out"
+out=$(python3 "$PT" task cancel k4 -m "inutile" --de "telephone : Annuler" 2>&1)
+check "task cancel accepte a l agent avec --de" "decision actee" "$out"
 
 # 12. le pre-commit s'etend aux taches annulees
 printf '{"tool_input":{"file_path":"%s/src/b.txt"}}' "$TMP" | python3 "$PT" hook-filelog
