@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [150 commits]
+FIL ACTIF — t23 : guides de test automatiques (d100) [151 commits]
   fichiers recemment ecrits : ../../../tmp/claude-0/-home-mariella-plantrack/7b59f58f-ad68-4f47-87d7-39e67fa8ec2a/scratchpad/ancre.patch, sortie/carte-suite.log, pyproject.toml, sortie/carte-suite-2.log, ../projob/scripts/seed-exemples-suivi.sql, ../projob/apps/web/scripts-local-capture-suivi.mjs
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -237,6 +237,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d199 : Mariella (tel, 07/11 soir, carte Ancrage) : 'Je refais l'essai (Recommande)' apres correction de l'ancrage du guide (zone amenee a l'ecran … (agent)
   d200 : Mariella (tel, 07/11 soir) : 'c'est bon j'ai teste un guide et ca marche' -> b42 valide ; v1.9.38 publiee sur GitHub (main + tag, PyPI touj… (agent)
   d201 : Mariella (tel, 07/11, carte Tri des 7) : 'Valider les 5, garder ProJob (Recommande)' — b24 b25 b26 b27 b31 valides ; b33/b34 (ProJob design… (agent)
+  d202 : Mariella (tel, 08/11 00h24, carte Suite tableau Suivi ProJob) : 'Je regarde (Recommande)' — elle verifie b43 (colonnes), b33 (Passer a) et … (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
