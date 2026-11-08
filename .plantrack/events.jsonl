@@ -2355,3 +2355,9 @@
 {"ts": "2026-11-08T18:29:13+00:00", "kind": "file_touched", "text": "sortie/scenario-feu.log", "thread": "t23"}
 {"ts": "2026-11-08T18:39:07+00:00", "kind": "commit", "sha": "91dfc56", "ctype": "feat", "thread": "t23"}
 {"ts": "2026-11-08T18:41:48+00:00", "kind": "decision", "id": "d213", "text": "v1.9.40 publiee (08/11, GitHub + PyPI verifie) : d212 (feu de l'orchestre sur 1 min, pause 10 min max) + correctif b44 (guide termine) ; orchestre redemarre, feu vert ; 573 tests ok, seul echec = pg31 connu.", "par": "agent"}
+{"ts": "2026-11-08T18:41:49+00:00", "kind": "commit", "sha": "6dc22a6", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-08T18:41:52+00:00", "kind": "file_touched", "text": "sortie/carte-suite-1940.json", "thread": "t23"}
+{"ts": "2026-11-08T18:41:52+00:00", "kind": "file_touched", "text": "sortie/carte-suite-1940.log", "thread": "t23"}
+{"ts": "2026-11-08T18:49:41+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-woolly-pinwheel.md", "thread": "t23"}
+{"ts": "2026-11-08T19:25:08+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-starry-oasis.md", "thread": "t23"}
+{"ts": "2026-11-08T20:33:10+00:00", "kind": "decision", "id": "d214", "text": "Mariella (tel, 08/11 19h24, plan approuve 'On y va') : attente de son essai du guide ProJob recette2 pour b44, veille silencieuse (d23)", "par": "agent"}

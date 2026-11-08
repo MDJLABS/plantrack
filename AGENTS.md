@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [166 commits]
-  fichiers recemment ecrits : sortie/tsc-b44.sh, sortie/tsc-b44.log, ../../../tmp/claude-0/-home-mariella-plantrack/40e1fc28-7141-4ff7-8dd9-8a41d0dad13a/scratchpad/simplify.diff, ../../../tmp/claude-0/-home-mariella-plantrack/40e1fc28-7141-4ff7-8dd9-8a41d0dad13a/scratchpad/carte-b44.json, ../../../root/.claude/plans/contexte-reconstruit-par-le-giggly-acorn.md, sortie/scenario-feu.log
+FIL ACTIF — t23 : guides de test automatiques (d100) [167 commits]
+  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-giggly-acorn.md, sortie/scenario-feu.log, sortie/carte-suite-1940.json, sortie/carte-suite-1940.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-woolly-pinwheel.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-starry-oasis.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -243,6 +243,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d211 : Mariella (tel, 08/11, carte Suite) : 'Attendre le bilan de dimanche (Recommande)' apres d209/d210 — veille silencieuse (d23), verdict sur l… (agent)
   d212 : d212 orchestre : feu juge sur la pression memoire a 1 min (PSI avg60 ; pic avg10 full > 25 = rouge tout de suite), RAM disponible = simple … (agent)
   d213 : v1.9.40 publiee (08/11, GitHub + PyPI verifie) : d212 (feu de l'orchestre sur 1 min, pause 10 min max) + correctif b44 (guide termine) ; or… (agent)
+  d214 : Mariella (tel, 08/11 19h24, plan approuve 'On y va') : attente de son essai du guide ProJob recette2 pour b44, veille silencieuse (d23) (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
