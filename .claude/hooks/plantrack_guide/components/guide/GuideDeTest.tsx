@@ -114,6 +114,8 @@ function memesParametres(url: string): boolean {
 const Z = 2147483000; // au-dessus de tout : la page a des overlays à z-index élevé (max mesuré : 1000)
 /** Seuil posture (charte mdjlabs) : < 600 → feuille collée en bas ; >= 600 → carte fixe. */
 const SEUIL_ORDINATEUR = 600;
+/** b44 : temps pendant lequel la dernière réponse reste à l'écran, cochée, avant la carte de fin. */
+const DELAI_COCHE_FIN = 700;
 
 /**
  * Couleurs FIXES (littérales, pas des jetons `var(--…)`) : le fond de la bulle
@@ -169,6 +171,7 @@ export function GuideDeTest({
   verdictsServeur,
   onFermerDefinitivement,
   onChoisirAutre,
+  onTermine,
 }: {
   /** Choisi dans le panneau du lanceur (`GuideDeTestLazy`) — jamais résolu ici. */
   scenario: GuideScenario;
@@ -182,6 +185,8 @@ export function GuideDeTest({
   /** « Choisir un autre guide » (Mariella, 07/11) : quitte CE guide sans effacer sa
    *  progression et rouvre la liste des guides. Absent : le lien ne s'affiche pas. */
   onChoisirAutre?: () => void;
+  /** b44 : la fin du guide est consignée — le lanceur relit la liste (pastille à jour). */
+  onTermine?: () => void;
 }) {
   const [monte, setMonte] = useState(false);
   // eslint-disable-next-line react-hooks/set-state-in-effect -- drapeau d'hydratation, cf. bandeau de tête
@@ -215,6 +220,7 @@ export function GuideDeTest({
           // `Visite`, qui est le seul endroit à savoir de quelle progression il s'agit.
           onTerminer={onFermerDefinitivement}
           onChoisirAutre={onChoisirAutre}
+          onTermine={onTermine}
         />
       )
       : (
@@ -288,7 +294,7 @@ function BoutonOuvrir({ scenario, onOpen, onQuitter }: {
   );
 }
 
-function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, onChoisirAutre }: {
+function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, onChoisirAutre, onTermine }: {
   scenario: GuideScenario;
   /** Verdicts SERVEUR déjà connus pour ce scénario — cf. `GuideDeTest` ci-dessus. */
   verdictsServeur?: Record<string, VerdictStocke>;
@@ -301,6 +307,7 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, on
    *  qui ne fait que replier vers la pastille. */
   onTerminer: () => void;
   onChoisirAutre?: () => void;
+  onTermine?: () => void;
 }) {
   const [prog, setProg] = useState<GuideProgress>(() => vide(scenario.id));
   const [cible, setCible] = useState<Rect | null>(null);
@@ -357,6 +364,13 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, on
   // complet (cf. l'effet de bascule plus bas) : garde contre un double appel (changement de
   // point qui ne modifie pas le statut final, double rendu StrictMode…).
   const consigneRef = useRef<string | null>(null);
+  // b44 : la consignation de fin attend que le DERNIER point soit écrit côté serveur
+  // (`pointRef`), et la dernière réponse reste visible un instant, cochée, avant la carte de
+  // fin (`vientDeNoterRef`) — sinon elle ne se voyait jamais validée.
+  const pointRef = useRef<Promise<unknown>>(Promise.resolve());
+  const vientDeNoterRef = useRef(false);
+  const onTermineRef = useRef(onTermine);
+  useEffect(() => { onTermineRef.current = onTermine; }, [onTermine]);
   // Envoi du retour de fin à la session (05/11) : la carte dit la vérité — parti, en
   // cours, ou raté (le copier-coller ne reparaît qu'alors, en secours).
   const [envoi, setEnvoi] = useState<"envoi" | "envoye" | "echec">("envoi");
@@ -433,16 +447,29 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, on
       setEcranBilan(false);
       return;
     }
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- bascule du bilan sur progression relue, cf. bandeau de tête
-    setEcranBilan(true);
-    if (consigneRef.current !== scenario.id) {
+    // Un « pas ok » au DERNIER point : la carte de fin attend sa remarque (le champ motif
+    // disparaissait sinon aussitôt, et la remarque ne partait jamais — b44).
+    if (motifActif) return;
+    const delai = vientDeNoterRef.current ? DELAI_COCHE_FIN : 0;
+    vientDeNoterRef.current = false;
+    const t = setTimeout(() => {
+      setEcranBilan(true);
+      if (consigneRef.current === scenario.id) return;
       consigneRef.current = scenario.id;
       setEnvoi("envoi");
-      void consignerGuide(scenario.id)
-        .then((r) => setEnvoi(!r.error && r.envoye ? "envoye" : "echec"))
+      // Une réouverture rappelle `consignerGuide`, mais le serveur ne renvoie jamais une fin
+      // déjà prise par le poste (b44) : il rend juste `envoye`.
+      void pointRef.current
+        .catch(() => undefined)
+        .then(() => consignerGuide(scenario.id))
+        .then((r) => {
+          setEnvoi(!r.error && r.envoye ? "envoye" : "echec");
+          if (!r.error && r.statut !== "en-cours") onTermineRef.current?.();
+        })
         .catch(() => setEnvoi("echec"));
-    }
-  }, [charge, bilan.statut, scenario.id]);
+    }, delai);
+    return () => clearTimeout(t);
+  }, [charge, bilan.statut, scenario.id, motifActif]);
 
   const renvoyer = () => {
     setEnvoi("envoi");
@@ -617,7 +644,8 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, on
     // ci-dessous : deux écritures pour ce cas, l'une écrase l'autre, jamais destructeur.
     // Un "ko" n'avertit la session qu'à la confirmation du motif (`confirmerMotif`) : un
     // seul message, avec sa remarque, plutôt que deux (d172).
-    void consignerPoint(scenario.id, etape.id, val, undefined, val === "ok");
+    pointRef.current = consignerPoint(scenario.id, etape.id, val, undefined, val === "ok");
+    vientDeNoterRef.current = true;
     if (val === "ko") {
       // Le "ko" est acquis tout de suite (`maj`), mais n'avance PAS encore : le petit champ
       // de motif (#guide-motif) s'ouvre, et c'est sa confirmation (`confirmerMotif`) qui fait
@@ -640,7 +668,8 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, on
     const p = texte ? noterMotif(prog, etape.id, texte) : prog;
     // Reconsigne avec le motif, s'il y en a un — `consignerPoint` remplace simplement
     // l'entrée posée par `noter("ko")` ci-dessus (jamais deux verdicts qui coexistent).
-    void consignerPoint(scenario.id, etape.id, "ko", texte || undefined);
+    pointRef.current = consignerPoint(scenario.id, etape.id, "ko", texte || undefined);
+    vientDeNoterRef.current = true;
     setMotifActif(false);
     setMotifSaisie("");
     maj(prog.index < total - 1 ? avancer(p, total) : p);
@@ -737,10 +766,10 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, on
           <span style={{
             font: "500 11px/1 var(--font-mono, monospace)", color: C.doux, whiteSpace: "nowrap",
           }}>
-            Point {prog.index + 1} sur {total}
+            {ecranBilan ? `${total} sur ${total}` : `Point ${prog.index + 1} sur ${total}`}
           </span>
-          {!ecranBilan && (
-            // Barre de progression segmentée (design validé 1ddbc6f, mêmes valeurs que
+          {(
+            // Barre de progression segmentée (visible aussi sur la carte de fin, toute verte : b44) (design validé 1ddbc6f, mêmes valeurs que
             // ProLearn) : vert = point déjà jugé, cyan = point courant, bord = à venir.
             <div id="guide-progression" aria-hidden="true" style={{ flexGrow: 1, display: "flex", gap: 4 }}>
               {scenario.etapes.map((e, i) => (

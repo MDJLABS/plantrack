@@ -9,7 +9,7 @@
  * session du projet. Les points « ok » ne réveillent personne : ils voyagent dans l'état
  * du parcours joint à chaque message.
  *
- * Jamais fatal, jamais bloquant au-delà de 3 s : un poste absent ou éteint laisse le guide
+ * Jamais fatal, jamais bloquant au-delà de 8 s : un poste absent ou éteint laisse le guide
  * fonctionner exactement comme avant (le registre reste la référence).
  *
  * Le projet est le dossier du site CÔTÉ SERVEUR (`racine`), jamais une donnée du
@@ -86,8 +86,9 @@ async function lirePoste(): Promise<{ base: string; jeton: string }> {
   }
 }
 
-/** Porte le texte à la session du projet. Rend `true` si le poste l'a pris. */
-export async function avertirSession(racine: string, texte: string): Promise<boolean> {
+/** Porte le texte à la session du projet. Rend `true` si le poste l'a pris. `cle` (b44) :
+ *  étiquette unique d'un envoi ; le poste ignore un second envoi de la même étiquette. */
+export async function avertirSession(racine: string, texte: string, cle?: string): Promise<boolean> {
   if (process.env.GUIDE_AVERTIR === "0") return false;
   try {
     const poste = await lirePoste();
@@ -96,8 +97,10 @@ export async function avertirSession(racine: string, texte: string): Promise<boo
     const r = await fetch(`${poste.base}/guide/point`, {
       method: "POST",
       headers: entetes,
-      body: JSON.stringify({ projet: racine, texte }),
-      signal: AbortSignal.timeout(3_000),
+      body: JSON.stringify({ projet: racine, texte, ...(cle ? { cle } : {}) }),
+      // 8 s (b44) : un poste lent (redémarrage) qui prend quand même le message ne doit pas
+      // passer pour un échec, que l'essai suivant renverrait.
+      signal: AbortSignal.timeout(8_000),
     });
     return r.ok;
   } catch {

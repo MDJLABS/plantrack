@@ -95,6 +95,9 @@ export function GuideDeTestLazy() {
   // changement de page : un verdict posé ailleurs (son téléphone) doit se refléter ici
   // sans avoir à recharger l'onglet.
   const [etat, setEtat] = useState<EtatGuides | null>(null);
+  // b44 : relue AUSSI dès qu'un guide est consigné (`relire`), sans attendre un changement
+  // de page — la pastille « Guides à traiter » baisse tout de suite.
+  const [relecture, setRelecture] = useState(0);
   useEffect(() => {
     let annule = false;
     void etatGuides().then((e) => {
@@ -103,7 +106,8 @@ export function GuideDeTestLazy() {
     return () => {
       annule = true;
     };
-  }, [pathname]);
+  }, [pathname, relecture]);
+  const relire = () => setRelecture((n) => n + 1);
 
   // `version` force un nouveau rendu après une écriture `sessionStorage` (choisir/fermer un
   // guide) qui ne passe par aucun changement de `pathname`/props.
@@ -152,6 +156,7 @@ export function GuideDeTestLazy() {
         verdictsServeur={itemActif.verdicts}
         onFermerDefinitivement={fermerDefinitivement}
         onChoisirAutre={choisirAutre}
+        onTermine={relire}
       />
     );
   }
@@ -169,12 +174,13 @@ export function GuideDeTestLazy() {
             boxShadow: "0 6px 24px rgba(0,0,0,.45)", padding: 8,
           }}
         >
-          {etat.length === 0 ? (
+          {/* b44 : seuls les guides RESTANTS — un guide fini sort de la liste. */}
+          {aTraiter.length === 0 ? (
             <p style={{ margin: 4, color: COULEURS.doux, fontSize: 12.5 }}>
-              Aucun guide dans le catalogue.
+              {etat.length === 0 ? "Aucun guide dans le catalogue." : "Plus aucun guide à traiter."}
             </p>
           ) : (
-            etat.map((g) => (
+            aTraiter.map((g) => (
               <button
                 key={g.id}
                 id={`guide-lanceur-item-${g.id}`}

@@ -23,8 +23,8 @@
 
 import { access, appendFile, readFile, rename, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
-import type { ResultatGuide, StepVerdict } from "./types";
-import { calculerStatut, faitsPour, type EtatScenarioStocke, type EtatStocke, type VerdictStocke } from "./guide-etat";
+import type { GuideScenario, ResultatGuide, StepVerdict } from "./types";
+import { calculerStatut, dejaConsigne, faitsPour, type EtatScenarioStocke, type EtatStocke, type VerdictStocke } from "./guide-etat";
 import { verdictScenario } from "./guide-verdict";
 import { getScenario, SCENARIOS } from "./scenarios.ts";
 import { reglagesGuideServeur } from "./guide-reglages-serveur.ts";
@@ -255,9 +255,19 @@ export async function guideInterrompu(scenarioId: string): Promise<{ error: stri
  * recalculé ici à partir du registre, jamais d'une conclusion reçue toute faite du
  * navigateur. Une visite incomplète n'écrit rien (`statut: "en-cours"`, aucune exception).
  */
-export async function consignerGuide(
-  scenarioId: string,
-): Promise<{ error: string | null; statut: "en-cours" | "valide" | "a-revoir" | null; envoye?: boolean }> {
+type Consignation = { error: string | null; statut: "en-cours" | "valide" | "a-revoir" | null; envoye?: boolean };
+
+/** b44 : deux fins du même guide (deux onglets, un double clic) passent l'une APRÈS l'autre :
+ *  la seconde trouve la première consignée et ne renvoie rien. */
+let fileConsignation: Promise<unknown> = Promise.resolve();
+
+export async function consignerGuide(scenarioId: string): Promise<Consignation> {
+  const tour = fileConsignation.then(() => consignerGuideSeul(scenarioId));
+  fileConsignation = tour.catch(() => undefined);
+  return tour;
+}
+
+async function consignerGuideSeul(scenarioId: string): Promise<Consignation> {
   if (!(await porteAdmin())) return { error: "hors session admin", statut: null };
 
   const scenario = getScenario(scenarioId);
@@ -280,6 +290,15 @@ export async function consignerGuide(
 
   const bilan = verdictScenario(scenario.etapes, verdicts);
   if (bilan.statut === "en-cours") return { error: null, statut: "en-cours" };
+
+  // b44 (08/11 : « un guide terminé doit n'envoyer qu'une seule fois sa confirmation ») : une
+  // visite déjà consignée, sans verdict changé depuis, ne réécrit rien et ne renvoie rien —
+  // la réouverture du guide (replier, recharger, rechoisir) relisait sinon tout et repartait.
+  if (dejaConsigne(scenario, entree)) {
+    if (entree!.envoye) return { error: null, statut: bilan.statut, envoye: true };
+    const envoye = await envoyerFin(racine, scenarioId, scenario, entree!);
+    return { error: null, statut: bilan.statut, envoye };
+  }
 
   const quand = new Date().toISOString();
   const suivant: EtatScenarioStocke = {
@@ -313,16 +332,40 @@ export async function consignerGuide(
 
   await ecrireCompteRendu(racine, scenario, resultat, quand);
   await reglagesGuideServeur.apresConsigne?.(resultat);
-  const envoye = await avertirAvecEssais(racine, texteAvis(scenario, suivant.verdicts, "fin"));
+  const envoye = await envoyerFin(racine, scenarioId, scenario, suivant);
 
   return { error: null, statut: bilan.statut, envoye };
 }
 
+/** b44 : envoie le retour de fin d'UNE consignation (étiquette `scenarioId@date@fini`, que le
+ *  poste dédoublonne), puis note `envoye` au registre pour ne plus jamais le renvoyer. */
+async function envoyerFin(
+  racine: string, scenarioId: string, scenario: GuideScenario, entree: EtatScenarioStocke,
+): Promise<boolean> {
+  const cle = `${scenarioId}@${entree.date}@${entree.fini ?? ""}`;
+  const envoye = await avertirAvecEssais(racine, texteAvis(scenario, entree.verdicts, "fin"), cle);
+  if (envoye) {
+    try {
+      const etat = await lireEtat(racine);
+      const courant = etat[scenarioId];
+      // Seulement si c'est toujours CETTE consignation (pas une plus récente entre-temps).
+      if (courant && courant.fini === entree.fini) {
+        await ecrireEtat(racine, { ...etat, [scenarioId]: { ...courant, envoye: new Date().toISOString() } });
+      }
+    } catch {
+      // Registre non inscriptible : le poste dédoublonne quand même par l'étiquette.
+    }
+  }
+  return envoye;
+}
+
 /** Le retour de fin ne doit pas se perdre en silence (05/11 : « qu'ils s'envoient tout seul
- *  à la session sans copier-coller ») : 3 essais espacés avant d'avouer l'échec à la carte. */
-async function avertirAvecEssais(racine: string, texte: string): Promise<boolean> {
+ *  à la session sans copier-coller ») : 3 essais espacés avant d'avouer l'échec à la carte.
+ *  Même étiquette à chaque essai : un essai dont le poste avait déjà pris le message (réponse
+ *  trop lente) est ignoré par lui, jamais remis une seconde fois à la session (b44). */
+async function avertirAvecEssais(racine: string, texte: string, cle: string): Promise<boolean> {
   for (let i = 0; i < 3; i++) {
-    if (await avertirSession(racine, texte)) return true;
+    if (await avertirSession(racine, texte, cle)) return true;
     if (process.env.GUIDE_AVERTIR === "0") return false;
     if (i < 2) await new Promise((r) => setTimeout(r, 1_000 * (i + 1)));
   }
@@ -342,5 +385,7 @@ export async function renvoyerGuide(scenarioId: string): Promise<{ error: string
 
   const entree = (await lireEtat(racine))[scenarioId];
   if (!entree || entree.date !== scenario.date || !entree.fini) return { error: "visite pas terminée", envoye: false };
-  return { error: null, envoye: await avertirAvecEssais(racine, texteAvis(scenario, entree.verdicts, "fin")) };
+  // Déjà pris par le poste : rien à renvoyer (b44).
+  if (entree.envoye) return { error: null, envoye: true };
+  return { error: null, envoye: await envoyerFin(racine, scenarioId, scenario, entree) };
 }

@@ -28,7 +28,7 @@ async function step(n: string, fn: () => Promise<void> | void) {
   }
 }
 
-const recus: { chemin: string; corps: { projet: string; texte: string } }[] = [];
+const recus: { chemin: string; corps: { projet: string; texte: string; cle?: string } }[] = [];
 const faux = createServer((req, res) => {
   let brut = "";
   req.on("data", (c) => (brut += c));
@@ -91,26 +91,46 @@ await step("guide terminé → bilan", async () => {
   assert.equal(recus.length, 4);
   assert.match(recus[3]!.corps.texte, /terminé : 4 ok, 2 pas ok/);
   assert.equal(r.envoye, true); // la carte de fin peut dire « ✓ Envoyé à ta session »
+  // b44 : une étiquette unique par consignation, que le poste dédoublonne.
+  assert.match(recus[3]!.corps.cle ?? "", /^temoin-principal@.+@\d{4}-/);
 });
 
-await step("guide déjà consigné → la fermeture ne redit rien", async () => {
-  await guideInterrompu("temoin-principal");
+await step("b44 : le guide se rouvre → consignerGuide ne renvoie RIEN, rend envoye", async () => {
+  const r = await consignerGuide("temoin-principal");
+  assert.equal(r.statut, "a-revoir");
+  assert.equal(r.envoye, true);
   assert.equal(recus.length, 4);
 });
 
-await step("bouton Réessayer → le bilan repart, reconstruit du registre", async () => {
+await step("b44 : deux fins simultanées (deux onglets) → un seul envoi", async () => {
+  await consignerPoint("temoin-second", "q1", "ok");
+  const avant = recus.length;
+  const [a, b] = await Promise.all([consignerGuide("temoin-second"), consignerGuide("temoin-second")]);
+  assert.equal(a.envoye, true);
+  assert.equal(b.envoye, true);
+  assert.equal(recus.length, avant + 1);
+});
+
+await step("guide déjà consigné → la fermeture ne redit rien", async () => {
+  const avant = recus.length;
+  await guideInterrompu("temoin-principal");
+  assert.equal(recus.length, avant);
+});
+
+await step("b44 : Réessayer une fin déjà prise par le poste → rien ne repart", async () => {
+  const avant = recus.length;
   const r = await renvoyerGuide("temoin-principal");
   assert.deepEqual(r, { error: null, envoye: true });
-  assert.equal(recus.length, 5);
-  assert.match(recus[4]!.corps.texte, /terminé : 4 ok, 2 pas ok/);
+  assert.equal(recus.length, avant);
 });
 
 await step("Réessayer sur une visite pas terminée → refusé, rien n'est envoyé", async () => {
-  await consignerPoint("temoin-second", "q1", "ok");
-  const r = await renvoyerGuide("temoin-second");
+  await consignerPoint("temoin-geste", "r1", "ok");
+  const avant = recus.length;
+  const r = await renvoyerGuide("temoin-geste");
   assert.equal(r.envoye, false);
   assert.ok(r.error);
-  assert.equal(recus.length, 5);
+  assert.equal(recus.length, avant);
 });
 
 await step("poste éteint → jamais d'erreur pour le guide", async () => {
@@ -120,8 +140,18 @@ await step("poste éteint → jamais d'erreur pour le guide", async () => {
 });
 
 await step("poste éteint au bilan → envoye = faux, après 3 essais", async () => {
-  const r = await renvoyerGuide("temoin-principal");
-  assert.deepEqual(r, { error: null, envoye: false });
+  await consignerPoint("temoin-geste", "r2", "ok");
+  const r = await consignerGuide("temoin-geste");
+  assert.equal(r.envoye, false);
+});
+
+await step("b44 : poste revenu → Réessayer envoie la fin, une fois", async () => {
+  process.env.BCC_PORT = String((faux.address() as AddressInfo).port);
+  const avant = recus.length;
+  assert.deepEqual(await renvoyerGuide("temoin-geste"), { error: null, envoye: true });
+  assert.equal(recus.length, avant + 1);
+  assert.deepEqual(await renvoyerGuide("temoin-geste"), { error: null, envoye: true });
+  assert.equal(recus.length, avant + 1);
 });
 
 const ecranTel = { w: 390, h: 844 };

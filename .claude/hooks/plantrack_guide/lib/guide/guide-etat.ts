@@ -36,7 +36,21 @@ export type EtatScenarioStocke = {
   /** Horodatage de `consignerGuide` — absent ⇒ pas encore consigné, même si tous les points
    *  ont déjà un verdict. */
   fini?: string;
+  /** b44 : horodatage du retour de fin PRIS par le poste pour ce `fini`. Posé ⇒ la session a
+   *  déjà reçu cette fin : ni une réouverture du guide ni un nouvel appel ne la renvoient. */
+  envoye?: string;
 };
+
+/** b44 : une visite est « déjà consignée » quand `fini` est posé et qu'aucun verdict n'a été
+ *  donné APRÈS (revoir un point puis le changer rouvre une consignation, voulue). */
+export function dejaConsigne(scenario: GuideScenario, etat: EtatScenarioStocke | undefined): boolean {
+  if (!correspondALaLivraison(scenario, etat) || !etat.fini) return false;
+  const fini = etat.fini;
+  return scenario.etapes.every((e) => {
+    const x = etat.verdicts[e.id];
+    return !!x && x.a <= fini;
+  });
+}
 
 /** Table complète persistée (`.planning/guides-etat.json`) — une entrée par scénario déjà
  *  touché au moins une fois. */
