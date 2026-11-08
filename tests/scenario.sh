@@ -1678,7 +1678,7 @@ check "orchestre : feu vert au calme" "feu vert" "$out"
 check "orchestre : 3 sessions, la relayee de Mariella est humaine" "humain 1, agent 0, fond 2" "$out"
 memoire 500000; O orchestre --tour
 out=$(O orchestre)
-check "orchestre : feu rouge sous 8 % de memoire" "feu rouge" "$out"
+check "orchestre : feu rouge sous 5 % de memoire" "feu rouge" "$out"
 check "orchestre : une seule session en pause (la plus grosse continue)" "en pause : 1" "$out"
 enpause=$(python3 -c 'import json,sys; print(" ".join(json.load(open(sys.argv[1]))["pauses"]))' "$OD/etat.json")
 check_not "orchestre : la session humaine n'est jamais mise en pause" "sc" "$enpause"
@@ -1700,6 +1700,22 @@ check "orchestre : journal pause + reprise" "reprise" "$(cat "$OD/journal.log")"
 # arret du service : personne ne reste gele
 memoire 500000; O orchestre --tour; O orchestre --tout-reprendre
 check_exit "orchestre : tout-reprendre degele" "0" "$(python3 -c 'import json,sys; print(len(json.load(open(sys.argv[1]))["pauses"]))' "$OD/etat.json")"
+# d212 : le feu juge la pression sur 1 min ; un a-coup de 10 s seul ne le fait pas changer
+niv() { python3 -c 'import importlib.util as u,sys,json; sp=u.spec_from_file_location("pt",sys.argv[1]); a=sys.argv[2]; m=u.module_from_spec(sp); sys.argv=["pt"]; sp.loader.exec_module(m); print(m.orch_niveau(json.loads(a)))' "$PT" "$1"; }
+check_exit "feu : a-coup de 10 s seul = vert" "vert" "$(niv '{"dispo":40,"psi_memory_full":9,"psi_memory_some":30}')"
+check_exit "feu : pression soutenue 1 min = rouge" "rouge" "$(niv '{"dispo":40,"psi_memory_full_60":6}')"
+check_exit "feu : coup dur (full 10 s > 25) = rouge tout de suite" "rouge" "$(niv '{"dispo":40,"psi_memory_full":30}')"
+check_exit "feu : gene moderee sur 1 min = orange" "orange" "$(niv '{"dispo":40,"psi_memory_some_60":12}')"
+check_exit "feu : 13 % de RAM disponible sans pression = vert" "vert" "$(niv '{"dispo":13}')"
+check_exit "feu : filet sous 5 % de RAM = rouge" "rouge" "$(niv '{"dispo":4}')"
+# le feu ne redescend qu'apres le calme ; une pause est plafonnee
+memoire 500000; O orchestre --tour; memoire 8000000
+PLANTRACK_ORCHESTRE="$OD" PLANTRACK_PROC="$OP" ORCH_CALME=3600 ORCH_PAS=0 ORCH_ALERTE=true python3 "$PT" orchestre --tour
+check "feu : reste rouge tant que le calme n'a pas dure" "feu rouge" "$(O orchestre)"
+memoire 500000; PLANTRACK_ORCHESTRE="$OD" PLANTRACK_PROC="$OP" ORCH_CALME=0 ORCH_PAS=0 ORCH_PAUSE_MAX=1 ORCH_ALERTE=true python3 "$PT" orchestre --tour
+sleep 2; PLANTRACK_ORCHESTRE="$OD" PLANTRACK_PROC="$OP" ORCH_CALME=0 ORCH_PAS=0 ORCH_PAUSE_MAX=1 ORCH_ALERTE=true python3 "$PT" orchestre --tour
+check "pause plafonnee : la session reprend d'office" "de pause au plus" "$(cat "$OD/journal.log")"
+O orchestre --tout-reprendre >/dev/null
 # fail-open : orchestre muet (etat vieux) = aucune attente
 python3 -c 'import json,sys; e=json.load(open(sys.argv[1])); e["ts"]=0; e["pauses"]={"sa":{"ts":0}}; json.dump(e,open(sys.argv[1],"w"))' "$OD/etat.json"
 debut=$(date +%s)

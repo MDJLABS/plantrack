@@ -1240,16 +1240,19 @@ ORCH_DIR = os.environ.get("PLANTRACK_ORCHESTRE") or "/var/lib/plantrack-orchestr
 ORCH_PROC = os.environ.get("PLANTRACK_PROC") or "/proc"   # meminfo + pressure (tests)
 ORCH_FRAIS = 60                                            # etat plus vieux : orchestre muet
 ORCH_ATTENTE = int(os.environ.get("ORCH_ATTENTE") or 540)  # sous le timeout 600 des hooks
-ORCH_PAUSE_MAX = int(os.environ.get("ORCH_PAUSE_MAX") or 1800)  # une pause ne depasse jamais 30 min
+ORCH_PAUSE_MAX = int(os.environ.get("ORCH_PAUSE_MAX") or 600)  # une pause ne depasse jamais 10 min
 ORCH_HUMAIN = 600        # prompt de Mariella plus recent : rang humain, jamais en pause
 ORCH_FOND = 7200         # aucun prompt de Mariella depuis 2 h : rang fond
-ORCH_CALME = int(os.environ.get("ORCH_CALME") or 60)       # sous le seuil depuis : le feu baisse
+ORCH_CALME = int(os.environ.get("ORCH_CALME") or 180)      # sous le seuil depuis : le feu baisse
 ORCH_PAS = int(os.environ.get("ORCH_PAS") or 30)           # entre deux pauses, deux reprises
 ORCH_TOUR = 10                                             # periode de la boucle
-ORCH_ROUGE_DISPO = float(os.environ.get("ORCH_ROUGE_DISPO") or 8)     # % de RAM disponible
-ORCH_ORANGE_DISPO = float(os.environ.get("ORCH_ORANGE_DISPO") or 15)
-ORCH_ROUGE_PSI = float(os.environ.get("ORCH_ROUGE_PSI") or 5)         # PSI memoire full avg10
-ORCH_ORANGE_PSI = float(os.environ.get("ORCH_ORANGE_PSI") or 10)      # PSI memoire some avg10
+# d212 : le feu juge la pression sur 1 min (avg60) ; avg10 seul faisait rouge/vert a la
+# minute sur un a-coup. La RAM disponible n'est plus qu'un filet (le cache la fait paraitre basse).
+ORCH_ROUGE_DISPO = float(os.environ.get("ORCH_ROUGE_DISPO") or 5)     # % de RAM disponible
+ORCH_ORANGE_DISPO = float(os.environ.get("ORCH_ORANGE_DISPO") or 10)
+ORCH_ROUGE_PSI = float(os.environ.get("ORCH_ROUGE_PSI") or 5)         # PSI memoire full avg60
+ORCH_ROUGE_PSI_PIC = float(os.environ.get("ORCH_ROUGE_PSI_PIC") or 25)  # full avg10 : coup dur
+ORCH_ORANGE_PSI = float(os.environ.get("ORCH_ORANGE_PSI") or 10)      # PSI memoire some avg60
 ORCH_ALERTE_DELAI = 600  # rouge depuis 10 min malgre les pauses : une bulle
 ORCH_ALERTE = os.environ.get("ORCH_ALERTE") or "node /home/mariella/bcc/hook/repondre.ts --ton probleme"
 ORCH_JAMAIS = {"systemd", "sshd", "cloudflared", "dockerd", "containerd", "earlyoom"}
@@ -1391,16 +1394,19 @@ def orch_mesure():
             with open(os.path.join(ORCH_PROC, "pressure", res), encoding="utf-8") as f:
                 for l in f:
                     k, *kv = l.split()
-                    m[f"psi_{res}_{k}"] = float(dict(x.split("=", 1) for x in kv).get("avg10", 0))
+                    v = dict(x.split("=", 1) for x in kv)
+                    m[f"psi_{res}_{k}"] = float(v.get("avg10", 0))
+                    m[f"psi_{res}_{k}_60"] = float(v.get("avg60", 0))
         except (OSError, ValueError):
             pass
     return m
 
 
 def orch_niveau(m):
-    if m["dispo"] < ORCH_ROUGE_DISPO or m.get("psi_memory_full", 0) > ORCH_ROUGE_PSI:
+    if (m["dispo"] < ORCH_ROUGE_DISPO or m.get("psi_memory_full_60", 0) > ORCH_ROUGE_PSI
+            or m.get("psi_memory_full", 0) > ORCH_ROUGE_PSI_PIC):
         return "rouge"
-    if m["dispo"] < ORCH_ORANGE_DISPO or m.get("psi_memory_some", 0) > ORCH_ORANGE_PSI:
+    if m["dispo"] < ORCH_ORANGE_DISPO or m.get("psi_memory_some_60", 0) > ORCH_ORANGE_PSI:
         return "orange"
     return "vert"
 
@@ -1573,7 +1579,7 @@ def orch_tour(etat, maintenant):
            else "vert")
     if feu != etat.get("feu"):
         orch_journal(f"feu {feu} (memoire disponible {m['dispo']} %, swap {m['swap']} %, "
-                     f"pression {m.get('psi_memory_some', 0)} %)")
+                     f"pression sur 1 min {m.get('psi_memory_some_60', 0)} %)")
         etat["feu_depuis"] = maintenant
         etat.pop("alerte_feu", None)
     etat["feu"], etat["mesure"] = feu, m
@@ -1584,7 +1590,7 @@ def orch_tour(etat, maintenant):
         if sid not in sessions:
             orch_reprendre(etat, sid, "session terminee")
         elif maintenant - pauses[sid]["ts"] > ORCH_PAUSE_MAX:
-            orch_reprendre(etat, sid, "30 minutes de pause au plus")
+            orch_reprendre(etat, sid, f"{ORCH_PAUSE_MAX // 60} minutes de pause au plus")
             etat.setdefault("repit", {})[sid] = maintenant  # ne la regele pas aussitot
     repit = {s: t for s, t in etat.get("repit", {}).items() if maintenant - t < ORCH_PAUSE_MAX}
     etat["repit"] = repit
@@ -1637,7 +1643,7 @@ def orch_resume(e):
     ss = e.get("sessions", {})
     pauses = e.get("pauses", {})
     lignes = [f"feu {e.get('feu')} — memoire disponible {m.get('dispo')} %, swap {m.get('swap')} %, "
-              f"pression memoire {m.get('psi_memory_some', 0)} %",
+              f"pression memoire sur 1 min {m.get('psi_memory_some_60', 0)} %",
               f"sessions : {len(ss)} ("
               + ", ".join(f"{r} {sum(1 for f in ss.values() if f['rang'] == r)}" for r in RANGS)
               + f"), en pause : {len(pauses)}"]
