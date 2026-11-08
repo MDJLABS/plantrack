@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [162 commits]
-  fichiers recemment ecrits : sortie/carte-suite-6.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-vectorized-waffle.md, ../../../etc/kvm-lourd/types.conf, ../../../usr/local/bin/kvm-lourd, sortie/scenario-voix.log, ../../../usr/local/bin/menage-serveur.sh
+FIL ACTIF — t23 : guides de test automatiques (d100) [166 commits]
+  fichiers recemment ecrits : sortie/tsc-b44.sh, sortie/tsc-b44.log, ../../../tmp/claude-0/-home-mariella-plantrack/40e1fc28-7141-4ff7-8dd9-8a41d0dad13a/scratchpad/simplify.diff, ../../../tmp/claude-0/-home-mariella-plantrack/40e1fc28-7141-4ff7-8dd9-8a41d0dad13a/scratchpad/carte-b44.json, ../../../root/.claude/plans/contexte-reconstruit-par-le-giggly-acorn.md, sortie/scenario-feu.log
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -27,6 +27,7 @@ BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b39 (to_verify) [t23] Essai guide Soirees (02/11 11h, tel Mariella) : la page /soirees de la version de test s69-soirees affiche 'canal MiamBoost non configure (… (agent) [1 tentatives, derniere: Version de test branchee sur la preprod MiamBoost locale : …]
   b40 (to_verify) [t23] Essai guide Soirees (02/11 11h23, tel Mariella) : 'probleme sur les captcha cloudflare, il y en a 3 dans la page, beaucoup trop ; un seul s… (agent) [1 tentatives, derniere: s69-soirees 3c92781 : TurnstileWidget monte seulement a l'e…]
   b41 (to_verify) [t23] Orchestre (d159) : les sessions lancees sous bccsession (telephone) ne peuvent pas s'inscrire — /var/lib/plantrack-orchestre/sessions en ro… (agent) [1 tentatives, derniere: Dossier sessions en 1777 (bit collant) pose par l'orchestre…]
+  b44 (to_verify) [t23] Guide termine (tel Mariella 08/11, session projob) : derniere etape pas confirmee a l'ecran, guide reste dans la liste des restants, fin en… (agent) [2 tentatives, derniere: Livre : moteur (cda33df + 8ea12a4 sans grands tirets) coche…]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
@@ -240,6 +241,8 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d209 : Voix et video en file (choix Mariella tel 08/11 'Voix et video en file (Recommande)', plan approuve) : cause des 135 arrets earlyoom de la … (agent)
   d210 : Secours rendu par les services au repos (choix Mariella tel 08/11 'Vider le secours (Recommande)') : menage-serveur.sh (hors depot, sauvega… (agent)
   d211 : Mariella (tel, 08/11, carte Suite) : 'Attendre le bilan de dimanche (Recommande)' apres d209/d210 — veille silencieuse (d23), verdict sur l… (agent)
+  d212 : d212 orchestre : feu juge sur la pression memoire a 1 min (PSI avg60 ; pic avg10 full > 25 = rouge tout de suite), RAM disponible = simple … (agent)
+  d213 : v1.9.40 publiee (08/11, GitHub + PyPI verifie) : d212 (feu de l'orchestre sur 1 min, pause 10 min max) + correctif b44 (guide termine) ; or… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…

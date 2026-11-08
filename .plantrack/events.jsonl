@@ -2316,3 +2316,42 @@
 {"ts": "2026-11-08T12:03:59+00:00", "kind": "decision", "id": "d210", "text": "Secours rendu par les services au repos (choix Mariella tel 08/11 'Vider le secours (Recommande)') : menage-serveur.sh (hors depot, sauvegarde backup/code/usr-local-bin/menage-serveur.sh.pre-secours) redemarre omnivoice (:3900) et bcc-passerelle-passerelle-1 (litellm :4000) si leur swap >= 512 Mo, aucune connexion etablie sur leur port depuis 30 min (temoin /var/lib/menage-serveur/calme-<nom>, ss dans leur netns) et au plus une fois par 6 h. Essai a blanc : 1055 + 705 Mo rendus. Le revidage swapoff existant ne se declenchait jamais (exige swap + 3 Go dispo).", "par": "agent"}
 {"ts": "2026-11-08T12:03:59+00:00", "kind": "commit", "sha": "f6cad61", "ctype": "chore", "thread": "t23"}
 {"ts": "2026-11-08T12:04:45+00:00", "kind": "decision", "id": "d211", "text": "Mariella (tel, 08/11, carte Suite) : 'Attendre le bilan de dimanche (Recommande)' apres d209/d210 — veille silencieuse (d23), verdict sur le nombre d'arrets earlyoom au bilan du dimanche 15/11.", "par": "agent"}
+{"ts": "2026-11-08T12:04:46+00:00", "kind": "commit", "sha": "e640e5f", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-08T12:04:57+00:00", "kind": "file_touched", "text": "sortie/carte-suite-bilan.log", "thread": "t23"}
+{"ts": "2026-11-08T12:09:32+00:00", "kind": "file_touched", "text": "sortie/carte-suite-ressources.json", "thread": "t23"}
+{"ts": "2026-11-08T12:09:32+00:00", "kind": "file_touched", "text": "sortie/carte-suite-ressources.log", "thread": "t23"}
+{"ts": "2026-11-08T12:20:52+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-polymorphic-pixel.md", "thread": "t23"}
+{"ts": "2026-11-08T12:30:59+00:00", "kind": "file_touched", "text": "sortie/scenario-feu.log", "thread": "t23"}
+{"ts": "2026-11-08T12:31:15+00:00", "kind": "file_touched", "text": "sortie/scenario-feu.log", "thread": "t23"}
+{"ts": "2026-11-08T13:07:09+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-dapper-pinwheel.md", "thread": "t23"}
+{"ts": "2026-11-08T13:19:25+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t23"}
+{"ts": "2026-11-08T13:19:33+00:00", "kind": "file_touched", "text": "sortie/scenario-feu.log", "thread": "t23"}
+{"ts": "2026-11-08T13:50:28+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/7f99b187-aac7-41aa-912c-715cc9f4d792/scratchpad/carte.json", "thread": "t23"}
+{"ts": "2026-11-08T16:15:49+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-tender-hopper.md", "thread": "t23"}
+{"ts": "2026-11-08T16:24:30+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-fluttering-donut.md", "thread": "t23"}
+{"ts": "2026-11-08T16:25:09+00:00", "kind": "bug", "id": "b44", "text": "Guide termine (tel Mariella 08/11, session projob) : derniere etape pas confirmee a l'ecran, guide reste dans la liste des restants, fin envoyee 3 fois a projob (tours 160998/161008/161014, 16:18:11/27/39, poste en redemarrage). Causes : garde anti-doublon seulement cote navigateur (consigneRef), consignerGuide non idempotent, timeout 3 s + 3 essais, liste relue seulement au changement de page, ko final masque le motif.", "thread": "t23", "severity": "normal", "par": "agent"}
+{"ts": "2026-11-08T16:25:20+00:00", "kind": "attempt", "id": "a63", "bug": "b44", "hypothesis": "Idempotence serveur (fini+envoye dans guides-etat.json, consignerGuide ne renvoie pas), cle unique scenarioId@date@fini dedoublonnee par le poste bcc (+ empreinte texte 2 min pour les anciens sites), timeout 8 s ; ecran : coche de la derniere etape ~700 ms avant la carte de fin, ko final attend le motif ; liste relue apres consignation, guides finis hors des restants.", "session": "40e1fc28-7141-4ff7-8dd9-8a41d0dad13a", "actor": "claude-code"}
+{"ts": "2026-11-08T16:26:16+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/lib/guide/guide-etat.ts", "thread": "t23"}
+{"ts": "2026-11-08T16:26:19+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/lib/guide/guide-actions.ts", "thread": "t23"}
+{"ts": "2026-11-08T16:26:27+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/lib/guide/guide-actions.ts", "thread": "t23"}
+{"ts": "2026-11-08T16:26:29+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/lib/guide/guide-actions.ts", "thread": "t23"}
+{"ts": "2026-11-08T16:28:27+00:00", "kind": "file_touched", "text": "tests/guide/avertir.test.ts", "thread": "t23"}
+{"ts": "2026-11-08T16:28:43+00:00", "kind": "commit", "sha": "cda33df", "ctype": "fix", "thread": "t23"}
+{"ts": "2026-11-08T16:30:44+00:00", "kind": "file_touched", "text": "../bcc/server/api.ts", "thread": "t23"}
+{"ts": "2026-11-08T16:38:20+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t23"}
+{"ts": "2026-11-08T16:40:28+00:00", "kind": "file_touched", "text": "../bcc/sortie/relance-b44.log", "thread": "t23"}
+{"ts": "2026-11-08T16:40:38+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/40e1fc28-7141-4ff7-8dd9-8a41d0dad13a/scratchpad/avant.tsx", "thread": "t23"}
+{"ts": "2026-11-08T16:41:51+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/40e1fc28-7141-4ff7-8dd9-8a41d0dad13a/scratchpad/t.log", "thread": "t23"}
+{"ts": "2026-11-08T16:42:07+00:00", "kind": "commit", "sha": "8ea12a4", "ctype": "fix", "thread": "t23"}
+{"ts": "2026-11-08T16:42:50+00:00", "kind": "file_touched", "text": "sortie/tsc-b44.sh", "thread": "t23"}
+{"ts": "2026-11-08T16:42:50+00:00", "kind": "file_touched", "text": "sortie/tsc-b44.log", "thread": "t23"}
+{"ts": "2026-11-08T16:43:14+00:00", "kind": "file_touched", "text": "sortie/tsc-b44.log", "thread": "t23"}
+{"ts": "2026-11-08T16:44:23+00:00", "kind": "attempt", "id": "a64", "bug": "b44", "hypothesis": "Livre : moteur (cda33df + 8ea12a4 sans grands tirets) coche la derniere etape ~700 ms, attend la remarque d'un ko final, retire le guide fini des restants, consignerGuide idempotent (fini+envoye dans guides-etat.json, consignations en file) ; poste bcc b105568 : cle unique (24 h) ou empreinte du texte (2 min), memoire persistee ~/.bcc/guide-envois.json. Recopie sur projob, openstyle, Mizzzen, mdjlabs_marketing, s69-soirees (update) et prolearn, miamboost, s69-francoviet (leurs retouches = tirets, desormais dans le moteur).", "session": "40e1fc28-7141-4ff7-8dd9-8a41d0dad13a", "actor": "claude-code"}
+{"ts": "2026-11-08T16:48:27+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/40e1fc28-7141-4ff7-8dd9-8a41d0dad13a/scratchpad/simplify.diff", "thread": "t23"}
+{"ts": "2026-11-08T16:52:36+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/40e1fc28-7141-4ff7-8dd9-8a41d0dad13a/scratchpad/carte-b44.json", "thread": "t23"}
+{"ts": "2026-11-08T18:28:32+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-giggly-acorn.md", "thread": "t23"}
+{"ts": "2026-11-08T18:29:09+00:00", "kind": "decision", "id": "d212", "text": "d212 orchestre : feu juge sur la pression memoire a 1 min (PSI avg60 ; pic avg10 full > 25 = rouge tout de suite), RAM disponible = simple filet (rouge < 5 %, orange < 10 %), calme 3 min avant de baisser le feu, pause plafonnee a 10 min (choix Mariella tel 08/11 'Tester puis garder (Recommande)')", "par": "agent"}
+{"ts": "2026-11-08T18:29:13+00:00", "kind": "bug_status", "id": "b44", "status": "to_verify"}
+{"ts": "2026-11-08T18:29:13+00:00", "kind": "file_touched", "text": "sortie/scenario-feu.log", "thread": "t23"}
+{"ts": "2026-11-08T18:39:07+00:00", "kind": "commit", "sha": "91dfc56", "ctype": "feat", "thread": "t23"}
+{"ts": "2026-11-08T18:41:48+00:00", "kind": "decision", "id": "d213", "text": "v1.9.40 publiee (08/11, GitHub + PyPI verifie) : d212 (feu de l'orchestre sur 1 min, pause 10 min max) + correctif b44 (guide termine) ; orchestre redemarre, feu vert ; 573 tests ok, seul echec = pg31 connu.", "par": "agent"}
