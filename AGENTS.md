@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [155 commits]
-  fichiers recemment ecrits : sortie/carte-suite-3.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-stateful-lemon.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-snug-melody.md, sortie/carte-suite-4.json, sortie/carte-suite-4.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-linked-cake.md
+FIL ACTIF — t23 : guides de test automatiques (d100) [158 commits]
+  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-linked-cake.md, .claude/hooks/pt.py, tests/scenario.sh, sortie/scenario-cancel.log, ../../../tmp/claude-0/-home-mariella-plantrack/a53aed50-7a2c-4d57-8cc1-f6d0b6b464b8/scratchpad/vide, pyproject.toml
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -235,6 +235,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d204 : Mariella (tel, 08/11, plan approuve apres relance auto memoire 70 %/swap 100 %) : rien a faire, veille silencieuse (d23) ; menage auto deja… (agent)
   d205 : Mariella (tel, 08/11, tri des 4 corrections de plus de 7 jours) : b30 (reveil ProLearn), b32 (guide ProJob auto), b35 et b36 (file d'attent… (agent)
   d206 : Mariella (tel, 08/11, carte Suite apres tri des 4) : 'Rester en veille (Recommande)' — b37-b41 (moins de 7 jours) reproposes a la reouvertu… (agent)
+  d207 : v1.9.39 publiee (08/11, GitHub + PyPI verifie) : task cancel accepte --de comme task done (demande de la session bcc b161) ; test ajoute. E… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
@@ -254,6 +255,7 @@ Pieges connus :
   pg28 : Orchestre : le hook-pretool reinscrit la session sur le premier ancetre claude/…
   pg29 : tests/scenario.sh lance sous le compte bccsession : 6 echecs ronde/b20/bilan --…
   pg30 : Compte bccsession (sessions du telephone) : la boucle locale est filtree — seul…
+  pg31 : tests/scenario.sh 'bilan --all : rien a dire' echoue sur le serveur reel quand …
 
 Questions en attente (reponds via !answer qN ...) :
   q15 : Guide Soirées pret (s69-soirees 1db1d2a) : Mariella fait-elle l'essai sur https…

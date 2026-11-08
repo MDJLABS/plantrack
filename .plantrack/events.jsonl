@@ -2288,3 +2288,14 @@
 {"ts": "2026-11-08T03:33:12+00:00", "kind": "decision", "id": "d205", "text": "Mariella (tel, 08/11, tri des 4 corrections de plus de 7 jours) : b30 (reveil ProLearn), b32 (guide ProJob auto), b35 et b36 (file d'attente) valides", "par": "agent"}
 {"ts": "2026-11-08T03:33:19+00:00", "kind": "commit", "sha": "59fcbbd", "ctype": "chore", "thread": "t23"}
 {"ts": "2026-11-08T04:06:51+00:00", "kind": "decision", "id": "d206", "text": "Mariella (tel, 08/11, carte Suite apres tri des 4) : 'Rester en veille (Recommande)' — b37-b41 (moins de 7 jours) reproposes a la reouverture des projets, veille silencieuse (d23)", "par": "agent"}
+{"ts": "2026-11-08T04:06:53+00:00", "kind": "commit", "sha": "41607d9", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-08T04:08:56+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-08T04:09:11+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t23"}
+{"ts": "2026-11-08T04:12:13+00:00", "kind": "file_touched", "text": "sortie/scenario-cancel.log", "thread": "t23"}
+{"ts": "2026-11-08T04:12:26+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/a53aed50-7a2c-4d57-8cc1-f6d0b6b464b8/scratchpad/vide", "thread": "t23"}
+{"ts": "2026-11-08T04:12:26+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/a53aed50-7a2c-4d57-8cc1-f6d0b6b464b8/scratchpad/vide", "thread": "t23"}
+{"ts": "2026-11-08T04:12:35+00:00", "kind": "commit", "sha": "83ce378", "ctype": "fix", "thread": "t23"}
+{"ts": "2026-11-08T04:12:48+00:00", "kind": "commit", "sha": "d9db4e7", "ctype": "release", "thread": "t23"}
+{"ts": "2026-11-08T04:12:50+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t23"}
+{"ts": "2026-11-08T04:14:03+00:00", "kind": "decision", "id": "d207", "text": "v1.9.39 publiee (08/11, GitHub + PyPI verifie) : task cancel accepte --de comme task done (demande de la session bcc b161) ; test ajoute. Echec 'bilan --all rien a dire' preexistant : depend du vrai journal de l'orchestre du serveur (semaine chargee).", "par": "agent"}
+{"ts": "2026-11-08T04:14:04+00:00", "kind": "piege", "id": "pg31", "text": "tests/scenario.sh 'bilan --all : rien a dire' echoue sur le serveur reel quand l'orchestre a des pauses dans la semaine : le bilan --all lit le journal systeme de l'orchestre, pas seulement le registre vide du test."}
