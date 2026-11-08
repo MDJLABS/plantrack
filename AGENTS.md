@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [154 commits]
+FIL ACTIF — t23 : guides de test automatiques (d100) [155 commits]
   fichiers recemment ecrits : sortie/carte-suite-3.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-stateful-lemon.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-snug-melody.md, sortie/carte-suite-4.json, sortie/carte-suite-4.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-linked-cake.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -234,6 +234,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d203 : Mariella (tel, 08/11 00h25) : 'Tout est bon' sur le tableau Suivi ProJob -> b43 (colonnes), b33 (Passer a), b34 (Voir la fiche) valides ; v… (agent)
   d204 : Mariella (tel, 08/11, plan approuve apres relance auto memoire 70 %/swap 100 %) : rien a faire, veille silencieuse (d23) ; menage auto deja… (agent)
   d205 : Mariella (tel, 08/11, tri des 4 corrections de plus de 7 jours) : b30 (reveil ProLearn), b32 (guide ProJob auto), b35 et b36 (file d'attent… (agent)
+  d206 : Mariella (tel, 08/11, carte Suite apres tri des 4) : 'Rester en veille (Recommande)' — b37-b41 (moins de 7 jours) reproposes a la reouvertu… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…

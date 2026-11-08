@@ -2286,3 +2286,5 @@
 {"ts": "2026-11-08T03:33:11+00:00", "kind": "bug_status", "id": "b35", "status": "validated", "canal": "telephone 08/11 : File d'attente 2 cas du 31/10 -> Valider les deux (Recommande)"}
 {"ts": "2026-11-08T03:33:11+00:00", "kind": "bug_status", "id": "b36", "status": "validated", "canal": "telephone 08/11 : File d'attente 2 cas du 31/10 -> Valider les deux (Recommande)"}
 {"ts": "2026-11-08T03:33:12+00:00", "kind": "decision", "id": "d205", "text": "Mariella (tel, 08/11, tri des 4 corrections de plus de 7 jours) : b30 (reveil ProLearn), b32 (guide ProJob auto), b35 et b36 (file d'attente) valides", "par": "agent"}
+{"ts": "2026-11-08T03:33:19+00:00", "kind": "commit", "sha": "59fcbbd", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-08T04:06:51+00:00", "kind": "decision", "id": "d206", "text": "Mariella (tel, 08/11, carte Suite apres tri des 4) : 'Rester en veille (Recommande)' — b37-b41 (moins de 7 jours) reproposes a la reouverture des projets, veille silencieuse (d23)", "par": "agent"}
