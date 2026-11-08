@@ -2303,3 +2303,11 @@
 {"ts": "2026-11-08T04:14:27+00:00", "kind": "file_touched", "text": "sortie/carte-suite-5.log", "thread": "t23"}
 {"ts": "2026-11-08T04:16:21+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-luminous-bunny.md", "thread": "t23"}
 {"ts": "2026-11-08T08:58:58+00:00", "kind": "decision", "id": "d208", "text": "Mariella (tel, 08/11, plan approuve apres depeche bcc b161) : rien a faire, veille silencieuse (d23) ; seul rouge du doctor = eba6bd5 (30/10, note de journal sans fil, plafond de fils), sans gravite, s'eteint seul hors fenetre.", "par": "agent"}
+{"ts": "2026-11-08T08:58:58+00:00", "kind": "commit", "sha": "24aade9", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-08T08:59:11+00:00", "kind": "file_touched", "text": "sortie/carte-suite-6.json", "thread": "t23"}
+{"ts": "2026-11-08T08:59:11+00:00", "kind": "file_touched", "text": "sortie/carte-suite-6.log", "thread": "t23"}
+{"ts": "2026-11-08T11:57:18+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-vectorized-waffle.md", "thread": "t23"}
+{"ts": "2026-11-08T11:58:41+00:00", "kind": "file_touched", "text": "../../../etc/kvm-lourd/types.conf", "thread": "t23"}
+{"ts": "2026-11-08T11:58:41+00:00", "kind": "file_touched", "text": "../../../usr/local/bin/kvm-lourd", "thread": "t23"}
+{"ts": "2026-11-08T11:58:56+00:00", "kind": "file_touched", "text": "sortie/scenario-voix.log", "thread": "t23"}
+{"ts": "2026-11-08T11:59:02+00:00", "kind": "decision", "id": "d209", "text": "Voix et video en file (choix Mariella tel 08/11 'Voix et video en file (Recommande)', plan approuve) : cause des 135 arrets earlyoom de la semaine = 30 episodes dont 86 le 07/11 (OmniVoice 1,5-2,6 Go + rendu Remotion promovie + navigateurs de test en meme temps, swap 4 Go plein en permanence). /etc/kvm-lourd/types.conf gagne video 2.5G (remotion render, pnpm render*) et voix 3G (:3900/generate, plancher fixe car la memoire est dans le conteneur) avant build ; DUREE_MAX video 1h, voix 35m. Hors depot, sauvegardes backup/code. Hors perimetre signale : swap plein (omnivoice 1 Go, litellm 0,7 Go), navigateurs Playwright hors file.", "par": "agent"}
