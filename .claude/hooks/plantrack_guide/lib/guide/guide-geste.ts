@@ -34,6 +34,17 @@ import type { GuideGeste } from "./types";
 export type ResultatGeste = { ok: boolean; raison?: string };
 
 /**
+ * Tous les gestes d'une étape, dans l'ordre où ils se jouent : `geste` d'abord, puis
+ * `gestes` (d216). Liste vide ⇒ l'étape n'a rien à jouer. Un "aller" placé avant la fin
+ * coupe la suite (la page se décharge) : on s'arrête donc juste après lui.
+ */
+export function gestesEtape(etape: { geste?: GuideGeste; gestes?: GuideGeste[] }): GuideGeste[] {
+  const tous = [...(etape.geste ? [etape.geste] : []), ...(etape.gestes ?? [])];
+  const aller = tous.findIndex((g) => g.type === "aller");
+  return aller >= 0 ? tous.slice(0, aller + 1) : tous;
+}
+
+/**
  * Sélecteurs à essayer, du plus précis au plus général : celui du geste d'abord (il
  * désigne précisément l'élément à actionner), puis les `cibles` de l'étape en repli —
  * c'est la même zone que celle surlignée, un repli raisonnable si le geste n'a pas son

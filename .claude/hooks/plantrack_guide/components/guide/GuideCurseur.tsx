@@ -1,37 +1,32 @@
 "use client";
 
 /* ==============================================================================
- * Guide de test intégré — curseur animé qui joue un geste à la place de Mariella.
+ * Guide de test intégré (Stepper) : curseur animé qui joue les gestes d'une étape à la
+ * place de Mariella.
  *
- * Glisse depuis la bulle jusqu'au centre de la cible (transition CSS ~700 ms), fait un
- * petit « clic » visuel (léger rétrécissement), puis appelle `jouerGeste`
- * (`@/lib/guide/guide-geste.ts`). Mariella n'a plus qu'à juger le résultat ✓/✗.
+ * Pour chaque geste, à la suite (d216 : « écrire la demande » puis « toucher Envoyer ») :
+ * glisse jusqu'au centre de la cible (transition CSS ~700 ms), fait un petit « clic »
+ * visuel (léger rétrécissement), puis appelle `jouerGeste` (`@/lib/guide/guide-geste.ts`).
+ * Entre deux gestes, une courte pause laisse la page réagir (un bouton Envoyer qui ne
+ * s'active qu'une fois le champ rempli) ; la cible du geste suivant n'est cherchée
+ * qu'APRÈS cette pause. La suite s'arrête au premier échec, dont la raison remonte.
+ * Mariella n'a plus qu'à juger le résultat.
  *
- * `prefers-reduced-motion: reduce` → aucune animation : la position cible et l'absence de
- * transition sont posées dans le MÊME effet, donc dans le même rendu — il n'y a jamais de
- * frame intermédiaire à `depart` à transitionner. Le geste est joué tout de suite après.
+ * `prefers-reduced-motion: reduce` → aucune animation : position et absence de transition
+ * posées dans le même rendu, le geste est joué tout de suite.
  *
- * Type "aller" (navigation) : rien à encadrer — on ne fait pas « glisser » un curseur
- * vers une URL. Ce composant ne rend alors rien (`null`) et appelle `jouerGeste`
- * directement. C'est malgré tout par LUI que ça passe (plutôt que par l'appelant) : un
- * seul endroit décide quand le geste part, qu'il y ait une animation à montrer ou pas.
+ * Type "aller" (navigation) : rien à encadrer, le geste part directement. C'est toujours
+ * le dernier de la suite (`gestesEtape` coupe après lui) : la page se décharge.
  *
- * ⚠️ `onAvantAction` : `jouerGeste` (cf. son bandeau de tête) exige que l'étape soit
- * marquée JOUÉE et la progression PERSISTÉE avant qu'il ne s'exécute — une navigation
- * décharge la page tout de suite après, et perdre cette écriture ferait rejouer le geste
- * en boucle à chaque retour sur l'étape. `jouerGeste` lui-même n'a aucune idée de ce
- * qu'est une « progression » (module pur, sans React) : c'est ce composant qui porte la
- * séquence exacte (marquer → jouer), via ce callback appelé juste avant `jouerGeste`,
- * pour TOUT type de geste — pas seulement "aller" — par cohérence et parce qu'un clic/une
- * saisie peut elle aussi déclencher une navigation côté page (un bouton qui redirige).
+ * ⚠️ `onAvantAction` : appelé UNE fois, juste avant le premier `jouerGeste`. L'appelant y
+ * marque l'étape jouée et persiste la progression (une navigation décharge la page tout
+ * de suite après ; perdre cette écriture ferait rejouer les gestes en boucle).
  *
- * `#guide-curseur` : id stable, pour que la visite guidée puisse un jour s'auto-vérifier
- * (et pour qu'un humain qui inspecte la page retrouve facilement ce qui bouge).
+ * `#guide-curseur` : id stable (auto-vérification, inspection humaine).
  *
  * `ancetresReplies` (réglages CLIENT du site, `guide-reglages.ts`) : même garde que les
- * deux `resolveTarget` de `GuideDeTest.tsx` (surlignage, scroll) — sans elle, le curseur
- * pouvait viser/cliquer un élément caché sous un ancêtre replié (ex. ProLearn,
- * `.tn-childwrap.collapsed`) alors même que l'encadrement refusait de le surligner.
+ * `resolveTarget` de `GuideDeTest.tsx`, pour ne jamais viser un élément caché sous un
+ * ancêtre replié.
  * ============================================================================== */
 
 import { useEffect, useRef, useState } from "react";
@@ -39,13 +34,13 @@ import { resolveTarget } from "@/lib/guide/guide-geometry";
 import { jouerGeste, selecteursGeste, type ResultatGeste } from "@/lib/guide/guide-geste";
 import type { GuideGeste } from "@/lib/guide/types";
 
-/** Durée du glissé — alignée sur le ~700 ms demandé : assez lent pour être SUIVI du
- *  regard, assez rapide pour ne pas donner l'impression que le guide traîne. */
+/** Durée du glissé : assez lent pour être SUIVI du regard, assez rapide pour ne pas traîner. */
 const DUREE_GLISSE_MS = 700;
-/** Durée du petit « clic » visuel une fois arrivé — bref, c'est un ACCENT, pas une pause. */
+/** Durée du petit « clic » visuel une fois arrivé : un accent, pas une pause. */
 const DUREE_CLIC_MS = 160;
-/** Au-dessus de `#guide-overlay` (Z = 2147483000 dans `GuideDeTest.tsx`) : le curseur doit
- *  rester visible PAR-DESSUS le cadre de surlignage et la bulle. */
+/** Pause entre deux gestes : le temps que React rende l'effet du précédent. */
+const PAUSE_ENTRE_GESTES_MS = 450;
+/** Au-dessus de `#guide-overlay` (Z = 2147483000 dans `GuideDeTest.tsx`). */
 const Z_CURSEUR = 2147483001;
 
 /** La position du curseur en coordonnées écran (`position: fixed`), centre de l'icône. */
@@ -53,97 +48,112 @@ type Point = { x: number; y: number };
 
 export function GuideCurseur({
   depart,
-  geste,
+  gestes,
   ciblesRepli = [],
   ancetresReplies = [],
   onAvantAction,
   onJoue,
 }: {
-  /** Point de départ du glissé — en pratique, le centre de la bulle. */
+  /** Point de départ du glissé : en pratique, le centre de la bulle. */
   depart: Point;
-  geste: GuideGeste;
-  /** `cibles` de l'étape — repli si `geste.cible` est absent ou ne résout rien (même
-   *  logique que `jouerGeste`, cf. `selecteursGeste`). */
+  /** Gestes de l'étape, dans l'ordre (`gestesEtape`). */
+  gestes: GuideGeste[];
+  /** `cibles` de l'étape : repli si `geste.cible` est absent ou ne résout rien. */
   ciblesRepli?: string[];
-  /** Réglages CLIENT du site (`reglagesGuide.ancetresReplies`, `guide-reglages.ts`) — cf.
-   *  bandeau de tête. Absent ⇒ aucun ancêtre replié ignoré, comportement inchangé. */
+  /** Réglages CLIENT du site : cf. bandeau de tête. */
   ancetresReplies?: string[];
-  /** Appelé juste avant `jouerGeste` — cf. bandeau de tête : c'est ici que l'appelant doit
-   *  marquer l'étape jouée et persister la progression. */
+  /** Appelé une fois, juste avant le premier `jouerGeste` : cf. bandeau de tête. */
   onAvantAction: () => void;
-  /** Appelé une fois (et une seule) avec le résultat du geste. */
+  /** Appelé une fois (et une seule) : ok si tous les gestes ont réussi, sinon le premier échec. */
   onJoue: (resultat: ResultatGeste) => void;
 }) {
   const [pos, setPos] = useState<Point>(depart);
   const [clic, setClic] = useState(false);
   const [sansTransition, setSansTransition] = useState(false);
-  // Garde contre un double effet (StrictMode en dev, ou un changement de deps imprévu) :
-  // un geste — surtout "aller", qui NAVIGUE — ne doit jamais partir deux fois.
+  const [visible, setVisible] = useState(gestes[0]?.type !== "aller");
+  // Garde contre un double effet (StrictMode en dev) : un geste ne part jamais deux fois.
   const dejaJoue = useRef(false);
 
   useEffect(() => {
     if (dejaJoue.current) return;
     dejaJoue.current = true;
 
-    // StrictMode (dev) monte, DÉMONTE puis remonte l'effet : le nettoyage annule les minuteurs.
-    // Si le geste n'est pas encore parti, relâcher la garde — sinon le remontage le croit joué
-    // et rien ne part jamais (b28). Une fois parti, la garde tient : jamais deux départs.
+    // StrictMode monte, DÉMONTE puis remonte l'effet : le nettoyage annule les minuteurs.
+    // Tant que rien n'est parti, relâcher la garde (b28). Une fois parti, elle tient.
     let parti = false;
-    const conclure = () => {
-      parti = true;
-      onAvantAction();
-      onJoue(jouerGeste(geste, document, ciblesRepli, undefined, ancetresReplies));
-    };
-
-    if (geste.type === "aller") {
-      // Rien à montrer (cf. bandeau de tête) — on part directement.
-      conclure();
-      return;
-    }
-
-    const el = resolveTarget(selecteursGeste(geste, ciblesRepli), document, undefined, ancetresReplies);
-    if (!el) {
-      // Invariant 2 du guide (GuideDeTest.tsx) : ne jamais prétendre avoir atteint une
-      // cible absente. On ne joue rien, et on le dit.
-      onJoue({ ok: false, raison: "cible introuvable" });
-      return;
-    }
-
-    const r = el.getBoundingClientRect();
-    const centre: Point = { x: r.x + r.width / 2, y: r.y + r.height / 2 };
+    let annule = false;
+    const minuteurs: ReturnType<typeof setTimeout>[] = [];
+    let raf = 0;
+    const attendre = (ms: number, fn: () => void) => { minuteurs.push(setTimeout(fn, ms)); };
 
     let motionReduite = false;
     try {
       motionReduite = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     } catch {
-      // API indisponible (contexte restreint) : on se comporte comme si le mouvement
-      // était acceptable, c'est le réglage le plus courant.
+      // API indisponible : on se comporte comme si le mouvement était acceptable.
     }
 
-    if (motionReduite) {
-      // `sansTransition` ET `pos` posés dans le MÊME effet ⇒ même rendu ⇒ aucune frame
-      // intermédiaire à `depart` ne peut être transitionnée (cf. bandeau de tête).
-      setSansTransition(true);
-      setPos(centre);
-      conclure();
-      return;
-    }
+    const jouer = (geste: GuideGeste): ResultatGeste => {
+      if (!parti) { parti = true; onAvantAction(); }
+      return jouerGeste(geste, document, ciblesRepli, undefined, ancetresReplies);
+    };
 
-    // Un rAF : laisser le PREMIER rendu se faire à `depart` avant de viser `centre`,
-    // sinon le navigateur n'aurait jamais de frame de départ à transitionner depuis.
-    const raf = requestAnimationFrame(() => setPos(centre));
-    const timerClic = setTimeout(() => setClic(true), DUREE_GLISSE_MS);
-    const timerAction = setTimeout(conclure, DUREE_GLISSE_MS + DUREE_CLIC_MS);
+    const suivant = (i: number) => {
+      if (annule) return;
+      if (i >= gestes.length) { onJoue({ ok: true }); return; }
+      const geste = gestes[i];
+
+      if (geste.type === "aller") {
+        setVisible(false);
+        onJoue(jouer(geste)); // dernier geste de la suite, cf. `gestesEtape`
+        return;
+      }
+
+      // La cible est cherchée MAINTENANT, après que la page a réagi au geste précédent.
+      const el = resolveTarget(selecteursGeste(geste, ciblesRepli), document, undefined, ancetresReplies);
+      if (!el) {
+        // Invariant 2 du guide : ne jamais prétendre avoir atteint une cible absente.
+        onJoue({ ok: false, raison: "cible introuvable" });
+        return;
+      }
+      const r = el.getBoundingClientRect();
+      const centre: Point = { x: r.x + r.width / 2, y: r.y + r.height / 2 };
+      setVisible(true);
+      setClic(false);
+
+      const conclure = () => {
+        if (annule) return;
+        const res = jouer(geste);
+        if (!res.ok) { onJoue(res); return; }
+        if (i + 1 >= gestes.length) { onJoue(res); return; }
+        attendre(PAUSE_ENTRE_GESTES_MS, () => suivant(i + 1));
+      };
+
+      if (motionReduite) {
+        setSansTransition(true);
+        setPos(centre);
+        conclure();
+        return;
+      }
+      // Un rAF : laisser le rendu courant se faire avant de viser `centre`, sinon le
+      // navigateur n'a pas de frame de départ à transitionner.
+      raf = requestAnimationFrame(() => setPos(centre));
+      attendre(DUREE_GLISSE_MS, () => setClic(true));
+      attendre(DUREE_GLISSE_MS + DUREE_CLIC_MS, conclure);
+    };
+
+    suivant(0);
+
     return () => {
+      annule = true;
       cancelAnimationFrame(raf);
-      clearTimeout(timerClic);
-      clearTimeout(timerAction);
+      minuteurs.forEach(clearTimeout);
       if (!parti) dejaJoue.current = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- un seul passage par montage, cf. `dejaJoue`
   }, []);
 
-  if (geste.type === "aller") return null; // rien à encadrer, cf. bandeau de tête
+  if (!visible) return null; // geste "aller" : rien à encadrer
 
   return (
     <div
@@ -163,7 +173,7 @@ export function GuideCurseur({
       }}
     >
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        {/* Flèche de curseur classique, pointe en haut-gauche — orientation standard. */}
+        {/* Flèche de curseur classique, pointe en haut-gauche. */}
         <path
           d="M4 2 L4 20 L9 15.5 L12.5 21.5 L15.5 20 L12 14 L19 14 Z"
           fill="#F3EEE6"

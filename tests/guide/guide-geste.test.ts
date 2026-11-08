@@ -17,7 +17,7 @@
 
 import assert from "node:assert/strict";
 import {
-  appliquerClic, appliquerSaisie, jouerGeste, selecteursGeste,
+  appliquerClic, appliquerSaisie, gestesEtape, jouerGeste, selecteursGeste,
 } from "../../.claude/hooks/plantrack_guide/lib/guide/guide-geste";
 import type { GuideGeste } from "../../.claude/hooks/plantrack_guide/lib/guide/types";
 
@@ -164,6 +164,23 @@ step('jouerGeste : "clic"/"saisie" passent bien les cibles de repli à `resolve`
     return el as unknown as Element;
   });
   assert.deepEqual(recus, ["#repli-a", "#repli-b"]);
+});
+
+// d216 : plusieurs gestes par point.
+step("gestesEtape : sans geste => liste vide", () => {
+  assert.deepEqual(gestesEtape({}), []);
+});
+step("gestesEtape : geste puis gestes, dans l'ordre", () => {
+  const a: GuideGeste = { type: "saisie", cible: "#champ", valeur: "x" };
+  const b: GuideGeste = { type: "clic", cible: "#envoyer" };
+  const c: GuideGeste = { type: "clic", cible: "#autre" };
+  assert.deepEqual(gestesEtape({ geste: a, gestes: [b, c] }), [a, b, c]);
+  assert.deepEqual(gestesEtape({ gestes: [b] }), [b]);
+});
+step("gestesEtape : un aller coupe la suite juste apres lui", () => {
+  const aller: GuideGeste = { type: "aller", url: "/suivi" };
+  const clic: GuideGeste = { type: "clic", cible: "#x" };
+  assert.deepEqual(gestesEtape({ geste: clic, gestes: [aller, clic] }), [clic, aller]);
 });
 
 console.log(`\n${passed} assertions vertes`);

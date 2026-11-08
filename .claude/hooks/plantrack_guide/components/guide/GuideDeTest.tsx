@@ -96,7 +96,7 @@ import { consignerGuide, consignerPoint, guideInterrompu, renvoyerGuide } from "
 import { reglagesGuide } from "@/lib/guide/guide-reglages";
 import { surLaPage } from "@/lib/guide/guide-visite";
 import { GuideCurseur } from "./GuideCurseur";
-import type { ResultatGeste } from "@/lib/guide/guide-geste";
+import { gestesEtape, type ResultatGeste } from "@/lib/guide/guide-geste";
 import type { VerdictStocke } from "@/lib/guide/guide-etat";
 import type { GuideScenario, GuideProgress } from "@/lib/guide/types";
 
@@ -395,6 +395,9 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, on
   }, [scenario.id, scenario.etapes, verdictsServeur]);
 
   const etape = scenario.etapes[Math.min(prog.index, scenario.etapes.length - 1)];
+  // Tous les gestes de l'étape, dans l'ordre (`geste` puis `gestes`, d216).
+  const gestes = gestesEtape(etape);
+  const aGestes = gestes.length > 0;
   const total = scenario.etapes.length;
 
   // « Si je ne suis pas sur la bonne page, un bouton doit m'y emmener » (porté de Prolearn,
@@ -599,7 +602,7 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, on
     // Pas sur la bonne page (porté de Prolearn, commit 958ecde2) : le geste raterait sa
     // cible. Il partira une fois arrivée (cf. `onAllerAuBonEndroit`).
     if (horsPage) { setCurseurVisible(false); return; }
-    if (etape.geste && !prog.joues?.includes(etape.id)) {
+    if (aGestes && !prog.joues?.includes(etape.id)) {
       setCurseurVisible(true);
       setCurseurCle((c) => c + 1);
     } else {
@@ -735,11 +738,11 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, on
         );
       })()}
 
-      {curseurVisible && etape.geste && !ecranBilan && (
+      {curseurVisible && aGestes && !ecranBilan && (
         <GuideCurseur
           key={`${etape.id}:${curseurCle}`}
           depart={departCurseur}
-          geste={etape.geste}
+          gestes={gestes}
           ciblesRepli={etape.cibles ?? []}
           ancetresReplies={reglagesGuide.ancetresReplies ?? []}
           onAvantAction={avantGeste}
@@ -798,7 +801,7 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, on
               <div id="guide-menu-panel" role="menu" style={menuPanelStyle}>
                 {/* Le curseur animé ne joue le geste qu'une fois (`prog.joues`) — cette entrée
                     permet de le REJOUER à la demande, par ex. après correction de la cible. */}
-                {etape.geste && !ecranBilan && (
+                {aGestes && !ecranBilan && (
                   <button id="guide-rejouer" role="menuitem" onClick={rejouerGeste} style={menuItemStyle}>
                     Rejouer le geste
                   </button>

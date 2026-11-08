@@ -48,6 +48,11 @@ export type GuideStep = {
   /** Geste à jouer automatiquement à l'entrée de l'étape (curseur animé) — absent ⇒
    *  comportement actuel inchangé (elle fait le geste elle-même). */
   geste?: GuideGeste;
+  /** Gestes SUPPLÉMENTAIRES, joués à la suite de `geste` (d216, 09/11) : par ex. « écrire
+   *  la demande » puis « toucher Envoyer ». Chaque geste attend que la page ait réagi au
+   *  précédent ; la suite s'arrête au premier échec. Un geste "aller" (navigation) doit
+   *  être le DERNIER : la page se décharge, les gestes suivants ne partiraient jamais. */
+  gestes?: GuideGeste[];
   /** Identifiant d'étape PlanTrack (ex. "s3") — RETIRÉ DE SERVICE (d138, 31/10) : portait le
    *  verdict vers l'ancien envoi réseau `guide-envoi.ts`, supprimé. Champ laissé TEL QUEL
    *  (type optionnel, jamais lu) pour ne pas forcer une modification des `scenarios.ts` de
