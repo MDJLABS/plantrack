@@ -261,7 +261,7 @@ function BoutonOuvrir({ scenario, onOpen, onQuitter }: {
       <button
         id="guide-ouvrir"
         onClick={onOpen}
-        title={`${scenario.etapes.length} points à vérifier — ${scenario.titre}`}
+        title={`${scenario.etapes.length} points à vérifier : ${scenario.titre}`}
         style={{
           display: "flex", alignItems: "center", gap: 8,
           padding: "9px 12px 9px 14px",
@@ -882,7 +882,7 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, on
             margin: "0 0 8px", padding: "6px 8px", borderRadius: 6,
             background: C.koSoft, color: C.ko, fontSize: 12,
           }}>
-            La zone décrite n&rsquo;est pas visible sur cette page — la consigne reste
+            La zone décrite n&rsquo;est pas visible sur cette page, la consigne reste
             valable, mais rien n&rsquo;est encadré.
           </p>
         )}
@@ -952,7 +952,7 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, on
             }}>
               {bilan.statut === "valide"
                 ? `C'est fini, tout est bon · ${bilan.total} sur ${bilan.total}`
-                : `⚠️ ${bilan.total - bilan.ko.length}/${bilan.total} conformes — ${bilan.ko.length} à revoir.`}
+                : `⚠️ ${bilan.total - bilan.ko.length}/${bilan.total} conformes : ${bilan.ko.length} à revoir.`}
             </p>
             {bilan.statut === "a-revoir" && (
               <ul style={{ margin: "0 0 10px", paddingLeft: 16, color: C.doux }}>
@@ -1004,7 +1004,7 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, on
             {etatCopie === "echec" && (
               <div style={{ marginBottom: 8 }}>
                 <p style={{ margin: "0 0 4px", color: C.ko, fontSize: 11.5 }}>
-                  La copie automatique a échoué — sélectionne le texte ci-dessous et
+                  La copie automatique a échoué, sélectionne le texte ci-dessous et
                   copie-le à la main (Ctrl+C / Cmd+C).
                 </p>
                 <textarea

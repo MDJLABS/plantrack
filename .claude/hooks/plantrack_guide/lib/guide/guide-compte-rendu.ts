@@ -52,5 +52,5 @@ export function construireCompteRendu(
     const motif = v === "ko" ? motifs[e.id] : undefined;
     return `- ${e.titre} : ${v ? LIBELLE[v] : LIBELLE.manquant}${motif ? ` (${motif})` : ""}`;
   });
-  return [`Guide de test — ${scenarioId}`, "", ...lignes].join("\n");
+  return [`Guide de test : ${scenarioId}`, "", ...lignes].join("\n");
 }

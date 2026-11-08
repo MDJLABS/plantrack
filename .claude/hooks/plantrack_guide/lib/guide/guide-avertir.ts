@@ -48,7 +48,7 @@ export function texteAvis(
     const n = scenario.etapes.findIndex((e) => e.id === stepId);
     const e = scenario.etapes[n];
     const x = verdicts[stepId];
-    tete = `Guide « ${scenario.titre} » — point ${n + 1}/${total} « ${e?.titre ?? stepId} » : `
+    tete = `Guide « ${scenario.titre} », point ${n + 1}/${total} « ${e?.titre ?? stepId} » : `
       + (x?.v === "ko" ? "PAS OK" : "ok, avec une remarque")
       + (x?.note ? `. Sa remarque : « ${citer(x.note)} »` : "")
       + ". Elle est peut-être bloquée sur ce point : agis maintenant.";
@@ -61,7 +61,7 @@ export function texteAvis(
   const lignes = scenario.etapes.map((e, i) => {
     const x = verdicts[e.id];
     const etat = !x ? "pas encore vu" : x.v === "ok" ? "ok" : "PAS OK";
-    const note = x?.note && e.id !== stepId ? ` — « ${citer(x.note)} »` : "";
+    const note = x?.note && e.id !== stepId ? `, « ${citer(x.note)} »` : "";
     return `${i + 1}. ${e.titre} : ${etat}${note}`;
   });
   return `${tete}\n\nOù en est le parcours :\n${lignes.join("\n")}`;
