@@ -14,18 +14,14 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [153 commits]
-  fichiers recemment ecrits : sortie/carte-suite-2.log, ../projob/scripts/seed-exemples-suivi.sql, ../projob/apps/web/scripts-local-capture-suivi.mjs, sortie/carte-suite-3.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-stateful-lemon.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-snug-melody.md
+FIL ACTIF — t23 : guides de test automatiques (d100) [154 commits]
+  fichiers recemment ecrits : sortie/carte-suite-3.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-stateful-lemon.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-snug-melody.md, sortie/carte-suite-4.json, sortie/carte-suite-4.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-linked-cake.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
   t5 : travaux sur main — reprise : retour au travail courant apres la faille
 
 BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
-  b30 (to_verify) [t23] Essai guide ProLearn (31/10 06h16, tel Mariella) : apres le code Cloudflare Access (accepte a 05:16:56Z dans le registre Access), la page '… (agent) [2 tentatives, derniere: d144 : portier-reveil etendu a bcc-proxy (18787) et miamboo…]
-  b32 (to_verify) [t23] Essai guide ProJob (31/10, tel Mariella) : 'catastrophe' — au lieu d'un guide qui joue les etapes pour elle, elle doit tout faire elle-meme… (agent) [1 tentatives, derniere: Guide design2 ProJob rendu automatique (27de37f, 16 points …]
-  b35 (to_verify) [t23] kvm-lourd (31/10, install guide OpenStyle) : une commande 'git add ...' a ete classee 'next-build' et mise en file derriere un build Mizzze… (agent) [1 tentatives, derniere: Diagnostic, aucun changement de code : les commandes mises …]
-  b36 (to_verify) [t23] Recurrence de b35 (31/10, session ProJob guide commun) : un simple 'git add <fichiers>' (etape 10 du portage guide) a ete classe 'next-buil… (agent) [1 tentatives, derniere: Meme cause que b35 : la commande de l'etape 10 contenait au…]
   b37 (to_verify) [t23] kvm-lourd (01/11) : une commande de lecture (diff/grep/ls dans prolearn) classee next-build et mise en file 8/8 — recurrence b35/b36 (agent) [1 tentatives, derniere: Cause trouvee (reproduite) : dans 'diff <(cat A) B', la par…]
   b38 (to_verify) [t23] Essai versions de test (01/11 soir, tel Mariella) : 's69 soirees mene vers le site s69 dev il me semble, et les 2 autres liens ne fonctionn… (agent) [1 tentatives, derniere: MiamBoost : miamboost-dev.mdjlabs.com classe en domaine de …]
   b39 (to_verify) [t23] Essai guide Soirees (02/11 11h, tel Mariella) : la page /soirees de la version de test s69-soirees affiche 'canal MiamBoost non configure (… (agent) [1 tentatives, derniere: Version de test branchee sur la preprod MiamBoost locale : …]
@@ -237,6 +233,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d202 : Mariella (tel, 08/11 00h24, carte Suite tableau Suivi ProJob) : 'Je regarde (Recommande)' — elle verifie b43 (colonnes), b33 (Passer a) et … (agent)
   d203 : Mariella (tel, 08/11 00h25) : 'Tout est bon' sur le tableau Suivi ProJob -> b43 (colonnes), b33 (Passer a), b34 (Voir la fiche) valides ; v… (agent)
   d204 : Mariella (tel, 08/11, plan approuve apres relance auto memoire 70 %/swap 100 %) : rien a faire, veille silencieuse (d23) ; menage auto deja… (agent)
+  d205 : Mariella (tel, 08/11, tri des 4 corrections de plus de 7 jours) : b30 (reveil ProLearn), b32 (guide ProJob auto), b35 et b36 (file d'attent… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
