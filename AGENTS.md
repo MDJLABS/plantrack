@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [167 commits]
-  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-giggly-acorn.md, sortie/scenario-feu.log, sortie/carte-suite-1940.json, sortie/carte-suite-1940.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-woolly-pinwheel.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-starry-oasis.md
+FIL ACTIF — t23 : guides de test automatiques (d100) [168 commits]
+  fichiers recemment ecrits : sortie/carte-suite-1940.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-woolly-pinwheel.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-starry-oasis.md, sortie/carte-b44-essai.json, sortie/carte-b44-essai.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-keen-kettle.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -244,6 +244,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d212 : d212 orchestre : feu juge sur la pression memoire a 1 min (PSI avg60 ; pic avg10 full > 25 = rouge tout de suite), RAM disponible = simple … (agent)
   d213 : v1.9.40 publiee (08/11, GitHub + PyPI verifie) : d212 (feu de l'orchestre sur 1 min, pause 10 min max) + correctif b44 (guide termine) ; or… (agent)
   d214 : Mariella (tel, 08/11 19h24, plan approuve 'On y va') : attente de son essai du guide ProJob recette2 pour b44, veille silencieuse (d23) (agent)
+  d215 : Mariella (tel, 08/11 22h50, carte Suite) : 'Je fais l'essai (Recommande)' - essai du guide ProJob pour b44 ; veille silencieuse jusqu'a son… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…

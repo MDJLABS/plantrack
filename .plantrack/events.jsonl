@@ -2361,3 +2361,8 @@
 {"ts": "2026-11-08T18:49:41+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-woolly-pinwheel.md", "thread": "t23"}
 {"ts": "2026-11-08T19:25:08+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-starry-oasis.md", "thread": "t23"}
 {"ts": "2026-11-08T20:33:10+00:00", "kind": "decision", "id": "d214", "text": "Mariella (tel, 08/11 19h24, plan approuve 'On y va') : attente de son essai du guide ProJob recette2 pour b44, veille silencieuse (d23)", "par": "agent"}
+{"ts": "2026-11-08T20:33:11+00:00", "kind": "commit", "sha": "decc031", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-08T20:33:23+00:00", "kind": "file_touched", "text": "sortie/carte-b44-essai.json", "thread": "t23"}
+{"ts": "2026-11-08T20:33:23+00:00", "kind": "file_touched", "text": "sortie/carte-b44-essai.log", "thread": "t23"}
+{"ts": "2026-11-08T22:50:55+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-keen-kettle.md", "thread": "t23"}
+{"ts": "2026-11-08T22:52:22+00:00", "kind": "decision", "id": "d215", "text": "Mariella (tel, 08/11 22h50, carte Suite) : 'Je fais l'essai (Recommande)' - essai du guide ProJob pour b44 ; veille silencieuse jusqu'a son verdict (d23, d214)", "par": "agent"}
