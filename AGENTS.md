@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [151 commits]
-  fichiers recemment ecrits : ../../../tmp/claude-0/-home-mariella-plantrack/7b59f58f-ad68-4f47-87d7-39e67fa8ec2a/scratchpad/ancre.patch, sortie/carte-suite.log, pyproject.toml, sortie/carte-suite-2.log, ../projob/scripts/seed-exemples-suivi.sql, ../projob/apps/web/scripts-local-capture-suivi.mjs
+FIL ACTIF — t23 : guides de test automatiques (d100) [152 commits]
+  fichiers recemment ecrits : pyproject.toml, sortie/carte-suite-2.log, ../projob/scripts/seed-exemples-suivi.sql, ../projob/apps/web/scripts-local-capture-suivi.mjs, sortie/carte-suite-3.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-stateful-lemon.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -24,8 +24,6 @@ FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
 BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b30 (to_verify) [t23] Essai guide ProLearn (31/10 06h16, tel Mariella) : apres le code Cloudflare Access (accepte a 05:16:56Z dans le registre Access), la page '… (agent) [2 tentatives, derniere: d144 : portier-reveil etendu a bcc-proxy (18787) et miamboo…]
   b32 (to_verify) [t23] Essai guide ProJob (31/10, tel Mariella) : 'catastrophe' — au lieu d'un guide qui joue les etapes pour elle, elle doit tout faire elle-meme… (agent) [1 tentatives, derniere: Guide design2 ProJob rendu automatique (27de37f, 16 points …]
-  b33 (to_verify) [t23] ProJob design2 (essai Mariella 31/10 13h33, guide) : tableau de suivi, au clic sur 'Passer a' la liste s'affiche dans le cadre de la carte … (agent) [1 tentatives, derniere: Menu Passer a sorti du cadre qui defile : portail vers docu…]
-  b34 (to_verify) [t23] ProJob design2 (essai Mariella 31/10 13h34-13h35, guide) : points 'La fiche : en-tete et les 5 etapes', 'L historique a l heure de Paris', … (agent) [1 tentatives, derniere: Bouton + : n'existe que sous 600 px, texte du point precise…]
   b35 (to_verify) [t23] kvm-lourd (31/10, install guide OpenStyle) : une commande 'git add ...' a ete classee 'next-build' et mise en file derriere un build Mizzze… (agent) [1 tentatives, derniere: Diagnostic, aucun changement de code : les commandes mises …]
   b36 (to_verify) [t23] Recurrence de b35 (31/10, session ProJob guide commun) : un simple 'git add <fichiers>' (etape 10 du portage guide) a ete classe 'next-buil… (agent) [1 tentatives, derniere: Meme cause que b35 : la commande de l'etape 10 contenait au…]
   b37 (to_verify) [t23] kvm-lourd (01/11) : une commande de lecture (diff/grep/ls dans prolearn) classee next-build et mise en file 8/8 — recurrence b35/b36 (agent) [1 tentatives, derniere: Cause trouvee (reproduite) : dans 'diff <(cat A) B', la par…]
@@ -33,7 +31,6 @@ BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b39 (to_verify) [t23] Essai guide Soirees (02/11 11h, tel Mariella) : la page /soirees de la version de test s69-soirees affiche 'canal MiamBoost non configure (… (agent) [1 tentatives, derniere: Version de test branchee sur la preprod MiamBoost locale : …]
   b40 (to_verify) [t23] Essai guide Soirees (02/11 11h23, tel Mariella) : 'probleme sur les captcha cloudflare, il y en a 3 dans la page, beaucoup trop ; un seul s… (agent) [1 tentatives, derniere: s69-soirees 3c92781 : TurnstileWidget monte seulement a l'e…]
   b41 (to_verify) [t23] Orchestre (d159) : les sessions lancees sous bccsession (telephone) ne peuvent pas s'inscrire — /var/lib/plantrack-orchestre/sessions en ro… (agent) [1 tentatives, derniere: Dossier sessions en 1777 (bit collant) pose par l'orchestre…]
-  b43 (to_verify) [t23] ProJob design2 Suivi (capture Mariella 07/11 20h08, 1872px) : colonnes du tableau mal affichees — 5e colonne ecrasee, carte qui deborde (ti… (agent) [1 tentatives, derniere: projob 9f31a36 : bascule tableau/liste par requete de conte…]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
@@ -238,6 +235,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d200 : Mariella (tel, 07/11 soir) : 'c'est bon j'ai teste un guide et ca marche' -> b42 valide ; v1.9.38 publiee sur GitHub (main + tag, PyPI touj… (agent)
   d201 : Mariella (tel, 07/11, carte Tri des 7) : 'Valider les 5, garder ProJob (Recommande)' — b24 b25 b26 b27 b31 valides ; b33/b34 (ProJob design… (agent)
   d202 : Mariella (tel, 08/11 00h24, carte Suite tableau Suivi ProJob) : 'Je regarde (Recommande)' — elle verifie b43 (colonnes), b33 (Passer a) et … (agent)
+  d203 : Mariella (tel, 08/11 00h25) : 'Tout est bon' sur le tableau Suivi ProJob -> b43 (colonnes), b33 (Passer a), b34 (Voir la fiche) valides ; v… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
