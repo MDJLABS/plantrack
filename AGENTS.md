@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [160 commits]
-  fichiers recemment ecrits : sortie/carte-suite-6.json, sortie/carte-suite-6.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-vectorized-waffle.md, ../../../etc/kvm-lourd/types.conf, ../../../usr/local/bin/kvm-lourd, sortie/scenario-voix.log
+FIL ACTIF — t23 : guides de test automatiques (d100) [161 commits]
+  fichiers recemment ecrits : sortie/carte-suite-6.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-vectorized-waffle.md, ../../../etc/kvm-lourd/types.conf, ../../../usr/local/bin/kvm-lourd, sortie/scenario-voix.log, ../../../usr/local/bin/menage-serveur.sh
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -238,6 +238,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d207 : v1.9.39 publiee (08/11, GitHub + PyPI verifie) : task cancel accepte --de comme task done (demande de la session bcc b161) ; test ajoute. E… (agent)
   d208 : Mariella (tel, 08/11, plan approuve apres depeche bcc b161) : rien a faire, veille silencieuse (d23) ; seul rouge du doctor = eba6bd5 (30/1… (agent)
   d209 : Voix et video en file (choix Mariella tel 08/11 'Voix et video en file (Recommande)', plan approuve) : cause des 135 arrets earlyoom de la … (agent)
+  d210 : Secours rendu par les services au repos (choix Mariella tel 08/11 'Vider le secours (Recommande)') : menage-serveur.sh (hors depot, sauvega… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
