@@ -217,8 +217,8 @@ export function GuideDeTestLazy() {
         }}
       >
         <span aria-hidden="true" style={{ color: COULEURS.accent }}>◎</span>
-        {/* Nom de l'outil : Stepper (choix Mariella, d216). */}
-        Stepper · à traiter
+        {/* Nom de l'outil : Checker (choix Mariella, d216). */}
+        Checker · à traiter
         <span style={{
           padding: "2px 6px", borderRadius: 999, background: "rgba(0,0,0,.25)",
           color: COULEURS.doux, fontSize: 11,

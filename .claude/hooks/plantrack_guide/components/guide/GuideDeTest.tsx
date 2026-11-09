@@ -279,8 +279,8 @@ function BoutonOuvrir({ scenario, onOpen, onQuitter }: {
       <button
         id="guide-quitter"
         onClick={onQuitter}
-        aria-label="Quitter Stepper, le guide de test"
-        title="Quitter Stepper (il ne réapparaîtra plus dans cet onglet)"
+        aria-label="Quitter Checker, le guide de test"
+        title="Quitter Checker (il ne réapparaîtra plus dans cet onglet)"
         style={{
           padding: "0 11px",
           border: "none", borderLeft: `1px solid ${C.bord}`,

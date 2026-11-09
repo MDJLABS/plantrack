@@ -1,7 +1,7 @@
 "use client";
 
 /* ==============================================================================
- * Guide de test intégré (Stepper) : curseur animé qui joue les gestes d'une étape à la
+ * Guide de test intégré (Checker) : curseur animé qui joue les gestes d'une étape à la
  * place de Mariella.
  *
  * Pour chaque geste, à la suite (d216 : « écrire la demande » puis « toucher Envoyer ») :
