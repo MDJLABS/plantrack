@@ -2366,3 +2366,18 @@
 {"ts": "2026-11-08T20:33:23+00:00", "kind": "file_touched", "text": "sortie/carte-b44-essai.log", "thread": "t23"}
 {"ts": "2026-11-08T22:50:55+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-keen-kettle.md", "thread": "t23"}
 {"ts": "2026-11-08T22:52:22+00:00", "kind": "decision", "id": "d215", "text": "Mariella (tel, 08/11 22h50, carte Suite) : 'Je fais l'essai (Recommande)' - essai du guide ProJob pour b44 ; veille silencieuse jusqu'a son verdict (d23, d214)", "par": "agent"}
+{"ts": "2026-11-08T22:52:22+00:00", "kind": "commit", "sha": "7e656a4", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-08T22:52:34+00:00", "kind": "file_touched", "text": "sortie/carte-b44-verdict-2250.json", "thread": "t23"}
+{"ts": "2026-11-08T22:52:39+00:00", "kind": "file_touched", "text": "sortie/carte-b44-verdict-2250.log", "thread": "t23"}
+{"ts": "2026-11-08T23:13:33+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-vectorized-unicorn.md", "thread": "t23"}
+{"ts": "2026-11-08T23:18:52+00:00", "kind": "decision", "id": "d216", "text": "Mariella (tel, 09/11, cartes Gestes + brainstorm) : guide de test -> plusieurs gestes par point (ecrire puis envoyer), ProJob d'abord puis tous les guides des projets ; nom de l'outil : Stepper (sa proposition). Constat : recette2 fini + envoye une seule fois (b44 a son verdict) ; b30 ko Google Android transmis a ProJob.", "par": "agent"}
+{"ts": "2026-11-08T23:19:30+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/lib/guide/types.ts", "thread": "t23"}
+{"ts": "2026-11-08T23:19:34+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/lib/guide/guide-geste.ts", "thread": "t23"}
+{"ts": "2026-11-08T23:19:57+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/components/guide/GuideCurseur.tsx", "thread": "t23"}
+{"ts": "2026-11-08T23:20:32+00:00", "kind": "commit", "sha": "ff0bb31", "ctype": "feat", "thread": "t23"}
+{"ts": "2026-11-08T23:50:24+00:00", "kind": "commit", "sha": "20c040f", "ctype": "feat", "thread": "t23"}
+{"ts": "2026-11-09T00:55:46+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-parallel-lagoon.md", "thread": "t23"}
+{"ts": "2026-11-09T01:17:33+00:00", "kind": "file_touched", "text": "sortie/carte-stepper-essai.json", "thread": "t23"}
+{"ts": "2026-11-09T01:17:36+00:00", "kind": "file_touched", "text": "sortie/attendre-projob-stepper.sh", "thread": "t23"}
+{"ts": "2026-11-09T01:17:43+00:00", "kind": "decision", "id": "d217", "text": "Reprise 09/11 apres coupure : moteur Stepper (ff0bb31+20c040f) tests verts, /code-review low sans vrai defaut ; ProJob c30f9ab+4e1e16e reconstruit par la chaine de la session ProJob (sortie/nav/chaine.sh, en file kvm-lourd) - pas de second build (d76) ; carte d'essai retouche2 envoyee des la relance (sortie/attendre-projob-stepper.sh). Reste apres son verdict : autres projets + publication GitHub+PyPI.", "par": "agent"}
+{"ts": "2026-11-09T01:17:43+00:00", "kind": "file_touched", "text": "sortie/attendre-projob-stepper.log", "thread": "t23"}

@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [168 commits]
-  fichiers recemment ecrits : sortie/carte-suite-1940.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-woolly-pinwheel.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-starry-oasis.md, sortie/carte-b44-essai.json, sortie/carte-b44-essai.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-keen-kettle.md
+FIL ACTIF — t23 : guides de test automatiques (d100) [171 commits]
+  fichiers recemment ecrits : .claude/hooks/plantrack_guide/lib/guide/guide-geste.ts, .claude/hooks/plantrack_guide/components/guide/GuideCurseur.tsx, ../../../root/.claude/plans/contexte-reconstruit-par-le-parallel-lagoon.md, sortie/carte-stepper-essai.json, sortie/attendre-projob-stepper.sh, sortie/attendre-projob-stepper.log
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -245,6 +245,8 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d213 : v1.9.40 publiee (08/11, GitHub + PyPI verifie) : d212 (feu de l'orchestre sur 1 min, pause 10 min max) + correctif b44 (guide termine) ; or… (agent)
   d214 : Mariella (tel, 08/11 19h24, plan approuve 'On y va') : attente de son essai du guide ProJob recette2 pour b44, veille silencieuse (d23) (agent)
   d215 : Mariella (tel, 08/11 22h50, carte Suite) : 'Je fais l'essai (Recommande)' - essai du guide ProJob pour b44 ; veille silencieuse jusqu'a son… (agent)
+  d216 : Mariella (tel, 09/11, cartes Gestes + brainstorm) : guide de test -> plusieurs gestes par point (ecrire puis envoyer), ProJob d'abord puis … (agent)
+  d217 : Reprise 09/11 apres coupure : moteur Stepper (ff0bb31+20c040f) tests verts, /code-review low sans vrai defaut ; ProJob c30f9ab+4e1e16e reco… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
