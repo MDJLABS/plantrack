@@ -1578,6 +1578,20 @@ ORCH_TACHES_POIDS = 10   # CPUWeight du frein (100 = normal) : elles prennent ce
 ORCH_TICK = os.sysconf("SC_CLK_TCK")
 
 
+ORCH_SECRET_OPT = re.compile(r"(--?[\w-]*(?:token|key|pass|secret|auth)[\w-]*[ =])\S+", re.I)
+
+
+def orch_masquer(cmd):
+    """Etiquette d'une ligne de commande, sure pour un journal ou une bulle : caracteres de
+    controle retires, valeurs d'affectation (X=...), d'options sensibles et longues chaines
+    (clefs probables) masquees, 120 caracteres au plus."""
+    cmd = "".join(c if c.isprintable() else " " for c in cmd)
+    cmd = re.sub(r"\b([A-Za-z_][A-Za-z0-9_]*)=\S+", r"\1=***", cmd)
+    cmd = ORCH_SECRET_OPT.sub(r"\1***", cmd)
+    cmd = re.sub(r"[A-Za-z0-9+_-]{24,}", "***", cmd)
+    return cmd[:120]
+
+
 def orch_tache_pids(unite):
     """{pid: (secondes processeur, etiquette)} des processus du groupe de l'unite. Etiquette =
     ligne de commande de l'ancetre lance directement par le demon (la ligne de crontab)."""
@@ -1594,7 +1608,9 @@ def orch_tache_pids(unite):
             champs = s.rsplit(")", 1)[1].split()
             with open(f"/proc/{p}/cmdline", "rb") as f:
                 cmd = f.read().replace(b"\0", b" ").decode(errors="replace").strip()
-            info[p] = (int(champs[1]), (int(champs[11]) + int(champs[12])) / ORCH_TICK, cmd)
+            # + temps des enfants deja termines (cutime/cstime) : un « wrangler » d'une seconde,
+            # lance et fini entre deux tours, reste ainsi impute a la ligne qui l'a lance
+            info[p] = (int(champs[1]), sum(int(x) for x in champs[11:15]) / ORCH_TICK, cmd)
         except (OSError, ValueError, IndexError):
             continue
     demon = next((p for p, v in info.items()
@@ -1606,7 +1622,7 @@ def orch_tache_pids(unite):
             vus.add(haut)
             haut = info[haut][0]
         if p != demon:
-            res[p] = (sec, (info[haut][2] or cmd)[:160])
+            res[p] = (sec, orch_masquer(info[haut][2] or cmd))
     return res
 
 
