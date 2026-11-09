@@ -2427,3 +2427,15 @@
 {"ts": "2026-11-09T19:55:55+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t23"}
 {"ts": "2026-11-09T19:56:00+00:00", "kind": "commit", "sha": "0d96027", "ctype": "commit", "thread": "t23"}
 {"ts": "2026-11-09T19:56:09+00:00", "kind": "decision", "id": "d225", "text": "v1.9.42 publiee (09/11, GitHub seul, pas de cle PyPI) : d224 livre - l'orchestre mesure chaque conteneur docker (groupe docker-<id>.scope) sur 10 min ; au-dela de 30 % d'un processeur il passe apres le reste (CPUWeight=10, jamais arrete), bulle a Mariella avec son nom (docker inspect, masque), frein leve sous 15 % ; conteneur disparu oublie ; resume n'affiche que les conteneurs actifs ou freines. Tests verts sauf pg31 connu.", "par": "agent"}
+{"ts": "2026-11-09T19:56:09+00:00", "kind": "commit", "sha": "591ac2a", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-09T20:02:27+00:00", "kind": "decision", "id": "d226", "text": "Mariella (tel, 09/11, carte Suite apres v1.9.42) : 'Continue de mettre a jour les guides de tous les autres projets, commence par promovie, prolearn, projob puis le reste'", "par": "agent"}
+{"ts": "2026-11-09T20:11:15+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/b5a982b0-872f-448d-a7cc-72a79cb4c755/scratchpad/pl.txt", "thread": "t23"}
+{"ts": "2026-11-09T20:12:20+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/b5a982b0-872f-448d-a7cc-72a79cb4c755/scratchpad/autres.txt", "thread": "t23"}
+{"ts": "2026-11-09T20:12:52+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-09T20:12:56+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-09T20:13:02+00:00", "kind": "file_touched", "text": "sortie/scenario-etiquette.log", "thread": "t23"}
+{"ts": "2026-11-09T20:15:07+00:00", "kind": "commit", "sha": "706f4a1", "ctype": "fix", "thread": "t23"}
+{"ts": "2026-11-09T20:15:13+00:00", "kind": "commit", "sha": "cce4dfc", "ctype": "commit", "thread": "t23"}
+{"ts": "2026-11-09T20:15:17+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t23"}
+{"ts": "2026-11-09T20:21:09+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/tsc-miamboost.log", "thread": "t23"}
+{"ts": "2026-11-09T20:26:46+00:00", "kind": "decision", "id": "d227", "text": "Guides Checker propages (09/11, demande Mariella tel) : moteur 3fed332 sur Promovie (port Vite 97ae04f, mise en ligne laissee a sa session : travail non commite en cours ; reveil immediat d172 non portable sur Worker), ProLearn ed41978+2076140, ProJob deja a jour, OpenStyle c0a8ca2+bc06804, Mizzzen 06db86d+22053a8, MiamBoost 2922bfc+9824cd5, mdjlabs d3c7177 (aucun scenario, pas reconstruit), S69 soirees cf29af2 / francoviet a856bb6. Gestes enchaines ajoutes aux scenarios non joues ; OpenStyle et Mizzzen reconstruits. v1.9.43 : etiquettes des taches = programme + scripts seulement (relecture securite). Relecture 'task cancel --de' : voulu (d207, meme regle que verify/reject d8).", "par": "agent"}

@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [183 commits]
-  fichiers recemment ecrits : ../../../root/.claude/projects/-home-mariella-plantrack/memory/charge-cause-et-algorithme.md, ../promovie/sortie/studio-guet.log, sortie/scenario-taches.log, sortie/scenario-conteneurs.log, .claude/hooks/pt.py, pyproject.toml
+FIL ACTIF — t23 : guides de test automatiques (d100) [186 commits]
+  fichiers recemment ecrits : ../../../tmp/claude-0/-home-mariella-plantrack/b5a982b0-872f-448d-a7cc-72a79cb4c755/scratchpad/pl.txt, ../../../tmp/claude-0/-home-mariella-plantrack/b5a982b0-872f-448d-a7cc-72a79cb4c755/scratchpad/autres.txt, .claude/hooks/pt.py, sortie/scenario-etiquette.log, pyproject.toml, ../../../tmp/claude-0/tsc-miamboost.log
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -255,6 +255,8 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d223 : v1.9.41 publiee (09/11, GitHub seul : aucune cle PyPI sur la machine) : d222 livre — l'orchestre compte le CPU du groupe cron.service sur 1… (agent)
   d224 : Mariella (tel, 09/11, carte Suite) : 'Surveiller les conteneurs (Recommande)' — meme regle que d222 pour chaque conteneur docker (groupe do… (agent)
   d225 : v1.9.42 publiee (09/11, GitHub seul, pas de cle PyPI) : d224 livre - l'orchestre mesure chaque conteneur docker (groupe docker-<id>.scope) … (agent)
+  d226 : Mariella (tel, 09/11, carte Suite apres v1.9.42) : 'Continue de mettre a jour les guides de tous les autres projets, commence par promovie,… (agent)
+  d227 : Guides Checker propages (09/11, demande Mariella tel) : moteur 3fed332 sur Promovie (port Vite 97ae04f, mise en ligne laissee a sa session … (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
