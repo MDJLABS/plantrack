@@ -1629,7 +1629,15 @@ def orch_tache_pids(unite):
 def orch_taches(etat, maintenant):
     """Surveille et freine les taches planifiees. Modifie etat["taches"]."""
     toutes = etat.setdefault("taches", {})
-    for unite in ORCH_TACHES:
+    try:   # conteneurs (d224, VPN MdjFlight bloques a 120 % chacun) : meme regle, un par un
+        scopes = sorted(f for f in os.listdir(ORCH_CGROUP)
+                        if f.startswith("docker-") and f.endswith(".scope"))
+    except OSError:
+        scopes = []
+    for u in [u for u in toutes if u.endswith(".scope") and u not in scopes]:
+        del toutes[u]   # conteneur disparu : son groupe (et son frein) avec lui
+    for unite in ORCH_TACHES + tuple(scopes):
+        conteneur = unite.endswith(".scope")
         try:
             with open(os.path.join(ORCH_CGROUP, unite, "cpu.stat")) as f:
                 usage = int(next(l.split()[1] for l in f if l.startswith("usage_usec"))) / 1e6
@@ -1640,7 +1648,7 @@ def orch_taches(etat, maintenant):
         while len(hist) > 2 and maintenant - hist[1][0] >= ORCH_TACHES_FENETRE:
             hist.pop(0)   # on garde un seul point plus vieux que la fenetre : son repere
         t["hist"] = hist
-        pids = orch_tache_pids(unite)
+        pids = {} if conteneur else orch_tache_pids(unite)
         avant = {int(k): v for k, v in t.get("pids", {}).items()}
         parts = [x for x in t.get("parts", []) if maintenant - x[0] <= ORCH_TACHES_FENETRE]
         if "pids" in t:   # premier tour : simple repere, rien n'est compte
@@ -1666,18 +1674,35 @@ def orch_taches(etat, maintenant):
                 trace("orchestre : frein taches", e)
                 continue
             t["frein"] = maintenant
-            noms = " ; ".join(f"« {e} »" for e, _ in pire) or "(non identifiée)"
+            noms = (f"« {orch_conteneur(unite)} »" if conteneur else
+                    " ; ".join(f"« {e} »" for e, _ in pire) or "(non identifiée)")
             orch_journal(f"frein {unite} : {part} % d'un processeur sur "
                          f"{ORCH_TACHES_FENETRE // 60} min — {noms}")
             if maintenant - t.get("alerte", 0) > 6 * 3600:
                 t["alerte"] = maintenant
-                orch_alerter(f"Les tâches automatiques de la machine ont pris {part} % d'un "
+                quoi = (f"Le conteneur {noms} a pris" if conteneur else
+                        "Les tâches automatiques de la machine ont pris")
+                orch_alerter(f"{quoi} {part} % d'un "
                              f"processeur sur les {ORCH_TACHES_FENETRE // 60} dernières minutes. "
-                             f"Je les fais passer après le reste, rien n'est arrêté. "
-                             f"La plus gourmande : {noms}. À corriger dans son projet.")
+                             + ("Je le fais passer après le reste, il n'est pas arrêté. " if conteneur
+                                else "Je les fais passer après le reste, rien n'est arrêté. ")
+                             + ("" if conteneur else f"La plus gourmande : {noms}. ")
+                             + "À corriger dans son projet.")
         elif t.get("frein") and part < ORCH_TACHES_SEUIL / 2 \
                 and maintenant - t["frein"] >= ORCH_TACHES_FENETRE:
             orch_lever_frein(t, unite, f"retombees a {part} %")
+
+
+def orch_conteneur(unite):
+    """Nom lisible du conteneur d'un groupe docker-<id>.scope (repli : debut de l'id)."""
+    ident = unite[len("docker-"):-len(".scope")]
+    try:
+        nom = subprocess.run(shlex.split(os.environ.get("ORCH_DOCKER") or "docker")
+                             + ["inspect", "-f", "{{.Name}}", ident],
+                             capture_output=True, text=True, timeout=10).stdout.strip().lstrip("/")
+    except (OSError, subprocess.SubprocessError):
+        nom = ""
+    return orch_masquer(nom or ident[:12])
 
 
 def orch_lever_frein(t, unite, motif):
@@ -1778,7 +1803,8 @@ def orch_resume(e):
               + f"), en pause : {len(pauses)}"]
     for unite, t in e.get("taches", {}).items():
         if "part" in t:
-            lignes.append(f"taches planifiees ({unite}) : {t['part']} % d'un processeur sur "
+            quoi = "conteneur" if unite.endswith(".scope") else "taches planifiees"
+            lignes.append(f"{quoi} ({unite[:30]}) : {t['part']} % d'un processeur sur "
                           f"{ORCH_TACHES_FENETRE // 60} min" + (" — FREINEES" if t.get("frein") else ""))
     for s, f in sorted(ss.items(), key=lambda sf: -sf[1]["poids"]):
         etat = " — EN PAUSE" if s in pauses else ""

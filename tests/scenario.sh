@@ -1707,6 +1707,15 @@ check "orchestre : taches planifiees gourmandes freinees" "CPUWeight=10" "$(cat 
 check "orchestre : journal du frein" "frein cron.service" "$(cat "$OD/journal.log")"
 sleep 1.2; OT; sleep 1.2; OT
 check "orchestre : frein leve quand elles retombent" "CPUWeight=100" "$(cat "$TO/sysctl.log" 2>/dev/null)"
+# conteneurs (d224) : un groupe docker-<id>.scope a fond est freine et nomme
+mkdir -p "$TO/cg/docker-abc123.scope"; : > "$TO/sysctl.log"
+printf '#!/bin/sh\necho /vpn-essai\n' > "$TO/docker"; chmod +x "$TO/docker"
+echo "usage_usec 0" > "$TO/cg/docker-abc123.scope/cpu.stat"; ORCH_DOCKER="$TO/docker" OT; sleep 1.2
+echo "usage_usec 5000000" > "$TO/cg/docker-abc123.scope/cpu.stat"; ORCH_DOCKER="$TO/docker" OT
+check "orchestre : conteneur a fond freine" "docker-abc123.scope CPUWeight=10" "$(cat "$TO/sysctl.log")"
+check "orchestre : conteneur nomme dans le journal" "vpn-essai" "$(cat "$OD/journal.log")"
+rm -r "$TO/cg/docker-abc123.scope"; OT
+check_not "orchestre : conteneur disparu oublie" "docker-abc123" "$(cat "$OD/etat.json")"
 # arret du service : personne ne reste gele
 memoire 500000; O orchestre --tour; O orchestre --tout-reprendre
 check_exit "orchestre : tout-reprendre degele" "0" "$(python3 -c 'import json,sys; print(len(json.load(open(sys.argv[1]))["pauses"]))' "$OD/etat.json")"
