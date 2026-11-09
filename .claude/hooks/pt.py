@@ -1802,10 +1802,12 @@ def orch_resume(e):
               + ", ".join(f"{r} {sum(1 for f in ss.values() if f['rang'] == r)}" for r in RANGS)
               + f"), en pause : {len(pauses)}"]
     for unite, t in e.get("taches", {}).items():
-        if "part" in t:
-            quoi = "conteneur" if unite.endswith(".scope") else "taches planifiees"
+        conteneur = unite.endswith(".scope")
+        # 55 conteneurs au repos noieraient le resume : seuls ceux qui consomment ou sont freines
+        if "part" in t and (not conteneur or t.get("frein") or t["part"] >= ORCH_TACHES_SEUIL / 3):
+            quoi = "conteneur" if conteneur else "taches planifiees"
             lignes.append(f"{quoi} ({unite[:30]}) : {t['part']} % d'un processeur sur "
-                          f"{ORCH_TACHES_FENETRE // 60} min" + (" — FREINEES" if t.get("frein") else ""))
+                          f"{ORCH_TACHES_FENETRE // 60} min" + (" (FREINEES)" if t.get("frein") else ""))
     for s, f in sorted(ss.items(), key=lambda sf: -sf[1]["poids"]):
         etat = " — EN PAUSE" if s in pauses else ""
         lignes.append(f"  {s[:8]} {f['projet']} [{f['rang']}] {f['poids'] // 2**20} Mo{etat}")
