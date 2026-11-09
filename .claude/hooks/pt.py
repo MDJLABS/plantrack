@@ -1592,6 +1592,16 @@ def orch_masquer(cmd):
     return cmd[:120]
 
 
+def orch_etiquette(cmd):
+    """Nom sur d'une tache : le programme et les scripts lances (nom de fichier seul), jamais
+    les arguments, qui peuvent porter une clef (relecture securite d222). Ex. « bash studio.sh »."""
+    mots = cmd.split()
+    garde = [os.path.basename(m) for i, m in enumerate(mots)
+             if (i == 0 or re.fullmatch(r"[\w./-]+\.(sh|mjs|cjs|js|ts|py|rb|pl)", m))
+             and "://" not in m and "=" not in m]
+    return orch_masquer(" ".join(garde[:4]) or "?")
+
+
 def orch_tache_pids(unite):
     """{pid: (secondes processeur, etiquette)} des processus du groupe de l'unite. Etiquette =
     ligne de commande de l'ancetre lance directement par le demon (la ligne de crontab)."""
@@ -1622,7 +1632,7 @@ def orch_tache_pids(unite):
             vus.add(haut)
             haut = info[haut][0]
         if p != demon:
-            res[p] = (sec, orch_masquer(info[haut][2] or cmd))
+            res[p] = (sec, orch_etiquette(info[haut][2] or cmd))
     return res
 
 
