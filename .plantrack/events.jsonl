@@ -2391,3 +2391,5 @@
 {"ts": "2026-11-09T09:06:55+00:00", "kind": "commit", "sha": "3fed332", "ctype": "feat", "thread": "t23"}
 {"ts": "2026-11-09T09:07:35+00:00", "kind": "file_touched", "text": "../projob/sortie/nav/chaine.log", "thread": "t23"}
 {"ts": "2026-11-09T09:14:03+00:00", "kind": "file_touched", "text": "sortie/carte-checker-essai.log", "thread": "t23"}
+{"ts": "2026-11-09T09:14:08+00:00", "kind": "commit", "sha": "95b10e6", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-09T09:47:56+00:00", "kind": "decision", "id": "d219", "text": "Mariella (tel, 09/11, carte Essai Checker) : 'Je fais l essai (Recommande)' - essai du guide ProJob retouche2 avec Checker ; veille silencieuse jusqu'a son verdict (d23)", "par": "agent"}
