@@ -2381,3 +2381,13 @@
 {"ts": "2026-11-09T01:17:36+00:00", "kind": "file_touched", "text": "sortie/attendre-projob-stepper.sh", "thread": "t23"}
 {"ts": "2026-11-09T01:17:43+00:00", "kind": "decision", "id": "d217", "text": "Reprise 09/11 apres coupure : moteur Stepper (ff0bb31+20c040f) tests verts, /code-review low sans vrai defaut ; ProJob c30f9ab+4e1e16e reconstruit par la chaine de la session ProJob (sortie/nav/chaine.sh, en file kvm-lourd) - pas de second build (d76) ; carte d'essai retouche2 envoyee des la relance (sortie/attendre-projob-stepper.sh). Reste apres son verdict : autres projets + publication GitHub+PyPI.", "par": "agent"}
 {"ts": "2026-11-09T01:17:43+00:00", "kind": "file_touched", "text": "sortie/attendre-projob-stepper.log", "thread": "t23"}
+{"ts": "2026-11-09T01:17:48+00:00", "kind": "commit", "sha": "728daab", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-09T01:18:21+00:00", "kind": "file_touched", "text": "sortie/attendre-projob-stepper.sh", "thread": "t23"}
+{"ts": "2026-11-09T01:18:26+00:00", "kind": "file_touched", "text": "sortie/carte-stepper-essai.json", "thread": "t23"}
+{"ts": "2026-11-09T01:18:36+00:00", "kind": "file_touched", "text": "sortie/attendre-projob-stepper.log", "thread": "t23"}
+{"ts": "2026-11-09T01:18:36+00:00", "kind": "file_touched", "text": "sortie/carte-stepper-essai.log", "thread": "t23"}
+{"ts": "2026-11-09T08:59:27+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-delegated-russell.md", "thread": "t23"}
+{"ts": "2026-11-09T09:06:55+00:00", "kind": "decision", "id": "d218", "text": "Nom de l'outil de guide : Checker (remplace Stepper de d216), proposition de Mariella tel 09/11 'on l'appellerait pas plutot Checker ?', plan approuve", "par": "agent"}
+{"ts": "2026-11-09T09:06:55+00:00", "kind": "commit", "sha": "3fed332", "ctype": "feat", "thread": "t23"}
+{"ts": "2026-11-09T09:07:35+00:00", "kind": "file_touched", "text": "../projob/sortie/nav/chaine.log", "thread": "t23"}
+{"ts": "2026-11-09T09:14:03+00:00", "kind": "file_touched", "text": "sortie/carte-checker-essai.log", "thread": "t23"}
