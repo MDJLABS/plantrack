@@ -2399,3 +2399,22 @@
 {"ts": "2026-11-09T16:27:52+00:00", "kind": "file_touched", "text": "../promovie/scripts/studio-projets.mjs", "thread": "t23"}
 {"ts": "2026-11-09T16:27:55+00:00", "kind": "file_touched", "text": "../promovie/scripts/studio-projets.mjs", "thread": "t23"}
 {"ts": "2026-11-09T16:33:54+00:00", "kind": "decision", "id": "d220", "text": "Charge serveur 09/11 (demande Mariella tel 'gere la charge serveur', plan approuve) : cause principale = guet du studio promovie (cron chaque minute) qui republiait 17 fiches KV par minute depuis 78f28be (miroir personnages/lieux reecrit a l'identique). Corrige dans promovie 706dcd0 (b23 promovie to_verify). Charge 1 min 27 -> 5,8 ; plus aucun envoi depuis 17:29. Le reste (Chrome d'un moteur tripcom, repack git) etait passager.", "par": "agent"}
+{"ts": "2026-11-09T16:33:54+00:00", "kind": "commit", "sha": "17c607d", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-09T16:39:49+00:00", "kind": "file_touched", "text": "../../../root/.claude/projects/-home-mariella-plantrack/memory/charge-cause-et-algorithme.md", "thread": "t23"}
+{"ts": "2026-11-09T16:39:53+00:00", "kind": "decision", "id": "d221", "text": "Mariella (tel, 09/11, carte Charge) : 'Rester en veille (Recommande)' + 'a chaque fois qu'on resoud un probleme on cherche la cause et on ameliore l'algorithme de gestion de la charge serveur en consequence' -> apres d220, ameliorer l'orchestre pour reperer seul une tache planifiee qui relance du lourd en boucle.", "par": "agent"}
+{"ts": "2026-11-09T16:48:07+00:00", "kind": "decision", "id": "d222", "text": "Mariella (tel, 09/11, carte Orchestre) : 'Reperer et freiner (Recommande)' — l'orchestre compte le CPU cumule des taches planifiees (cgroup cron.service) ; au-dela de 30 % d'un processeur sur 10 min il les fait passer apres le reste (priorite basse) et alerte Mariella avec la ligne de crontab fautive ; rien n'est arrete.", "par": "agent"}
+{"ts": "2026-11-09T16:49:08+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-09T16:49:10+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-09T16:58:48+00:00", "kind": "file_touched", "text": "sortie/scenario-taches.log", "thread": "t23"}
+{"ts": "2026-11-09T16:59:10+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-09T17:01:14+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-09T17:11:19+00:00", "kind": "file_touched", "text": "sortie/scenario-taches.log", "thread": "t23"}
+{"ts": "2026-11-09T17:12:21+00:00", "kind": "commit", "sha": "3cf1f12", "ctype": "feat", "thread": "t23"}
+{"ts": "2026-11-09T18:30:23+00:00", "kind": "file_touched", "text": "../promovie/sortie/studio-guet.log", "thread": "t23"}
+{"ts": "2026-11-09T18:30:29+00:00", "kind": "file_touched", "text": "../promovie/sortie/studio-guet.log", "thread": "t23"}
+{"ts": "2026-11-09T18:30:29+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-09T18:30:33+00:00", "kind": "file_touched", "text": "sortie/scenario-taches.log", "thread": "t23"}
+{"ts": "2026-11-09T18:32:42+00:00", "kind": "commit", "sha": "c0fce23", "ctype": "fix", "thread": "t23"}
+{"ts": "2026-11-09T18:33:40+00:00", "kind": "commit", "sha": "60d3ea5", "ctype": "commit", "thread": "t23"}
+{"ts": "2026-11-09T18:33:44+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t23"}
+{"ts": "2026-11-09T18:33:50+00:00", "kind": "decision", "id": "d223", "text": "v1.9.41 publiee (09/11, GitHub seul : aucune cle PyPI sur la machine) : d222 livre — l'orchestre compte le CPU du groupe cron.service sur 10 min ; au-dela de 30 % d'un processeur, CPUWeight=10 (rien n'est arrete) + bulle a Mariella avec la ligne fautive (masquee : X=***, options token/key/pass, longues chaines) ; frein leve sous 15 %. Taches ephemeres imputees via cutime. Orchestre redemarre, 576 tests ok (seul echec pg31). Au passage : VPN MdjFlight in/th bloques (~120 % CPU chacun) freines par docker update --cpus 0.25, bug b2 MdjFlight.", "par": "agent"}

@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [175 commits]
-  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-delegated-russell.md, ../projob/sortie/nav/chaine.log, sortie/carte-checker-essai.log, sortie/carte-checker-suite.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-sprightly-cocke.md, ../promovie/scripts/studio-projets.mjs
+FIL ACTIF — t23 : guides de test automatiques (d100) [179 commits]
+  fichiers recemment ecrits : ../promovie/scripts/studio-projets.mjs, ../../../root/.claude/projects/-home-mariella-plantrack/memory/charge-cause-et-algorithme.md, ../promovie/sortie/studio-guet.log, .claude/hooks/pt.py, sortie/scenario-taches.log, pyproject.toml
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -250,6 +250,9 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d218 : Nom de l'outil de guide : Checker (remplace Stepper de d216), proposition de Mariella tel 09/11 'on l'appellerait pas plutot Checker ?', pl… (agent)
   d219 : Mariella (tel, 09/11, carte Essai Checker) : 'Je fais l essai (Recommande)' - essai du guide ProJob retouche2 avec Checker ; veille silenci… (agent)
   d220 : Charge serveur 09/11 (demande Mariella tel 'gere la charge serveur', plan approuve) : cause principale = guet du studio promovie (cron chaq… (agent)
+  d221 : Mariella (tel, 09/11, carte Charge) : 'Rester en veille (Recommande)' + 'a chaque fois qu'on resoud un probleme on cherche la cause et on a… (agent)
+  d222 : Mariella (tel, 09/11, carte Orchestre) : 'Reperer et freiner (Recommande)' — l'orchestre compte le CPU cumule des taches planifiees (cgroup… (agent)
+  d223 : v1.9.41 publiee (09/11, GitHub seul : aucune cle PyPI sur la machine) : d222 livre — l'orchestre compte le CPU du groupe cron.service sur 1… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
