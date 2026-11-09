@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [186 commits]
+FIL ACTIF — t23 : guides de test automatiques (d100) [187 commits]
   fichiers recemment ecrits : ../../../tmp/claude-0/-home-mariella-plantrack/b5a982b0-872f-448d-a7cc-72a79cb4c755/scratchpad/pl.txt, ../../../tmp/claude-0/-home-mariella-plantrack/b5a982b0-872f-448d-a7cc-72a79cb4c755/scratchpad/autres.txt, .claude/hooks/pt.py, sortie/scenario-etiquette.log, pyproject.toml, ../../../tmp/claude-0/tsc-miamboost.log
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -280,5 +280,6 @@ Pieges connus :
 
 Questions en attente (reponds via !answer qN ...) :
   q15 : Guide Soirées pret (s69-soirees 1db1d2a) : Mariella fait-elle l'essai sur https…
+  q21 : Carte Essai Checker (09/11 soir) : Mariella essaie-t-elle les guides a gestes e…
 ```
 <!-- plantrack:state-end -->
