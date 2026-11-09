@@ -2418,3 +2418,12 @@
 {"ts": "2026-11-09T18:33:40+00:00", "kind": "commit", "sha": "60d3ea5", "ctype": "commit", "thread": "t23"}
 {"ts": "2026-11-09T18:33:44+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t23"}
 {"ts": "2026-11-09T18:33:50+00:00", "kind": "decision", "id": "d223", "text": "v1.9.41 publiee (09/11, GitHub seul : aucune cle PyPI sur la machine) : d222 livre — l'orchestre compte le CPU du groupe cron.service sur 10 min ; au-dela de 30 % d'un processeur, CPUWeight=10 (rien n'est arrete) + bulle a Mariella avec la ligne fautive (masquee : X=***, options token/key/pass, longues chaines) ; frein leve sous 15 %. Taches ephemeres imputees via cutime. Orchestre redemarre, 576 tests ok (seul echec pg31). Au passage : VPN MdjFlight in/th bloques (~120 % CPU chacun) freines par docker update --cpus 0.25, bug b2 MdjFlight.", "par": "agent"}
+{"ts": "2026-11-09T18:33:50+00:00", "kind": "commit", "sha": "c41beb0", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-09T18:37:59+00:00", "kind": "decision", "id": "d224", "text": "Mariella (tel, 09/11, carte Suite) : 'Surveiller les conteneurs (Recommande)' — meme regle que d222 pour chaque conteneur docker (groupe docker-<id>.scope) : a fond 10 min -> passe apres le reste + bulle avec son nom.", "par": "agent"}
+{"ts": "2026-11-09T19:43:27+00:00", "kind": "file_touched", "text": "sortie/scenario-conteneurs.log", "thread": "t23"}
+{"ts": "2026-11-09T19:54:40+00:00", "kind": "commit", "sha": "ef900ba", "ctype": "feat", "thread": "t23"}
+{"ts": "2026-11-09T19:55:48+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-09T19:55:50+00:00", "kind": "commit", "sha": "68c2e0c", "ctype": "fix", "thread": "t23"}
+{"ts": "2026-11-09T19:55:55+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t23"}
+{"ts": "2026-11-09T19:56:00+00:00", "kind": "commit", "sha": "0d96027", "ctype": "commit", "thread": "t23"}
+{"ts": "2026-11-09T19:56:09+00:00", "kind": "decision", "id": "d225", "text": "v1.9.42 publiee (09/11, GitHub seul, pas de cle PyPI) : d224 livre - l'orchestre mesure chaque conteneur docker (groupe docker-<id>.scope) sur 10 min ; au-dela de 30 % d'un processeur il passe apres le reste (CPUWeight=10, jamais arrete), bulle a Mariella avec son nom (docker inspect, masque), frein leve sous 15 % ; conteneur disparu oublie ; resume n'affiche que les conteneurs actifs ou freines. Tests verts sauf pg31 connu.", "par": "agent"}
