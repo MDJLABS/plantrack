@@ -1565,8 +1565,121 @@ def orch_reprendre(etat, sid, motif):
                      f"{int(time.time() - p['ts'])} s — {motif}")
 
 
+# Taches planifiees (d222, Mariella 09/11) : le cron de la machine relancait chaque minute 17
+# « wrangler kv put » sans que rien ne le voie (l'orchestre ne regardait que les sessions et
+# la memoire). On compte le processeur cumule de leur groupe systemd ; au-dela du seuil sur la
+# fenetre, elles passent apres le reste (CPUWeight bas, rien n'est arrete) et Mariella recoit
+# le nom de la ligne fautive. Le frein se leve quand la conso retombe sous la moitie du seuil.
+ORCH_CGROUP = os.environ.get("PLANTRACK_CGROUP") or "/sys/fs/cgroup/system.slice"
+ORCH_TACHES = tuple((os.environ.get("ORCH_TACHES") or "cron.service").split())
+ORCH_TACHES_SEUIL = float(os.environ.get("ORCH_TACHES_SEUIL") or 30)    # % d'un processeur
+ORCH_TACHES_FENETRE = int(os.environ.get("ORCH_TACHES_FENETRE") or 600)
+ORCH_TACHES_POIDS = 10   # CPUWeight du frein (100 = normal) : elles prennent ce qui reste
+ORCH_TICK = os.sysconf("SC_CLK_TCK")
+
+
+def orch_tache_pids(unite):
+    """{pid: (secondes processeur, etiquette)} des processus du groupe de l'unite. Etiquette =
+    ligne de commande de l'ancetre lance directement par le demon (la ligne de crontab)."""
+    try:
+        with open(os.path.join(ORCH_CGROUP, unite, "cgroup.procs")) as f:
+            pids = {int(l) for l in f if l.strip().isdigit()}
+    except OSError:
+        return {}
+    info = {}
+    for p in pids:
+        try:
+            with open(f"/proc/{p}/stat", "rb") as f:
+                s = f.read().decode(errors="replace")
+            champs = s.rsplit(")", 1)[1].split()
+            with open(f"/proc/{p}/cmdline", "rb") as f:
+                cmd = f.read().replace(b"\0", b" ").decode(errors="replace").strip()
+            info[p] = (int(champs[1]), (int(champs[11]) + int(champs[12])) / ORCH_TICK, cmd)
+        except (OSError, ValueError, IndexError):
+            continue
+    demon = next((p for p, v in info.items()
+                  if os.path.basename(v[2].split(" ")[0]) in ("cron", "crond", "anacron")), None)
+    res = {}
+    for p, (ppid, sec, cmd) in info.items():
+        haut, vus = p, set()
+        while info.get(haut, (0,))[0] in info and info[haut][0] != demon and haut not in vus:
+            vus.add(haut)
+            haut = info[haut][0]
+        if p != demon:
+            res[p] = (sec, (info[haut][2] or cmd)[:160])
+    return res
+
+
+def orch_taches(etat, maintenant):
+    """Surveille et freine les taches planifiees. Modifie etat["taches"]."""
+    toutes = etat.setdefault("taches", {})
+    for unite in ORCH_TACHES:
+        try:
+            with open(os.path.join(ORCH_CGROUP, unite, "cpu.stat")) as f:
+                usage = int(next(l.split()[1] for l in f if l.startswith("usage_usec"))) / 1e6
+        except (OSError, ValueError, StopIteration):
+            continue
+        t = toutes.setdefault(unite, {})
+        hist = t.get("hist", []) + [[maintenant, usage]]
+        while len(hist) > 2 and maintenant - hist[1][0] >= ORCH_TACHES_FENETRE:
+            hist.pop(0)   # on garde un seul point plus vieux que la fenetre : son repere
+        t["hist"] = hist
+        pids = orch_tache_pids(unite)
+        avant = {int(k): v for k, v in t.get("pids", {}).items()}
+        parts = [x for x in t.get("parts", []) if maintenant - x[0] <= ORCH_TACHES_FENETRE]
+        if "pids" in t:   # premier tour : simple repere, rien n'est compte
+            for p, (sec, etiq) in pids.items():
+                d = sec - avant.get(p, 0)
+                if d > 0:
+                    parts.append([maintenant, etiq, round(d, 2)])
+        t["pids"] = {str(p): v[0] for p, v in pids.items()}
+        t["parts"] = parts
+        duree = maintenant - hist[0][0]
+        if duree < ORCH_TACHES_FENETRE * 0.9:
+            continue
+        part = round(100 * max(0.0, usage - hist[0][1]) / duree, 1)
+        t["part"] = part
+        if part > ORCH_TACHES_SEUIL and not t.get("frein"):
+            cumul = {}
+            for _, etiq, d in parts:
+                cumul[etiq] = cumul.get(etiq, 0) + d
+            pire = sorted(cumul.items(), key=lambda kv: -kv[1])[:2]
+            try:
+                systemctl(["set-property", "--runtime", unite, f"CPUWeight={ORCH_TACHES_POIDS}"])
+            except (OSError, subprocess.SubprocessError) as e:
+                trace("orchestre : frein taches", e)
+                continue
+            t["frein"] = maintenant
+            noms = " ; ".join(f"« {e} »" for e, _ in pire) or "(non identifiée)"
+            orch_journal(f"frein {unite} : {part} % d'un processeur sur "
+                         f"{ORCH_TACHES_FENETRE // 60} min — {noms}")
+            if maintenant - t.get("alerte", 0) > 6 * 3600:
+                t["alerte"] = maintenant
+                orch_alerter(f"Les tâches automatiques de la machine ont pris {part} % d'un "
+                             f"processeur sur les {ORCH_TACHES_FENETRE // 60} dernières minutes. "
+                             f"Je les fais passer après le reste, rien n'est arrêté. "
+                             f"La plus gourmande : {noms}. À corriger dans son projet.")
+        elif t.get("frein") and part < ORCH_TACHES_SEUIL / 2 \
+                and maintenant - t["frein"] >= ORCH_TACHES_FENETRE:
+            orch_lever_frein(t, unite, f"retombees a {part} %")
+
+
+def orch_lever_frein(t, unite, motif):
+    try:
+        systemctl(["set-property", "--runtime", unite, "CPUWeight=100"])
+    except (OSError, subprocess.SubprocessError) as e:
+        trace("orchestre : frein taches", e)
+        return
+    t.pop("frein", None)
+    orch_journal(f"frein {unite} leve — {motif}")
+
+
 def orch_tour(etat, maintenant):
     """Un tour du chef d'orchestre. Modifie et rend etat (ecrit par l'appelant)."""
+    try:
+        orch_taches(etat, maintenant)
+    except Exception as e:   # fail-open : jamais au prix du reste du tour
+        trace("orchestre : taches", e)
     m = orch_mesure()
     brut = orch_niveau(m)
     if brut == "rouge":
@@ -1647,6 +1760,10 @@ def orch_resume(e):
               f"sessions : {len(ss)} ("
               + ", ".join(f"{r} {sum(1 for f in ss.values() if f['rang'] == r)}" for r in RANGS)
               + f"), en pause : {len(pauses)}"]
+    for unite, t in e.get("taches", {}).items():
+        if "part" in t:
+            lignes.append(f"taches planifiees ({unite}) : {t['part']} % d'un processeur sur "
+                          f"{ORCH_TACHES_FENETRE // 60} min" + (" — FREINEES" if t.get("frein") else ""))
     for s, f in sorted(ss.items(), key=lambda sf: -sf[1]["poids"]):
         etat = " — EN PAUSE" if s in pauses else ""
         lignes.append(f"  {s[:8]} {f['projet']} [{f['rang']}] {f['poids'] // 2**20} Mo{etat}")
@@ -1705,6 +1822,9 @@ def cmd_orchestre(args):
         etat = orch_lire(chemin, {}) or {}
         for sid in list(etat.get("pauses", {})):
             orch_reprendre(etat, sid, "arret du chef d'orchestre")
+        for unite, t in etat.get("taches", {}).items():
+            if t.get("frein"):
+                orch_lever_frein(t, unite, "arret du chef d'orchestre")
         if os.path.isdir(ORCH_DIR):
             orch_ecrire(chemin, etat)
         return

@@ -1664,7 +1664,7 @@ mkdir -p "$OD" "$OP/pressure"
 memoire() { printf 'MemTotal: 16000000 kB\nMemAvailable: %s kB\nSwapTotal: 4000000 kB\nSwapFree: 2000000 kB\n' "$1" > "$OP/meminfo"; }
 printf 'some avg10=0.00 avg60=0 avg300=0 total=0\nfull avg10=0.00 avg60=0 avg300=0 total=0\n' > "$OP/pressure/memory"
 cp "$OP/pressure/memory" "$OP/pressure/cpu"
-O() { PLANTRACK_ORCHESTRE="$OD" PLANTRACK_PROC="$OP" ORCH_CALME=0 ORCH_PAS=0 ORCH_ALERTE=true python3 "$PT" "$@"; }
+O() { PLANTRACK_ORCHESTRE="$OD" PLANTRACK_PROC="$OP" PLANTRACK_CGROUP="$TO/cg" ORCH_CALME=0 ORCH_PAS=0 ORCH_ALERTE=true python3 "$PT" "$@"; }
 cp /bin/bash "$TO/claude"   # comm = claude : une fausse session, avec une commande en cours
 lancer() { "$TO/claude" -c 'bash -c "sleep 300; true # shell-snapshots" & wait' >/dev/null 2>&1 & echo $!; }
 pa=$(lancer); pb=$(lancer); pc=$(lancer); sleep 0.5
@@ -1697,6 +1697,16 @@ memoire 8000000; O orchestre --tour
 check "orchestre : retour au vert, la session reprend" "en pause : 0" "$(O orchestre)"
 check_exit "orchestre : sa commande est degelee" "S" "$(etat_proc "$pz")"
 check "orchestre : journal pause + reprise" "reprise" "$(cat "$OD/journal.log")"
+# taches planifiees (d222) : le groupe cron mange trop -> frein (CPUWeight bas), puis leve
+mkdir -p "$TO/cg/cron.service"; : > "$TO/cg/cron.service/cgroup.procs"
+printf '#!/bin/sh\necho "$@" >> "%s/sysctl.log"\n' "$TO" > "$TO/sysctl"; chmod +x "$TO/sysctl"
+OT() { SOUFFLE_SYSTEMCTL="$TO/sysctl" ORCH_TACHES_FENETRE=1 O orchestre --tour; }
+echo "usage_usec 0" > "$TO/cg/cron.service/cpu.stat"; OT; sleep 1.2
+echo "usage_usec 5000000" > "$TO/cg/cron.service/cpu.stat"; OT
+check "orchestre : taches planifiees gourmandes freinees" "CPUWeight=10" "$(cat "$TO/sysctl.log" 2>/dev/null)"
+check "orchestre : journal du frein" "frein cron.service" "$(cat "$OD/journal.log")"
+sleep 1.2; OT; sleep 1.2; OT
+check "orchestre : frein leve quand elles retombent" "CPUWeight=100" "$(cat "$TO/sysctl.log" 2>/dev/null)"
 # arret du service : personne ne reste gele
 memoire 500000; O orchestre --tour; O orchestre --tout-reprendre
 check_exit "orchestre : tout-reprendre degele" "0" "$(python3 -c 'import json,sys; print(len(json.load(open(sys.argv[1]))["pauses"]))' "$OD/etat.json")"
