@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [174 commits]
-  fichiers recemment ecrits : sortie/carte-stepper-essai.json, sortie/attendre-projob-stepper.log, sortie/carte-stepper-essai.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-delegated-russell.md, ../projob/sortie/nav/chaine.log, sortie/carte-checker-essai.log
+FIL ACTIF — t23 : guides de test automatiques (d100) [175 commits]
+  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-delegated-russell.md, ../projob/sortie/nav/chaine.log, sortie/carte-checker-essai.log, sortie/carte-checker-suite.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-sprightly-cocke.md, ../promovie/scripts/studio-projets.mjs
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -249,6 +249,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d217 : Reprise 09/11 apres coupure : moteur Stepper (ff0bb31+20c040f) tests verts, /code-review low sans vrai defaut ; ProJob c30f9ab+4e1e16e reco… (agent)
   d218 : Nom de l'outil de guide : Checker (remplace Stepper de d216), proposition de Mariella tel 09/11 'on l'appellerait pas plutot Checker ?', pl… (agent)
   d219 : Mariella (tel, 09/11, carte Essai Checker) : 'Je fais l essai (Recommande)' - essai du guide ProJob retouche2 avec Checker ; veille silenci… (agent)
+  d220 : Charge serveur 09/11 (demande Mariella tel 'gere la charge serveur', plan approuve) : cause principale = guet du studio promovie (cron chaq… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…

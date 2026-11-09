@@ -2393,3 +2393,9 @@
 {"ts": "2026-11-09T09:14:03+00:00", "kind": "file_touched", "text": "sortie/carte-checker-essai.log", "thread": "t23"}
 {"ts": "2026-11-09T09:14:08+00:00", "kind": "commit", "sha": "95b10e6", "ctype": "chore", "thread": "t23"}
 {"ts": "2026-11-09T09:47:56+00:00", "kind": "decision", "id": "d219", "text": "Mariella (tel, 09/11, carte Essai Checker) : 'Je fais l essai (Recommande)' - essai du guide ProJob retouche2 avec Checker ; veille silencieuse jusqu'a son verdict (d23)", "par": "agent"}
+{"ts": "2026-11-09T09:47:57+00:00", "kind": "commit", "sha": "9ece227", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-09T09:48:21+00:00", "kind": "file_touched", "text": "sortie/carte-checker-suite.log", "thread": "t23"}
+{"ts": "2026-11-09T16:26:20+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-sprightly-cocke.md", "thread": "t23"}
+{"ts": "2026-11-09T16:27:52+00:00", "kind": "file_touched", "text": "../promovie/scripts/studio-projets.mjs", "thread": "t23"}
+{"ts": "2026-11-09T16:27:55+00:00", "kind": "file_touched", "text": "../promovie/scripts/studio-projets.mjs", "thread": "t23"}
+{"ts": "2026-11-09T16:33:54+00:00", "kind": "decision", "id": "d220", "text": "Charge serveur 09/11 (demande Mariella tel 'gere la charge serveur', plan approuve) : cause principale = guet du studio promovie (cron chaque minute) qui republiait 17 fiches KV par minute depuis 78f28be (miroir personnages/lieux reecrit a l'identique). Corrige dans promovie 706dcd0 (b23 promovie to_verify). Charge 1 min 27 -> 5,8 ; plus aucun envoi depuis 17:29. Le reste (Chrome d'un moteur tripcom, repack git) etait passager.", "par": "agent"}
