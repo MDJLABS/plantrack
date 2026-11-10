@@ -1716,6 +1716,13 @@ check "orchestre : conteneur a fond freine" "docker-abc123.scope CPUWeight=10" "
 check "orchestre : conteneur nomme dans le journal" "vpn-essai" "$(cat "$OD/journal.log")"
 rm -r "$TO/cg/docker-abc123.scope"; OT
 check_not "orchestre : conteneur disparu oublie" "docker-abc123" "$(cat "$OD/etat.json")"
+# controles de sante docker (d232) : cout de containerd vu et signale, jamais freine
+mkdir -p "$TO/cg/containerd.service"; : > "$TO/sysctl.log"
+echo "usage_usec 0" > "$TO/cg/containerd.service/cpu.stat"; OT; sleep 1.2
+echo "usage_usec 5000000" > "$TO/cg/containerd.service/cpu.stat"; OT
+check "orchestre : controles de sante vus dans le journal" "controles de sante docker" "$(cat "$OD/journal.log")"
+check_not "orchestre : containerd jamais freine" "containerd" "$(cat "$TO/sysctl.log")"
+rm -r "$TO/cg/containerd.service"
 # arret du service : personne ne reste gele
 memoire 500000; O orchestre --tour; O orchestre --tout-reprendre
 check_exit "orchestre : tout-reprendre degele" "0" "$(python3 -c 'import json,sys; print(len(json.load(open(sys.argv[1]))["pauses"]))' "$OD/etat.json")"

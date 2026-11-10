@@ -1575,6 +1575,12 @@ ORCH_TACHES = tuple((os.environ.get("ORCH_TACHES") or "cron.service").split())
 ORCH_TACHES_SEUIL = float(os.environ.get("ORCH_TACHES_SEUIL") or 30)    # % d'un processeur
 ORCH_TACHES_FENETRE = int(os.environ.get("ORCH_TACHES_FENETRE") or 600)
 ORCH_TACHES_POIDS = 10   # CPUWeight du frein (100 = normal) : elles prennent ce qui reste
+# Controles de sante docker (d232, pg32) : leurs « docker exec » toutes les 5-10 s sont comptes
+# dans containerd/dockerd, pas dans le groupe du conteneur. On les regarde (journal + alerte),
+# sans jamais les freiner : un frein sur dockerd ralentirait tous les sites.
+ORCH_SANTE = tuple((os.environ.get("ORCH_SANTE_UNITES")
+                    or "containerd.service docker.service").split())
+ORCH_SANTE_SEUIL = float(os.environ.get("ORCH_SANTE_SEUIL") or 15)   # % d'un processeur, cumule
 ORCH_TICK = os.sysconf("SC_CLK_TCK")
 
 
@@ -1646,8 +1652,10 @@ def orch_taches(etat, maintenant):
         scopes = []
     for u in [u for u in toutes if u.endswith(".scope") and u not in scopes]:
         del toutes[u]   # conteneur disparu : son groupe (et son frein) avec lui
-    for unite in ORCH_TACHES + tuple(scopes):
+    sante = {}
+    for unite in ORCH_TACHES + tuple(scopes) + ORCH_SANTE:
         conteneur = unite.endswith(".scope")
+        observe = unite in ORCH_SANTE
         try:
             with open(os.path.join(ORCH_CGROUP, unite, "cpu.stat")) as f:
                 usage = int(next(l.split()[1] for l in f if l.startswith("usage_usec"))) / 1e6
@@ -1658,7 +1666,7 @@ def orch_taches(etat, maintenant):
         while len(hist) > 2 and maintenant - hist[1][0] >= ORCH_TACHES_FENETRE:
             hist.pop(0)   # on garde un seul point plus vieux que la fenetre : son repere
         t["hist"] = hist
-        pids = {} if conteneur else orch_tache_pids(unite)
+        pids = {} if conteneur or observe else orch_tache_pids(unite)
         avant = {int(k): v for k, v in t.get("pids", {}).items()}
         parts = [x for x in t.get("parts", []) if maintenant - x[0] <= ORCH_TACHES_FENETRE]
         if "pids" in t:   # premier tour : simple repere, rien n'est compte
@@ -1673,6 +1681,9 @@ def orch_taches(etat, maintenant):
             continue
         part = round(100 * max(0.0, usage - hist[0][1]) / duree, 1)
         t["part"] = part
+        if observe:
+            sante[unite] = part
+            continue
         if part > ORCH_TACHES_SEUIL and not t.get("frein"):
             cumul = {}
             for _, etiq, d in parts:
@@ -1701,6 +1712,31 @@ def orch_taches(etat, maintenant):
         elif t.get("frein") and part < ORCH_TACHES_SEUIL / 2 \
                 and maintenant - t["frein"] >= ORCH_TACHES_FENETRE:
             orch_lever_frein(t, unite, f"retombees a {part} %")
+    orch_sante(etat, maintenant, sante)
+
+
+def orch_sante(etat, maintenant, parts):
+    """Cout cumule des controles de sante docker : journal et alerte au-dela du seuil, au plus
+    une alerte toutes les 6 h. Aucun frein (voir ORCH_SANTE)."""
+    s = etat.setdefault("sante", {})
+    total = round(sum(parts.values()), 1)
+    if not parts:
+        return
+    s["part"] = total
+    if total <= ORCH_SANTE_SEUIL:
+        s.pop("haut", None)
+        return
+    if not s.get("haut"):
+        s["haut"] = maintenant
+        detail = ", ".join(f"{u.split('.')[0]} {p} %" for u, p in sorted(parts.items()))
+        orch_journal(f"controles de sante docker : {total} % d'un processeur sur "
+                     f"{ORCH_TACHES_FENETRE // 60} min ({detail}), non freines")
+    if maintenant - s.get("alerte", 0) > 6 * 3600:
+        s["alerte"] = maintenant
+        orch_alerter(f"Les contrôles de santé des conteneurs prennent {total} % d'un processeur "
+                     f"sur les {ORCH_TACHES_FENETRE // 60} dernières minutes. Je ne les freine "
+                     "pas (ça ralentirait tous les sites) : il faut espacer les contrôles des "
+                     "conteneurs concernés.")
 
 
 def orch_conteneur(unite):
