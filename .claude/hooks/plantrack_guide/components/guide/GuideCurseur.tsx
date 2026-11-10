@@ -72,15 +72,16 @@ export function GuideCurseur({
   const [sansTransition, setSansTransition] = useState(false);
   const [visible, setVisible] = useState(gestes[0]?.type !== "aller");
   // Garde contre un double effet (StrictMode en dev) : un geste ne part jamais deux fois.
-  const dejaJoue = useRef(false);
+  // `prochain` retient le premier geste pas encore joué : un remontage reprend la suite LÀ,
+  // sans rejouer ni abandonner les gestes restants (b28) ; `fini` ferme la porte au résultat.
+  const prochain = useRef(0);
+  const avantFait = useRef(false);
+  const fini = useRef(false);
 
   useEffect(() => {
-    if (dejaJoue.current) return;
-    dejaJoue.current = true;
+    if (fini.current) return;
 
     // StrictMode monte, DÉMONTE puis remonte l'effet : le nettoyage annule les minuteurs.
-    // Tant que rien n'est parti, relâcher la garde (b28). Une fois parti, elle tient.
-    let parti = false;
     let annule = false;
     const minuteurs: ReturnType<typeof setTimeout>[] = [];
     let raf = 0;
@@ -93,19 +94,22 @@ export function GuideCurseur({
       // API indisponible : on se comporte comme si le mouvement était acceptable.
     }
 
-    const jouer = (geste: GuideGeste): ResultatGeste => {
-      if (!parti) { parti = true; onAvantAction(); }
+    const rendre = (res: ResultatGeste) => { fini.current = true; onJoue(res); };
+
+    const jouer = (geste: GuideGeste, i: number): ResultatGeste => {
+      if (!avantFait.current) { avantFait.current = true; onAvantAction(); }
+      prochain.current = i + 1;
       return jouerGeste(geste, document, ciblesRepli, undefined, ancetresReplies);
     };
 
     const suivant = (i: number) => {
       if (annule) return;
-      if (i >= gestes.length) { onJoue({ ok: true }); return; }
+      if (i >= gestes.length) { rendre({ ok: true }); return; }
       const geste = gestes[i];
 
       if (geste.type === "aller") {
         setVisible(false);
-        onJoue(jouer(geste)); // dernier geste de la suite, cf. `gestesEtape`
+        rendre(jouer(geste, i)); // dernier geste de la suite, cf. `gestesEtape`
         return;
       }
 
@@ -113,7 +117,7 @@ export function GuideCurseur({
       const el = resolveTarget(selecteursGeste(geste, ciblesRepli), document, undefined, ancetresReplies);
       if (!el) {
         // Invariant 2 du guide : ne jamais prétendre avoir atteint une cible absente.
-        onJoue({ ok: false, raison: "cible introuvable" });
+        rendre({ ok: false, raison: "cible introuvable" });
         return;
       }
       const r = el.getBoundingClientRect();
@@ -123,9 +127,9 @@ export function GuideCurseur({
 
       const conclure = () => {
         if (annule) return;
-        const res = jouer(geste);
-        if (!res.ok) { onJoue(res); return; }
-        if (i + 1 >= gestes.length) { onJoue(res); return; }
+        const res = jouer(geste, i);
+        if (!res.ok) { rendre(res); return; }
+        if (i + 1 >= gestes.length) { rendre(res); return; }
         attendre(PAUSE_ENTRE_GESTES_MS, () => suivant(i + 1));
       };
 
@@ -142,15 +146,14 @@ export function GuideCurseur({
       attendre(DUREE_GLISSE_MS + DUREE_CLIC_MS, conclure);
     };
 
-    suivant(0);
+    suivant(prochain.current);
 
     return () => {
       annule = true;
       cancelAnimationFrame(raf);
       minuteurs.forEach(clearTimeout);
-      if (!parti) dejaJoue.current = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- un seul passage par montage, cf. `dejaJoue`
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- un seul passage par montage, cf. `prochain`
   }, []);
 
   if (!visible) return null; // geste "aller" : rien à encadrer
