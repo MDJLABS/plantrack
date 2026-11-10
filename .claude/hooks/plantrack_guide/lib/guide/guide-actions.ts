@@ -200,24 +200,28 @@ export async function consignerPoint(
   const racine = await racineDuDepot();
   if (!racine) return { error: "dossier .planning introuvable" };
 
-  const etatComplet = await lireEtat(racine);
-  const precedent = etatComplet[scenarioId];
-  const base: EtatScenarioStocke = precedent && precedent.date === scenario.date
-    ? precedent
-    : { date: scenario.date, verdicts: {} };
-
   const propre = note ? nettoyer(note) : "";
-  const entree: VerdictStocke = { v, a: new Date().toISOString(), ...(propre ? { note: propre } : {}) };
-  const suivant: EtatScenarioStocke = { ...base, verdicts: { ...base.verdicts, [stepId]: entree } };
-
-  try {
-    await ecrireEtat(racine, { ...etatComplet, [scenarioId]: suivant });
-  } catch {
-    // Un site servi par un environnement sans vraie écriture fichier (ex. un runtime Workers
-    // sans accès `node:fs` réel) ne doit jamais faire planter l'action serveur — l'appelant
-    // (`GuideDeTest.tsx`) reçoit une erreur à afficher, jamais une exception non attrapée.
-    return { error: "écriture du registre impossible" };
-  }
+  // b45 : lecture puis écriture du registre dans la MÊME file que la consignation de fin :
+  // deux verdicts rapprochés ne s'effacent plus l'un l'autre.
+  const suivant = await enFile(async (): Promise<EtatScenarioStocke | null> => {
+    const etatComplet = await lireEtat(racine);
+    const precedent = etatComplet[scenarioId];
+    const base: EtatScenarioStocke = precedent && precedent.date === scenario.date
+      ? precedent
+      : { date: scenario.date, verdicts: {} };
+    const entree: VerdictStocke = { v, a: new Date().toISOString(), ...(propre ? { note: propre } : {}) };
+    const nouveau: EtatScenarioStocke = { ...base, verdicts: { ...base.verdicts, [stepId]: entree } };
+    try {
+      await ecrireEtat(racine, { ...etatComplet, [scenarioId]: nouveau });
+    } catch {
+      // Un site servi par un environnement sans vraie écriture fichier (ex. un runtime Workers
+      // sans accès `node:fs` réel) ne doit jamais faire planter l'action serveur : l'appelant
+      // (`GuideDeTest.tsx`) reçoit une erreur à afficher, jamais une exception non attrapée.
+      return null;
+    }
+    return nouveau;
+  });
+  if (!suivant) return { error: "écriture du registre impossible" };
 
   // d172 : un « pas ok » ou une remarque part TOUT DE SUITE à la session — un point raté
   // peut bloquer la suite de l'essai. Le clic « ko » lui-même passe `avertir = false` : c'est
@@ -261,10 +265,15 @@ type Consignation = { error: string | null; statut: "en-cours" | "valide" | "a-r
  *  la seconde trouve la première consignée et ne renvoie rien. */
 let fileConsignation: Promise<unknown> = Promise.resolve();
 
-export async function consignerGuide(scenarioId: string): Promise<Consignation> {
-  const tour = fileConsignation.then(() => consignerGuideSeul(scenarioId));
+/** Toute lecture-écriture du registre passe par cette file (b44, b45). */
+function enFile<T>(travail: () => Promise<T>): Promise<T> {
+  const tour = fileConsignation.then(travail);
   fileConsignation = tour.catch(() => undefined);
   return tour;
+}
+
+export async function consignerGuide(scenarioId: string): Promise<Consignation> {
+  return enFile(() => consignerGuideSeul(scenarioId));
 }
 
 async function consignerGuideSeul(scenarioId: string): Promise<Consignation> {

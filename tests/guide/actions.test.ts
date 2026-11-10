@@ -108,6 +108,18 @@ await step("consignerGuide sur un scénario encore incomplet → statut en-cours
   assert.equal(r.statut, "en-cours");
 });
 
+await step("b45 : deux verdicts envoyés en même temps → les deux sont gardés", async () => {
+  const [a, b] = await Promise.all([
+    consignerPoint("temoin-geste", "r1", "ok", undefined, false),
+    consignerPoint("temoin-geste", "r2", "ok", undefined, false),
+  ]);
+  assert.equal(a.error, null);
+  assert.equal(b.error, null);
+  const geste = (await etatGuides())!.find((g) => g.id === "temoin-geste");
+  assert.equal(geste?.verdicts.r1?.v, "ok");
+  assert.equal(geste?.verdicts.r2?.v, "ok");
+});
+
 await step("un point ko sur un scénario complet → consignerGuide rend a-revoir", async () => {
   await consignerPoint("temoin-geste", "r1", "ok");
   await consignerPoint("temoin-geste", "r2", "ko", "le bouton ne répond pas");
