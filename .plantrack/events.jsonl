@@ -2467,3 +2467,24 @@
 {"ts": "2026-11-10T17:23:12+00:00", "kind": "attempt", "id": "a66", "bug": "b45", "hypothesis": "Livre : consignerPoint passe par la file enFile (meme file que consignerGuide), test 'deux verdicts en meme temps' vert", "session": "c3e1a8d5-0dd9-42f5-a0ad-d4868235b7a8", "actor": "claude-code"}
 {"ts": "2026-11-10T17:23:28+00:00", "kind": "bug_status", "id": "b45", "status": "to_verify"}
 {"ts": "2026-11-10T17:23:51+00:00", "kind": "question", "id": "q23", "text": "Carte 10/11 : guide ProRent pret, rallumer sa base de test (eteinte d155) pour l'essai ?"}
+{"ts": "2026-11-10T17:23:52+00:00", "kind": "commit", "sha": "b7c158d", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-10T17:23:52+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/c3e1a8d5-0dd9-42f5-a0ad-d4868235b7a8/scratchpad/carte2.json", "thread": "t23"}
+{"ts": "2026-11-10T17:23:52+00:00", "kind": "file_touched", "text": "sortie/carte-prorent.log", "thread": "t23"}
+{"ts": "2026-11-10T21:18:10+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-polymorphic-donut.md", "thread": "t23"}
+{"ts": "2026-11-10T21:22:16+00:00", "kind": "decision", "id": "d232", "text": "Mariella (tel, 10/11, plan approuve) : charge -> l'orchestre observe containerd.service+docker.service (cout des healthchecks, alerte seulement, jamais de CPUWeight) ; healthchecks des projets compose (vpn MdjFlight, Mizzzen, bcc-passerelle, postiz) espaces a 60s par docker-compose.override.yml non commite, recreation a 3h ; Supabase CLI inchange. Site mdjlabs : son guide maison gagne les gestes enchaines (gestes[], copie de gestesEtape + boucle du curseur commun). ProRent : base rallumee seulement sur 'go'.", "par": "agent"}
+{"ts": "2026-11-10T21:22:19+00:00", "kind": "answer", "id": "q22", "text": "Voir + ralentir ; Ajouter les gestes ; Ceux qui se règlent", "canal": "tel : Voir + ralentir (Recommandé) ; Ajouter les gestes (Recommandé) ; Ceux qui se règlent (Recommandé)"}
+{"ts": "2026-11-10T21:23:05+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-10T21:23:10+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-10T21:23:12+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-10T21:23:13+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-10T21:23:13+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-10T21:23:20+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t23"}
+{"ts": "2026-11-10T21:26:40+00:00", "kind": "file_touched", "text": "sortie/tests-d232.log", "thread": "t23"}
+{"ts": "2026-11-10T21:26:51+00:00", "kind": "commit", "sha": "649a4c0", "ctype": "feat", "thread": "t23"}
+{"ts": "2026-11-10T21:27:50+00:00", "kind": "file_touched", "text": "sortie/healthcheck-recreate.sh", "thread": "t23"}
+{"ts": "2026-11-10T21:30:19+00:00", "kind": "commit", "sha": "1f12792", "ctype": "fix", "thread": "t23"}
+{"ts": "2026-11-10T21:30:19+00:00", "kind": "bug", "id": "b46", "text": "Guide (moteur commun + mdjlabs) : en dev (StrictMode) avec mouvement reduit, un point a plusieurs gestes s'arretait apres le 1er geste sans resultat (garde dejaJoue tenue apres nettoyage). Trouve a la relecture d232.", "thread": "t23", "severity": "normal", "par": "agent"}
+{"ts": "2026-11-10T21:30:29+00:00", "kind": "attempt", "id": "a67", "bug": "b46", "hypothesis": "Ref prochain (index du 1er geste non joue) + fini a la place de dejaJoue/parti : un remontage reprend la suite, onAvantAction une seule fois. plantrack 1f12792, mdjlabs-site 2312991.", "session": "9ae70209-48d3-4310-94de-18608cd4c5f8", "actor": "claude-code"}
+{"ts": "2026-11-10T21:30:41+00:00", "kind": "bug_status", "id": "b46", "status": "to_verify"}
+{"ts": "2026-11-10T21:31:14+00:00", "kind": "decision", "id": "d233", "text": "d232 livre : orchestre 649a4c0 (containerd/docker.service observes, journal+alerte au-dela de 15 %, jamais de frein) ; overrides healthcheck 60s poses (MdjFlight/vpn, Mizzzen, bcc passerelle, postiz ; exclus de git), recreation programmee par plantrack-healthcheck-recreate.timer le 11/11 04h CET (sortie/healthcheck-recreate.sh/.log) ; guide mdjlabs-site gestes enchaines b965ee3+2312991, b46 corrige dans le moteur commun 1f12792.", "par": "agent"}
+{"ts": "2026-11-10T21:31:20+00:00", "kind": "piege_clos", "id": "pg32", "text": "orchestre 649a4c0 mesure containerd.service + docker.service (d232)"}

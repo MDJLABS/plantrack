@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [190 commits]
-  fichiers recemment ecrits : ../../../tmp/claude-0/-home-mariella-plantrack/c3e1a8d5-0dd9-42f5-a0ad-d4868235b7a8/scratchpad/b.txt, ../../../tmp/claude-0/-home-mariella-plantrack/c3e1a8d5-0dd9-42f5-a0ad-d4868235b7a8/scratchpad/carte.json, sortie/carte-charge-mdjlabs.log, ../prorent-docs/sortie/essai-checker.mjs, .claude/hooks/plantrack_guide/lib/guide/guide-actions.ts, tests/guide/actions.test.ts
+FIL ACTIF — t23 : guides de test automatiques (d100) [193 commits]
+  fichiers recemment ecrits : sortie/carte-prorent.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-polymorphic-donut.md, .claude/hooks/pt.py, tests/scenario.sh, sortie/tests-d232.log, sortie/healthcheck-recreate.sh
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -29,6 +29,7 @@ BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b41 (to_verify) [t23] Orchestre (d159) : les sessions lancees sous bccsession (telephone) ne peuvent pas s'inscrire — /var/lib/plantrack-orchestre/sessions en ro… (agent) [1 tentatives, derniere: Dossier sessions en 1777 (bit collant) pose par l'orchestre…]
   b44 (to_verify) [t23] Guide termine (tel Mariella 08/11, session projob) : derniere etape pas confirmee a l'ecran, guide reste dans la liste des restants, fin en… (agent) [2 tentatives, derniere: Livre : moteur (cda33df + 8ea12a4 sans grands tirets) coche…]
   b45 (to_verify) [t23] Moteur guide : consignerPoint lit puis reecrit guides-etat.json hors de la file de consignation ; deux verdicts rapproches (deux onglets, p… (agent) [2 tentatives, derniere: Livre : consignerPoint passe par la file enFile (meme file …]
+  b46 (to_verify) [t23] Guide (moteur commun + mdjlabs) : en dev (StrictMode) avec mouvement reduit, un point a plusieurs gestes s'arretait apres le 1er geste sans… (agent) [1 tentatives, derniere: Ref prochain (index du 1er geste non joue) + fini a la plac…]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
@@ -262,6 +263,8 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d229 : Mariella (tel, 09/11 21h20, plan approuve apres relance auto) : rien a faire, attente de son essai du guide Checker Mizzzen (d228), veille … (agent)
   d230 : Mariella (tel, 09/11, carte Suite) : 'Je fais l essai (Recommande)' - essai du guide Checker Mizzzen ; veille silencieuse jusqu'a son verdi… (agent)
   d231 : Mariella (tel, 10/11, plan approuve) : suite 'continue de mettre a jour les guides' - restent ProRent (prorent-docs, ancien GuideDeTest san… (agent)
+  d232 : Mariella (tel, 10/11, plan approuve) : charge -> l'orchestre observe containerd.service+docker.service (cout des healthchecks, alerte seule… (agent)
+  d233 : d232 livre : orchestre 649a4c0 (containerd/docker.service observes, journal+alerte au-dela de 15 %, jamais de frein) ; overrides healthchec… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
@@ -282,11 +285,9 @@ Pieges connus :
   pg29 : tests/scenario.sh lance sous le compte bccsession : 6 echecs ronde/b20/bilan --…
   pg30 : Compte bccsession (sessions du telephone) : la boucle locale est filtree — seul…
   pg31 : tests/scenario.sh 'bilan --all : rien a dire' echoue sur le serveur reel quand …
-  pg32 : Charge 10/11 : les controles de sante docker (35 conteneurs, toutes les 5-10 s)…
 
 Questions en attente (reponds via !answer qN ...) :
   q15 : Guide Soirées pret (s69-soirees 1db1d2a) : Mariella fait-elle l'essai sur https…
-  q22 : Carte 10/11 : charge (voir + ralentir les controles de sante / arreter Postiz) …
   q23 : Carte 10/11 : guide ProRent pret, rallumer sa base de test (eteinte d155) pour …
 ```
 <!-- plantrack:state-end -->
