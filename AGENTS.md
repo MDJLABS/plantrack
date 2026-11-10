@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [193 commits]
-  fichiers recemment ecrits : sortie/carte-prorent.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-polymorphic-donut.md, .claude/hooks/pt.py, tests/scenario.sh, sortie/tests-d232.log, sortie/healthcheck-recreate.sh
+FIL ACTIF — t23 : guides de test automatiques (d100) [195 commits]
+  fichiers recemment ecrits : sortie/tests-d232.log, sortie/healthcheck-recreate.sh, pyproject.toml, sortie/mdjlabs-deploy-d232.log, sortie/essai-mdjlabs/essai.mjs, sortie/carte-mdjlabs-gestes.log
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -289,5 +289,6 @@ Pieges connus :
 Questions en attente (reponds via !answer qN ...) :
   q15 : Guide Soirées pret (s69-soirees 1db1d2a) : Mariella fait-elle l'essai sur https…
   q23 : Carte 10/11 : guide ProRent pret, rallumer sa base de test (eteinte d155) pour …
+  q24 : Carte 10/11 : essai guide mdjlabs gestes enchaines (preprod essai-gestes, point…
 ```
 <!-- plantrack:state-end -->

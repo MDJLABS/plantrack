@@ -2488,3 +2488,11 @@
 {"ts": "2026-11-10T21:30:41+00:00", "kind": "bug_status", "id": "b46", "status": "to_verify"}
 {"ts": "2026-11-10T21:31:14+00:00", "kind": "decision", "id": "d233", "text": "d232 livre : orchestre 649a4c0 (containerd/docker.service observes, journal+alerte au-dela de 15 %, jamais de frein) ; overrides healthcheck 60s poses (MdjFlight/vpn, Mizzzen, bcc passerelle, postiz ; exclus de git), recreation programmee par plantrack-healthcheck-recreate.timer le 11/11 04h CET (sortie/healthcheck-recreate.sh/.log) ; guide mdjlabs-site gestes enchaines b965ee3+2312991, b46 corrige dans le moteur commun 1f12792.", "par": "agent"}
 {"ts": "2026-11-10T21:31:20+00:00", "kind": "piege_clos", "id": "pg32", "text": "orchestre 649a4c0 mesure containerd.service + docker.service (d232)"}
+{"ts": "2026-11-10T21:31:22+00:00", "kind": "commit", "sha": "d87683d", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-10T21:31:48+00:00", "kind": "commit", "sha": "138fcb6", "ctype": "commit", "thread": "t23"}
+{"ts": "2026-11-10T21:31:55+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t23"}
+{"ts": "2026-11-10T21:55:31+00:00", "kind": "file_touched", "text": "sortie/mdjlabs-deploy-d232.log", "thread": "t23"}
+{"ts": "2026-11-10T21:58:02+00:00", "kind": "file_touched", "text": "sortie/essai-mdjlabs/essai.mjs", "thread": "t23"}
+{"ts": "2026-11-10T21:58:55+00:00", "kind": "file_touched", "text": "sortie/essai-mdjlabs/essai.mjs", "thread": "t23"}
+{"ts": "2026-11-10T22:00:40+00:00", "kind": "question", "id": "q24", "text": "Carte 10/11 : essai guide mdjlabs gestes enchaines (preprod essai-gestes, point 3) ?"}
+{"ts": "2026-11-10T22:00:41+00:00", "kind": "file_touched", "text": "sortie/carte-mdjlabs-gestes.log", "thread": "t23"}
