@@ -2444,3 +2444,26 @@
 {"ts": "2026-11-09T21:16:06+00:00", "kind": "commit", "sha": "c062be1", "ctype": "chore", "thread": "t23"}
 {"ts": "2026-11-09T21:16:14+00:00", "kind": "answer", "id": "q21", "text": "J essaie Mizzzen (Recommande)", "canal": "tel carte Essai Checker : J essaie Mizzzen (Recommandé)"}
 {"ts": "2026-11-09T21:16:14+00:00", "kind": "decision", "id": "d228", "text": "Mariella (tel, 09/11 soir, carte Essai Checker) : 'J essaie Mizzzen (Recommande)' - essai du guide cuisine Mizzzen a gestes enchaines ; veille silencieuse jusqu'a son verdict (d23)", "par": "agent"}
+{"ts": "2026-11-09T21:16:15+00:00", "kind": "commit", "sha": "bfc7e0b", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-09T21:38:25+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-majestic-boole.md", "thread": "t23"}
+{"ts": "2026-11-09T21:59:42+00:00", "kind": "decision", "id": "d229", "text": "Mariella (tel, 09/11 21h20, plan approuve apres relance auto) : rien a faire, attente de son essai du guide Checker Mizzzen (d228), veille silencieuse (d23)", "par": "agent"}
+{"ts": "2026-11-09T22:24:11+00:00", "kind": "decision", "id": "d230", "text": "Mariella (tel, 09/11, carte Suite) : 'Je fais l essai (Recommande)' - essai du guide Checker Mizzzen ; veille silencieuse jusqu'a son verdict (d23, d228)", "par": "agent"}
+{"ts": "2026-11-10T10:16:26+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-wild-orbit.md", "thread": "t23"}
+{"ts": "2026-11-10T17:16:10+00:00", "kind": "decision", "id": "d231", "text": "Mariella (tel, 10/11, plan approuve) : suite 'continue de mettre a jour les guides' - restent ProRent (prorent-docs, ancien GuideDeTest sans gestes) et le site mdjlabs (mdjlabs-site, port maison d103, un geste par point) : brancher le moteur commun Checker sur les deux, garder leurs scenarios/porte/envoi ; Promovie et mdjlabs-site-labo non touches.", "par": "agent"}
+{"ts": "2026-11-10T17:17:31+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/c3e1a8d5-0dd9-42f5-a0ad-d4868235b7a8/scratchpad/a.txt", "thread": "t23"}
+{"ts": "2026-11-10T17:17:31+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/c3e1a8d5-0dd9-42f5-a0ad-d4868235b7a8/scratchpad/b.txt", "thread": "t23"}
+{"ts": "2026-11-10T17:19:29+00:00", "kind": "piege", "id": "pg32", "text": "Charge 10/11 : les controles de sante docker (35 conteneurs, toutes les 5-10 s) coutent ~20 % d'un coeur, comptes dans containerd.service et docker.service et PAS dans le groupe du conteneur : l'orchestre (d224, mesure par docker-<id>.scope) ne les voit pas. Postiz (+temporal) au repos : ~26 % d'un coeur et 1,4 Go en continu."}
+{"ts": "2026-11-10T17:19:29+00:00", "kind": "question", "id": "q22", "text": "Carte 10/11 : charge (voir + ralentir les controles de sante / arreter Postiz) et guide du site mdjlabs (ajouter les gestes / carte Checker complete)"}
+{"ts": "2026-11-10T17:19:29+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/c3e1a8d5-0dd9-42f5-a0ad-d4868235b7a8/scratchpad/carte.json", "thread": "t23"}
+{"ts": "2026-11-10T17:19:29+00:00", "kind": "file_touched", "text": "sortie/carte-charge-mdjlabs.log", "thread": "t23"}
+{"ts": "2026-11-10T17:19:47+00:00", "kind": "file_touched", "text": "sortie/carte-charge-mdjlabs.log", "thread": "t23"}
+{"ts": "2026-11-10T17:21:34+00:00", "kind": "file_touched", "text": "../prorent-docs/sortie/essai-checker.mjs", "thread": "t23"}
+{"ts": "2026-11-10T17:22:23+00:00", "kind": "bug", "id": "b45", "text": "Moteur guide : consignerPoint lit puis reecrit guides-etat.json hors de la file de consignation ; deux verdicts rapproches (deux onglets, point juge pendant la consignation de fin) : le dernier ecrit efface l'autre, verdict perdu (relecture /code-review low du portage ProRent, 10/11)", "thread": "t23", "severity": "normal", "par": "agent"}
+{"ts": "2026-11-10T17:22:30+00:00", "kind": "attempt", "id": "a65", "bug": "b45", "hypothesis": "Faire passer la lecture-ecriture de consignerPoint par la meme file que consignerGuide (helper enFile), l'avertissement de la session reste hors file", "session": "c3e1a8d5-0dd9-42f5-a0ad-d4868235b7a8", "actor": "claude-code"}
+{"ts": "2026-11-10T17:22:38+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/lib/guide/guide-actions.ts", "thread": "t23"}
+{"ts": "2026-11-10T17:22:41+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/lib/guide/guide-actions.ts", "thread": "t23"}
+{"ts": "2026-11-10T17:22:58+00:00", "kind": "file_touched", "text": "tests/guide/actions.test.ts", "thread": "t23"}
+{"ts": "2026-11-10T17:23:11+00:00", "kind": "commit", "sha": "6e39574", "ctype": "fix", "thread": "t23"}
+{"ts": "2026-11-10T17:23:12+00:00", "kind": "attempt", "id": "a66", "bug": "b45", "hypothesis": "Livre : consignerPoint passe par la file enFile (meme file que consignerGuide), test 'deux verdicts en meme temps' vert", "session": "c3e1a8d5-0dd9-42f5-a0ad-d4868235b7a8", "actor": "claude-code"}
+{"ts": "2026-11-10T17:23:28+00:00", "kind": "bug_status", "id": "b45", "status": "to_verify"}
+{"ts": "2026-11-10T17:23:51+00:00", "kind": "question", "id": "q23", "text": "Carte 10/11 : guide ProRent pret, rallumer sa base de test (eteinte d155) pour l'essai ?"}
