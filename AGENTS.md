@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [200 commits]
+FIL ACTIF — t23 : guides de test automatiques (d100) [201 commits]
   fichiers recemment ecrits : .claude/hooks/plantrack_guide/components/guide/GuideDeTest.tsx, sortie/mdjlabs-deploy-b48b.log, ../mdjlabs-site/lib/guide/guide-geste.ts, ../mdjlabs-site/lib/guide/__tests__/guide-geste.test.ts, sortie/mdjlabs-deploy-b48c.log, ../mdjlabs-site/components/guide/guide-de-test.tsx
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -268,6 +268,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d232 : Mariella (tel, 10/11, plan approuve) : charge -> l'orchestre observe containerd.service+docker.service (cout des healthchecks, alerte seule… (agent)
   d233 : d232 livre : orchestre 649a4c0 (containerd/docker.service observes, journal+alerte au-dela de 15 %, jamais de frein) ; overrides healthchec… (agent)
   d234 : v1.9.46 publiee (11/11, GitHub seul, pas de cle PyPI d127) : correctif b48 - le curseur du guide n'est arme qu'apres lecture de la progress… (agent)
+  d235 : Mariella (tel, 11/11 13h13, carte Essai mdjlabs) : 'Je refais l essai (Recommande)' - essai du guide mdjlabs rejoue de bout en bout (b48, v… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
@@ -294,6 +295,5 @@ Questions en attente (reponds via !answer qN ...) :
   q23 : Carte 10/11 : guide ProRent pret, rallumer sa base de test (eteinte d155) pour …
   q25 : Carte 11/11 : guide mdjlabs corrige (b47), Mariella refait-elle l'essai gestes …
   q26 : Carte 11/11 : guide mdjlabs corrige (b48, boucle de rechargement), Mariella ref…
-  q27 : Carte 11/11 : guide mdjlabs teste de bout en bout (b48 points 1 et 4, retour ar…
 ```
 <!-- plantrack:state-end -->

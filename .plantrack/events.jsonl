@@ -2538,3 +2538,6 @@
 {"ts": "2026-11-11T11:37:59+00:00", "kind": "file_touched", "text": "sortie/mdjlabs-deploy-b48c.log", "thread": "t23"}
 {"ts": "2026-11-11T11:56:40+00:00", "kind": "file_touched", "text": "../mdjlabs-site/components/guide/guide-de-test.tsx", "thread": "t23"}
 {"ts": "2026-11-11T12:11:31+00:00", "kind": "question", "id": "q27", "text": "Carte 11/11 : guide mdjlabs teste de bout en bout (b48 points 1 et 4, retour arriere, Recommencer), Mariella refait-elle l'essai ?"}
+{"ts": "2026-11-11T12:11:31+00:00", "kind": "commit", "sha": "80e98c0", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-11T13:14:00+00:00", "kind": "decision", "id": "d235", "text": "Mariella (tel, 11/11 13h13, carte Essai mdjlabs) : 'Je refais l essai (Recommande)' - essai du guide mdjlabs rejoue de bout en bout (b48, v1.9.46) ; veille silencieuse jusqu'a son verdict (d23)", "par": "agent"}
+{"ts": "2026-11-11T13:14:05+00:00", "kind": "answer", "id": "q27", "text": "Elle refait l essai", "canal": "telephone : Je refais l essai (Recommandé)"}
