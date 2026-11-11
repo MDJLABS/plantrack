@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [202 commits]
-  fichiers recemment ecrits : ../mdjlabs-site/lib/guide/guide-geste.ts, ../mdjlabs-site/lib/guide/__tests__/guide-geste.test.ts, sortie/mdjlabs-deploy-b48c.log, ../mdjlabs-site/components/guide/guide-de-test.tsx, ../../../tmp/claude-0/-home-mariella-plantrack/71553c77-e842-4678-8bbb-c3db0eb62776/scratchpad/carte.json, sortie/carte-suite-1111.log
+FIL ACTIF — t23 : guides de test automatiques (d100) [203 commits]
+  fichiers recemment ecrits : sortie/mdjlabs-deploy-b48c.log, ../mdjlabs-site/components/guide/guide-de-test.tsx, ../../../tmp/claude-0/-home-mariella-plantrack/71553c77-e842-4678-8bbb-c3db0eb62776/scratchpad/carte.json, sortie/carte-suite-1111.log, ../../../tmp/claude-0/-home-mariella-plantrack/ecf9a9a5-4736-4a4f-be83-a65441738a2a/scratchpad/carte.json, sortie/carte-suite-1111b.log
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -30,8 +30,6 @@ BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b44 (to_verify) [t23] Guide termine (tel Mariella 08/11, session projob) : derniere etape pas confirmee a l'ecran, guide reste dans la liste des restants, fin en… (agent) [2 tentatives, derniere: Livre : moteur (cda33df + 8ea12a4 sans grands tirets) coche…]
   b45 (to_verify) [t23] Moteur guide : consignerPoint lit puis reecrit guides-etat.json hors de la file de consignation ; deux verdicts rapproches (deux onglets, p… (agent) [2 tentatives, derniere: Livre : consignerPoint passe par la file enFile (meme file …]
   b46 (to_verify) [t23] Guide (moteur commun + mdjlabs) : en dev (StrictMode) avec mouvement reduit, un point a plusieurs gestes s'arretait apres le 1er geste sans… (agent) [1 tentatives, derniere: Ref prochain (index du 1er geste non joue) + fini a la plac…]
-  b47 (to_verify) [t23] Guide (moteur commun + mdjlabs) : quand le dernier geste d'un point retire la zone (fermer une boite), la carte affiche a tort 'La zone dec… (agent) [2 tentatives, derniere: Livre : bandeau 'zone pas visible' masque quand le geste du…]
-  b48 (to_verify) [t23] Guide mdjlabs (tel Mariella 11/11) : 'conflit entre la fenetre du chat et la fenetre du guide, les deux boites se bousculent, l'une s'ouvre… (agent) [3 tentatives, derniere: Suite (Mariella tel : 'le point 1 sur 4 ne fonctionne pas')…]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
@@ -294,6 +292,5 @@ Pieges connus :
 Questions en attente (reponds via !answer qN ...) :
   q15 : Guide Soirées pret (s69-soirees 1db1d2a) : Mariella fait-elle l'essai sur https…
   q23 : Carte 10/11 : guide ProRent pret, rallumer sa base de test (eteinte d155) pour …
-  q25 : Carte 11/11 : guide mdjlabs corrige (b47), Mariella refait-elle l'essai gestes …
 ```
 <!-- plantrack:state-end -->
