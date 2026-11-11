@@ -878,7 +878,9 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, on
               }}
             >M&rsquo;emmener au bon endroit</button>
           </div>
-        ) : !trouvee && !ecranBilan && (
+        ) : !trouvee && !gesteOk && !ecranBilan && (
+          // b47 : une zone retirée par le geste lui-même (fermer une boîte) n'est pas
+          // « introuvable » : le geste a réussi, l'alerte serait un faux problème.
           // Invariant 2 : ne JAMAIS laisser croire que la zone encadrée est la bonne quand
           // elle est introuvable — le dire est le minimum honnête.
           <p style={{
