@@ -602,6 +602,11 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, on
     // Pas sur la bonne page (porté de Prolearn, commit 958ecde2) : le geste raterait sa
     // cible. Il partira une fois arrivée (cf. `onAllerAuBonEndroit`).
     if (horsPage) { setCurseurVisible(false); return; }
+    // Rien avant que la progression soit LUE (b48) : au montage elle est vide, donc sur le
+    // point 1 ; armer le curseur là ferait monter, au rendu suivant, un curseur sur le point
+    // REPRIS, dont l'effet (enfant, joué avant celui-ci) rejouerait un geste déjà fait. Un
+    // geste "aller" rechargeait ainsi la page en boucle.
+    if (!charge) { setCurseurVisible(false); return; }
     if (aGestes && !prog.joues?.includes(etape.id)) {
       setCurseurVisible(true);
       setCurseurCle((c) => c + 1);
@@ -609,7 +614,7 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, on
       setCurseurVisible(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- un seul passage par ÉTAPE (et par arrivée sur sa page), cf. commentaire ci-dessus
-  }, [etape.id, horsPage]);
+  }, [etape.id, horsPage, charge]);
 
   // ⚠️ Invariant 4 : Échap ne ferme PAS la visite. Aucun `onKeyDown` ici, volontairement —
   // en ajouter un pour intercepter Échap casserait le test qu'elle sert justement à faire.
