@@ -165,6 +165,10 @@ export function GuideDeTestLazy() {
   }
 
   const aTraiter = etat.filter((g) => estEncoreATraiter(g.statut));
+  // Checker v2 : un guide dont tout le reste est bloqué n'a rien à jouer ; il attend la
+  // session. Distinct de « à reprendre » (il y a de quoi jouer maintenant).
+  const aReprendre = aTraiter.filter((g) => !g.enAttente);
+  const enAttente = aTraiter.filter((g) => g.enAttente);
 
   return (
     <div id="guide-lanceur" style={{ position: "fixed", right: 16, bottom: 16 + menuBas, zIndex: 2147483000 }}>
@@ -202,7 +206,9 @@ export function GuideDeTestLazy() {
                   background: g.statut === "ok" ? COULEURS.okSoft : g.statut === "ko" ? COULEURS.koSoft : "rgba(0,0,0,.25)",
                   color: g.statut === "ok" ? COULEURS.ok : g.statut === "ko" ? COULEURS.ko : COULEURS.doux,
                 }}>
-                  {g.statut === "ok" ? "✓" : g.statut === "ko" ? "⚠️" : `${g.faits}/${g.total}`}
+                  {g.statut === "ok" ? "✓" : g.statut === "ko" ? "⚠️"
+                    : g.enAttente ? "en attente de la session"
+                      : g.faits > 0 ? `${g.faits}/${g.total} · à reprendre` : `${g.faits}/${g.total}`}
                 </span>
               </button>
             ))
@@ -226,8 +232,16 @@ export function GuideDeTestLazy() {
           padding: "2px 6px", borderRadius: 999, background: "rgba(0,0,0,.25)",
           color: COULEURS.doux, fontSize: 11,
         }}>
-          {aTraiter.length}
+          {aReprendre.length}
         </span>
+        {enAttente.length > 0 && (
+          <span id="guide-lanceur-attente" style={{
+            padding: "2px 6px", borderRadius: 999, background: COULEURS.koSoft,
+            color: COULEURS.ko, fontSize: 11,
+          }}>
+            {enAttente.length} en attente de la session
+          </span>
+        )}
       </button>
     </div>
   );

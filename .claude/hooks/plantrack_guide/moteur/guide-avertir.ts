@@ -24,7 +24,7 @@ import { join } from "node:path";
 import type { GuideScenario } from "./types";
 import type { VerdictStocke } from "./guide-etat";
 
-export type RaisonAvis = "point" | "fin" | "arret";
+export type RaisonAvis = "point" | "fin" | "arret" | "bloquant";
 
 /** Une remarque tient sur UNE ligne citée, bornée : rien de ce qu'elle tape ne peut
  *  ouvrir un bloc ou une consigne dans le message lu par l'agent. */
@@ -43,9 +43,16 @@ export function texteAvis(
   stepId?: string,
 ): string {
   const total = scenario.etapes.length;
-  const repondus = scenario.etapes.filter((e) => verdicts[e.id]).length;
+  const repondus = scenario.etapes.filter((e) => verdicts[e.id] && verdicts[e.id].v !== "bloque").length;
   let tete: string;
-  if (raison === "point" && stepId) {
+  if (raison === "bloquant" && stepId) {
+    const n = scenario.etapes.findIndex((e) => e.id === stepId);
+    const e = scenario.etapes[n];
+    const x = verdicts[stepId];
+    tete = `BLOQUANT : ${scenario.id} / ${stepId} (point ${n + 1}/${total} « ${e?.titre ?? stepId} » du guide « ${scenario.titre} »)`
+      + (x?.note ? `. Sa remarque : « ${citer(x.note)} »` : "")
+      + `. Corrige, puis lance \`plantrack checker corrige ${scenario.id} ${stepId}\` : le point redevient à jouer et Mariella ne rejouera que lui.`;
+  } else if (raison === "point" && stepId) {
     const n = scenario.etapes.findIndex((e) => e.id === stepId);
     const e = scenario.etapes[n];
     const x = verdicts[stepId];
@@ -61,7 +68,7 @@ export function texteAvis(
   }
   const lignes = scenario.etapes.map((e, i) => {
     const x = verdicts[e.id];
-    const etat = !x ? "pas encore vu" : x.v === "ok" ? "ok" : "PAS OK";
+    const etat = !x ? "pas encore vu" : x.v === "ok" ? "ok" : x.v === "bloque" ? "BLOQUANT" : "PAS OK";
     const note = x?.note && e.id !== stepId ? `, « ${citer(x.note)} »` : "";
     return `${i + 1}. ${e.titre} : ${etat}${note}`;
   });

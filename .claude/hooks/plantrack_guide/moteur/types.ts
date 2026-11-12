@@ -95,7 +95,9 @@ export type GuideScenario = {
 };
 
 /** Verdict de Mariella sur un point. */
-export type StepVerdict = "ok" | "ko";
+export type StepVerdict = "ok" | "ko" | "bloque";
+/* "bloque" (Checker v2, d241) : le point empêche de continuer. Il compte comme NON répondu
+ * (le guide reste à traiter) jusqu'à ce que la session le corrige et retire son verdict. */
 
 /** Progression persistée (localStorage) — reprise là où elle s'est arrêtée. */
 export type GuideProgress = {

@@ -87,7 +87,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { BORD_CARTE, placerCarte, resolveTarget, type PlaceCarte, type Rect } from "./guide-geometry";
 import {
   accederLocalStorage, avancer, chargerProgression, marquerJoue, noterMotif, oublierProgression,
-  oublierToutesLesProgressions, progressionDepuisServeur, reculer, sauverProgression, serveurPrime,
+  oublierToutesLesProgressions, progressionDepuisServeur, reconcilierAvecServeur, reculer, sauverProgression, serveurPrime,
   verdict, vide,
 } from "./guide-progress";
 import { indexDePoint, SCENARIOS } from "./guides-json";
@@ -361,6 +361,8 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, on
   // Motif d'un "ko" — champ posé APRÈS avoir noté "ko" (cf. `noter` plus bas), jamais avant :
   // le verdict est acquis dès le clic, le motif n'est qu'un détail optionnel qui s'y ajoute.
   const [motifActif, setMotifActif] = useState(false);
+  // Verdict auquel se rattache le champ de note ouvert : "ko" ou "bloque" (Checker v2).
+  const [motifVerdict, setMotifVerdict] = useState<"ko" | "bloque">("ko");
   const [motifSaisie, setMotifSaisie] = useState("");
 
   // Consignation du scénario (`consignerGuide`) — une seule fois par passage à l'état
@@ -381,6 +383,7 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, on
   // Reprise « là où elle s'est arrêtée » — lue APRÈS montage (localStorage n'existe pas
   // au rendu serveur).
   const [charge, setCharge] = useState(false);
+  const premiereLectureRef = useRef(true);
   useEffect(() => {
     // Les IDS, pas le nombre d'étapes : c'est ce qui permet à `chargerProgression` de rouvrir
     // sur le premier point SANS RÉPONSE quand le scénario a gagné des points depuis la
@@ -389,9 +392,17 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, on
     const local = chargerProgression(scenario.id, accederLocalStorage(), etapesIds);
     // Le serveur prime sur ce poste SEULEMENT s'il porte STRICTEMENT plus de verdicts (d138)
     // — ex. un point jugé sur le téléphone de Mariella, jamais rouvert ici.
-    const p = serveurPrime(local, verdictsServeur)
-      ? progressionDepuisServeur(scenario.id, verdictsServeur!, etapesIds)
-      : local;
+    // Checker v2 : à la PREMIÈRE lecture, le serveur fait aussi foi pour les points qu'il a
+    // retirés (point corrigé par la session) : ils redeviennent à jouer, les ok restent acquis.
+    // Aux relectures suivantes (registre rechargé en cours de visite), seule la règle d138
+    // s'applique : un verdict posé à l'instant, pas encore écrit côté serveur, n'est jamais perdu.
+    const premiere = premiereLectureRef.current;
+    premiereLectureRef.current = false;
+    const p = premiere
+      ? reconcilierAvecServeur(local, verdictsServeur, etapesIds)
+      : serveurPrime(local, verdictsServeur)
+        ? progressionDepuisServeur(scenario.id, verdictsServeur!, etapesIds)
+        : local;
     // eslint-disable-next-line react-hooks/set-state-in-effect -- reprise lue dans localStorage/serveur après montage, cf. bandeau de tête
     setProg(p);
     setCharge(true);
@@ -445,6 +456,16 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, on
     // Rien avant que la progression soit LUE : au premier rendu elle est vide, donc
     // « en-cours », et son chargement passerait pour une complétion.
     if (!charge) return;
+    if (bilan.statut === "en-cours" && bilan.enAttente) {
+      // Checker v2 : il ne reste que des points « Bloquant ». Carte de fin « en attente de la
+      // session », mais RIEN n'est consigné : pas de compte-rendu final tant qu'il en reste.
+      consigneRef.current = null;
+      if (motifActif) return;
+      const delaiAttente = vientDeNoterRef.current ? DELAI_COCHE_FIN : 0;
+      vientDeNoterRef.current = false;
+      const ta = setTimeout(() => setEcranBilan(true), delaiAttente);
+      return () => clearTimeout(ta);
+    }
     if (bilan.statut === "en-cours") {
       // Retour à une visite incomplète (elle a cliqué ↻, ou un point a perdu son verdict) :
       // refermer le récapitulatif, et autoriser une prochaine consignation.
@@ -475,7 +496,7 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, on
         .catch(() => setEnvoi("echec"));
     }, delai);
     return () => clearTimeout(t);
-  }, [charge, bilan.statut, scenario.id, motifActif]);
+  }, [charge, bilan.statut, bilan.enAttente, scenario.id, motifActif]);
 
   const renvoyer = () => {
     setEnvoi("envoi");
@@ -647,7 +668,7 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, on
     : { x: window.innerWidth - 220, y: window.innerHeight - 160 };
   const v = prog.verdicts[etape.id];
 
-  const noter = (val: "ok" | "ko") => {
+  const noter = (val: "ok" | "ko" | "bloque") => {
     const p = verdict(prog, etape.id, val);
     // Consigné côté serveur dès le clic (d138 : « chaque verdict appelle consignerPoint ») —
     // jamais bloquant pour l'affichage local, qui reste la source immédiate de vérité pour
@@ -657,7 +678,10 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, on
     // seul message, avec sa remarque, plutôt que deux (d172).
     pointRef.current = consignerPoint(scenario.id, etape.id, val, undefined, val === "ok");
     vientDeNoterRef.current = true;
-    if (val === "ko") {
+    if (val === "ko" || val === "bloque") {
+      // "bloque" (Checker v2) : même champ de note facultatif ; l'avis immédiat à la session
+      // part à la confirmation (`confirmerMotif`), une seule fois, avec la note.
+      setMotifVerdict(val);
       // Le "ko" est acquis tout de suite (`maj`), mais n'avance PAS encore : le petit champ
       // de motif (#guide-motif) s'ouvre, et c'est sa confirmation (`confirmerMotif`) qui fait
       // avancer — même séquence qu'avant pour "ok", juste différée d'un geste pour "ko".
@@ -679,7 +703,7 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, on
     const p = texte ? noterMotif(prog, etape.id, texte) : prog;
     // Reconsigne avec le motif, s'il y en a un — `consignerPoint` remplace simplement
     // l'entrée posée par `noter("ko")` ci-dessus (jamais deux verdicts qui coexistent).
-    pointRef.current = consignerPoint(scenario.id, etape.id, "ko", texte || undefined);
+    pointRef.current = consignerPoint(scenario.id, etape.id, motifVerdict, texte || undefined);
     vientDeNoterRef.current = true;
     setMotifActif(false);
     setMotifSaisie("");
@@ -788,7 +812,7 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, on
                   key={e.id}
                   style={{
                     flex: 1, height: 4, borderRadius: 2,
-                    background: prog.verdicts[e.id] ? C.vert : i === prog.index ? C.cyan : C.bord,
+                    background: prog.verdicts[e.id] === "bloque" ? C.orange : prog.verdicts[e.id] ? C.vert : i === prog.index ? C.cyan : C.bord,
                   }}
                 />
               ))}
@@ -952,7 +976,36 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, on
           </>
         )}
 
-        {ecranBilan ? (
+        {ecranBilan && bilan.enAttente ? (
+          // Checker v2 (d241) : il ne reste que des points bloqués. Pas de compte-rendu final
+          // (rien n'est consigné) : la session corrige, puis Mariella ne rejouera que ces points.
+          <div>
+            <p id="guide-attente-titre" style={{
+              margin: "0 0 9px", padding: "7px 9px", borderRadius: 6,
+              background: C.koSoft, color: C.ko, fontWeight: 500,
+            }}>
+              {bilan.bloques.length === 1
+                ? "1 point attend la correction de la session ; tu le rejoueras ensuite."
+                : `${bilan.bloques.length} points attendent la correction de la session ; tu les rejoueras ensuite.`}
+            </p>
+            <ul style={{ margin: "0 0 10px", paddingLeft: 16, color: C.doux }}>
+              {bilan.bloques.map((k) => (
+                <li key={k.id} style={{ marginBottom: 4 }}>{k.titre}</li>
+              ))}
+            </ul>
+            <p style={{ margin: "0 0 8px", color: C.doux, fontSize: 11.5 }}>
+              Ta session a été prévenue point par point. Rouvre ce guide quand elle a corrigé.
+            </p>
+            <div style={{ display: "flex", gap: 6 }}>
+              <button onClick={() => setEcranBilan(false)} style={{ ...btn, color: C.doux }}>
+                Revoir les points
+              </button>
+              <button id="guide-fermer-attente" onClick={onFermer} style={{ ...btn, flex: 1 }}>
+                Fermer
+              </button>
+            </div>
+          </div>
+        ) : ecranBilan ? (
           // Écran de clôture — décision Mariella 2026-07-25 : répondre à tous les points
           // VAUT sa validation, elle n'a pas à la redonner à la main. Ce bilan reste un
           // CONFORT DE LECTURE affiché à l'écran : le texte COPIÉ ci-dessous, lui, ne porte
@@ -1074,6 +1127,17 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, on
                 }}
               >Non, pas ça</button>
             </div>
+            {/* Checker v2 (d241) : « Bloquant » = je ne peux pas continuer ici. La session est
+                prévenue tout de suite, le guide passe au point suivant. */}
+            <button
+              id="guide-bloquant"
+              onClick={() => noter("bloque")}
+              style={{
+                width: "100%", height: 44, marginTop: 8, borderRadius: 10,
+                border: `2px solid ${C.ko}`, background: "transparent", color: C.ko,
+                font: "600 14px/1 var(--font-sans, var(--sans, system-ui, sans-serif))", cursor: "pointer",
+              }}
+            >Bloquant</button>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 6 }}>
               <button
                 onClick={() => maj(reculer(prog))}
@@ -1100,7 +1164,7 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, on
               type="text"
               value={motifSaisie}
               onChange={(e) => setMotifSaisie(e.target.value)}
-              placeholder="Motif de l'écart (facultatif)"
+              placeholder={motifVerdict === "bloque" ? "Ce qui bloque (facultatif)" : "Motif de l'écart (facultatif)"}
               style={{
                 flex: 1, padding: "6px 8px", borderRadius: 6,
                 border: `1px solid ${C.bord}`, background: "transparent", color: C.texte,
@@ -1117,7 +1181,7 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, on
 
         {v && !ecranBilan && (
           <p style={{ margin: "8px 0 0", fontSize: 11.5, color: v === "ok" ? C.ok : C.ko }}>
-            {v === "ok" ? "✓ noté comme conforme" : "✗ noté comme à revoir"}
+            {v === "ok" ? "✓ noté comme conforme" : v === "bloque" ? "⛔ noté comme bloquant, ta session corrige" : "✗ noté comme à revoir"}
           </p>
         )}
 

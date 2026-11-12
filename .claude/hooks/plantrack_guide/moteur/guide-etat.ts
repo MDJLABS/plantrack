@@ -19,6 +19,7 @@
  * ============================================================================== */
 
 import type { GuideScenario, StepVerdict } from "./types";
+import { estRepondu } from "./guide-verdict";
 
 export type StatutGuide = "a_traiter" | "en_cours" | "ok" | "ko";
 
@@ -49,7 +50,7 @@ export function dejaConsigne(scenario: GuideScenario, etat: EtatScenarioStocke |
   const fini = etat.fini;
   return scenario.etapes.every((e) => {
     const x = etat.verdicts[e.id];
-    return !!x && x.a <= fini;
+    return !!x && estRepondu(x.v) && x.a <= fini;
   });
 }
 
@@ -69,7 +70,7 @@ export function calculerStatut(scenario: GuideScenario, etat: EtatScenarioStocke
   const total = scenario.etapes.length;
   if (total === 0) return "a_traiter";
 
-  const repondus = scenario.etapes.filter((e) => Object.prototype.hasOwnProperty.call(etat.verdicts, e.id)).length;
+  const repondus = nbRepondus(scenario, etat);
   if (repondus === 0) return "a_traiter";
   if (repondus < total || !etat.fini) return "en_cours";
 
@@ -90,5 +91,20 @@ export function estEncoreATraiter(statut: StatutGuide): boolean {
  *  rien, le scénario repart de zéro. */
 export function faitsPour(scenario: GuideScenario, etat: EtatScenarioStocke | undefined): number {
   if (!correspondALaLivraison(scenario, etat)) return 0;
-  return scenario.etapes.filter((e) => Object.prototype.hasOwnProperty.call(etat.verdicts, e.id)).length;
+  return nbRepondus(scenario, etat);
+}
+
+/** Points avec un verdict ok ou ko : un point "bloque" n'est PAS répondu (d241). */
+function nbRepondus(scenario: GuideScenario, etat: EtatScenarioStocke): number {
+  return scenario.etapes.filter((e) =>
+    Object.prototype.hasOwnProperty.call(etat.verdicts, e.id) && estRepondu(etat.verdicts[e.id]?.v),
+  ).length;
+}
+
+/** Nombre de points "bloque" de la livraison courante (attendent la correction de la session). */
+export function bloquesPour(scenario: GuideScenario, etat: EtatScenarioStocke | undefined): number {
+  if (!correspondALaLivraison(scenario, etat)) return 0;
+  return scenario.etapes.filter((e) =>
+    Object.prototype.hasOwnProperty.call(etat.verdicts, e.id) && etat.verdicts[e.id]?.v === "bloque",
+  ).length;
 }

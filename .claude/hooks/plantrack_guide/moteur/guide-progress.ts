@@ -42,6 +42,7 @@
 
 import type { GuideProgress, StepVerdict } from "./types";
 import type { VerdictStocke } from "./guide-etat";
+import { estRepondu } from "./guide-verdict";
 
 /** Interface minimale d'un stockage — injectable pour les tests. `removeItem` depuis le
  *  05/08 (« un guide validé s'efface », ci-dessous) : sans lui, une progression terminée ne
@@ -235,8 +236,8 @@ function premierSansReponseOuIndex(
   etapesIds: readonly string[], verdicts: Record<string, StepVerdict>, index: number,
 ): number {
   const idCourant: string | undefined = etapesIds[index];
-  const premierSansReponse = etapesIds.findIndex((id) => !verdicts[id]);
-  return idCourant && verdicts[idCourant] && premierSansReponse !== -1 ? premierSansReponse : index;
+  const premierSansReponse = etapesIds.findIndex((id) => !estRepondu(verdicts[id]));
+  return idCourant && estRepondu(verdicts[idCourant]) && premierSansReponse !== -1 ? premierSansReponse : index;
 }
 
 /* ------------------------------------------------------------------------------------------
@@ -323,4 +324,37 @@ export function progressionDepuisServeur(
   }
   const index = premierSansReponseOuIndex(etapesIds, verdicts, 0);
   return { scenarioId, index, verdicts, motifs, joues: [] };
+}
+
+/**
+ * Ouverture d'une visite (Checker v2, d241) : met la progression locale d'accord avec le
+ * registre serveur. Le serveur fait foi pour les points qu'il a RETIRÉS : quand la session
+ * corrige un point (`plantrack checker corrige`), son verdict disparaît du registre ; ici le
+ * verdict local du même point est écarté (avec son motif, et son geste redevient à jouer),
+ * et la reprise tombe sur le premier point sans réponse, donc sur lui. Les points déjà ok
+ * restent acquis. Sans registre serveur (`undefined`), la progression locale est gardée.
+ */
+export function reconcilierAvecServeur(
+  local: GuideProgress,
+  verdictsServeur: Record<string, VerdictStocke> | undefined,
+  etapesIds: readonly string[],
+): GuideProgress {
+  if (!verdictsServeur) return local;
+  if (serveurPrime(local, verdictsServeur)) return progressionDepuisServeur(local.scenarioId, verdictsServeur, etapesIds);
+
+  const retires = etapesIds.filter(
+    (id) => Object.prototype.hasOwnProperty.call(local.verdicts, id)
+      && !Object.prototype.hasOwnProperty.call(verdictsServeur, id),
+  );
+  if (retires.length === 0) return local;
+
+  const verdicts = { ...local.verdicts };
+  const motifs = { ...(local.motifs ?? {}) };
+  for (const id of retires) {
+    delete verdicts[id];
+    delete motifs[id];
+  }
+  const joues = (local.joues ?? []).filter((id) => !retires.includes(id));
+  const premier = etapesIds.findIndex((id) => !estRepondu(verdicts[id]));
+  return { scenarioId: local.scenarioId, index: premier >= 0 ? premier : local.index, verdicts, motifs, joues };
 }

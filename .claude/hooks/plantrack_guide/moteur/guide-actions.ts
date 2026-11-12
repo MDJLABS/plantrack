@@ -25,8 +25,8 @@
 import { access, appendFile, readFile, rename, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import type { GuideScenario, ResultatGuide, StepVerdict } from "./types";
-import { calculerStatut, dejaConsigne, faitsPour, type EtatScenarioStocke, type EtatStocke, type VerdictStocke } from "./guide-etat";
-import { verdictScenario } from "./guide-verdict";
+import { bloquesPour, calculerStatut, dejaConsigne, faitsPour, type EtatScenarioStocke, type EtatStocke, type VerdictStocke } from "./guide-etat";
+import { estRepondu, verdictScenario } from "./guide-verdict";
 import { getScenario, SCENARIOS } from "./guides-json.ts";
 import { reglagesGuideServeur } from "../guide-reglages-serveur.ts";
 import { avertirSession, texteAvis } from "./guide-avertir";
@@ -66,6 +66,10 @@ export type EtatGuideItem = {
   total: number;
   faits: number;
   statut: ReturnType<typeof calculerStatut>;
+  /** Points "Bloquant" qui attendent la correction de la session (Checker v2). */
+  bloques: number;
+  /** `true` si tout ce qui reste à jouer est bloqué : le guide attend la session. */
+  enAttente: boolean;
   verdicts: Record<string, VerdictStocke>;
 };
 
@@ -163,6 +167,8 @@ export async function etatGuides(): Promise<EtatGuides | null> {
   return Object.values(SCENARIOS).map((scenario) => {
     const entree = etatComplet[scenario.id];
     const correspond = !!entree && entree.date === scenario.date;
+    const bloques = bloquesPour(scenario, entree);
+    const faits = faitsPour(scenario, entree);
     return {
       id: scenario.id,
       titre: scenario.titre,
@@ -170,8 +176,10 @@ export async function etatGuides(): Promise<EtatGuides | null> {
       url: scenario.url,
       date: scenario.date,
       total: scenario.etapes.length,
-      faits: faitsPour(scenario, entree),
+      faits,
       statut: calculerStatut(scenario, entree),
+      bloques,
+      enAttente: bloques > 0 && faits + bloques === scenario.etapes.length,
       verdicts: correspond ? entree.verdicts : {},
     };
   });
@@ -196,7 +204,7 @@ export async function consignerPoint(
   if (!scenario) return { error: "scénario inconnu" };
   const etape = scenario.etapes.find((e) => e.id === stepId);
   if (!etape) return { error: "étape inconnue" };
-  if (v !== "ok" && v !== "ko") return { error: "verdict invalide" };
+  if (v !== "ok" && v !== "ko" && v !== "bloque") return { error: "verdict invalide" };
 
   const racine = await racineDuDepot();
   if (!racine) return { error: "dossier .planning introuvable" };
@@ -227,8 +235,9 @@ export async function consignerPoint(
   // d172 : un « pas ok » ou une remarque part TOUT DE SUITE à la session — un point raté
   // peut bloquer la suite de l'essai. Le clic « ko » lui-même passe `avertir = false` : c'est
   // la confirmation de son motif (`confirmerMotif`, GuideDeTest.tsx) qui avertit, une fois.
-  if (avertir && (v === "ko" || propre)) {
-    await avertirSession(racine, texteAvis(scenario, suivant.verdicts, "point", stepId));
+  // Checker v2 : un point « Bloquant » avertit toujours, avec la consigne de correction.
+  if (avertir && (v === "ko" || v === "bloque" || propre)) {
+    await avertirSession(racine, texteAvis(scenario, suivant.verdicts, v === "bloque" ? "bloquant" : "point", stepId));
   }
   return { error: null };
 }
@@ -247,8 +256,10 @@ export async function guideInterrompu(scenarioId: string): Promise<{ error: stri
 
   const entree = (await lireEtat(racine))[scenarioId];
   if (!entree || entree.date !== scenario.date || entree.fini) return { error: null };
-  const repondus = scenario.etapes.filter((e) => entree.verdicts[e.id]).length;
+  const repondus = scenario.etapes.filter((e) => estRepondu(entree.verdicts[e.id]?.v)).length;
   if (repondus === 0 || repondus === scenario.etapes.length) return { error: null };
+  // Tout ce qui reste est bloqué : la session a déjà été avertie point par point (Checker v2).
+  if (repondus + bloquesPour(scenario, entree) === scenario.etapes.length) return { error: null };
 
   await avertirSession(racine, texteAvis(scenario, entree.verdicts, "arret"));
   return { error: null };
@@ -294,7 +305,7 @@ async function consignerGuideSeul(scenarioId: string): Promise<Consignation> {
   if (correspond) {
     for (const e of scenario.etapes) {
       const v = entree!.verdicts[e.id];
-      if (v) verdicts[e.id] = v.v;
+      if (v && estRepondu(v.v)) verdicts[e.id] = v.v;
     }
   }
 

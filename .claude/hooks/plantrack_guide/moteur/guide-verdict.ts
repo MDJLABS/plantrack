@@ -11,6 +11,12 @@
 
 import type { StepVerdict } from "./types";
 
+/** Un point est « répondu » s'il porte un verdict ok ou ko. Un point "bloque" attend la
+ *  correction de la session : il compte comme NON répondu (Checker v2, d241). */
+export function estRepondu(v: StepVerdict | undefined | null): boolean {
+  return v === "ok" || v === "ko";
+}
+
 /** Repère minimal d'une étape, pour nommer les points concernés. */
 type Etape = { id: string; titre: string };
 
@@ -25,8 +31,13 @@ export type ScenarioVerdict = {
   total: number;
   /** Points en écart, dans l'ordre du scénario (connus même si la visite est inachevée). */
   ko: Etape[];
-  /** Points encore sans réponse. */
+  /** Points encore sans réponse (les points bloqués y sont compris). */
   manquants: Etape[];
+  /** Points marqués « Bloquant » : en attente de la correction de la session. */
+  bloques: Etape[];
+  /** `true` si le guide n'a plus rien à jouer maintenant : il reste des points, tous
+   *  bloqués (carte de fin « N points attendent la correction de la session »). */
+  enAttente: boolean;
 };
 
 /**
@@ -41,12 +52,15 @@ export function verdictScenario(
   etapes: Etape[], verdicts: Record<string, StepVerdict | undefined>,
 ): ScenarioVerdict {
   const ko = etapes.filter((e) => verdicts[e.id] === "ko").map(({ id, titre }) => ({ id, titre }));
-  const manquants = etapes.filter((e) => !verdicts[e.id]).map(({ id, titre }) => ({ id, titre }));
+  const manquants = etapes.filter((e) => !estRepondu(verdicts[e.id])).map(({ id, titre }) => ({ id, titre }));
+  const bloques = etapes.filter((e) => verdicts[e.id] === "bloque").map(({ id, titre }) => ({ id, titre }));
   const repondus = etapes.length - manquants.length;
 
   const statut = manquants.length || !etapes.length
     ? "en-cours"
     : ko.length ? "a-revoir" : "valide";
 
-  return { statut, repondus, total: etapes.length, ko, manquants };
+  const enAttente = bloques.length > 0 && bloques.length === manquants.length;
+
+  return { statut, repondus, total: etapes.length, ko, manquants, bloques, enAttente };
 }

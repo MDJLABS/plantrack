@@ -35,6 +35,7 @@ type Etape = { id: string; titre: string };
 const LIBELLE: Record<StepVerdict | "manquant", string> = {
   ok: "conforme",
   ko: "écart",
+  bloque: "bloquant, attend la correction de la session",
   manquant: "sans réponse",
 };
 
@@ -50,7 +51,7 @@ export function construireCompteRendu(
 ): string {
   const lignes = etapes.map((e) => {
     const v = verdicts[e.id];
-    const motif = v === "ko" ? motifs[e.id] : undefined;
+    const motif = v === "ko" || v === "bloque" ? motifs[e.id] : undefined;
     return `- ${e.titre} : ${v ? LIBELLE[v] : LIBELLE.manquant}${motif ? ` (${motif})` : ""}`;
   });
   return [`Guide de test : ${scenarioId}`, "", ...lignes].join("\n");
