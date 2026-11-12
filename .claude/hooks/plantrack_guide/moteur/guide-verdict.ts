@@ -40,6 +40,13 @@ export type ScenarioVerdict = {
   enAttente: boolean;
 };
 
+/** Définition UNIQUE de « en attente de la session » : il reste des points bloqués et rien
+ *  d'autre à jouer (répondus + bloqués = total). Partagée par `verdictScenario` (client) et
+ *  `etatGuides` (serveur). */
+export function enAttenteDeSession(faits: number, bloques: number, total: number): boolean {
+  return bloques > 0 && faits + bloques === total;
+}
+
 /**
  * Déduit le verdict d'une visite de ses points.
  *
@@ -60,7 +67,7 @@ export function verdictScenario(
     ? "en-cours"
     : ko.length ? "a-revoir" : "valide";
 
-  const enAttente = bloques.length > 0 && bloques.length === manquants.length;
+  const enAttente = enAttenteDeSession(repondus, bloques.length, etapes.length);
 
   return { statut, repondus, total: etapes.length, ko, manquants, bloques, enAttente };
 }

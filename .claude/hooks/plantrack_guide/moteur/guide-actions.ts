@@ -26,7 +26,7 @@ import { access, appendFile, readFile, rename, writeFile } from "node:fs/promise
 import { dirname, join, resolve } from "node:path";
 import type { GuideScenario, ResultatGuide, StepVerdict } from "./types";
 import { bloquesPour, calculerStatut, dejaConsigne, faitsPour, type EtatScenarioStocke, type EtatStocke, type VerdictStocke } from "./guide-etat";
-import { estRepondu, verdictScenario } from "./guide-verdict";
+import { enAttenteDeSession, estRepondu, verdictScenario } from "./guide-verdict";
 import { getScenario, SCENARIOS } from "./guides-json.ts";
 import { reglagesGuideServeur } from "../guide-reglages-serveur.ts";
 import { avertirSession, texteAvis } from "./guide-avertir";
@@ -179,7 +179,7 @@ export async function etatGuides(): Promise<EtatGuides | null> {
       faits,
       statut: calculerStatut(scenario, entree),
       bloques,
-      enAttente: bloques > 0 && faits + bloques === scenario.etapes.length,
+      enAttente: enAttenteDeSession(faits, bloques, scenario.etapes.length),
       verdicts: correspond ? entree.verdicts : {},
     };
   });
