@@ -1074,6 +1074,7 @@ CLI humaine : plantrack status | bugs | inbox | verify <id> | reject <id> -m ...
               plantrack answer <question_id> <texte>   toi seule, hors session
               plantrack testcheck on|off | guide <titre>|<id> | step <id> <texte> | check <id> ok|ko [-m motif]
               plantrack guide-lien <id> --url <page> [--poste <base>] [--scenario <id>]   lien de guide web a jeton unique (b24/d100) — poste seulement ; agent : node <bcc>/hook/guide-lien.ts (b25)
+              plantrack checker [installer|aide|verifier [id]|corrige <scenario> <point>|etat]   guides de test (un fichier .json par guide)
               plantrack guide-resultat   recoit sur stdin le verdict d'un guide web (jeton), appele par la route bcc
               plantrack init  installation vendoree (tous agents, + hooks git post-commit et pre-commit d'office)
               uvx plantrack@latest update   mise a jour d'une installation existante
@@ -3034,7 +3035,7 @@ def cmd_init(args):
     # 4. blocs d'instructions : le bloc complet dans AGENTS.md (standard
     # cross-agents, source unique), une ligne d'import @AGENTS.md dans
     # CLAUDE.md et GEMINI.md — chaque agent, present ou futur, le trouve
-    write_md_block("AGENTS.md", MD_BLOCK)
+    write_md_block("AGENTS.md", md_block())
     write_state_block(project(), quiet=False)
     for name in ("CLAUDE.md", "GEMINI.md"):
         write_md_block(name, REF_BLOCK)
@@ -3064,6 +3065,7 @@ def cmd_init(args):
         with open(INJECTIONS, "w", encoding="utf-8") as f:
             json.dump({"_depuis": now(), "_guide": "a_poser"}, f, indent=1, sort_keys=True)
     sync_guide()
+    write_md_block("AGENTS.md", md_block(), quiet=True)  # la ligne Checker suit la pose du guide
     register_root()
     install_post_commit_hook()
     install_git_hook()  # d'office : doctor le compte en panne, chaque nouveau depot sortait en defaut
@@ -3129,61 +3131,200 @@ def base_guide_next():
     return None
 
 
-def poser_guide(src):
-    """d151 : un projet equipe pour la premiere fois recoit le guide de test des qu'il est un
-    site Next — tout de suite a l'init, ou a une mise a jour plus tard si Next arrive apres."""
+def guide_src():
+    """Dossier source du moteur. PLANTRACK_GUIDE_SRC ne sert qu'aux tests."""
+    return (os.environ.get("PLANTRACK_GUIDE_SRC")
+            or os.path.join(os.path.dirname(os.path.abspath(__file__)), "plantrack_guide"))
+
+
+def guide_dans_depot(d):
+    """Jamais d'ecriture a travers un lien qui sortirait du depot (le chemin peut ne pas exister encore)."""
+    if os.path.islink(d):
+        return False
+    p = os.path.abspath(d)
+    while not os.path.lexists(p) and os.path.dirname(p) != p:
+        p = os.path.dirname(p)
+    return (os.path.realpath(p) + os.sep).startswith(os.path.realpath(ROOT) + os.sep)
+
+
+def guide_est_raccourci(contenu):
+    """Un raccourci tient en une ligne `export * from "...";` (eventuels commentaires en tete)."""
+    lignes = [l.strip() for l in contenu.decode("utf-8", "replace").splitlines()
+              if l.strip() and not l.strip().startswith(("/*", "*", "//"))]
+    return len(lignes) == 1 and lignes[0].startswith("export * from ")
+
+
+def guide_sauvegarder(d, contenu, publies):
+    """Copie une version inconnue (ni publiee ni raccourci) dans backup/code/<chemin> avant de la remplacer."""
+    if hashlib.sha256(contenu).hexdigest() in publies or guide_est_raccourci(contenu):
+        return None
+    rel = os.path.relpath(d, ROOT)
+    cible = os.path.join(ROOT, "backup", "code", rel)
+    if os.path.exists(cible) and open(cible, "rb").read() != contenu:
+        cible += "." + datetime.now().strftime("%Y%m%d%H%M%S")
+    os.makedirs(os.path.dirname(cible), exist_ok=True)
+    with open(cible, "wb") as f:
+        f.write(contenu)
+    return rel
+
+
+def guide_publies():
     try:
-        etat = json.load(open(INJECTIONS, encoding="utf-8"))
-    except (OSError, ValueError):
-        return
-    if etat.get("_guide") != "a_poser":
-        return
-    base = base_guide_next()
-    if base is None:
-        return
-    racine = os.path.realpath(ROOT) + os.sep
+        from pt_publies import GUIDE_PUBLIES
+        return GUIDE_PUBLIES
+    except ImportError:
+        return set()
 
-    def dans_depot(d):  # jamais d'ecriture a travers un lien qui sortirait du depot
-        return not os.path.islink(d) and os.path.realpath(d).startswith(racine)
 
-    for dirpath, _, files in os.walk(src):
+def guide_fichiers_source(src):
+    """(source, chemin relatif a la base) : moteur/ vers lib/guide/moteur/, raccourcis/ aux anciens chemins."""
+    out = []
+    for sous, prefixe in (("moteur", os.path.join("lib", "guide", "moteur")), ("raccourcis", "")):
+        racine = os.path.join(src, sous)
+        for dirpath, _, files in os.walk(racine):
+            for name in files:
+                s = os.path.join(dirpath, name)
+                out.append((s, os.path.join(prefixe, os.path.relpath(s, racine))))
+    return out
+
+
+def guide_ecrire_si_change(d, contenu):
+    """Ecrit d seulement si le contenu change ; True si ecrit."""
+    if os.path.isfile(d) and open(d, "rb").read() == contenu:
+        return False
+    os.makedirs(os.path.dirname(d), exist_ok=True)
+    tmp = d + ".tmp-pt"
+    with open(tmp, "wb") as f:
+        f.write(contenu)
+    os.replace(tmp, d)
+    return True
+
+
+GUIDE_INDEX_ENTETE = ("/* Fichier genere par PlanTrack (plantrack checker), ne pas editer : "
+                      "il est reecrit a chaque mise a jour. */\n")
+
+
+def guide_generer_index(base):
+    """Regenere <base>/lib/guide/guides/index.ts : importe chaque .json du dossier, exporte GUIDES_JSON."""
+    dossier = os.path.join(ROOT, base, "lib", "guide", "guides")
+    index = os.path.join(dossier, "index.ts")
+    if not guide_dans_depot(dossier):
+        return False
+    ids = sorted(f[:-5] for f in os.listdir(dossier) if f.endswith(".json")) if os.path.isdir(dossier) else []
+    ids = [i for i in ids if re.fullmatch(r"[a-z0-9-]+", i)]
+    lignes = [GUIDE_INDEX_ENTETE]
+    for n, i in enumerate(ids):
+        lignes.append(f'import g{n} from "./{i}.json";\n')
+    if ids:
+        lignes.append("\nexport const GUIDES_JSON: Record<string, unknown> = {\n")
+        lignes += [f'  "{i}": g{n},\n' for n, i in enumerate(ids)]
+        lignes.append("};\n")
+    else:
+        lignes.append("\nexport const GUIDES_JSON: Record<string, unknown> = {};\n")
+    if not guide_dans_depot(index):
+        return False
+    return guide_ecrire_si_change(index, "".join(lignes).encode("utf-8"))
+
+
+def guide_copier_moteur(src, base):
+    """Section 1 de la spec Checker v2 : moteur/ et raccourcis toujours remplaces (une copie
+    inconnue est d'abord sauvegardee), ancien guide-actions.ts sauvegarde puis supprime, fichiers du
+    site jamais ecrases. Rend le nombre de fichiers changes."""
+    publies = guide_publies()
+    changes = 0
+    for s, rel in guide_fichiers_source(src):
+        d = os.path.join(ROOT, base, rel)
+        if not guide_dans_depot(d):
+            print(f"guide de test : {os.path.relpath(d, ROOT)} ignore (lien hors du depot).")
+            continue
+        neuf = open(s, "rb").read()
+        if os.path.isfile(d):
+            ancien = open(d, "rb").read()
+            if ancien == neuf:
+                continue
+            sauve = guide_sauvegarder(d, ancien, publies)
+            if sauve:
+                print(f"guide de test : {sauve} etait modifie, copie dans backup/code puis remplace.")
+        guide_ecrire_si_change(d, neuf)
+        changes += 1
+    # l'ancien fichier "use server" n'a plus de raccourci : il est sauvegarde si inconnu, puis supprime
+    ancien = os.path.join(ROOT, base, "lib", "guide", "guide-actions.ts")
+    if os.path.isfile(ancien) and not os.path.islink(ancien) and guide_dans_depot(ancien):
+        sauve = guide_sauvegarder(ancien, open(ancien, "rb").read(), publies)
+        if sauve:
+            print(f"guide de test : {sauve} etait modifie, copie dans backup/code puis supprime.")
+        os.remove(ancien)
+        changes += 1
+    return changes
+
+
+def guide_poser_fichiers_site(src, base):
+    """Fichiers propres au site : poses seulement s'ils manquent (gabarits de plantrack_guide/site/,
+    sinon ceux de GUIDE_SITE). guides/index.ts est genere a part. Rend la liste des fichiers crees."""
+    modeles = dict(GUIDE_SITE)
+    racine = os.path.join(src, "site")
+    for dirpath, _, files in os.walk(racine):
         for name in files:
             s = os.path.join(dirpath, name)
-            d = os.path.join(ROOT, base, os.path.relpath(s, src))
-            os.makedirs(os.path.dirname(d), exist_ok=True)
-            if dans_depot(d):
-                shutil.copy(s, d)
-    for rel, texte in GUIDE_SITE.items():
-        d = os.path.join(ROOT, base, rel)
-        if os.path.lexists(d) or not dans_depot(d):
+            rel = os.path.join("lib", "guide", os.path.relpath(s, racine))
+            modeles[rel.replace(os.sep, "/")] = open(s, encoding="utf-8").read()
+    crees = []
+    for rel, texte in modeles.items():
+        if rel.endswith("guides/index.ts"):
             continue
+        d = os.path.join(ROOT, base, rel)
+        if os.path.lexists(d) or not guide_dans_depot(d):
+            continue
+        os.makedirs(os.path.dirname(d), exist_ok=True)
         fd = os.open(d, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o644)
         with os.fdopen(fd, "w", encoding="utf-8") as f:
             f.write(texte)
-    etat["_guide"] = "pose"
-    with open(INJECTIONS, "w", encoding="utf-8") as f:
-        json.dump(etat, f, indent=1, sort_keys=True)
+        crees.append(rel)
+    return crees
+
+
+def poser_guide(src, force=False):
+    """d151 : un projet equipe pour la premiere fois recoit le guide de test des qu'il est un
+    site Next : tout de suite a l'init, ou a une mise a jour plus tard si Next arrive apres.
+    `force` (plantrack checker installer) pose le guide meme sans la marque `_guide: a_poser`."""
+    try:
+        etat = json.load(open(INJECTIONS, encoding="utf-8"))
+    except (OSError, ValueError):
+        etat = {} if force else None
+    if etat is None or (not force and etat.get("_guide") != "a_poser"):
+        return None
+    base = base_guide_next()
+    if base is None:
+        return None
+    guide_copier_moteur(src, base)
+    guide_poser_fichiers_site(src, base)
+    guide_generer_index(base)
+    if etat.get("_guide") != "pose":
+        etat["_guide"] = "pose"
+        os.makedirs(PT_DIR, exist_ok=True)
+        with open(INJECTIONS, "w", encoding="utf-8") as f:
+            json.dump(etat, f, indent=1, sort_keys=True)
     ou = os.path.join(base, "lib", "guide") if base else os.path.join("lib", "guide")
     print(f"guide de test pose dans {ou} — reste a le monter dans le layout "
           "(<GuideDeTestLazy />) et a brancher estAdmin (guide-reglages-serveur.ts).")
+    return base
+
+
+def guide_bases_existantes():
+    return [b for b in GUIDE_BASES if os.path.exists(os.path.join(ROOT, b, "lib", "guide", "types.ts"))]
 
 
 def sync_guide():
     """Le moteur du guide de test (Next.js) vit ici, en un seul exemplaire (d34) : un site
-    qui l'a deja (lib/guide/types.ts, a la racine ou sous src/, app/, apps/web[/src]) recoit la derniere version. Ses scenarios.ts restent a lui.
-    Un depot sans guide n'est pas touche. Un site qui a son propre guide (un fichier du moteur
-    qui n'est aucune version publiee par PlanTrack) n'est pas touche non plus (b24)."""
-    src = os.path.join(os.path.dirname(os.path.abspath(__file__)), "plantrack_guide")
+    qui l'a deja (lib/guide/types.ts, a la racine ou sous src/, app/, apps/web[/src]) recoit la derniere
+    version. Checker v2 (d241) : moteur/ et raccourcis sont TOUJOURS remplaces (une copie inconnue est
+    sauvegardee dans backup/code avant), les fichiers du site (scenarios.ts, reglages, guides/*.json)
+    ne sont jamais ecrases, guides/index.ts est regenere. Un depot sans guide n'est pas touche."""
+    src = guide_src()
     if not os.path.isdir(src):
         return  # copie vendoree : le moteur ne voyage qu'avec le paquet ou le depot plantrack
-    try:
-        from pt_publies import GUIDE_PUBLIES
-    except ImportError:
-        GUIDE_PUBLIES = set()
     # b31 : les sites rangent leur code sous app/ (prolearn, openstyle) ou dans un monorepo
-    # (projob : apps/web, mizzzen : apps/web/src) — chercher seulement a la racine et sous
-    # src/ laissait ces quatre sites hors de toute mise a jour du moteur.
-    bases = [b for b in GUIDE_BASES if os.path.exists(os.path.join(ROOT, b, "lib", "guide", "types.ts"))]
+    bases = guide_bases_existantes()
     if not bases:
         poser_guide(src)
     for base in bases:
@@ -3193,37 +3334,320 @@ def sync_guide():
             print("guide de test : ancien guide (avant le moteur commun), laisse tel quel — "
                   "portage a faire (guide-reglages-serveur.ts absent).")
             continue
-        propres = []
-        for dirpath, _, files in os.walk(src):
-            for name in files:
-                s = os.path.join(dirpath, name)
-                d = os.path.join(ROOT, base, os.path.relpath(s, src))
-                if os.path.isfile(d) and not os.path.islink(d):
-                    contenu = open(d, "rb").read()
-                    if (contenu != open(s, "rb").read()
-                            and hashlib.sha256(contenu).hexdigest() not in GUIDE_PUBLIES):
-                        propres.append(os.path.relpath(d, ROOT))
-        if propres:
-            print(f"guide de test : le site a son propre guide ({', '.join(propres[:3])}"
-                  f"{'…' if len(propres) > 3 else ''}), laisse tel quel.")
-            continue
-        changes = 0
-        for dirpath, _, files in os.walk(src):
-            for name in files:
-                s = os.path.join(dirpath, name)
-                d = os.path.join(ROOT, base, os.path.relpath(s, src))
-                # jamais d'ecriture a travers un lien symbolique qui sortirait du depot
-                if os.path.islink(d) or not os.path.realpath(d).startswith(
-                        os.path.realpath(ROOT) + os.sep):
-                    print(f"guide de test : {os.path.relpath(d, ROOT)} ignore (lien hors du depot).")
-                    continue
-                if os.path.exists(d) and open(d, "rb").read() == open(s, "rb").read():
-                    continue
-                os.makedirs(os.path.dirname(d), exist_ok=True)
-                shutil.copy(s, d)
-                changes += 1
+        changes = guide_copier_moteur(src, base)
+        if guide_generer_index(base):
+            changes += 1
         print(f"guide de test : {changes} fichier(s) du moteur mis a jour." if changes
               else "guide de test deja a jour.")
+
+
+# ---------------------------------------------------------------- Checker (d241)
+
+CHECKER_LIGNE = ("- Checker : écrire un guide de test = un fichier `lib/guide/guides/<id>.json`, puis "
+                 "`./plantrack checker verifier` ; format : `./plantrack checker aide`. Un point BLOQUANT reçu : "
+                 "corrige, puis `./plantrack checker corrige <scenario> <point>`. "
+                 "Ne jamais modifier `lib/guide/moteur/`.\n")
+
+
+def md_block():
+    """Bloc de regles de AGENTS.md ; la ligne Checker n'est ajoutee que dans un depot qui a un guide."""
+    regles = RULES + (CHECKER_LIGNE if guide_bases_existantes() else "")
+    return MD_START + "\n## PlanTrack\n" + regles + MD_END + "\n"
+
+
+CHECKER_AIDE = """Checker : un guide de test = un fichier lib/guide/guides/<id>.json (l'id est le nom du fichier : a-z, 0-9, tiret).
+{
+  "titre": "Reserver une soiree", "page": "/soirees", "version": "2026-11-12",
+  "points": [
+    { "id": "ouvrir", "titre": "Ouvrir la fiche", "faire": "Touche la premiere soiree.",
+      "attendu": "La fiche de la soiree s'ouvre.", "cible": "#soiree-1", "clic": "#soiree-1" },
+    { "id": "email", "titre": "Saisir l'e-mail", "faire": "Le guide ecrit ton e-mail.",
+      "attendu": "Le champ affiche l'e-mail.", "cible": "#email",
+      "gestes": [ { "saisir": "#email", "valeur": "essai@exemple.fr" }, { "clic": "#envoyer" } ] },
+    { "id": "page2", "titre": "Aller au compte", "faire": "...", "attendu": "...", "aller": "/compte" }
+  ]
+}
+Obligatoires : titre, page, points ; par point : faire et attendu. Facultatifs : id (sinon p1, p2...), cible (texte
+ou liste), url, version (defaut "1" : la changer remet le guide a zero), gestes (liste, "aller" en dernier) ou le
+raccourci clic / saisir + valeur / aller. Les cibles sont des #id presents dans le code du site.
+Commandes : plantrack checker verifier [id] | corrige <scenario> <point> | etat | installer | aide"""
+
+
+def checker_base():
+    """Dossier `lib/guide` du site : celui qui a deja le guide, sinon celui que vise l'alias @/ d'un site Next."""
+    bases = guide_bases_existantes()
+    return bases[0] if bases else base_guide_next()
+
+
+def checker_dossier_guides(base):
+    return os.path.join(ROOT, base, "lib", "guide", "guides")
+
+
+def checker_monter_layout(base):
+    """Monte <GuideDeTestLazy /> dans le layout racine, sans doublon. Rend un message."""
+    candidats = [os.path.join(base, "app", f"layout.{e}") for e in ("tsx", "jsx", "js")]
+    candidats += [os.path.join(base, "src", "app", f"layout.{e}") for e in ("tsx", "jsx", "js")]
+    chemin = next((c for c in candidats if os.path.isfile(os.path.join(ROOT, c))), None)
+    ou = os.path.join(base, "app", "layout.tsx")
+    if chemin is None:
+        return (f"layout racine introuvable : ajoute a la main dans {ou} "
+                '`import { GuideDeTestLazy } from "@/components/guide/GuideDeTestLazy";` '
+                "puis `<GuideDeTestLazy />` juste avant </body>.")
+    complet = os.path.join(ROOT, chemin)
+    if not guide_dans_depot(complet):
+        return f"{chemin} est un lien hors du depot : monte <GuideDeTestLazy /> a la main."
+    texte = open(complet, encoding="utf-8").read()
+    if "GuideDeTestLazy" in texte:
+        return f"{chemin} : le guide est deja monte."
+    m = re.search(r"^([ \t]*)</body>", texte, re.M)
+    if not m:
+        return (f"pas de </body> dans {chemin} : ajoute a la main "
+                '`import { GuideDeTestLazy } from "@/components/guide/GuideDeTestLazy";` '
+                "et `<GuideDeTestLazy />` a la fin du corps de la page.")
+    retrait = m.group(1) + "  "
+    texte = texte[:m.start()] + f"{retrait}<GuideDeTestLazy />\n" + texte[m.start():]
+    fin = 0
+    for im in re.finditer(r"^import\b[^;]*?(?:from\s+)?[\"'][^\"']+[\"'];?[ \t]*$", texte, re.M):
+        fin = max(fin, im.end())
+    ligne = 'import { GuideDeTestLazy } from "@/components/guide/GuideDeTestLazy";'
+    if fin:
+        texte = texte[:fin] + "\n" + ligne + texte[fin:]
+    else:
+        texte = ligne + "\n" + texte
+    tmp = complet + ".tmp-pt"
+    with open(tmp, "w", encoding="utf-8") as f:
+        f.write(texte)
+    os.replace(tmp, complet)
+    return f"{chemin} : guide monte (import + <GuideDeTestLazy /> avant </body>)."
+
+
+def checker_installer():
+    src = guide_src()
+    if not os.path.isdir(src):
+        sys.exit("[PlanTrack] le moteur du guide n'est pas dans cette copie de PlanTrack : "
+                 "lance `uvx plantrack@latest update` puis reessaie.")
+    base = checker_base()
+    if base is None:
+        sys.exit("[PlanTrack] pas de site Next ici (package.json avec next et alias \"@/*\" dans tsconfig.json) : "
+                 "le guide ne peut pas etre pose.")
+    existe = os.path.exists(os.path.join(ROOT, base, "lib", "guide", "types.ts"))
+    if existe and not os.path.exists(os.path.join(ROOT, base, "lib", "guide", "guide-reglages-serveur.ts")):
+        sys.exit("[PlanTrack] ancien guide (avant le moteur commun) : portage a faire a la main "
+                 "(guide-reglages-serveur.ts absent), je n'y touche pas.")
+    n = guide_copier_moteur(src, base)
+    crees = guide_poser_fichiers_site(src, base)
+    guide_generer_index(base)
+    os.makedirs(checker_dossier_guides(base), exist_ok=True)
+    print(f"Checker : moteur a jour dans {os.path.join(base, 'lib', 'guide')} ({n} fichier(s) change(s)).")
+    if crees:
+        print("fichiers du site crees : " + ", ".join(crees))
+    print(checker_monter_layout(base))
+    write_md_block("AGENTS.md", md_block(), quiet=True)
+    tsconfig = os.path.join(ROOT, "tsconfig.json")
+    if os.path.exists(tsconfig) and "resolveJsonModule" not in open(tsconfig, encoding="utf-8").read():
+        print("a verifier : tsconfig.json doit avoir \"resolveJsonModule\": true pour lire les guides .json.")
+    print("Reste a faire :\n"
+          "  - brancher estAdmin dans lib/guide/guide-reglages-serveur.ts (tant qu'il rend false, le guide reste ferme) ;\n"
+          "  - poser GUIDE_ACTIF=1 sur le site de test.\n")
+    print(CHECKER_AIDE)
+
+
+def checker_ids_du_code():
+    """Tous les id="..." / id='...' / id={"..."} du code du site, hors node_modules, .next et les guides."""
+    trouves = set()
+    motif = re.compile(r"""\bid=(?:"([^"]+)"|'([^']+)'|\{\s*["'`]([^"'`]+)["'`]\s*\})""")
+    exclus = {"node_modules", ".next", ".git", "backup", "dist", "build", ".turbo", "sortie", ".open-next"}
+    for dirpath, dirs, files in os.walk(ROOT):
+        dirs[:] = [d for d in dirs if d not in exclus and not os.path.islink(os.path.join(dirpath, d))]
+        for name in files:
+            if not name.endswith((".tsx", ".jsx", ".ts", ".js", ".html", ".mdx", ".vue", ".svelte")):
+                continue
+            try:
+                texte = open(os.path.join(dirpath, name), encoding="utf-8", errors="replace").read()
+            except OSError:
+                continue
+            for g in motif.findall(texte):
+                trouves.update(x for x in g if x)
+    return trouves
+
+
+def checker_selecteurs(point):
+    """Tous les selecteurs #id cites par un point (cible, clic, saisir, gestes)."""
+    bruts = []
+    cible = point.get("cible")
+    bruts += cible if isinstance(cible, list) else [cible]
+    bruts += [point.get("clic"), point.get("saisir")]
+    for g in point.get("gestes") or []:
+        if isinstance(g, dict):
+            bruts += [g.get("clic"), g.get("saisir")]
+    out = []
+    for b in bruts:
+        if isinstance(b, str):
+            out += re.findall(r"#([A-Za-z_][\w-]*)", b)
+    return out
+
+
+def checker_valider(gid, chemin, ids_code):
+    """(erreurs, avertissements) d'un fichier de guide."""
+    erreurs, avis = [], []
+    if not re.fullmatch(r"[a-z0-9-]+", gid):
+        erreurs.append("le nom du fichier doit etre en a-z, 0-9 et tirets")
+    try:
+        g = json.load(open(chemin, encoding="utf-8"))
+    except (OSError, ValueError) as e:
+        return [f"JSON illisible : {e}"], avis
+    if not isinstance(g, dict):
+        return ["le fichier doit contenir un objet { titre, page, points }"], avis
+    for champ in ("titre", "page"):
+        if not isinstance(g.get(champ), str) or not g[champ].strip():
+            erreurs.append(f"champ « {champ} » manquant")
+    pts = g.get("points")
+    if not isinstance(pts, list) or not pts:
+        erreurs.append("« points » doit etre une liste non vide")
+        return erreurs, avis
+    vus = set()
+    for n, p in enumerate(pts, 1):
+        if not isinstance(p, dict):
+            erreurs.append(f"point {n} : doit etre un objet")
+            continue
+        pid = p.get("id") or f"p{n}"
+        if pid in vus:
+            erreurs.append(f"point {n} : id « {pid} » en double")
+        vus.add(pid)
+        for champ in ("faire", "attendu"):
+            if not isinstance(p.get(champ), str) or not p[champ].strip():
+                erreurs.append(f"point {pid} : champ « {champ} » manquant")
+        gestes = p.get("gestes")
+        if gestes is not None and (not isinstance(gestes, list) or any(not isinstance(x, dict) for x in gestes)):
+            erreurs.append(f"point {pid} : « gestes » doit etre une liste d'objets")
+        for s in dict.fromkeys(checker_selecteurs(p)):
+            if s not in ids_code:
+                avis.append(f"point {pid} : #{s} introuvable dans le code du site (id=\"{s}\")")
+    return erreurs, avis
+
+
+def checker_verifier(args):
+    base = checker_base()
+    if base is None:
+        sys.exit("[PlanTrack] pas de guide ici : lance `plantrack checker installer`.")
+    dossier = checker_dossier_guides(base)
+    fichiers = sorted(f for f in os.listdir(dossier) if f.endswith(".json")) if os.path.isdir(dossier) else []
+    if args:
+        gid = args[0]
+        if gid + ".json" not in fichiers:
+            sys.exit(f"[PlanTrack] guide « {gid} » introuvable (attendu : {os.path.join(base, 'lib', 'guide', 'guides', gid + '.json')}).")
+        fichiers = [gid + ".json"]
+    if not fichiers:
+        print("aucun guide a verifier (dossier lib/guide/guides vide).")
+    ids_code = checker_ids_du_code()
+    nb_err = 0
+    for f in fichiers:
+        gid = f[:-5]
+        erreurs, avis = checker_valider(gid, os.path.join(dossier, f), ids_code)
+        if erreurs:
+            nb_err += len(erreurs)
+            print(f"ERREUR {gid} :")
+            print("\n".join("  - " + e for e in erreurs))
+        for a in avis:
+            print(f"avertissement {gid} : {a}")
+        if not erreurs and not avis:
+            print(f"ok {gid}")
+        elif not erreurs:
+            print(f"ok {gid} (avec avertissements)")
+    if guide_generer_index(base):
+        print("guides/index.ts regenere.")
+    if nb_err:
+        sys.exit(f"[PlanTrack] {nb_err} erreur(s) a corriger.")
+
+
+def checker_lire_etat():
+    chemin = os.path.join(ROOT, ".planning", "guides-etat.json")
+    try:
+        etat = json.load(open(chemin, encoding="utf-8"))
+    except OSError:
+        return chemin, {}
+    except ValueError:
+        sys.exit(f"[PlanTrack] {os.path.relpath(chemin, ROOT)} est illisible, je n'y touche pas.")
+    return chemin, etat if isinstance(etat, dict) else {}
+
+
+def checker_corrige(args):
+    if len(args) < 2:
+        sys.exit("usage : plantrack checker corrige <scenario> <point>")
+    scen, point = args[0], args[1]
+    chemin, etat = checker_lire_etat()
+    entree = etat.get(scen)
+    verdicts = entree.get("verdicts") if isinstance(entree, dict) else None
+    if not isinstance(verdicts, dict):
+        sys.exit(f"[PlanTrack] aucun verdict enregistre pour le guide « {scen} » : rien a remettre a jouer.")
+    if point not in verdicts:
+        sys.exit(f"[PlanTrack] le point « {point} » n'a pas de verdict dans « {scen} » "
+                 f"(points avec verdict : {', '.join(verdicts) or 'aucun'}).")
+    ancien = verdicts.pop(point)
+    tmp = chemin + ".tmp-pt"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(etat, f, indent=2, ensure_ascii=False)
+        f.write("\n")
+    os.replace(tmp, chemin)
+    v = ancien.get("v", "?") if isinstance(ancien, dict) else "?"
+    print(f"Point « {point} » du guide « {scen} » remis a jouer (il etait : {v}). "
+          "Les autres points restent acquis : le testeur ne rejouera que lui.")
+
+
+def checker_etat():
+    base = checker_base()
+    if base is None:
+        sys.exit("[PlanTrack] pas de guide ici : lance `plantrack checker installer`.")
+    dossier = checker_dossier_guides(base)
+    fichiers = sorted(f for f in os.listdir(dossier) if f.endswith(".json")) if os.path.isdir(dossier) else []
+    _, etat = checker_lire_etat()
+    if not fichiers:
+        print("aucun guide .json (dossier lib/guide/guides).")
+    for f in fichiers:
+        gid = f[:-5]
+        try:
+            g = json.load(open(os.path.join(dossier, f), encoding="utf-8"))
+            pts = [(p.get("id") or f"p{n}") for n, p in enumerate(g["points"], 1)]
+            version = str(g.get("version") or "1")
+        except (OSError, ValueError, KeyError, TypeError, AttributeError):
+            print(f"{gid} : fichier invalide (lance `plantrack checker verifier {gid}`)")
+            continue
+        e = etat.get(gid) if isinstance(etat.get(gid), dict) else None
+        if not e:
+            print(f"{gid} : {len(pts)} point(s), pas encore joue")
+            continue
+        if str(e.get("date")) != version:
+            print(f"{gid} : version changee depuis le dernier passage, tout est a rejouer")
+            continue
+        vd = e.get("verdicts") or {}
+        ok = [p for p in pts if (vd.get(p) or {}).get("v") == "ok"]
+        bloques = [p for p in pts if (vd.get(p) or {}).get("v") == "bloque"]
+        ko = [p for p in pts if (vd.get(p) or {}).get("v") == "ko"]
+        rejouer = [p for p in pts if p not in vd]
+        morceaux = [f"{len(ok)}/{len(pts)} ok"]
+        if bloques:
+            morceaux.append("bloques : " + ", ".join(bloques))
+        if ko:
+            morceaux.append("ko : " + ", ".join(ko))
+        if rejouer:
+            morceaux.append("a rejouer : " + ", ".join(rejouer))
+        print(f"{gid} : " + " ; ".join(morceaux))
+
+
+def cmd_checker(args):
+    sub = args[0] if args else "installer"
+    if sub == "installer":
+        checker_installer()
+    elif sub == "aide":
+        print(CHECKER_AIDE)
+    elif sub == "verifier":
+        checker_verifier(args[1:])
+    elif sub == "corrige":
+        checker_corrige(args[1:])
+    elif sub == "etat":
+        checker_etat()
+    else:
+        sys.exit("usage : plantrack checker [installer|aide|verifier [id]|corrige <scenario> <point>|etat]")
 
 
 def cmd_update(args):
@@ -4603,6 +5027,8 @@ def cli(argv):
         print(cmd_guide_lien(args[0], args[1:], st))
     elif cmd == "guide-resultat":
         cmd_guide_resultat(st)
+    elif cmd == "checker":
+        cmd_checker(args)
     elif cmd == "attempt":
         cmd_attempt(args, st)
     elif cmd == "attempts":
