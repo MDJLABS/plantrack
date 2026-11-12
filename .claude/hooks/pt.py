@@ -1099,11 +1099,14 @@ def souffle_conf(racine):
     return os.path.join(racine, ".plantrack", "souffle.conf")
 
 
+# nom d'unite valide, sans option deguisee (partage : souffle.conf et demandes de reveil)
+nom_ok = re.compile(r"[A-Za-z0-9][A-Za-z0-9@_.:-]*\.(service|target|socket)").fullmatch
+
+
 def souffle(racine):
     """Lit souffle.conf : (reveil, garde). Une ligne = un service ; 'garde X' empeche
     l'expiration sans etre reveille. Pas de fichier = ([], []) : le projet ne respire pas."""
     reveil, garde = [], []
-    nom_ok = re.compile(r"[A-Za-z0-9][A-Za-z0-9@_.:-]*\.(service|target|socket)").fullmatch  # pas d'option deguisee
     try:
         with open(souffle_conf(racine), encoding="utf-8") as f:
             for l in f:
@@ -1145,6 +1148,12 @@ def battre(racine):
             pass
         os.utime(bat)
         if vieux and reveil:
+            # portier : un service deja actif ne se reveille pas
+            reveil = [s for s in reveil if systemctl(["is-active", "--", s]) != "active"]
+            if not reveil:
+                return False
+            if orch_portier(racine, reveil):
+                return False
             systemctl(["start", "--no-block", "--"] + reveil, detache=True)
             return True
     except Exception as e:
@@ -1189,14 +1198,28 @@ def commande_en_cours(racine):
     return False
 
 
-def vivant(racine, maintenant):
-    """Battement recent, ou commande Bash de session en cours (4.3)."""
+def vivant(racine, maintenant, delai=None):
+    """Battement recent (moins de delai, SOUFFLE_DELAI par defaut), ou commande Bash de
+    session en cours (4.3)."""
     try:
-        if maintenant - os.path.getmtime(os.path.join(racine, ".plantrack", "battement")) < SOUFFLE_DELAI:
+        if maintenant - os.path.getmtime(os.path.join(racine, ".plantrack", "battement")) < (delai or SOUFFLE_DELAI):
             return True
     except OSError:
         pass
     return commande_en_cours(racine)
+
+
+def souffle_etat(racine, maintenant):
+    """(reveil, garde, actifs, age) d'un projet qui respire : services de souffle.conf, ceux
+    qui sont actifs, et l'age de son battement en s (-1 si absent). Commun a la ronde
+    d'expiration et au menage d'urgence de l'orchestre."""
+    reveil, garde = souffle(racine)
+    actifs = [s for s in reveil + garde if systemctl(["is-active", "--", s]) == "active"]
+    try:
+        age = int(maintenant - os.path.getmtime(os.path.join(racine, ".plantrack", "battement")))
+    except OSError:
+        age = -1
+    return reveil, garde, actifs, age
 
 
 def cmd_respirer(args):
@@ -1206,12 +1229,7 @@ def cmd_respirer(args):
         if not os.path.exists(souffle_conf(racine)):
             continue
         try:
-            reveil, garde = souffle(racine)
-            actifs = [s for s in reveil + garde if systemctl(["is-active", "--", s]) == "active"]
-            try:
-                age = int(maintenant - os.path.getmtime(os.path.join(racine, ".plantrack", "battement")))
-            except OSError:
-                age = -1
+            reveil, garde, actifs, age = souffle_etat(racine, maintenant)
             if "--etat" in args:
                 print(f"{racine} : {'vivant' if vivant(racine, maintenant) else 'endormi'}, "
                       f"battement {age if age >= 0 else 'absent'}s, actifs : {' '.join(actifs) or 'aucun'}")
@@ -1256,6 +1274,18 @@ ORCH_ORANGE_PSI = float(os.environ.get("ORCH_ORANGE_PSI") or 10)      # PSI memo
 ORCH_ALERTE_DELAI = 600  # rouge depuis 10 min malgre les pauses : une bulle
 ORCH_ALERTE = os.environ.get("ORCH_ALERTE") or "node /home/mariella/bcc/hook/repondre.ts --ton probleme"
 ORCH_JAMAIS = {"systemd", "sshd", "cloudflared", "dockerd", "containerd", "earlyoom"}
+# Portier des reveils, menage d'urgence, apprentissage (d237, panne du 12/11 22h : deux piles
+# supabase de 1,5 a 2 Go reveillees par la respiration sans que l'orchestre soit consulte)
+ORCH_COUT_DEFAUT = float(os.environ.get("ORCH_COUT_DEFAUT") or 1.5 * 2**30)  # octets d'un reveil inconnu
+ORCH_COUT_PLANCHER = 200 * 2**20
+ORCH_APPRENDRE = 180         # delai avant de mesurer le cout reel d'un reveil
+ORCH_DEMANDE_AGE = 7200      # une demande de reveil plus vieille est oubliee
+ORCH_URGENCE_CALME = int(os.environ.get("ORCH_URGENCE_CALME") or 600)  # sans battement depuis : pile endormable
+ORCH_ECRANS = re.compile(r"studio|pg_meta|-meta-?1?$|supabase-meta|analytics|vector|imgproxy")
+ORCH_NOM_DOCKER = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]*")
+ORCH_ORANGE_PLAFOND = 20.0
+ORCH_INSTANTANE = 60         # periode des instantanes de memoire
+ORCH_FENETRE_CAUSES = 600    # les causes se cherchent sur les 10 dernieres minutes
 RANGS = ("humain", "agent", "fond")
 # relais bcc d'un message ou d'un appel de Mariella : c'est elle qui parle
 ORCH_RELAIS_HUMAIN = re.compile(r"Mariella (t'a ecrit|a repondu)|\[appel \d+")
@@ -1406,7 +1436,7 @@ def orch_niveau(m):
     if (m["dispo"] < ORCH_ROUGE_DISPO or m.get("psi_memory_full_60", 0) > ORCH_ROUGE_PSI
             or m.get("psi_memory_full", 0) > ORCH_ROUGE_PSI_PIC):
         return "rouge"
-    if m["dispo"] < ORCH_ORANGE_DISPO or m.get("psi_memory_some_60", 0) > ORCH_ORANGE_PSI:
+    if m["dispo"] < orch_orange() or m.get("psi_memory_some_60", 0) > ORCH_ORANGE_PSI:
         return "orange"
     return "vert"
 
@@ -1443,6 +1473,18 @@ def orch_geler(pid, enfants):
     shell-snapshots, comme commande_en_cours). Jamais la session elle-meme ni ses hooks,
     jamais un processus systeme de ORCH_JAMAIS. Rend les pids geles."""
     geles = []
+    for p in orch_gelables(pid, enfants):
+        try:
+            os.kill(p, signal.SIGSTOP)
+            geles.append(p)
+        except OSError:
+            pass
+    return geles
+
+
+def orch_gelables(pid, enfants):
+    """Les pids que orch_geler gelerait, sans rien geler (pour ne pas pauser a vide)."""
+    geles = []
     for d in orch_descendants(pid, enfants):
         try:
             with open(f"/proc/{d}/cmdline", "rb") as f:
@@ -1454,11 +1496,7 @@ def orch_geler(pid, enfants):
             st = orch_stat(p)
             if p in geles or not st or st[0] in ORCH_JAMAIS:
                 continue
-            try:
-                os.kill(p, signal.SIGSTOP)
-                geles.append(p)
-            except OSError:
-                pass
+            geles.append(p)
     return geles
 
 
@@ -1739,16 +1777,23 @@ def orch_sante(etat, maintenant, parts):
                      "conteneurs concernés.")
 
 
-def orch_conteneur(unite):
-    """Nom lisible du conteneur d'un groupe docker-<id>.scope (repli : debut de l'id)."""
-    ident = unite[len("docker-"):-len(".scope")]
+def docker(args):
+    """Seul point d'appel a docker, surchargeable par ORCH_DOCKER (tests). Rend stdout."""
+    cmd = shlex.split(os.environ.get("ORCH_DOCKER") or "docker") + list(args)
+    return subprocess.run(cmd, capture_output=True, text=True, timeout=30).stdout.strip()
+
+
+def orch_nom_docker(ident):
     try:
-        nom = subprocess.run(shlex.split(os.environ.get("ORCH_DOCKER") or "docker")
-                             + ["inspect", "-f", "{{.Name}}", ident],
-                             capture_output=True, text=True, timeout=10).stdout.strip().lstrip("/")
+        nom = docker(["inspect", "-f", "{{.Name}}", ident]).lstrip("/")
     except (OSError, subprocess.SubprocessError):
         nom = ""
     return orch_masquer(nom or ident[:12])
+
+
+def orch_conteneur(unite):
+    """Nom lisible du conteneur d'un groupe docker-<id>.scope (repli : debut de l'id)."""
+    return orch_nom_docker(unite[len("docker-"):-len(".scope")])
 
 
 def orch_lever_frein(t, unite, motif):
@@ -1759,6 +1804,327 @@ def orch_lever_frein(t, unite, motif):
         return
     t.pop("frein", None)
     orch_journal(f"frein {unite} leve — {motif}")
+
+
+def orch_dossier_ouvert(nom):
+    """ORCH_DIR/<nom>, en 1777 comme le dossier des sessions (b41) : chaque compte y depose
+    ses fichiers, seul leur proprietaire ou root peut les retirer."""
+    dossier = os.path.join(ORCH_DIR, nom)
+    os.makedirs(dossier, exist_ok=True)
+    try:
+        os.chmod(dossier, 0o1777)
+    except OSError:
+        pass
+    return dossier
+
+
+def orch_orange():
+    """Seuil orange de memoire disponible (%) en vigueur : la variable d'environnement si
+    posee, sinon la valeur apprise (reglages.json), jamais sous la valeur de base."""
+    if os.environ.get("ORCH_ORANGE_DISPO"):
+        return ORCH_ORANGE_DISPO
+    try:
+        return max(ORCH_ORANGE_DISPO, min(ORCH_ORANGE_PLAFOND,
+                   float((orch_lire(os.path.join(ORCH_DIR, "reglages.json"), {}) or {})["orange_dispo"])))
+    except (KeyError, TypeError, ValueError):
+        return ORCH_ORANGE_DISPO
+
+
+def orch_cout(service, couts):
+    """Memoire (octets) qu'un reveil de ce service prend d'habitude : appris, sinon defaut."""
+    try:
+        v = float((couts or {}).get(service))
+        return v if v > 0 else ORCH_COUT_DEFAUT
+    except (TypeError, ValueError):
+        return ORCH_COUT_DEFAUT
+
+
+def orch_portier(racine, reveil):
+    """Appele par battre() avant de reveiller des services. True = reveil DIFFERE : feu pas
+    vert, ou pas assez de marge pour le cout appris. Une demande est deposee, c'est
+    l'orchestre qui reveillera au retour du calme. Orchestre muet = False (fail-open)."""
+    e = orch_etat_frais()
+    if e is None:
+        return False
+    m = e.get("mesure", {})
+    couts = orch_lire(os.path.join(ORCH_DIR, "couts.json"), {})
+    cout = sum(orch_cout(s, couts) for s in reveil)
+    reserve = (m.get("total") or 1) * orch_orange() / 100
+    maintenant = time.time()
+    if e.get("feu") == "vert" and m.get("dispo_o", 0) - cout >= reserve:
+        try:   # trace du reveil accorde : l'orchestre en mesure le cout reel
+            dossier = orch_dossier_ouvert("reveils")
+            for s in reveil:
+                orch_ecrire(os.path.join(dossier, s + ".json"), {"ts": maintenant, "avant": m.get("dispo_o", 0)})
+        except OSError:
+            pass
+        return False
+    projet = os.path.basename(os.path.realpath(racine))
+    rangs = [f.get("rang") for f in (e.get("sessions") or {}).values() if f.get("projet") == projet]
+    rang = min(rangs, key=lambda r: RANGS.index(r) if r in RANGS else 1) if rangs else "agent"
+    try:
+        dossier = orch_dossier_ouvert("demandes")
+        journalise = False
+        for s in reveil:
+            chemin = os.path.join(dossier, s + ".json")
+            deja = orch_lire(chemin)
+            if isinstance(deja, dict) and maintenant - float(deja.get("ts", 0)) < ORCH_DEMANDE_AGE:
+                continue   # deja demande : on garde la plus ancienne
+            try:
+                with open(os.path.join(ORCH_DIR, "journal.log"), "a", encoding="utf-8") as f:
+                    f.write(f"{datetime.now().isoformat(timespec='seconds')} reveil differe {s} "
+                            f"({projet}) : memoire basse\n")
+                journalise = True
+            except OSError:
+                journalise = False
+            orch_ecrire(chemin, {"service": s, "projet": projet, "racine": racine, "ts": maintenant,
+                                 "rang": rang, "journalise": journalise})
+    except (OSError, ValueError):
+        return False   # impossible de deposer la demande : on reveille comme avant
+    return True
+
+
+def orch_ramasser_reveils(etat):
+    """Traces deposees par le portier pour un reveil accorde : l'orchestre en mesurera le cout."""
+    dossier = os.path.join(ORCH_DIR, "reveils")
+    suivis = etat.setdefault("reveils", {})
+    for nom in (os.listdir(dossier) if os.path.isdir(dossier) else []):
+        chemin = os.path.join(dossier, nom)
+        d = orch_lire(chemin)
+        try:
+            os.remove(chemin)
+        except OSError:
+            pass
+        if not isinstance(d, dict) or not nom.endswith(".json") or not nom_ok(nom[:-5]):
+            continue
+        try:
+            suivis.setdefault(nom[:-5], {"ts": float(d["ts"]), "avant": float(d["avant"])})
+        except (KeyError, TypeError, ValueError):
+            pass
+        etat.setdefault("recents", {})[nom[:-5]] = float(d.get("ts") or 0)
+
+
+def orch_demandes(etat, maintenant, m, feu):
+    """Sert les demandes de reveil deposees par les sessions (non fiables : le nom est
+    revalide). Au plus une par tour, si le feu est vert et la marge suffit."""
+    dossier = os.path.join(ORCH_DIR, "demandes")
+    if not os.path.isdir(dossier):
+        return
+    couts = orch_lire(os.path.join(ORCH_DIR, "couts.json"), {})
+    reserve = (m.get("total") or 1) * orch_orange() / 100
+    attente, vus = [], etat.setdefault("demandes_vues", {})
+    for nom in os.listdir(dossier):
+        chemin = os.path.join(dossier, nom)
+        d = orch_lire(chemin)
+        try:
+            ok = isinstance(d, dict) and nom.endswith(".json") and nom_ok(str(d.get("service"))) \
+                and nom == d["service"] + ".json" and maintenant - float(d["ts"]) <= ORCH_DEMANDE_AGE
+        except (KeyError, TypeError, ValueError):
+            ok = False
+        if not ok:
+            try:
+                os.remove(chemin)
+            except OSError:
+                pass
+            continue
+        d["projet"] = re.sub(r"[^\w.-]", "", str(d.get("projet")))[:60]
+        attente.append((chemin, d))
+    for s in [s for s in vus if not any(d["service"] == s for _, d in attente)]:
+        del vus[s]
+    for chemin, d in attente:
+        if d["service"] not in vus:
+            vus[d["service"]] = maintenant
+            if not d.get("journalise"):
+                orch_journal(f"reveil differe {d['service']} ({d['projet']}) : memoire basse")
+    if feu != "vert":
+        return
+    attente.sort(key=lambda cd: (RANGS.index(cd[1]["rang"]) if cd[1].get("rang") in RANGS else 1,
+                                 float(cd[1]["ts"])))
+    for chemin, d in attente:
+        s = d["service"]
+        if systemctl(["is-active", "--", s]) == "active":
+            os.remove(chemin)
+            continue
+        if m.get("dispo_o", 0) - orch_cout(s, couts) < reserve:
+            continue
+        systemctl(["start", "--no-block", "--", s], detache=True)
+        os.remove(chemin)
+        etat.setdefault("reveils", {})[s] = {"ts": maintenant, "avant": m.get("dispo_o", 0)}
+        etat.setdefault("recents", {})[s] = maintenant
+        orch_journal(f"reveil accorde {s} ({d['projet']}) apres {int(maintenant - float(d['ts']))} s")
+        return
+
+
+def orch_apprendre(etat, maintenant, m):
+    """Cout reel d'un reveil : 180 s apres, memoire perdue depuis le reveil. Moyenne
+    glissante dans couts.json (premiere mesure brute, plancher 200 Mio)."""
+    suivis = etat.get("reveils") or {}
+    for s in [s for s, r in suivis.items() if maintenant - r.get("ts", maintenant) >= ORCH_APPRENDRE]:
+        r = suivis.pop(s)
+        chemin = os.path.join(ORCH_DIR, "couts.json")
+        couts = orch_lire(chemin, {}) or {}
+        neuf = max(ORCH_COUT_PLANCHER, max(0, r.get("avant", 0) - m.get("dispo_o", 0)))
+        ancien = couts.get(s)
+        couts[s] = int(0.5 * ancien + 0.5 * neuf) if isinstance(ancien, (int, float)) and ancien > 0 else int(neuf)
+        orch_ecrire(chemin, couts)
+        orch_journal(f"cout appris {s} : {couts[s] // 2**20} Mo")
+    for s in [s for s, t in (etat.get("recents") or {}).items() if maintenant - t > 1800]:
+        del etat["recents"][s]
+
+
+def orch_geste(etat, texte):
+    """Un geste de l'orchestre : consigne dans l'episode de surcharge en cours."""
+    ep = etat.get("episode")
+    if ep is not None:
+        ep.setdefault("gestes", []).append(texte)
+
+
+def orch_urgence(etat, maintenant):
+    """Menage d'urgence (feu orange ou rouge) : UN geste, dans l'ordre, le premier qui
+    trouve quelque chose. (a) un ecran d'admin de base docker (arrete, jamais supprime) ;
+    (b) la pile de services d'un projet sans session depuis ORCH_URGENCE_CALME. Rend True
+    si un geste a eu lieu."""
+    try:
+        noms = docker(["ps", "--format", "{{.Names}}"]).splitlines()
+    except (OSError, subprocess.SubprocessError) as e:
+        trace("orchestre : urgence docker", e)
+        noms = []
+    for nom in (n.strip().lstrip("/") for n in noms):
+        if ORCH_NOM_DOCKER.fullmatch(nom) and ORCH_ECRANS.search(nom):
+            docker(["stop", nom])
+            orch_journal(f"menage d'urgence : ecran d'admin {nom} eteint (docker start {nom} pour le rallumer)")
+            orch_geste(etat, f"ecran {nom} eteint")
+            return True
+    infos = {}
+    for racine in registered_roots():
+        if not os.path.exists(souffle_conf(racine)):
+            continue
+        try:
+            reveil, garde, actifs, age = souffle_etat(racine, maintenant)
+            infos[racine] = (reveil, garde, actifs, age, vivant(racine, maintenant, ORCH_URGENCE_CALME))
+        except Exception as e:
+            trace(f"orchestre : urgence {racine}", e)
+    proteges = {g for (_, garde, _, _, vif) in infos.values() if vif for g in garde}
+    for racine, (reveil, garde, actifs, age, vif) in infos.items():
+        if vif or any(g in actifs for g in garde):
+            continue
+        arret = [s for s in reveil if s in actifs and s not in proteges]
+        if not arret:
+            continue
+        for s in arret:
+            systemctl(["stop", "--", s])
+            projet = os.path.basename(racine)
+            minutes = f"{age // 60} min" if age >= 0 else "longtemps"
+            orch_journal(f"menage d'urgence : {s} eteint ({projet}, aucune session depuis {minutes} ; "
+                         "il se rallume tout seul au prochain travail)")
+            orch_geste(etat, f"pile {s} eteinte ({projet})")
+        return True
+    return False
+
+
+def orch_instantane(etat, maintenant, sessions, force=False):
+    """Instantane leger de la memoire (par projet de session, conteneur docker, service
+    reveille recemment), une fois par minute, borne a la fenetre des causes. True si pris."""
+    inst = etat.setdefault("instantanes", [])
+    if inst and not force and maintenant - inst[-1]["ts"] < ORCH_INSTANTANE:
+        return False
+    cles = {}
+    for f in sessions.values():
+        k = "session " + str(f.get("projet"))
+        cles[k] = cles.get(k, 0) + f.get("poids", 0)
+
+    def lire(unite):
+        try:
+            with open(os.path.join(ORCH_CGROUP, unite, "memory.current")) as fh:
+                return int(fh.read().strip())
+        except (OSError, ValueError):
+            return None
+    try:
+        unites = [u for u in os.listdir(ORCH_CGROUP) if u.startswith("docker-") and u.endswith(".scope")]
+    except OSError:
+        unites = []
+    for u in unites:
+        v = lire(u)
+        if v is not None:
+            cles["docker " + u[len("docker-"):-len(".scope")][:12]] = v
+    for s in (etat.get("recents") or {}):
+        v = lire(s)
+        if v is not None:
+            cles["service " + s] = v
+    inst.append({"ts": maintenant, "cles": cles})
+    etat["instantanes"] = [i for i in inst if maintenant - i["ts"] <= ORCH_FENETRE_CAUSES + ORCH_INSTANTANE]
+    return True
+
+
+def orch_hausses(etat):
+    """Les 3 plus fortes hausses de memoire sur la fenetre : [[nom, octets], ...]."""
+    inst = etat.get("instantanes") or []
+    if not inst:
+        return []
+    base, fin = (inst[0]["cles"] if len(inst) > 1 else {}), inst[-1]["cles"]
+    h = sorted(((k, v - base.get(k, 0)) for k, v in fin.items() if v - base.get(k, 0) > 0),
+               key=lambda kv: -kv[1])
+    return [[k, v] for k, v in h[:3]]
+
+
+def orch_nom_cause(nom):
+    if nom.startswith("docker "):
+        return "docker " + orch_nom_docker(nom[len("docker "):])
+    return nom
+
+
+def orch_regler(maintenant, ep=None):
+    """Seuils appris (reglages.json) : un episode sous le rouge fait reagir plus tot (orange
+    +2 points, plafond 20) ; 7 jours sans episode, on redescend de 1 (plancher : la base)."""
+    if os.environ.get("ORCH_ORANGE_DISPO"):
+        return   # la variable d'environnement decide
+    chemin = os.path.join(ORCH_DIR, "reglages.json")
+    r = orch_lire(chemin, {}) or {}
+    actuel = orch_orange()
+    if ep is not None:
+        r["dernier_episode"] = maintenant
+        if ep.get("min_dispo", 100) < max(ORCH_ROUGE_DISPO, 5.0):
+            r["orange_dispo"] = min(ORCH_ORANGE_PLAFOND, actuel + 2)
+            r["maj"] = maintenant
+            orch_journal(f"j'apprends : je reagirai plus tot (orange a {r['orange_dispo']:g} % de memoire libre)")
+        orch_ecrire(chemin, r)
+    elif actuel > ORCH_ORANGE_DISPO and maintenant - max(r.get("dernier_episode", 0), r.get("maj", 0)) > 7 * 86400:
+        r["orange_dispo"] = max(ORCH_ORANGE_DISPO, actuel - 1)
+        r["maj"] = maintenant
+        orch_journal(f"j'apprends : sept jours calmes, orange redescend a {r['orange_dispo']:g} % de memoire libre")
+        orch_ecrire(chemin, r)
+
+
+def orch_episode(etat, maintenant, feu, m, sessions):
+    """Episode de surcharge : ouvert quand le feu quitte le vert, clos (incidents.jsonl) a son
+    retour. Jamais de bulle : la veille reste silencieuse, seule l'alerte rouge 10 min existe."""
+    ep = etat.get("episode")
+    if feu != "vert":
+        neuf = ep is None
+        if neuf:
+            ep = etat["episode"] = {"debut": maintenant, "min_dispo": m["dispo"], "causes": [], "gestes": []}
+        ep["min_dispo"] = min(ep.get("min_dispo", m["dispo"]), m["dispo"])
+        if orch_instantane(etat, maintenant, sessions, force=neuf) or neuf:
+            connues = {k: v for k, v in ep.get("causes", [])}
+            for k, v in orch_hausses(etat):
+                connues[k] = max(v, connues.get(k, 0))
+            ep["causes"] = [[k, v] for k, v in sorted(connues.items(), key=lambda kv: -kv[1])[:3]]
+        return
+    if ep is None:
+        orch_instantane(etat, maintenant, sessions)
+        orch_regler(maintenant)
+        return
+    causes = [[orch_nom_cause(k), v] for k, v in ep.get("causes", [])]
+    incident = {"debut": ep["debut"], "fin": maintenant, "min_dispo": ep["min_dispo"],
+                "causes": causes, "gestes": ep.get("gestes", [])}
+    with open(os.path.join(ORCH_DIR, "incidents.jsonl"), "a", encoding="utf-8") as f:
+        f.write(json.dumps(incident, ensure_ascii=False) + "\n")
+    if causes:
+        orch_journal(f"surcharge terminee : cause principale {causes[0][0]} (+{int(causes[0][1]) // 2**20} Mo)")
+    else:
+        orch_journal("surcharge terminee : cause non identifiee")
+    del etat["episode"]
+    orch_regler(maintenant, incident)
 
 
 def orch_tour(etat, maintenant):
@@ -1785,6 +2151,13 @@ def orch_tour(etat, maintenant):
     etat["feu"], etat["mesure"] = feu, m
     enfants, rss = orch_arbre()
     sessions = orch_sessions(maintenant, enfants, rss, etat)
+    for etape, args in ((orch_ramasser_reveils, (etat,)), (orch_apprendre, (etat, maintenant, m)),
+                        (orch_demandes, (etat, maintenant, m, feu)),
+                        (orch_episode, (etat, maintenant, feu, m, sessions))):
+        try:   # fail-open : aucune de ces etapes ne doit coûter le reste du tour
+            etape(*args)
+        except Exception as e:
+            trace(f"orchestre : {etape.__name__}", e)
     pauses = etat.setdefault("pauses", {})
     for sid in list(pauses):
         if sid not in sessions:
@@ -1795,7 +2168,17 @@ def orch_tour(etat, maintenant):
     repit = {s: t for s, t in etat.get("repit", {}).items() if maintenant - t < ORCH_PAUSE_MAX}
     etat["repit"] = repit
     if maintenant - etat.get("geste", 0) >= ORCH_PAS:
-        if feu == "rouge":
+        agi = False
+        if feu != "vert":   # menage d'urgence d'abord : la pause des sessions ne vient qu'ensuite
+            try:
+                agi = orch_urgence(etat, maintenant)
+            except Exception as e:
+                trace("orchestre : urgence", e)
+            if agi:
+                etat["geste"] = maintenant
+        if agi:
+            pass
+        elif feu == "rouge":
             cand = [(s, f) for s, f in sessions.items()
                     if s not in pauses and s not in repit and f["rang"] != "humain"]
             # on garde toujours au moins une session au travail : la plus prioritaire,
@@ -1803,14 +2186,21 @@ def orch_tour(etat, maintenant):
             # celle qui fait le plus gros travail)
             if len(cand) >= 2:
                 cand.sort(key=lambda sf: (-RANGS.index(sf[1]["rang"]), sf[1]["poids"]))
-                sid, f = cand[0]
-                geles = orch_geler(f["pid"], enfants)
-                pauses[sid] = {"ts": maintenant, "projet": f["projet"], "rang": f["rang"],
-                               "geles": geles}
-                etat["geste"] = maintenant
-                etat["nb_pauses"] = etat.get("nb_pauses", 0) + 1
-                orch_journal(f"pause {sid[:8]} ({f['projet']}, {f['rang']}, "
-                             f"{f['poids'] // 2**20} Mo) — {len(geles)} processus geles")
+                # une pause a vide ne soulage rien : seule compte une session qui a une commande a geler
+                for sid, f in cand[:-1]:
+                    if not orch_gelables(f["pid"], enfants):
+                        continue
+                    geles = orch_geler(f["pid"], enfants)
+                    if not geles:
+                        continue
+                    pauses[sid] = {"ts": maintenant, "projet": f["projet"], "rang": f["rang"],
+                                   "geles": geles}
+                    etat["geste"] = maintenant
+                    etat["nb_pauses"] = etat.get("nb_pauses", 0) + 1
+                    orch_journal(f"pause {sid[:8]} ({f['projet']}, {f['rang']}, "
+                                 f"{f['poids'] // 2**20} Mo), {len(geles)} processus geles")
+                    orch_geste(etat, f"pause {sid[:8]} ({f['projet']})")
+                    break
         elif feu == "vert" and pauses:
             orch_reprendre(etat, min(pauses, key=lambda s: pauses[s]["ts"]), "le serveur respire")
             etat["geste"] = maintenant
@@ -1881,7 +2271,32 @@ def orch_bilan(jours):
     if tues is not None:
         texte += (", le garde-fou n'a rien eu a tuer" if not tues else
                   f", mais le garde-fou a du tuer {tues} programme(s)")
-    return texte + "."
+    texte += "."
+    # surcharges apprises (incidents.jsonl) : combien, cause la plus frequente, reglage en vigueur
+    fin_min, causes = time.time() - jours * 86400, {}
+    n = 0
+    try:
+        with open(os.path.join(ORCH_DIR, "incidents.jsonl"), encoding="utf-8") as f:
+            for l in f:
+                try:
+                    i = json.loads(l)
+                    if i.get("fin", 0) >= fin_min:
+                        n += 1
+                        if i.get("causes"):
+                            c = i["causes"][0][0]
+                            causes[c] = causes.get(c, 0) + 1
+                except (ValueError, TypeError, IndexError, AttributeError):
+                    continue
+    except OSError:
+        pass
+    quand = "cette semaine" if jours == 7 else f"sur {jours} jours"
+    reglage = f"orange a {orch_orange():g} % de memoire libre"
+    if n:
+        top = max(causes, key=causes.get) if causes else "non identifiee"
+        texte += f"\n• {n} surcharge(s) {quand}, cause la plus frequente : {top} ; reglage : {reglage}."
+    else:
+        texte += f"\n• Aucune surcharge {quand} ; reglage : {reglage}."
+    return texte
 
 
 def cmd_orchestre(args):
@@ -1892,6 +2307,8 @@ def cmd_orchestre(args):
         os.makedirs(os.path.join(ORCH_DIR, "sessions"), exist_ok=True)
         try:   # chaque compte inscrit sa propre fiche, comme /tmp (b41)
             os.chmod(os.path.join(ORCH_DIR, "sessions"), 0o1777)
+            orch_dossier_ouvert("demandes")   # idem pour les demandes de reveil et leurs traces
+            orch_dossier_ouvert("reveils")
         except OSError:
             pass
         verrou = open(os.path.join(ORCH_DIR, "verrou"), "w")
@@ -1939,7 +2356,7 @@ def hook_prompt():
                 m = e.get("mesure", {})
                 apres = m.get("dispo_o", 0) - besoin
                 return e.get("feu") != "vert" or \
-                    (besoin and 100 * apres / (m.get("total") or 1) < ORCH_ORANGE_DISPO)
+                    (besoin and 100 * apres / (m.get("total") or 1) < orch_orange())
             orch_attendre(sid, retenu)
     if not prompt.startswith("!"):
         sys.exit(0)

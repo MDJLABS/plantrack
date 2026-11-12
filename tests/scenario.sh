@@ -1442,7 +1442,7 @@ FAUX
 chmod +x "$SB/systemctl"
 printf 'a.service\nb.service\ngarde g.service\n' > "$SR/.plantrack/souffle.conf"
 echo "$SR" > "$TMP/souffle-reg"
-bat() { echo '{}' | CLAUDE_PROJECT_DIR="$SR" SOUFFLE_SYSTEMCTL="${SC:-$SB/systemctl}" python3 "$PT" hook-prompt; }
+bat() { echo '{}' | CLAUDE_PROJECT_DIR="$SR" PLANTRACK_ORCHESTRE="$TMP/souffle-orch-absent" SOUFFLE_SYSTEMCTL="${SC:-$SB/systemctl}" python3 "$PT" hook-prompt; }
 resp() { CLAUDE_PROJECT_DIR="$SR" PLANTRACK_REGISTRY="$TMP/souffle-reg" SOUFFLE_SYSTEMCTL="$SB/systemctl" python3 "$PT" respirer "$@"; }
 attend() { for _ in $(seq 20); do grep -q "$1" "$SL" 2>/dev/null && return; sleep 0.25; done; }
 appels() { sleep 0.5; cat "$SL" 2>/dev/null; }
@@ -1664,7 +1664,9 @@ mkdir -p "$OD" "$OP/pressure"
 memoire() { printf 'MemTotal: 16000000 kB\nMemAvailable: %s kB\nSwapTotal: 4000000 kB\nSwapFree: 2000000 kB\n' "$1" > "$OP/meminfo"; }
 printf 'some avg10=0.00 avg60=0 avg300=0 total=0\nfull avg10=0.00 avg60=0 avg300=0 total=0\n' > "$OP/pressure/memory"
 cp "$OP/pressure/memory" "$OP/pressure/cpu"
-O() { PLANTRACK_ORCHESTRE="$OD" PLANTRACK_PROC="$OP" PLANTRACK_CGROUP="$TO/cg" ORCH_CALME=0 ORCH_PAS=0 ORCH_ALERTE=true python3 "$PT" "$@"; }
+printf '#!/bin/sh\nexit 0\n' > "$TO/inerte"; chmod +x "$TO/inerte"   # faux systemctl/docker par defaut : jamais les vrais
+O() { PLANTRACK_ORCHESTRE="$OD" PLANTRACK_PROC="$OP" PLANTRACK_CGROUP="$TO/cg" ORCH_CALME=0 ORCH_PAS=0 ORCH_ALERTE=true \
+  SOUFFLE_SYSTEMCTL="${SOUFFLE_SYSTEMCTL:-$TO/inerte}" ORCH_DOCKER="${ORCH_DOCKER:-$TO/inerte}" python3 "$PT" "$@"; }
 cp /bin/bash "$TO/claude"   # comm = claude : une fausse session, avec une commande en cours
 lancer() { "$TO/claude" -c 'bash -c "sleep 300; true # shell-snapshots" & wait' >/dev/null 2>&1 & echo $!; }
 pa=$(lancer); pb=$(lancer); pc=$(lancer); sleep 0.5
@@ -1727,7 +1729,7 @@ rm -r "$TO/cg/containerd.service"
 memoire 500000; O orchestre --tour; O orchestre --tout-reprendre
 check_exit "orchestre : tout-reprendre degele" "0" "$(python3 -c 'import json,sys; print(len(json.load(open(sys.argv[1]))["pauses"]))' "$OD/etat.json")"
 # d212 : le feu juge la pression sur 1 min ; un a-coup de 10 s seul ne le fait pas changer
-niv() { python3 -c 'import importlib.util as u,sys,json; sp=u.spec_from_file_location("pt",sys.argv[1]); a=sys.argv[2]; m=u.module_from_spec(sp); sys.argv=["pt"]; sp.loader.exec_module(m); print(m.orch_niveau(json.loads(a)))' "$PT" "$1"; }
+niv() { env -u ORCH_ORANGE_DISPO PLANTRACK_ORCHESTRE="$TO/absent" python3 -c 'import importlib.util as u,sys,json; sp=u.spec_from_file_location("pt",sys.argv[1]); a=sys.argv[2]; m=u.module_from_spec(sp); sys.argv=["pt"]; sp.loader.exec_module(m); print(m.orch_niveau(json.loads(a)))' "$PT" "$1"; }
 check_exit "feu : a-coup de 10 s seul = vert" "vert" "$(niv '{"dispo":40,"psi_memory_full":9,"psi_memory_some":30}')"
 check_exit "feu : pression soutenue 1 min = rouge" "rouge" "$(niv '{"dispo":40,"psi_memory_full_60":6}')"
 check_exit "feu : coup dur (full 10 s > 25) = rouge tout de suite" "rouge" "$(niv '{"dispo":40,"psi_memory_full":30}')"
@@ -1736,10 +1738,10 @@ check_exit "feu : 13 % de RAM disponible sans pression = vert" "vert" "$(niv '{"
 check_exit "feu : filet sous 5 % de RAM = rouge" "rouge" "$(niv '{"dispo":4}')"
 # le feu ne redescend qu'apres le calme ; une pause est plafonnee
 memoire 500000; O orchestre --tour; memoire 8000000
-PLANTRACK_ORCHESTRE="$OD" PLANTRACK_PROC="$OP" ORCH_CALME=3600 ORCH_PAS=0 ORCH_ALERTE=true python3 "$PT" orchestre --tour
+PLANTRACK_ORCHESTRE="$OD" PLANTRACK_PROC="$OP" SOUFFLE_SYSTEMCTL="$TO/inerte" ORCH_DOCKER="$TO/inerte" ORCH_CALME=3600 ORCH_PAS=0 ORCH_ALERTE=true python3 "$PT" orchestre --tour
 check "feu : reste rouge tant que le calme n'a pas dure" "feu rouge" "$(O orchestre)"
-memoire 500000; PLANTRACK_ORCHESTRE="$OD" PLANTRACK_PROC="$OP" ORCH_CALME=0 ORCH_PAS=0 ORCH_PAUSE_MAX=1 ORCH_ALERTE=true python3 "$PT" orchestre --tour
-sleep 2; PLANTRACK_ORCHESTRE="$OD" PLANTRACK_PROC="$OP" ORCH_CALME=0 ORCH_PAS=0 ORCH_PAUSE_MAX=1 ORCH_ALERTE=true python3 "$PT" orchestre --tour
+memoire 500000; PLANTRACK_ORCHESTRE="$OD" PLANTRACK_PROC="$OP" SOUFFLE_SYSTEMCTL="$TO/inerte" ORCH_DOCKER="$TO/inerte" ORCH_CALME=0 ORCH_PAS=0 ORCH_PAUSE_MAX=1 ORCH_ALERTE=true python3 "$PT" orchestre --tour
+sleep 2; PLANTRACK_ORCHESTRE="$OD" PLANTRACK_PROC="$OP" SOUFFLE_SYSTEMCTL="$TO/inerte" ORCH_DOCKER="$TO/inerte" ORCH_CALME=0 ORCH_PAS=0 ORCH_PAUSE_MAX=1 ORCH_ALERTE=true python3 "$PT" orchestre --tour
 check "pause plafonnee : la session reprend d'office" "de pause au plus" "$(cat "$OD/journal.log")"
 O orchestre --tout-reprendre >/dev/null
 # fail-open : orchestre muet (etat vieux) = aucune attente
@@ -1769,6 +1771,140 @@ check "orchestre : pic d'une session finie appris" '"projet": "psa"' "$(cat "$OD
 out=$(PLANTRACK_ORCHESTRE="$OD" python3 -c 'import importlib.util as u,sys; sp=u.spec_from_file_location("pt",sys.argv[1]); m=u.module_from_spec(sp); sys.argv=["pt"]; sp.loader.exec_module(m); print(m.orch_bilan(7))' "$PT")
 check "orchestre : le bilan du dimanche compte les pauses" "mise(s) en pause" "$out"
 pkill -CONT -f "sleep 300; true # shell-snapshots" 2>/dev/null; pkill -f "sleep 300; true # shell-snapshots" 2>/dev/null
+
+# Portier, demandes de reveil, menage d'urgence, apprentissage (d237, panne du 12/11 22h)
+OD2="$TO/etat2"; CG2="$TO/cg2"; mkdir -p "$OD2/sessions" "$CG2"
+cat > "$TO/sc2" <<FAUX
+#!/bin/bash
+echo "\$*" >> "$TO/sc2.log"
+if [ "\$1" = is-active ]; then grep -qx "\$3" "$TO/sc2.actifs" 2>/dev/null && echo active || echo inactive; fi
+if [ "\$1" = stop ]; then grep -vx "\$3" "$TO/sc2.actifs" > "$TO/sc2.actifs.n" 2>/dev/null; mv "$TO/sc2.actifs.n" "$TO/sc2.actifs"; fi
+exit 0
+FAUX
+cat > "$TO/dk2" <<FAUX
+#!/bin/bash
+echo "\$*" >> "$TO/dk2.log"
+case "\$1" in
+  ps) cat "$TO/dk2.noms" 2>/dev/null ;;
+  stop) grep -vx "\$2" "$TO/dk2.noms" > "$TO/dk2.noms.n"; mv "$TO/dk2.noms.n" "$TO/dk2.noms" ;;
+  inspect) echo /vpn-essai ;;
+esac
+exit 0
+FAUX
+chmod +x "$TO/sc2" "$TO/dk2"; : > "$TO/sc2.log"; : > "$TO/sc2.actifs"; : > "$TO/dk2.log"; : > "$TO/dk2.noms"
+: > "$TO/reg2"
+O2() { env -u ORCH_ORANGE_DISPO PLANTRACK_ORCHESTRE="$OD2" PLANTRACK_PROC="$OP" PLANTRACK_CGROUP="$CG2" \
+  PLANTRACK_REGISTRY="$TO/reg2" ORCH_CALME=0 ORCH_PAS=0 ORCH_ALERTE=true SOUFFLE_SYSTEMCTL="$TO/sc2" \
+  ORCH_DOCKER="$TO/dk2" python3 "$PT" "$@"; }
+PJ="$TO/pj"; mkdir -p "$PJ/.plantrack"; echo "x.service" > "$PJ/.plantrack/souffle.conf"
+bat2() { rm -f "$PJ/.plantrack/battement"; echo '{}' | env -u ORCH_ORANGE_DISPO CLAUDE_PROJECT_DIR="$PJ" PLANTRACK_ORCHESTRE="$OD2" \
+  SOUFFLE_SYSTEMCTL="$TO/sc2" python3 "$PT" hook-prompt; }
+attend2() { for _ in $(seq 20); do grep -q "$1" "$TO/sc2.log" 2>/dev/null && return; sleep 0.25; done; }
+jnl() { cat "$OD2/journal.log" 2>/dev/null; }
+# 1. portier : vert avec de la marge, le reveil part et une trace est deposee
+memoire 8000000; O2 orchestre --tour
+bat2; attend2 "start --no-block -- x.service"
+check "portier : vert avec marge, le service est reveille" "start --no-block -- x.service" "$(cat "$TO/sc2.log")"
+check_exit "portier : trace du reveil accorde deposee" "oui" "$([ -f "$OD2/reveils/x.service.json" ] && echo oui || echo non)"
+# 2. portier : service deja actif, rien a faire
+: > "$TO/sc2.log"; echo x.service > "$TO/sc2.actifs"; bat2; sleep 0.5
+check_not "portier : service deja actif, aucun start" "start" "$(cat "$TO/sc2.log")"
+: > "$TO/sc2.actifs"
+# 3. portier : memoire basse (vert mais marge insuffisante pour 1,5 Go), la demande est ecrite
+rm -f "$OD2/reveils/x.service.json"; : > "$TO/sc2.log"
+memoire 2000000; O2 orchestre --tour
+bat2; sleep 0.5
+check_not "portier : marge insuffisante, aucun start" "start" "$(cat "$TO/sc2.log")"
+check "portier : demande ecrite" '"service": "x.service"' "$(cat "$OD2/demandes/x.service.json" 2>/dev/null)"
+check "portier : la demande porte le rang" '"rang": "agent"' "$(cat "$OD2/demandes/x.service.json" 2>/dev/null)"
+check_exit "portier : dossier des demandes en 1777" "1777" "$(stat -c %a "$OD2/demandes")"
+check "portier : reveil differe journalise" "reveil differe x.service (pj) : memoire basse" "$(jnl)"
+# 3b. orange franc : meme chose
+memoire 1400000; O2 orchestre --tour
+check "orchestre : feu orange sous 10 % de memoire" "feu orange" "$(O2 orchestre)"
+check_not "orchestre : orange, la demande n'est pas servie" "start --no-block -- x.service" "$(cat "$TO/sc2.log")"
+# 4. retour du vert : l'orchestre sert la demande
+memoire 8000000; O2 orchestre --tour; attend2 "start --no-block -- x.service"
+check "orchestre : demande servie au retour du vert" "start --no-block -- x.service" "$(cat "$TO/sc2.log")"
+check_exit "orchestre : demande servie supprimee" "non" "$([ -f "$OD2/demandes/x.service.json" ] && echo oui || echo non)"
+check "orchestre : reveil accorde journalise" "reveil accorde x.service (pj) apres" "$(jnl)"
+check "orchestre : le reveil est suivi pour l'apprentissage" '"x.service"' "$(python3 -c 'import json,sys; print(json.dumps(json.load(open(sys.argv[1])).get("reveils")))' "$OD2/etat.json")"
+# 5. demandes hostiles : aucune ne mene a systemctl
+: > "$TO/sc2.log"; now=$(date +%s)
+printf '{"service":"--now","projet":"p","ts":%s,"rang":"agent"}' "$now" > "$OD2/demandes/evil.json"
+printf '{"service":"y.service","projet":"p","ts":%s,"rang":"agent"}' "$now" > "$OD2/demandes/autre.json"
+printf '{"service":"bad;z.service","projet":"p","ts":%s,"rang":"agent"}' "$now" > "$OD2/demandes/bad;z.service.json"
+printf '{"service":"vieux.service","projet":"p","ts":%s,"rang":"agent"}' "$((now - 9000))" > "$OD2/demandes/vieux.service.json"
+O2 orchestre --tour; sleep 0.5
+out=$(cat "$TO/sc2.log")
+check_not "demande hostile : option deguisee ignoree" "--now" "$out"
+check_not "demande hostile : nom invalide ignore" "bad" "$out"
+check_not "demande hostile : nom de fichier different ignore" "y.service" "$out"
+check_not "demande de plus de 2 h oubliee" "vieux" "$out"
+check_exit "demandes hostiles ou perimees supprimees" "0" "$(ls "$OD2/demandes" | wc -l)"
+# 6. apprentissage du cout reel, 180 s apres le reveil
+python3 - "$OD2/etat.json" <<'PY'
+import json, sys
+e = json.load(open(sys.argv[1])); e["reveils"]["x.service"]["ts"] -= 200; json.dump(e, open(sys.argv[1], "w"))
+PY
+memoire 6500000; O2 orchestre --tour
+check_exit "apprentissage : premier cout = valeur mesuree brute" "1536000000" "$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["x.service"])' "$OD2/couts.json")"
+python3 - "$OD2/etat.json" <<'PY'
+import json, sys
+e = json.load(open(sys.argv[1])); e["reveils"] = {"x.service": {"ts": e["ts"] - 200, "avant": e["mesure"]["dispo_o"] + 2**30}}
+json.dump(e, open(sys.argv[1], "w"))
+PY
+O2 orchestre --tour
+check_exit "apprentissage : moyenne glissante 0,5 / 0,5" "1304870912" "$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["x.service"])' "$OD2/couts.json")"
+check "apprentissage : journal du cout appris" "cout appris x.service" "$(jnl)"
+# 7. menage d'urgence : d'abord un ecran d'admin, puis une pile sans session, jamais une pile gardee
+PJ3="$TO/pj3"; mkdir -p "$PJ3/.plantrack"; printf 'garde x.service\n' > "$PJ3/.plantrack/souffle.conf"; touch "$PJ3/.plantrack/battement"
+touch -d '2 hours ago' "$PJ/.plantrack/battement"
+printf '%s\n%s\n' "$PJ" "$PJ3" > "$TO/reg2"; echo x.service > "$TO/sc2.actifs"; : > "$TO/sc2.log"
+printf 'app-studio-1\nweb-1\nsupabase-meta\n' > "$TO/dk2.noms"
+memoire 1400000; O2 orchestre --tour
+check "urgence : un ecran d'admin est arrete d'abord" "stop app-studio-1" "$(cat "$TO/dk2.log")"
+check_not "urgence : jamais de docker rm" " rm " "$(cat "$TO/dk2.log")"
+check "urgence : ecran journalise avec sa commande de rallumage" "ecran d'admin app-studio-1 eteint (docker start app-studio-1 pour le rallumer)" "$(jnl)"
+check_not "urgence : un seul geste par tour, la pile attend" "stop -- x.service" "$(cat "$TO/sc2.log")"
+O2 orchestre --tour; O2 orchestre --tour
+check "urgence : le second ecran suit" "stop supabase-meta" "$(cat "$TO/dk2.log")"
+check_not "urgence : un service garde par un projet actif n'est pas eteint" "stop -- x.service" "$(cat "$TO/sc2.log")"
+echo "$PJ" > "$TO/reg2"; O2 orchestre --tour
+check "urgence : la pile sans session est eteinte" "stop -- x.service" "$(cat "$TO/sc2.log")"
+check "urgence : pile journalisee" "x.service eteint (pj, aucune session depuis" "$(jnl)"
+check_not "urgence : web-1 n'est pas un ecran d'admin" "stop web-1" "$(cat "$TO/dk2.log")"
+# 8. pause : une session sans commande gelable n'est jamais choisie
+O2 orchestre --tout-reprendre >/dev/null
+pn=$("$TO/claude" -c 'sleep 300 & wait' >/dev/null 2>&1 & echo $!)
+pg=$(lancer); pk=$(lancer); sleep 0.5
+fiche2() { printf '{"sid":"%s","pid":%s,"projet":"p%s","vu":%s,"debut":%s%s}' "$1" "$2" "$1" "$(date +%s)" "$(date +%s)" "$3" > "$OD2/sessions/$1.json"; }
+fiche2 sn "$pn" ""; fiche2 sg "$pg" ",\"humain\":$(( $(date +%s) - 1000 ))"; fiche2 sk "$pk" ",\"humain\":$(( $(date +%s) - 1000 ))"
+: > "$TO/reg2"; : > "$TO/dk2.noms"
+memoire 500000; O2 orchestre --tour
+enpause=$(python3 -c 'import json,sys; print(" ".join(json.load(open(sys.argv[1]))["pauses"]))' "$OD2/etat.json")
+check_not "pause : la session sans commande gelable n'est pas choisie" "sn" "$enpause"
+check_exit "pause : une session avec commande est mise en pause" "1" "$(echo $enpause | wc -w)"
+check_not "pause : plus de pause a 0 processus geles" " 0 processus geles" "$(jnl)"
+O2 orchestre --tout-reprendre >/dev/null
+kill "$pn" "$pg" "$pk" 2>/dev/null; pkill -CONT -f "sleep 300; true # shell-snapshots" 2>/dev/null; pkill -f "sleep 300; true # shell-snapshots" 2>/dev/null
+# 9. episode de surcharge : cause consignee, orange appris
+OD2="$TO/etat3"; CG2="$TO/cg3"; mkdir -p "$OD2/sessions" "$CG2/docker-abc123.scope"
+echo 104857600 > "$CG2/docker-abc123.scope/memory.current"
+memoire 8000000; O2 orchestre --tour
+echo 3221225472 > "$CG2/docker-abc123.scope/memory.current"
+memoire 500000; O2 orchestre --tour
+check "episode : ouvert quand le feu quitte le vert" '"episode"' "$(cat "$OD2/etat.json")"
+memoire 8000000; O2 orchestre --tour
+check "episode : consigne dans incidents.jsonl avec sa cause" "docker vpn-essai" "$(cat "$OD2/incidents.jsonl" 2>/dev/null)"
+check "episode : cause principale journalisee" "surcharge terminee : cause principale docker vpn-essai (+2" "$(jnl)"
+check_not "episode : clos au retour du vert" '"episode"' "$(cat "$OD2/etat.json")"
+check "orange appris apres un episode sous 5 %" '"orange_dispo": 12' "$(cat "$OD2/reglages.json" 2>/dev/null)"
+check "orange appris : journal" "j'apprends : je reagirai plus tot (orange a 12 % de memoire libre)" "$(jnl)"
+out=$(env -u ORCH_ORANGE_DISPO PLANTRACK_ORCHESTRE="$OD2" python3 -c 'import importlib.util as u,sys; sp=u.spec_from_file_location("pt",sys.argv[1]); m=u.module_from_spec(sp); sys.argv=["pt"]; sp.loader.exec_module(m); print(m.orch_bilan(7))' "$PT")
+check "bilan : surcharges, cause la plus frequente et reglage" "1 surcharge(s) cette semaine, cause la plus frequente : docker vpn-essai ; reglage : orange a 12 %" "$out"
+# orange a 12 % : 11 % de memoire libre est maintenant orange
+check_exit "niveau : le seuil appris s'applique" "orange" "$(env -u ORCH_ORANGE_DISPO PLANTRACK_ORCHESTRE="$OD2" python3 -c 'import importlib.util as u,sys,json; sp=u.spec_from_file_location("pt",sys.argv[1]); m=u.module_from_spec(sp); sys.argv=["pt"]; sp.loader.exec_module(m); print(m.orch_niveau({"dispo":11}))' "$PT")"
 
 echo
 [ "$fail" = 0 ] && echo "TOUS LES TESTS PASSENT" || { echo "DES TESTS ECHOUENT"; exit 1; }
