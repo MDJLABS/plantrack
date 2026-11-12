@@ -14,15 +14,15 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [204 commits]
-  fichiers recemment ecrits : ../mdjlabs-site/components/guide/guide-de-test.tsx, ../../../tmp/claude-0/-home-mariella-plantrack/71553c77-e842-4678-8bbb-c3db0eb62776/scratchpad/carte.json, sortie/carte-suite-1111.log, ../../../tmp/claude-0/-home-mariella-plantrack/ecf9a9a5-4736-4a4f-be83-a65441738a2a/scratchpad/carte.json, sortie/carte-suite-1111b.log, ../../../tmp/claude-0/-home-mariella-plantrack/1a31736e-5532-4b6a-8650-290b2970d038/scratchpad/cmds.py
+FIL ACTIF — t23 : guides de test automatiques (d100) [208 commits]
+  fichiers recemment ecrits : ../../../tmp/claude-0/-home-mariella-plantrack/71553c77-e842-4678-8bbb-c3db0eb62776/scratchpad/carte.json, sortie/carte-suite-1111.log, ../../../tmp/claude-0/-home-mariella-plantrack/ecf9a9a5-4736-4a4f-be83-a65441738a2a/scratchpad/carte.json, sortie/carte-suite-1111b.log, ../../../tmp/claude-0/-home-mariella-plantrack/1a31736e-5532-4b6a-8650-290b2970d038/scratchpad/cmds.py, ../../../tmp/claude-0/-home-mariella-plantrack/1a31736e-5532-4b6a-8650-290b2970d038/scratchpad/bloc.py
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
   t5 : travaux sur main — reprise : retour au travail courant apres la faille
 
 BUGS NON CORRIGES (personne ne s'en est occupe) :
-  b49 (open) [t23] Surcharge 12/11 22h01-22h13 (earlyoom tue chrome + java 1,4 Go) : la respiration (battre, pt.py) reveille prolearn-supabase (22h01) puis pr… (agent)
+  b49 (open) [t23] Surcharge 12/11 22h01-22h13 (earlyoom tue chrome + java 1,4 Go) : la respiration (battre, pt.py) reveille prolearn-supabase (22h01) puis pr… (agent) [1 tentatives, derniere: Livre v1.9.47 (bd9c2a7 + 21baa4f, GitHub seul, pas de cle P…]
 
 BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b37 (to_verify) [t23] kvm-lourd (01/11) : une commande de lecture (diff/grep/ls dans prolearn) classee next-build et mise en file 8/8 — recurrence b35/b36 (agent) [1 tentatives, derniere: Cause trouvee (reproduite) : dans 'diff <(cat A) B', la par…]
@@ -273,6 +273,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d236 : Mariella (tel, 11/11 13h15, carte Essai mdjlabs lien preprod) : 'c'est bon' - essai du guide mdjlabs en cours (b48, v1.9.46) ; veille silen… (agent)
   d237 : Mariella (tel, 11/11, carte Suite apres validation b47/b48) : 'Trier les corrections' - presentation des corrections en attente de son verd… (agent)
   d238 : Mariella (tel, 12/11, carte Tri des 8) : 'fais d'abord une analyse de la charge serveur, libere de la charge, analyse pourquoi le coordinat… (agent)
+  d239 : Mariella (tel, 12/11 22h30, carte Coordinateur) : 'Les 3 etages (Recommande)' - 1) portier : tout reveil de base (battre/souffle) demande l… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
