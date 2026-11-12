@@ -1,3 +1,4 @@
+/* CHECKER, fichier du moteur PlanTrack, remplacé à chaque mise à jour. Ne pas modifier : les réglages du site vivent dans lib/guide/ (hors de moteur/). */
 /* ==============================================================================
  * Guide de test intégré — progression PURE + persistance (localStorage).
  * Porté de Prolearn (`app/lib/guide/guide-progress.ts`). Séparé du composant : la reprise

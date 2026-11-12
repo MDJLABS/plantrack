@@ -2,7 +2,7 @@
  *
  * `scenarios.ts` (le registre réel, `getScenario`/`SCENARIOS`) n'existe PAS dans ce dépôt :
  * c'est le contenu propre à CHAQUE SITE qui en porte un (cf. d34/d35 — le moteur vendu ici
- * n'embarque que le dispositif générique, `.claude/hooks/plantrack_guide/lib/guide/`).
+ * n'embarque que le dispositif générique, `.claude/hooks/plantrack_guide/moteur/`).
  * `guide-visite.ts` importe pourtant `./scenarios` en dur (même convention Next que le reste
  * du moteur, résolue par le bundler de chaque site) — pour l'exécuter en test depuis PlanTrack
  * lui-même, il faut donc un registre à sa place. `tests/guide/support/resolve-ts.mjs` redirige
@@ -13,7 +13,7 @@
  * `getScenario` (garde `hasOwnProperty.call` — un id forgé sur la chaîne de prototypes
  * n'y résout jamais), `indexDePoint`.
  */
-import type { GuideScenario } from "../../../.claude/hooks/plantrack_guide/lib/guide/types";
+import type { GuideScenario } from "../../../.claude/hooks/plantrack_guide/moteur/types";
 
 export const SCENARIOS: Record<string, GuideScenario> = {
   "temoin-principal": {

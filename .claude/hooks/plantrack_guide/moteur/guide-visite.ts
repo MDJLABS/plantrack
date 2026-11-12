@@ -1,3 +1,4 @@
+/* CHECKER, fichier du moteur PlanTrack, remplacé à chaque mise à jour. Ne pas modifier : les réglages du site vivent dans lib/guide/ (hors de moteur/). */
 /* ==============================================================================
  * Guide de test intégré — utilitaires de VISITE, purs (aucun DOM, aucun React).
  *
@@ -18,7 +19,7 @@
  * (`surLaPage`, pour « M'emmener au bon endroit »).
  * ============================================================================== */
 
-export { getScenario } from "./scenarios.ts";
+export { getScenario } from "./guides-json.ts";
 export type { GuideScenario } from "./types.ts";
 
 /** Interface minimale d'un stockage — injectable pour les tests (même idiome que

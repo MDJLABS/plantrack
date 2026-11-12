@@ -1,3 +1,4 @@
+/* CHECKER, fichier du moteur PlanTrack, remplacé à chaque mise à jour. Ne pas modifier : les réglages du site vivent dans lib/guide/ (hors de moteur/). */
 /* ==============================================================================
  * Guide de test intégré — JOUER un geste automatiquement (curseur animé).
  *

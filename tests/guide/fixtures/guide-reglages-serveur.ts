@@ -11,7 +11,7 @@
  * `appelsApresConsigne` enregistre chaque appel de `apresConsigne`, pour que les tests
  * puissent vérifier qu'il est bien déclenché (et avec quel résultat) sans double applicatif.
  */
-import type { ReglagesGuideServeur, ResultatGuide } from "../../../.claude/hooks/plantrack_guide/lib/guide/types";
+import type { ReglagesGuideServeur, ResultatGuide } from "../../../.claude/hooks/plantrack_guide/moteur/types";
 
 export const appelsApresConsigne: ResultatGuide[] = [];
 

@@ -11,7 +11,7 @@
 import assert from "node:assert/strict";
 import {
   calculerStatut, estEncoreATraiter, faitsPour, type EtatScenarioStocke,
-} from "../../.claude/hooks/plantrack_guide/lib/guide/guide-etat";
+} from "../../.claude/hooks/plantrack_guide/moteur/guide-etat";
 import { SCENARIOS } from "./fixtures/scenarios";
 
 let passed = 0;

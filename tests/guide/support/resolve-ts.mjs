@@ -1,6 +1,6 @@
 // tests/guide/support/resolve-ts.mjs
 //
-// POURQUOI CE FICHIER : le moteur `guide/` (`.claude/hooks/plantrack_guide/lib/guide/*.ts`)
+// POURQUOI CE FICHIER : le moteur `guide/` (`.claude/hooks/plantrack_guide/moteur/*.ts`)
 // est vendu tel quel dans chaque site, où c'est NEXT (bundler, `moduleResolution: "bundler"`)
 // qui résout les imports relatifs SANS extension (`./guide-geometry`, `./types`) — convention
 // du reste du dépôt, jamais changée pour les tests. `node --experimental-strip-types` fait une
@@ -25,14 +25,16 @@ import { existsSync, statSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 const EXTENSIONS = ["", ".ts", ".tsx", ".js", ".mjs", "/index.ts", "/index.tsx"];
-const MOTEUR = "/.claude/hooks/plantrack_guide/lib/guide/";
+const MOTEUR = "/.claude/hooks/plantrack_guide/moteur/"; // Checker v2 : un seul dossier, fichiers du site en ../
 const TEMOINS = new Map([
-  ["./scenarios", "../fixtures/scenarios.ts"],
-  ["./scenarios.ts", "../fixtures/scenarios.ts"],
-  ["./guide-reglages", "../fixtures/guide-reglages.ts"],
-  ["./guide-reglages.ts", "../fixtures/guide-reglages.ts"],
-  ["./guide-reglages-serveur", "../fixtures/guide-reglages-serveur.ts"],
-  ["./guide-reglages-serveur.ts", "../fixtures/guide-reglages-serveur.ts"],
+  ["../scenarios.ts", "../fixtures/scenarios.ts"],
+  ["../scenarios", "../fixtures/scenarios.ts"],
+  ["../guide-reglages.ts", "../fixtures/guide-reglages.ts"],
+  ["../guide-reglages", "../fixtures/guide-reglages.ts"],
+  ["../guide-reglages-serveur.ts", "../fixtures/guide-reglages-serveur.ts"],
+  ["../guide-reglages-serveur", "../fixtures/guide-reglages-serveur.ts"],
+  ["../guides/index.ts", "../fixtures/guides/index.ts"],
+  ["../guides/index", "../fixtures/guides/index.ts"],
 ]);
 
 export async function resolve(specifier, context, nextResolve) {

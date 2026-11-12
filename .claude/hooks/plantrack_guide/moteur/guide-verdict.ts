@@ -1,3 +1,4 @@
+/* CHECKER, fichier du moteur PlanTrack, remplacé à chaque mise à jour. Ne pas modifier : les réglages du site vivent dans lib/guide/ (hors de moteur/). */
 /* ==============================================================================
  * Guide de test — VERDICT D'UNE VISITE (calcul CÔTÉ CLIENT).
  * Porté de Prolearn (`app/lib/guide/guide-verdict.ts`).

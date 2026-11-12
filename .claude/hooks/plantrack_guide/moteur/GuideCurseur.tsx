@@ -1,4 +1,5 @@
 "use client";
+/* CHECKER, fichier du moteur PlanTrack, remplacé à chaque mise à jour. Ne pas modifier : les réglages du site vivent dans lib/guide/ (hors de moteur/). */
 
 /* ==============================================================================
  * Guide de test intégré (Checker) : curseur animé qui joue les gestes d'une étape à la
@@ -30,9 +31,9 @@
  * ============================================================================== */
 
 import { useEffect, useRef, useState } from "react";
-import { resolveTarget } from "@/lib/guide/guide-geometry";
-import { jouerGeste, selecteursGeste, type ResultatGeste } from "@/lib/guide/guide-geste";
-import type { GuideGeste } from "@/lib/guide/types";
+import { resolveTarget } from "./guide-geometry";
+import { jouerGeste, selecteursGeste, type ResultatGeste } from "./guide-geste";
+import type { GuideGeste } from "./types";
 
 /** Durée du glissé : assez lent pour être SUIVI du regard, assez rapide pour ne pas traîner. */
 const DUREE_GLISSE_MS = 700;

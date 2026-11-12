@@ -1,4 +1,5 @@
 'use server';
+/* CHECKER, fichier du moteur PlanTrack, remplacé à chaque mise à jour. Ne pas modifier : les réglages du site vivent dans lib/guide/ (hors de moteur/). */
 
 /* ==============================================================================
  * Guide de test intégré — ENREGISTREMENT serveur (d138, 31/10 : « ça ne fonctionne pas
@@ -26,8 +27,8 @@ import { dirname, join, resolve } from "node:path";
 import type { GuideScenario, ResultatGuide, StepVerdict } from "./types";
 import { calculerStatut, dejaConsigne, faitsPour, type EtatScenarioStocke, type EtatStocke, type VerdictStocke } from "./guide-etat";
 import { verdictScenario } from "./guide-verdict";
-import { getScenario, SCENARIOS } from "./scenarios.ts";
-import { reglagesGuideServeur } from "./guide-reglages-serveur.ts";
+import { getScenario, SCENARIOS } from "./guides-json.ts";
+import { reglagesGuideServeur } from "../guide-reglages-serveur.ts";
 import { avertirSession, texteAvis } from "./guide-avertir";
 
 /**

@@ -12,7 +12,7 @@ import assert from "node:assert/strict";
 import {
   ecrireGuideActif, effacerGuideActif, lireGuideActif, progressionDepuisServeur, serveurPrime, vide,
   type Storage,
-} from "../../.claude/hooks/plantrack_guide/lib/guide/guide-progress";
+} from "../../.claude/hooks/plantrack_guide/moteur/guide-progress";
 
 let passed = 0;
 function step(n: string, fn: () => void) {

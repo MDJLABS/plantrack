@@ -34,7 +34,7 @@ await mkdir(join(racine, ".planning"), { recursive: true });
 process.chdir(racine);
 
 const { etatGuides, consignerPoint, consignerGuide } = await import(
-  "../../.claude/hooks/plantrack_guide/lib/guide/guide-actions.ts"
+  "../../.claude/hooks/plantrack_guide/moteur/guide-actions.ts"
 );
 const { appelsApresConsigne } = await import("./fixtures/guide-reglages-serveur.ts");
 

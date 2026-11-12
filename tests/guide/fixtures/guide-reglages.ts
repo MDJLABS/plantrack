@@ -9,7 +9,7 @@
  * `.tn-childwrap.collapsed`) pour que les tests de `guide-geometry.ts`/`guide-geste.ts`
  * puissent vérifier qu'un réglage de site est bien PRIS EN COMPTE, pas seulement accepté.
  */
-import type { ReglagesGuideClient } from "../../../.claude/hooks/plantrack_guide/lib/guide/types";
+import type { ReglagesGuideClient } from "../../../.claude/hooks/plantrack_guide/moteur/types";
 
 export const reglagesGuide: ReglagesGuideClient = {
   ancetresReplies: [".tn-childwrap.collapsed"],

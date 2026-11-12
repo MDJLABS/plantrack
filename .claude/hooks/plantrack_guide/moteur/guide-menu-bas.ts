@@ -1,3 +1,4 @@
+/* CHECKER, fichier du moteur PlanTrack, remplacé à chaque mise à jour. Ne pas modifier : les réglages du site vivent dans lib/guide/ (hors de moteur/). */
 /* Guide de test : hauteur du menu fixé en bas de l'écran (au pouce), pour que la pastille et
  * le lanceur se posent AU-DESSUS au lieu de le cacher (b42 ProRent, 12/11 : la pastille
  * masquait Litiges/Contenu/Outils du menu admin). Moteur commun : aucun site n'a à déclarer

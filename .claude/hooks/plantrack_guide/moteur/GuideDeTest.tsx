@@ -1,4 +1,5 @@
 "use client";
+/* CHECKER, fichier du moteur PlanTrack, remplacé à chaque mise à jour. Ne pas modifier : les réglages du site vivent dans lib/guide/ (hors de moteur/). */
 
 /* ==============================================================================
  * Guide de test intégré — visite guidée des points à vérifier.
@@ -83,23 +84,23 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import { usePathname, useRouter } from "next/navigation";
-import { BORD_CARTE, placerCarte, resolveTarget, type PlaceCarte, type Rect } from "@/lib/guide/guide-geometry";
+import { BORD_CARTE, placerCarte, resolveTarget, type PlaceCarte, type Rect } from "./guide-geometry";
 import {
   accederLocalStorage, avancer, chargerProgression, marquerJoue, noterMotif, oublierProgression,
   oublierToutesLesProgressions, progressionDepuisServeur, reculer, sauverProgression, serveurPrime,
   verdict, vide,
-} from "@/lib/guide/guide-progress";
-import { indexDePoint, SCENARIOS } from "@/lib/guide/scenarios";
-import { verdictScenario } from "@/lib/guide/guide-verdict";
-import { construireCompteRendu } from "@/lib/guide/guide-compte-rendu";
-import { consignerGuide, consignerPoint, guideInterrompu, renvoyerGuide } from "@/lib/guide/guide-actions";
-import { reglagesGuide } from "@/lib/guide/guide-reglages";
-import { surLaPage } from "@/lib/guide/guide-visite";
+} from "./guide-progress";
+import { indexDePoint, SCENARIOS } from "./guides-json";
+import { verdictScenario } from "./guide-verdict";
+import { construireCompteRendu } from "./guide-compte-rendu";
+import { consignerGuide, consignerPoint, guideInterrompu, renvoyerGuide } from "./guide-actions";
+import { reglagesGuide } from "../guide-reglages";
+import { surLaPage } from "./guide-visite";
 import { GuideCurseur } from "./GuideCurseur";
-import { gestesEtape, type ResultatGeste } from "@/lib/guide/guide-geste";
-import type { VerdictStocke } from "@/lib/guide/guide-etat";
-import type { GuideScenario, GuideProgress } from "@/lib/guide/types";
-import { useDecalageMenuBas } from "@/lib/guide/guide-menu-bas";
+import { gestesEtape, type ResultatGeste } from "./guide-geste";
+import type { VerdictStocke } from "./guide-etat";
+import type { GuideScenario, GuideProgress } from "./types";
+import { useDecalageMenuBas } from "./guide-menu-bas";
 
 /** Vrai si les paramètres (`?…`) de `url` sont ceux de la page affichée (ordre ignoré). */
 function memesParametres(url: string): boolean {

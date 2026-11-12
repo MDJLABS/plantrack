@@ -1,3 +1,4 @@
+/* CHECKER, fichier du moteur PlanTrack, remplacé à chaque mise à jour. Ne pas modifier : les réglages du site vivent dans lib/guide/ (hors de moteur/). */
 /* ==============================================================================
  * Guide de test intégré — AVERTIR LA SESSION (d172, 03/11 : « une étape du guide peut
  * tout à fait bloquer la suite, et donc il faut agir de suite »).

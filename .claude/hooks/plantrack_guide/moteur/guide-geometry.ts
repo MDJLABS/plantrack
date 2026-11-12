@@ -1,3 +1,4 @@
+/* CHECKER, fichier du moteur PlanTrack, remplacé à chaque mise à jour. Ne pas modifier : les réglages du site vivent dans lib/guide/ (hors de moteur/). */
 /* ==============================================================================
  * Guide de test intégré — géométrie PURE (surlignage + placement de la bulle).
  * Porté de Prolearn (`app/lib/guide/guide-geometry.ts`). Séparé du composant pour être

@@ -48,9 +48,9 @@ await mkdir(join(racine, ".planning"), { recursive: true });
 process.chdir(racine);
 
 const { consignerPoint, consignerGuide, guideInterrompu, renvoyerGuide } = await import(
-  "../../.claude/hooks/plantrack_guide/lib/guide/guide-actions.ts"
+  "../../.claude/hooks/plantrack_guide/moteur/guide-actions.ts"
 );
-const { placerCarte } = await import("../../.claude/hooks/plantrack_guide/lib/guide/guide-geometry.ts");
+const { placerCarte } = await import("../../.claude/hooks/plantrack_guide/moteur/guide-geometry.ts");
 
 await step("un ok sans remarque ne réveille personne", async () => {
   await consignerPoint("temoin-principal", "p1", "ok");

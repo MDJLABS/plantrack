@@ -18,8 +18,8 @@
 import assert from "node:assert/strict";
 import {
   appliquerClic, appliquerSaisie, gestesEtape, jouerGeste, selecteursGeste,
-} from "../../.claude/hooks/plantrack_guide/lib/guide/guide-geste";
-import type { GuideGeste } from "../../.claude/hooks/plantrack_guide/lib/guide/types";
+} from "../../.claude/hooks/plantrack_guide/moteur/guide-geste";
+import type { GuideGeste } from "../../.claude/hooks/plantrack_guide/moteur/types";
 
 let passed = 0;
 function step(n: string, fn: () => void) {

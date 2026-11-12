@@ -1,4 +1,5 @@
 "use client";
+/* CHECKER, fichier du moteur PlanTrack, remplacé à chaque mise à jour. Ne pas modifier : les réglages du site vivent dans lib/guide/ (hors de moteur/). */
 
 /* ==============================================================================
  * Point de montage LAZY du guide de test intégré (lot 2.3, revue finale, IMPORTANT 3 ;
@@ -50,14 +51,14 @@
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
-import { etatGuides, type EtatGuides } from "@/lib/guide/guide-actions";
-import { estEncoreATraiter } from "@/lib/guide/guide-etat";
-import { getScenario, accederSessionStorage } from "@/lib/guide/guide-visite";
-import { lireGuideActif, ecrireGuideActif, effacerGuideActif } from "@/lib/guide/guide-progress";
-import { useDecalageMenuBas } from "@/lib/guide/guide-menu-bas";
+import { etatGuides, type EtatGuides } from "./guide-actions";
+import { estEncoreATraiter } from "./guide-etat";
+import { getScenario, accederSessionStorage } from "./guide-visite";
+import { lireGuideActif, ecrireGuideActif, effacerGuideActif } from "./guide-progress";
+import { useDecalageMenuBas } from "./guide-menu-bas";
 
 const GuideDeTest = dynamic(
-  () => import("@/components/guide/GuideDeTest").then((m) => m.GuideDeTest),
+  () => import("./GuideDeTest").then((m) => m.GuideDeTest),
   { ssr: false },
 );
 
