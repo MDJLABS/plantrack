@@ -1777,10 +1777,11 @@ def orch_sante(etat, maintenant, parts):
                      "conteneurs concernés.")
 
 
-def docker(args):
-    """Seul point d'appel a docker, surchargeable par ORCH_DOCKER (tests). Rend stdout."""
+def docker(args, code=False):
+    """Seul point d'appel a docker, surchargeable par ORCH_DOCKER (tests). Rend stdout, ou le code retour si code."""
     cmd = shlex.split(os.environ.get("ORCH_DOCKER") or "docker") + list(args)
-    return subprocess.run(cmd, capture_output=True, text=True, timeout=30).stdout.strip()
+    p = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+    return p.stdout.strip() if not code else p.returncode
 
 
 def orch_nom_docker(ident):
@@ -1884,24 +1885,76 @@ def orch_portier(racine, reveil):
     return True
 
 
+def orch_lire_sur(chemin):
+    """(objet, uid du proprietaire) d'un fichier regulier lu sans suivre de lien, sinon (None, None)."""
+    try:
+        fd = os.open(chemin, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+    except OSError:
+        return None, None
+    try:
+        st = os.fstat(fd)
+        if st.st_mode & 0o170000 != 0o100000 or st.st_size > 65536:
+            return None, None
+        with os.fdopen(fd, encoding="utf-8") as f:
+            fd = None
+            return json.load(f), st.st_uid
+    except (OSError, ValueError):
+        return None, None
+    finally:
+        if fd is not None:
+            os.close(fd)
+
+
+def orch_proprio_ok(uid, racine):
+    """Le fichier est de root ou du proprietaire du souffle.conf de ce projet."""
+    try:
+        return uid == 0 or uid == os.stat(souffle_conf(racine)).st_uid
+    except OSError:
+        return False
+
+
+def orch_service_du_registre(service, uid=None, racine=None):
+    """Le service figure dans le souffle.conf d'un projet du registre (celui donne, s'il y en a un)
+    et, si uid est donne, ce fichier appartient a root ou au proprietaire de ce souffle.conf."""
+    for r in registered_roots():
+        if racine is not None and os.path.realpath(r) != os.path.realpath(str(racine)):
+            continue
+        if service in souffle(r)[0] and (uid is None or orch_proprio_ok(uid, r)):
+            return True
+    return False
+
+
 def orch_ramasser_reveils(etat):
-    """Traces deposees par le portier pour un reveil accorde : l'orchestre en mesurera le cout."""
+    """Traces deposees par le portier pour un reveil accorde : l'orchestre en mesurera le cout.
+    Une trace est non fiable : meme controles qu'une demande, valeurs bornees."""
     dossier = os.path.join(ORCH_DIR, "reveils")
     suivis = etat.setdefault("reveils", {})
+    total = (etat.get("mesure") or {}).get("total") or 0
+    maintenant = time.time()
     for nom in (os.listdir(dossier) if os.path.isdir(dossier) else []):
         chemin = os.path.join(dossier, nom)
-        d = orch_lire(chemin)
         try:
-            os.remove(chemin)
-        except OSError:
-            pass
-        if not isinstance(d, dict) or not nom.endswith(".json") or not nom_ok(nom[:-5]):
+            d, uid = orch_lire_sur(chemin)
+            if os.path.lexists(chemin):
+                os.remove(chemin)
+            service = nom[:-5]
+            if not isinstance(d, dict) or not nom.endswith(".json") or not nom_ok(service) \
+                    or not orch_service_du_registre(service, uid):
+                continue
+            ts, avant = float(d["ts"]), float(d["avant"])
+            if not (0 <= maintenant - ts < 600) or not (0 <= avant <= (total or avant)):
+                continue
+            suivis.setdefault(service, {"ts": ts, "avant": avant})
+            etat.setdefault("recents", {})[service] = ts
+        except (KeyError, TypeError, ValueError, OverflowError, OSError):
             continue
-        try:
-            suivis.setdefault(nom[:-5], {"ts": float(d["ts"]), "avant": float(d["avant"])})
-        except (KeyError, TypeError, ValueError):
-            pass
-        etat.setdefault("recents", {})[nom[:-5]] = float(d.get("ts") or 0)
+
+
+def orch_retirer(chemin):
+    try:
+        os.remove(chemin)
+    except OSError:
+        pass
 
 
 def orch_demandes(etat, maintenant, m, feu):
@@ -1915,11 +1968,16 @@ def orch_demandes(etat, maintenant, m, feu):
     attente, vus = [], etat.setdefault("demandes_vues", {})
     for nom in os.listdir(dossier):
         chemin = os.path.join(dossier, nom)
-        d = orch_lire(chemin)
+        d, uid = orch_lire_sur(chemin)
         try:
             ok = isinstance(d, dict) and nom.endswith(".json") and nom_ok(str(d.get("service"))) \
                 and nom == d["service"] + ".json" and maintenant - float(d["ts"]) <= ORCH_DEMANDE_AGE
-        except (KeyError, TypeError, ValueError):
+            # la demande est ecrite par un compte quelconque : projet du registre, service de
+            # son souffle.conf, fichier de root ou du proprietaire de ce souffle.conf
+            if ok and not orch_service_du_registre(d["service"], uid, d.get("racine")):
+                ok = False
+                orch_journal(f"demande refusee {nom[:80]} : pas un reveil autorise de ce projet")
+        except (KeyError, TypeError, ValueError, OverflowError):
             ok = False
         if not ok:
             try:
@@ -1943,12 +2001,12 @@ def orch_demandes(etat, maintenant, m, feu):
     for chemin, d in attente:
         s = d["service"]
         if systemctl(["is-active", "--", s]) == "active":
-            os.remove(chemin)
+            orch_retirer(chemin)
             continue
         if m.get("dispo_o", 0) - orch_cout(s, couts) < reserve:
             continue
         systemctl(["start", "--no-block", "--", s], detache=True)
-        os.remove(chemin)
+        orch_retirer(chemin)
         etat.setdefault("reveils", {})[s] = {"ts": maintenant, "avant": m.get("dispo_o", 0)}
         etat.setdefault("recents", {})[s] = maintenant
         orch_journal(f"reveil accorde {s} ({d['projet']}) apres {int(maintenant - float(d['ts']))} s")
@@ -1989,9 +2047,18 @@ def orch_urgence(etat, maintenant):
     except (OSError, subprocess.SubprocessError) as e:
         trace("orchestre : urgence docker", e)
         noms = []
+    echecs = {n: t for n, t in (etat.get("echecs_docker") or {}).items() if maintenant - t < 3600}
+    etat["echecs_docker"] = echecs
     for nom in (n.strip().lstrip("/") for n in noms):
-        if ORCH_NOM_DOCKER.fullmatch(nom) and ORCH_ECRANS.search(nom):
-            docker(["stop", nom])
+        if ORCH_NOM_DOCKER.fullmatch(nom) and ORCH_ECRANS.search(nom) and nom not in echecs:
+            try:
+                rc = docker(["stop", nom], code=True)
+            except (OSError, subprocess.SubprocessError):
+                rc = 1
+            if rc != 0:   # echec : on ne le retente pas pendant 1 h, on passe a l'etape suivante
+                echecs[nom] = maintenant
+                orch_journal(f"menage d'urgence : docker stop {nom} a echoue, je n'insiste pas pendant 1 h")
+                continue
             orch_journal(f"menage d'urgence : ecran d'admin {nom} eteint (docker start {nom} pour le rallumer)")
             orch_geste(etat, f"ecran {nom} eteint")
             return True

@@ -1786,13 +1786,13 @@ cat > "$TO/dk2" <<FAUX
 echo "\$*" >> "$TO/dk2.log"
 case "\$1" in
   ps) cat "$TO/dk2.noms" 2>/dev/null ;;
-  stop) grep -vx "\$2" "$TO/dk2.noms" > "$TO/dk2.noms.n"; mv "$TO/dk2.noms.n" "$TO/dk2.noms" ;;
+  stop) [ -e "$TO/dk2.echec" ] && exit 1; grep -vx "\$2" "$TO/dk2.noms" > "$TO/dk2.noms.n"; mv "$TO/dk2.noms.n" "$TO/dk2.noms" ;;
   inspect) echo /vpn-essai ;;
 esac
 exit 0
 FAUX
 chmod +x "$TO/sc2" "$TO/dk2"; : > "$TO/sc2.log"; : > "$TO/sc2.actifs"; : > "$TO/dk2.log"; : > "$TO/dk2.noms"
-: > "$TO/reg2"
+echo "$TO/pj" > "$TO/reg2"
 O2() { env -u ORCH_ORANGE_DISPO PLANTRACK_ORCHESTRE="$OD2" PLANTRACK_PROC="$OP" PLANTRACK_CGROUP="$CG2" \
   PLANTRACK_REGISTRY="$TO/reg2" ORCH_CALME=0 ORCH_PAS=0 ORCH_ALERTE=true SOUFFLE_SYSTEMCTL="$TO/sc2" \
   ORCH_DOCKER="$TO/dk2" python3 "$PT" "$@"; }
@@ -1842,6 +1842,16 @@ check_not "demande hostile : nom invalide ignore" "bad" "$out"
 check_not "demande hostile : nom de fichier different ignore" "y.service" "$out"
 check_not "demande de plus de 2 h oubliee" "vieux" "$out"
 check_exit "demandes hostiles ou perimees supprimees" "0" "$(ls "$OD2/demandes" | wc -l)"
+# 5b. demandes de session non fiables : service hors souffle.conf, lien symbolique
+: > "$TO/sc2.log"; now=$(date +%s)
+printf '{"service":"z.service","projet":"pj","racine":"%s","ts":%s,"rang":"agent"}' "$PJ" "$now" > "$OD2/demandes/z.service.json"
+printf '{"service":"x.service","projet":"pj","racine":"%s","ts":%s,"rang":"agent"}' "$PJ" "$now" > "$TO/valide.json"
+ln -s "$TO/valide.json" "$OD2/demandes/x.service.json"
+O2 orchestre --tour; sleep 0.5
+check_not "demande hors souffle.conf refusee" "z.service" "$(cat "$TO/sc2.log")"
+check "demande refusee journalisee" "demande refusee z.service.json" "$(jnl)"
+check_not "demande par lien symbolique refusee" "start --no-block -- x.service" "$(cat "$TO/sc2.log")"
+check_exit "demande par lien symbolique supprimee" "0" "$(ls "$OD2/demandes" | wc -l)"
 # 6. apprentissage du cout reel, 180 s apres le reveil
 python3 - "$OD2/etat.json" <<'PY'
 import json, sys
@@ -1857,6 +1867,15 @@ PY
 O2 orchestre --tour
 check_exit "apprentissage : moyenne glissante 0,5 / 0,5" "1304870912" "$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["x.service"])' "$OD2/couts.json")"
 check "apprentissage : journal du cout appris" "cout appris x.service" "$(jnl)"
+# 6b. traces de reveil : une trace invalide est ignoree sans arreter les suivantes
+printf 'w.service\ny.service\n' >> "$PJ/.plantrack/souffle.conf"; mkdir -p "$OD2/reveils"
+printf '{"ts":"abc","avant":1}' > "$OD2/reveils/w.service.json"
+printf '{"ts":%s,"avant":1000}' "$(date +%s)" > "$OD2/reveils/y.service.json"
+printf '{"ts":%s,"avant":1000}' "$(date +%s)" > "$OD2/reveils/hors.service.json"
+O2 orchestre --tour
+out=$(python3 -c 'import json,sys; print(sorted(json.load(open(sys.argv[1]))["reveils"]))' "$OD2/etat.json")
+check_exit "trace invalide ignoree, la suivante est prise, la trace hors souffle.conf refusee" "['y.service']" "$out"
+check_exit "traces ramassees" "0" "$(ls "$OD2/reveils" | wc -l)"
 # 7. menage d'urgence : d'abord un ecran d'admin, puis une pile sans session, jamais une pile gardee
 PJ3="$TO/pj3"; mkdir -p "$PJ3/.plantrack"; printf 'garde x.service\n' > "$PJ3/.plantrack/souffle.conf"; touch "$PJ3/.plantrack/battement"
 touch -d '2 hours ago' "$PJ/.plantrack/battement"
@@ -1874,6 +1893,16 @@ echo "$PJ" > "$TO/reg2"; O2 orchestre --tour
 check "urgence : la pile sans session est eteinte" "stop -- x.service" "$(cat "$TO/sc2.log")"
 check "urgence : pile journalisee" "x.service eteint (pj, aucune session depuis" "$(jnl)"
 check_not "urgence : web-1 n'est pas un ecran d'admin" "stop web-1" "$(cat "$TO/dk2.log")"
+# 7b. docker stop en echec : pas de 'eteint', pas de nouvel essai, et la pile est quand meme eteinte
+touch "$TO/dk2.echec"; echo "$PJ" > "$TO/reg2"; echo x.service > "$TO/sc2.actifs"; : > "$TO/sc2.log"; : > "$TO/dk2.log"
+printf 'rebelle-studio-1\n' > "$TO/dk2.noms"
+O2 orchestre --tour
+check_not "docker stop en echec : pas journalise comme eteint" "rebelle-studio-1 eteint" "$(jnl)"
+check "docker stop en echec : l'echec est journalise" "docker stop rebelle-studio-1 a echoue" "$(jnl)"
+check "docker stop en echec : la pile est eteinte quand meme" "stop -- x.service" "$(cat "$TO/sc2.log")"
+: > "$TO/dk2.log"; O2 orchestre --tour
+check_not "docker stop en echec : pas retente avant 1 h" "stop rebelle" "$(cat "$TO/dk2.log")"
+rm -f "$TO/dk2.echec"
 # 8. pause : une session sans commande gelable n'est jamais choisie
 O2 orchestre --tout-reprendre >/dev/null
 pn=$("$TO/claude" -c 'sleep 300 & wait' >/dev/null 2>&1 & echo $!)
