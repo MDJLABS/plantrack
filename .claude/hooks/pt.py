@@ -3600,6 +3600,12 @@ def checker_corrige(args):
         sys.exit(f"[PlanTrack] le point « {point} » n'a pas de verdict dans « {scen} » "
                  f"(points avec verdict : {', '.join(verdicts) or 'aucun'}).")
     ancien = verdicts.pop(point)
+    # Marque explicite de correction (horodatage ISO UTC, meme format que le moteur TS) : le
+    # poste n'ecarte un verdict local que s'il est plus ancien que cette marque.
+    corriges = entree.get("corriges")
+    if not isinstance(corriges, dict):
+        corriges = entree["corriges"] = {}
+    corriges[point] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
     if not guide_ecrire_sur(chemin, (json.dumps(etat, indent=2, ensure_ascii=False) + "\n").encode("utf-8")):
         sys.exit(f"[PlanTrack] {os.path.relpath(chemin, ROOT)} sort du depot par un lien : je n'y ecris pas.")
     v = ancien.get("v", "?") if isinstance(ancien, dict) else "?"

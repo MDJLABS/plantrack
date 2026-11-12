@@ -614,8 +614,10 @@ out=$(ckpt checker etat)
 check "checker etat : point bloque liste" "bloques : un" "$out"
 out=$(ckpt checker corrige essai un)
 check "checker corrige : message clair" "remis a jouer (il etait : bloque)" "$out"
-check_not "checker corrige : verdict retire" '"un"' "$(cat "$CKD/.planning/guides-etat.json")"
+check_not "checker corrige : verdict retire" '"un": {' "$(cat "$CKD/.planning/guides-etat.json")"
 check "checker corrige : les autres points restent acquis" '"deux"' "$(cat "$CKD/.planning/guides-etat.json")"
+check "checker corrige : marque corriges posee (horodatage ISO UTC)" '"corriges"' "$(cat "$CKD/.planning/guides-etat.json")"
+check_exit "checker corrige : la marque est datee du point corrige" 0 "$(python3 -c "import json,re,sys; e=json.load(open('$CKD/.planning/guides-etat.json'))['essai']; sys.exit(0 if re.fullmatch(r'\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z', e['corriges']['un']) else 1)"; echo $?)"
 check_exit "checker corrige : pas de fichier temporaire oublie" 0 "$(ls "$CKD/.planning" | grep -c tmp)"
 out=$(ckpt checker corrige essai un); rc=$?
 check_exit "checker corrige : point sans verdict = code 1" 1 "$rc"
