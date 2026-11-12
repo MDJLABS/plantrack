@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [209 commits]
+FIL ACTIF — t23 : guides de test automatiques (d100) [210 commits]
   fichiers recemment ecrits : sortie/carte-suite-1111.log, ../../../tmp/claude-0/-home-mariella-plantrack/ecf9a9a5-4736-4a4f-be83-a65441738a2a/scratchpad/carte.json, sortie/carte-suite-1111b.log, ../../../tmp/claude-0/-home-mariella-plantrack/1a31736e-5532-4b6a-8650-290b2970d038/scratchpad/cmds.py, ../../../tmp/claude-0/-home-mariella-plantrack/1a31736e-5532-4b6a-8650-290b2970d038/scratchpad/bloc.py, pyproject.toml
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -272,6 +272,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d237 : Mariella (tel, 11/11, carte Suite apres validation b47/b48) : 'Trier les corrections' - presentation des corrections en attente de son verd… (agent)
   d238 : Mariella (tel, 12/11, carte Tri des 8) : 'fais d'abord une analyse de la charge serveur, libere de la charge, analyse pourquoi le coordinat… (agent)
   d239 : Mariella (tel, 12/11 22h30, carte Coordinateur) : 'Les 3 etages (Recommande)' - 1) portier : tout reveil de base (battre/souffle) demande l… (agent)
+  d240 : Mariella (tel, 12/11 soir, carte Suite) : apres v1.9.47 (coordinateur autonome, b49) et mesure de sa consommation (22 Mo, 0,6 % d'un proces… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…

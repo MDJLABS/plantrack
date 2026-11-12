@@ -2567,3 +2567,5 @@
 {"ts": "2026-11-12T21:40:17+00:00", "kind": "commit", "sha": "fdea47a", "ctype": "chore", "thread": "t23"}
 {"ts": "2026-11-12T21:40:17+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t23"}
 {"ts": "2026-11-12T21:40:44+00:00", "kind": "bug_status", "id": "b49", "status": "to_verify"}
+{"ts": "2026-11-12T21:40:44+00:00", "kind": "commit", "sha": "1cf03ea", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-12T21:43:32+00:00", "kind": "decision", "id": "d240", "text": "Mariella (tel, 12/11 soir, carte Suite) : apres v1.9.47 (coordinateur autonome, b49) et mesure de sa consommation (22 Mo, 0,6 % d'un processeur), choix 'Le laisser tourner (Recommande)' - verdict b49 au bilan de dimanche ; tri des 8 corrections toujours en attente.", "par": "agent"}
