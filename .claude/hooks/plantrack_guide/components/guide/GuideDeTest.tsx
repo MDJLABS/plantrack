@@ -99,6 +99,7 @@ import { GuideCurseur } from "./GuideCurseur";
 import { gestesEtape, type ResultatGeste } from "@/lib/guide/guide-geste";
 import type { VerdictStocke } from "@/lib/guide/guide-etat";
 import type { GuideScenario, GuideProgress } from "@/lib/guide/types";
+import { useDecalageMenuBas } from "@/lib/guide/guide-menu-bas";
 
 /** Vrai si les paramètres (`?…`) de `url` sont ceux de la page affichée (ordre ignoré). */
 function memesParametres(url: string): boolean {
@@ -248,11 +249,12 @@ function BoutonOuvrir({ scenario, onOpen, onQuitter }: {
   onOpen: () => void;
   onQuitter: () => void;
 }) {
+  const menuBas = useDecalageMenuBas(); // b42 : jamais posée sur le menu du bas
   return (
     <div
       id="guide-pastille"
       style={{
-        position: "fixed", right: 16, bottom: 16, zIndex: Z,
+        position: "fixed", right: 16, bottom: 16 + menuBas, zIndex: Z,
         display: "flex", alignItems: "stretch",
         borderRadius: 999, border: `1px solid ${C.bord}`, background: C.fond,
         boxShadow: "0 6px 24px rgba(0,0,0,.45)", overflow: "hidden",

@@ -54,6 +54,7 @@ import { etatGuides, type EtatGuides } from "@/lib/guide/guide-actions";
 import { estEncoreATraiter } from "@/lib/guide/guide-etat";
 import { getScenario, accederSessionStorage } from "@/lib/guide/guide-visite";
 import { lireGuideActif, ecrireGuideActif, effacerGuideActif } from "@/lib/guide/guide-progress";
+import { useDecalageMenuBas } from "@/lib/guide/guide-menu-bas";
 
 const GuideDeTest = dynamic(
   () => import("@/components/guide/GuideDeTest").then((m) => m.GuideDeTest),
@@ -81,6 +82,7 @@ const estIdConnu = (id: string) => getScenario(id) !== null;
 
 export function GuideDeTestLazy() {
   const pathname = usePathname();
+  const menuBas = useDecalageMenuBas(); // b42 : le lanceur se pose au-dessus du menu du bas
 
   // Hydratation — même motif que `GuideDeTest.tsx` (bandeau de tête) : le tout premier
   // rendu client doit être identique au rendu serveur, `sessionStorage` n'existant pas
@@ -164,7 +166,7 @@ export function GuideDeTestLazy() {
   const aTraiter = etat.filter((g) => estEncoreATraiter(g.statut));
 
   return (
-    <div style={{ position: "fixed", right: 16, bottom: 16, zIndex: 2147483000 }}>
+    <div id="guide-lanceur" style={{ position: "fixed", right: 16, bottom: 16 + menuBas, zIndex: 2147483000 }}>
       {panneauOuvert && (
         <div
           id="guide-lanceur-panneau"
