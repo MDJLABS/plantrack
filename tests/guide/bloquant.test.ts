@@ -13,7 +13,7 @@ import { join } from "node:path";
 import { calculerStatut, bloquesPour, dejaConsigne } from "../../.claude/hooks/plantrack_guide/moteur/guide-etat";
 import { verdictScenario } from "../../.claude/hooks/plantrack_guide/moteur/guide-verdict";
 import {
-  chargerProgression, progressionDepuisServeur, reconcilierAvecServeur, serveurPrime, vide,
+  chargerProgression, progressionDepuisServeur, reconcilierAvecServeur, serveurPrime, verdict, vide,
 } from "../../.claude/hooks/plantrack_guide/moteur/guide-progress";
 import { texteAvis } from "../../.claude/hooks/plantrack_guide/moteur/guide-avertir";
 import { SCENARIOS } from "./fixtures/scenarios";
@@ -69,11 +69,44 @@ await step("reconcilierAvecServeur : point retiré (corrigé) puis reprise sur l
   const serveur = {
     p1: { v: "ok", a }, p3: { v: "ok", a }, p5: { v: "ok", a },
   } as never;
-  const p = reconcilierAvecServeur(local, serveur, ids);
+  const p = reconcilierAvecServeur(local, serveur, ids, { p2: a, p4: a });
   assert.deepEqual(Object.keys(p.verdicts).sort(), ["p1", "p3", "p5"]);
   assert.equal(p.index, 1, "reprise sur le premier point sans réponse (p2)");
   assert.deepEqual(p.joues, ["p3"], "le geste du point corrigé est de nouveau à jouer");
   assert.equal(p.motifs?.p2, undefined);
+});
+
+await step("reconcilierAvecServeur : verdict local non encore envoyé (absent du serveur, sans marque) gardé", () => {
+  const local = { ...vide(principal.id), index: 2, verdicts: { p1: "ok", p2: "ko" } as never, quand: { p1: a, p2: a } };
+  const serveur = { p1: { v: "ok", a } } as never;
+  const p = reconcilierAvecServeur(local, serveur, ids, {});
+  assert.equal(p.verdicts.p2, "ko");
+  assert.equal(reconcilierAvecServeur(local, serveur, ids, undefined).verdicts.p2, "ko");
+});
+
+await step("reconcilierAvecServeur : marque plus récente = écarté à chaque lecture (onglet ouvert), geste à rejouer", () => {
+  const marque = "2026-11-12T11:00:00.000Z";
+  const local = { ...vide(principal.id), index: 3, verdicts: { p1: "ok", p2: "ko", p3: "ok" } as never, quand: { p1: a, p2: a }, joues: ["p2"], motifs: { p2: "x" } };
+  const serveur = { p1: { v: "ok", a } } as never;
+  const p = reconcilierAvecServeur(local, serveur, ids, { p2: marque, p3: marque });
+  assert.equal(p.verdicts.p2, undefined);
+  assert.equal(p.verdicts.p3, undefined, "sans horodatage local face à une marque = écarté");
+  assert.equal(p.verdicts.p1, "ok");
+  assert.deepEqual(p.joues, []);
+  assert.equal(p.motifs?.p2, undefined);
+  assert.equal(p.index, 1);
+});
+
+await step("reconcilierAvecServeur : verdict local posé après la marque = gardé", () => {
+  const marque = "2026-11-12T11:00:00.000Z";
+  const local = { ...vide(principal.id), verdicts: { p2: "ok" } as never, quand: { p2: "2026-11-12T12:00:00.000Z" } };
+  const p = reconcilierAvecServeur(local, {} as never, ids, { p2: marque });
+  assert.equal(p.verdicts.p2, "ok");
+});
+
+await step("verdict() horodate le verdict local", () => {
+  const p = verdict(vide(principal.id), "p1", "ok");
+  assert.match(p.quand!.p1, /^\d{4}-\d{2}-\d{2}T.*Z$/);
 });
 
 await step("reconcilierAvecServeur : sans retrait, la progression locale est gardée telle quelle", () => {

@@ -87,7 +87,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { BORD_CARTE, placerCarte, resolveTarget, type PlaceCarte, type Rect } from "./guide-geometry";
 import {
   accederLocalStorage, avancer, chargerProgression, marquerJoue, noterMotif, oublierProgression,
-  oublierToutesLesProgressions, progressionDepuisServeur, reconcilierAvecServeur, reculer, sauverProgression, serveurPrime,
+  oublierToutesLesProgressions, reconcilierAvecServeur, reculer, sauverProgression,
   verdict, vide,
 } from "./guide-progress";
 import { indexDePoint, SCENARIOS } from "./guides-json";
@@ -171,6 +171,7 @@ export const C = {
 export function GuideDeTest({
   scenario,
   verdictsServeur,
+  corriges,
   onFermerDefinitivement,
   onChoisirAutre,
   onTermine,
@@ -181,6 +182,8 @@ export function GuideDeTest({
    *  `GuideDeTestLazy`) — `undefined` si la liste n'a pas encore répondu. Sert UNIQUEMENT à
    *  faire primer le serveur sur le `localStorage` du poste (d138), cf. `serveurPrime`. */
   verdictsServeur?: Record<string, VerdictStocke>;
+  /** Marques de correction du serveur (`plantrack checker corrige`), cf. `reconcilierAvecServeur`. */
+  corriges?: Record<string, string>;
   /** Efface la persistance de session ET synchronise `GuideDeTestLazy` — appelé
    *  UNIQUEMENT par le ✕ « Fermer le guide », jamais par « Replier ». */
   onFermerDefinitivement: () => void;
@@ -208,6 +211,7 @@ export function GuideDeTest({
         <Visite
           scenario={scenario}
           verdictsServeur={verdictsServeur}
+          corriges={corriges}
           onReplier={() => setOuvert(false)}
           // ⚠️ Retour de Mariella du 26/07 : « si je ferme l'overlay je veux un bouton pour
           // le rouvrir ». Le ✕ effaçait la clé de session, donc PLUS RIEN ne se montait —
@@ -297,10 +301,11 @@ function BoutonOuvrir({ scenario, onOpen, onQuitter }: {
   );
 }
 
-function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, onChoisirAutre, onTermine }: {
+function Visite({ scenario, verdictsServeur, corriges, onReplier, onFermer, onTerminer, onChoisirAutre, onTermine }: {
   scenario: GuideScenario;
   /** Verdicts SERVEUR déjà connus pour ce scénario — cf. `GuideDeTest` ci-dessus. */
   verdictsServeur?: Record<string, VerdictStocke>;
+  corriges?: Record<string, string>;
   /** Replier : la pastille reste, la visite CONTINUE (session intacte). */
   onReplier: () => void;
   /** Fermer : tout s'efface (session) — un dispositif dont on ne peut pas sortir serait
@@ -383,7 +388,6 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, on
   // Reprise « là où elle s'est arrêtée » — lue APRÈS montage (localStorage n'existe pas
   // au rendu serveur).
   const [charge, setCharge] = useState(false);
-  const premiereLectureRef = useRef(true);
   useEffect(() => {
     // Les IDS, pas le nombre d'étapes : c'est ce qui permet à `chargerProgression` de rouvrir
     // sur le premier point SANS RÉPONSE quand le scénario a gagné des points depuis la
@@ -392,21 +396,14 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, on
     const local = chargerProgression(scenario.id, accederLocalStorage(), etapesIds);
     // Le serveur prime sur ce poste SEULEMENT s'il porte STRICTEMENT plus de verdicts (d138)
     // — ex. un point jugé sur le téléphone de Mariella, jamais rouvert ici.
-    // Checker v2 : à la PREMIÈRE lecture, le serveur fait aussi foi pour les points qu'il a
-    // retirés (point corrigé par la session) : ils redeviennent à jouer, les ok restent acquis.
-    // Aux relectures suivantes (registre rechargé en cours de visite), seule la règle d138
-    // s'applique : un verdict posé à l'instant, pas encore écrit côté serveur, n'est jamais perdu.
-    const premiere = premiereLectureRef.current;
-    premiereLectureRef.current = false;
-    const p = premiere
-      ? reconcilierAvecServeur(local, verdictsServeur, etapesIds)
-      : serveurPrime(local, verdictsServeur, etapesIds)
-        ? progressionDepuisServeur(scenario.id, verdictsServeur!, etapesIds, (local.joues ?? []).filter((id) => etapesIds.includes(id)))
-        : local;
+    // Checker v2 : à CHAQUE lecture, un verdict local n'est écarté que si le serveur porte une
+    // marque de correction plus récente (`corriges`) ; sans marque le local est gardé, même non
+    // encore envoyé. Cf. `reconcilierAvecServeur`.
+    const p = reconcilierAvecServeur(local, verdictsServeur, etapesIds, corriges);
     // eslint-disable-next-line react-hooks/set-state-in-effect -- reprise lue dans localStorage/serveur après montage, cf. bandeau de tête
     setProg(p);
     setCharge(true);
-  }, [scenario.id, scenario.etapes, verdictsServeur]);
+  }, [scenario.id, scenario.etapes, verdictsServeur, corriges]);
 
   const etape = scenario.etapes[Math.min(prog.index, scenario.etapes.length - 1)];
   // Tous les gestes de l'étape, dans l'ordre (`geste` puis `gestes`, d216).

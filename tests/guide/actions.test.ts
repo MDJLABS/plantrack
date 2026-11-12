@@ -9,7 +9,7 @@
 //     tests/guide/actions.test.ts
 
 import assert from "node:assert/strict";
-import { mkdtemp, mkdir, readFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -128,6 +128,21 @@ await step("un point ko sur un scénario complet → consignerGuide rend a-revoi
   assert.equal(r.statut, "a-revoir");
   assert.equal(appelsApresConsigne[0].statut, "a-revoir");
   assert.deepEqual(appelsApresConsigne[0].ko.map((k: { id: string }) => k.id), ["r2"]);
+});
+
+await step("marque de correction : transmise par etatGuides, retirée par un nouveau verdict (consignerPoint)", async () => {
+  const chemin = join(racine, ".planning", "guides-etat.json");
+  const etatFichier = JSON.parse(await readFile(chemin, "utf8"));
+  const date = etatFichier["temoin-geste"].date;
+  etatFichier["temoin-geste"].corriges = { r2: "2026-11-12T11:00:00.000Z", r1: "2026-11-12T11:00:00.000Z" };
+  await writeFile(chemin, JSON.stringify(etatFichier), "utf8");
+  const avant = (await etatGuides())!.find((g) => g.id === "temoin-geste");
+  assert.deepEqual(avant?.corriges, { r2: "2026-11-12T11:00:00.000Z", r1: "2026-11-12T11:00:00.000Z" });
+  assert.equal(avant?.date, date);
+  const r = await consignerPoint("temoin-geste", "r2", "ok", undefined, false);
+  assert.equal(r.error, null);
+  const apres = (await etatGuides())!.find((g) => g.id === "temoin-geste");
+  assert.deepEqual(apres?.corriges, { r1: "2026-11-12T11:00:00.000Z" }, "seule la marque du point rejugé est retirée");
 });
 
 console.log(`\n${passed} assertions vertes`);

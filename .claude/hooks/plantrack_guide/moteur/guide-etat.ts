@@ -41,6 +41,10 @@ export type EtatScenarioStocke = {
   /** b44 : horodatage du retour de fin PRIS par le poste pour ce `fini`. Posé ⇒ la session a
    *  déjà reçu cette fin : ni une réouverture du guide ni un nouvel appel ne la renvoient. */
   envoye?: string;
+  /** Marque de correction par id de point, posée par `plantrack checker corrige` (horodatage ISO
+   *  UTC) : le point a été corrigé par la session, tout verdict local plus ancien est écarté.
+   *  Retirée quand le point reçoit un nouveau verdict (`consignerPoint`). */
+  corriges?: Record<string, string>;
 };
 
 /** b44 : une visite est « déjà consignée » quand `fini` est posé et qu'aucun verdict n'a été

@@ -113,6 +113,9 @@ export type GuideProgress = {
    *  revenir sur une étape (←, bilan) le rejouerait à chaque passage. Optionnel pour la
    *  même raison que `motifs`. */
   joues?: string[];
+  /** Horodatage ISO (UTC) de pose de chaque verdict LOCAL, par id de point : sert à départager
+   *  un verdict local et une marque de correction du serveur (`corriges`). */
+  quand?: Record<string, string>;
 };
 
 /**

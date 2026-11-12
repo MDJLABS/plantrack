@@ -71,6 +71,8 @@ export type EtatGuideItem = {
   /** `true` si tout ce qui reste à jouer est bloqué : le guide attend la session. */
   enAttente: boolean;
   verdicts: Record<string, VerdictStocke>;
+  /** Marques de correction (`plantrack checker corrige`) de la livraison courante. */
+  corriges: Record<string, string>;
 };
 
 export type EtatGuides = EtatGuideItem[];
@@ -181,6 +183,7 @@ export async function etatGuides(): Promise<EtatGuides | null> {
       bloques,
       enAttente: enAttenteDeSession(faits, bloques, scenario.etapes.length),
       verdicts: correspond ? entree.verdicts : {},
+      corriges: correspond ? entree.corriges ?? {} : {},
     };
   });
 }
@@ -220,6 +223,11 @@ export async function consignerPoint(
       : { date: scenario.date, verdicts: {} };
     const entree: VerdictStocke = { v, a: new Date().toISOString(), ...(propre ? { note: propre } : {}) };
     const nouveau: EtatScenarioStocke = { ...base, verdicts: { ...base.verdicts, [stepId]: entree } };
+    // Un nouveau verdict sur le point lève sa marque de correction.
+    if (base.corriges && Object.prototype.hasOwnProperty.call(base.corriges, stepId)) {
+      const { [stepId]: _lue, ...reste } = base.corriges;
+      nouveau.corriges = reste;
+    }
     try {
       await ecrireEtat(racine, { ...etatComplet, [scenarioId]: nouveau });
     } catch {

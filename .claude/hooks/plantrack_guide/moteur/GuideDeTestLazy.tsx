@@ -157,6 +157,7 @@ export function GuideDeTestLazy() {
       <GuideDeTest
         scenario={scenarioActif}
         verdictsServeur={itemActif.verdicts}
+        corriges={itemActif.corriges}
         onFermerDefinitivement={fermerDefinitivement}
         onChoisirAutre={choisirAutre}
         onTermine={relire}

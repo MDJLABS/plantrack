@@ -99,7 +99,7 @@ export function reculer(p: GuideProgress): GuideProgress {
 
 /** Verdict de Mariella sur une étape (réversible : elle peut se raviser). */
 export function verdict(p: GuideProgress, stepId: string, v: StepVerdict): GuideProgress {
-  return { ...p, verdicts: { ...p.verdicts, [stepId]: v } };
+  return { ...p, verdicts: { ...p.verdicts, [stepId]: v }, quand: { ...p.quand, [stepId]: new Date().toISOString() } };
 }
 
 /** Motif d'un "ko" (champ libre, GuideDeTest.tsx) — distinct du verdict lui-même : une
@@ -224,7 +224,12 @@ export function chargerProgression(
   // arrière pour revoir un point qu'elle n'a pas encore tranché.
   const reprise = premierSansReponseOuIndex(etapesIds, verdicts, index);
 
-  return { scenarioId, index: reprise, verdicts, motifs, joues };
+  const quand: Record<string, string> = {};
+  if (p.quand && typeof p.quand === "object") {
+    for (const [k, v] of Object.entries(p.quand)) if (typeof v === "string") quand[k] = v;
+  }
+
+  return { scenarioId, index: reprise, verdicts, motifs, joues, quand };
 }
 
 /** Index où reprendre : le premier point SANS réponse si le point actuellement pointé en a
@@ -323,50 +328,59 @@ export function progressionDepuisServeur(
 ): GuideProgress {
   const verdicts: Record<string, StepVerdict> = {};
   const motifs: Record<string, string> = {};
+  const quand: Record<string, string> = {};
   for (const id of etapesIds) {
     const v = verdictsServeur[id];
     if (!v) continue;
     verdicts[id] = v.v;
+    if (v.a) quand[id] = v.a;
     if (v.note) motifs[id] = v.note;
   }
   const index = premierSansReponseOuIndex(etapesIds, verdicts, 0);
-  return { scenarioId, index, verdicts, motifs, joues: [...joues] };
+  return { scenarioId, index, verdicts, motifs, joues: [...joues], quand };
 }
 
 /**
- * Ouverture d'une visite (Checker v2, d241) : met la progression locale d'accord avec le
- * registre serveur. Le serveur fait foi pour les points qu'il a RETIRÉS : quand la session
- * corrige un point (`plantrack checker corrige`), son verdict disparaît du registre ; ici le
- * verdict local du même point est écarté (avec son motif, et son geste redevient à jouer),
- * et la reprise tombe sur le premier point sans réponse, donc sur lui. Les points déjà ok
- * restent acquis. Sans registre serveur (`undefined`), la progression locale est gardée.
+ * Réconciliation de la progression locale avec le registre serveur (Checker v2, d241), à CHAQUE
+ * lecture serveur. Le serveur ne fait foi que par une marque EXPLICITE : quand la session corrige
+ * un point (`plantrack checker corrige`), le registre porte `corriges[point]` (horodatage). Un
+ * verdict local n'est écarté (avec son motif, son geste redevient à jouer) que si ce point a une
+ * marque ET que le verdict local est plus ancien (ou sans horodatage). Sans marque, le local est
+ * gardé : un verdict noté puis pas encore envoyé (page rechargée, envoi raté) n'est jamais perdu.
+ * Un verdict posé APRÈS la marque est gardé. Ensuite la règle d138 (`serveurPrime`) s'applique.
  */
 export function reconcilierAvecServeur(
   local: GuideProgress,
   verdictsServeur: Record<string, VerdictStocke> | undefined,
   etapesIds: readonly string[],
+  corriges?: Record<string, string>,
 ): GuideProgress {
-  if (!verdictsServeur) return local;
-  if (serveurPrime(local, verdictsServeur, etapesIds)) {
+  let p = local;
+  const retires = etapesIds.filter((id) => {
+    if (!corriges || !Object.prototype.hasOwnProperty.call(corriges, id)) return false;
+    if (!Object.prototype.hasOwnProperty.call(local.verdicts, id)) return false;
+    const pose = local.quand?.[id];
+    return !pose || pose < corriges[id];
+  });
+  if (retires.length > 0) {
+    const verdicts = { ...local.verdicts };
+    const motifs = { ...(local.motifs ?? {}) };
+    const quand = { ...(local.quand ?? {}) };
+    for (const id of retires) {
+      delete verdicts[id];
+      delete motifs[id];
+      delete quand[id];
+    }
+    const joues = (local.joues ?? []).filter((id) => !retires.includes(id));
+    const premier = etapesIds.findIndex((id) => !estRepondu(verdicts[id]));
+    p = { scenarioId: local.scenarioId, index: premier >= 0 ? premier : local.index, verdicts, motifs, joues, quand };
+  }
+
+  if (verdictsServeur && serveurPrime(p, verdictsServeur, etapesIds)) {
     // Les gestes déjà joués sur ce poste le restent (sinon un geste « aller » rejoué = boucle
     // de redirection) ; seuls les ids encore au scénario sont gardés.
-    const joues = (local.joues ?? []).filter((id) => etapesIds.includes(id));
-    return progressionDepuisServeur(local.scenarioId, verdictsServeur, etapesIds, joues);
+    const joues = (p.joues ?? []).filter((id) => etapesIds.includes(id));
+    return progressionDepuisServeur(p.scenarioId, verdictsServeur, etapesIds, joues);
   }
-
-  const retires = etapesIds.filter(
-    (id) => Object.prototype.hasOwnProperty.call(local.verdicts, id)
-      && !Object.prototype.hasOwnProperty.call(verdictsServeur, id),
-  );
-  if (retires.length === 0) return local;
-
-  const verdicts = { ...local.verdicts };
-  const motifs = { ...(local.motifs ?? {}) };
-  for (const id of retires) {
-    delete verdicts[id];
-    delete motifs[id];
-  }
-  const joues = (local.joues ?? []).filter((id) => !retires.includes(id));
-  const premier = etapesIds.findIndex((id) => !estRepondu(verdicts[id]));
-  return { scenarioId: local.scenarioId, index: premier >= 0 ? premier : local.index, verdicts, motifs, joues };
+  return p;
 }
