@@ -14,15 +14,12 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [208 commits]
-  fichiers recemment ecrits : ../../../tmp/claude-0/-home-mariella-plantrack/71553c77-e842-4678-8bbb-c3db0eb62776/scratchpad/carte.json, sortie/carte-suite-1111.log, ../../../tmp/claude-0/-home-mariella-plantrack/ecf9a9a5-4736-4a4f-be83-a65441738a2a/scratchpad/carte.json, sortie/carte-suite-1111b.log, ../../../tmp/claude-0/-home-mariella-plantrack/1a31736e-5532-4b6a-8650-290b2970d038/scratchpad/cmds.py, ../../../tmp/claude-0/-home-mariella-plantrack/1a31736e-5532-4b6a-8650-290b2970d038/scratchpad/bloc.py
+FIL ACTIF — t23 : guides de test automatiques (d100) [209 commits]
+  fichiers recemment ecrits : sortie/carte-suite-1111.log, ../../../tmp/claude-0/-home-mariella-plantrack/ecf9a9a5-4736-4a4f-be83-a65441738a2a/scratchpad/carte.json, sortie/carte-suite-1111b.log, ../../../tmp/claude-0/-home-mariella-plantrack/1a31736e-5532-4b6a-8650-290b2970d038/scratchpad/cmds.py, ../../../tmp/claude-0/-home-mariella-plantrack/1a31736e-5532-4b6a-8650-290b2970d038/scratchpad/bloc.py, pyproject.toml
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
   t5 : travaux sur main — reprise : retour au travail courant apres la faille
-
-BUGS NON CORRIGES (personne ne s'en est occupe) :
-  b49 (open) [t23] Surcharge 12/11 22h01-22h13 (earlyoom tue chrome + java 1,4 Go) : la respiration (battre, pt.py) reveille prolearn-supabase (22h01) puis pr… (agent) [1 tentatives, derniere: Livre v1.9.47 (bd9c2a7 + 21baa4f, GitHub seul, pas de cle P…]
 
 BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b37 (to_verify) [t23] kvm-lourd (01/11) : une commande de lecture (diff/grep/ls dans prolearn) classee next-build et mise en file 8/8 — recurrence b35/b36 (agent) [1 tentatives, derniere: Cause trouvee (reproduite) : dans 'diff <(cat A) B', la par…]
@@ -33,6 +30,7 @@ BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b44 (to_verify) [t23] Guide termine (tel Mariella 08/11, session projob) : derniere etape pas confirmee a l'ecran, guide reste dans la liste des restants, fin en… (agent) [2 tentatives, derniere: Livre : moteur (cda33df + 8ea12a4 sans grands tirets) coche…]
   b45 (to_verify) [t23] Moteur guide : consignerPoint lit puis reecrit guides-etat.json hors de la file de consignation ; deux verdicts rapproches (deux onglets, p… (agent) [2 tentatives, derniere: Livre : consignerPoint passe par la file enFile (meme file …]
   b46 (to_verify) [t23] Guide (moteur commun + mdjlabs) : en dev (StrictMode) avec mouvement reduit, un point a plusieurs gestes s'arretait apres le 1er geste sans… (agent) [1 tentatives, derniere: Ref prochain (index du 1er geste non joue) + fini a la plac…]
+  b49 (to_verify) [t23] Surcharge 12/11 22h01-22h13 (earlyoom tue chrome + java 1,4 Go) : la respiration (battre, pt.py) reveille prolearn-supabase (22h01) puis pr… (agent) [1 tentatives, derniere: Livre v1.9.47 (bd9c2a7 + 21baa4f, GitHub seul, pas de cle P…]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
