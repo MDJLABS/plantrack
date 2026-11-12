@@ -3147,6 +3147,27 @@ def guide_dans_depot(d):
     return (os.path.realpath(p) + os.sep).startswith(os.path.realpath(ROOT) + os.sep)
 
 
+def guide_ecrire_sur(d, contenu, mode=None):
+    """Ecriture atomique (mkstemp dans le dossier + os.replace) refusee si d ou un parent sort du depot
+    par un lien symbolique. Rend True si ecrit."""
+    if not guide_dans_depot(d):
+        return False
+    os.makedirs(os.path.dirname(d), exist_ok=True)
+    if not guide_dans_depot(os.path.dirname(d)):
+        return False
+    fd, tmp = tempfile.mkstemp(dir=os.path.dirname(d), prefix=".pt-")
+    try:
+        with os.fdopen(fd, "wb") as f:
+            f.write(contenu)
+        os.chmod(tmp, mode if mode is not None else 0o644)
+        os.replace(tmp, d)
+    except BaseException:
+        if os.path.exists(tmp):
+            os.remove(tmp)
+        raise
+    return True
+
+
 def guide_est_raccourci(contenu):
     """Un raccourci tient en une ligne `export * from "...";` (eventuels commentaires en tete)."""
     lignes = [l.strip() for l in contenu.decode("utf-8", "replace").splitlines()
@@ -3162,9 +3183,9 @@ def guide_sauvegarder(d, contenu, publies):
     cible = os.path.join(ROOT, "backup", "code", rel)
     if os.path.exists(cible) and open(cible, "rb").read() != contenu:
         cible += "." + datetime.now().strftime("%Y%m%d%H%M%S")
-    os.makedirs(os.path.dirname(cible), exist_ok=True)
-    with open(cible, "wb") as f:
-        f.write(contenu)
+    if not guide_ecrire_sur(cible, contenu):
+        print(f"guide de test : sauvegarde de {rel} refusee (backup/code sort du depot par un lien).")
+        return False
     return rel
 
 
@@ -3192,12 +3213,7 @@ def guide_ecrire_si_change(d, contenu):
     """Ecrit d seulement si le contenu change ; True si ecrit."""
     if os.path.isfile(d) and open(d, "rb").read() == contenu:
         return False
-    os.makedirs(os.path.dirname(d), exist_ok=True)
-    tmp = d + ".tmp-pt"
-    with open(tmp, "wb") as f:
-        f.write(contenu)
-    os.replace(tmp, d)
-    return True
+    return guide_ecrire_sur(d, contenu)
 
 
 GUIDE_INDEX_ENTETE = ("/* Fichier genere par PlanTrack (plantrack checker), ne pas editer : "
@@ -3243,6 +3259,8 @@ def guide_copier_moteur(src, base):
             if ancien == neuf:
                 continue
             sauve = guide_sauvegarder(d, ancien, publies)
+            if sauve is False:
+                continue  # sauvegarde impossible : on ne remplace pas
             if sauve:
                 print(f"guide de test : {sauve} etait modifie, copie dans backup/code puis remplace.")
         guide_ecrire_si_change(d, neuf)
@@ -3253,8 +3271,9 @@ def guide_copier_moteur(src, base):
         sauve = guide_sauvegarder(ancien, open(ancien, "rb").read(), publies)
         if sauve:
             print(f"guide de test : {sauve} etait modifie, copie dans backup/code puis supprime.")
-        os.remove(ancien)
-        changes += 1
+        if sauve is not False:
+            os.remove(ancien)
+            changes += 1
     return changes
 
 
@@ -3414,10 +3433,7 @@ def checker_monter_layout(base):
         texte = texte[:fin] + "\n" + ligne + texte[fin:]
     else:
         texte = ligne + "\n" + texte
-    tmp = complet + ".tmp-pt"
-    with open(tmp, "w", encoding="utf-8") as f:
-        f.write(texte)
-    os.replace(tmp, complet)
+    guide_ecrire_sur(complet, texte.encode("utf-8"))
     return f"{chemin} : guide monte (import + <GuideDeTestLazy /> avant </body>)."
 
 
@@ -3584,11 +3600,8 @@ def checker_corrige(args):
         sys.exit(f"[PlanTrack] le point « {point} » n'a pas de verdict dans « {scen} » "
                  f"(points avec verdict : {', '.join(verdicts) or 'aucun'}).")
     ancien = verdicts.pop(point)
-    tmp = chemin + ".tmp-pt"
-    with open(tmp, "w", encoding="utf-8") as f:
-        json.dump(etat, f, indent=2, ensure_ascii=False)
-        f.write("\n")
-    os.replace(tmp, chemin)
+    if not guide_ecrire_sur(chemin, (json.dumps(etat, indent=2, ensure_ascii=False) + "\n").encode("utf-8")):
+        sys.exit(f"[PlanTrack] {os.path.relpath(chemin, ROOT)} sort du depot par un lien : je n'y ecris pas.")
     v = ancien.get("v", "?") if isinstance(ancien, dict) else "?"
     print(f"Point « {point} » du guide « {scen} » remis a jouer (il etait : {v}). "
           "Les autres points restent acquis : le testeur ne rejouera que lui.")

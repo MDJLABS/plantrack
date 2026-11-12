@@ -468,20 +468,18 @@ check_not "update : rien recopie dans l ancien guide" "fichier(s) du moteur mis 
 echo miens > "$TMP8/src/lib/guide/guide-reglages-serveur.ts"
 out=$(CLAUDE_PROJECT_DIR="$TMP8" python3 "$PT" update 2>&1)
 check "update : le moteur du guide de test est mis a jour" "fichier(s) du moteur mis a jour" "$out"
-check "update : types.ts remplace par la version PlanTrack" "ok" \
-  "$(cmp -s "$TMP8/src/lib/guide/types.ts" "$(dirname "$PT")/plantrack_guide/lib/guide/types.ts" && echo ok)"
+check "update : le moteur est pose dans moteur/ (Checker v2)" "ok" \
+  "$(cmp -s "$TMP8/src/lib/guide/moteur/types.ts" "$(dirname "$PT")/plantrack_guide/moteur/types.ts" && echo ok)"
 check "update : scenarios.ts du site intact" "miens" "$(cat "$TMP8/src/lib/guide/scenarios.ts")"
-check "update : composant du guide pose" "ok" "$([ -f "$TMP8/src/components/guide/GuideDeTest.tsx" ] && echo ok)"
+check "update : raccourci du composant pose" "ok" "$([ -f "$TMP8/src/components/guide/GuideDeTestLazy.tsx" ] && echo ok)"
 out=$(CLAUDE_PROJECT_DIR="$TMP8" python3 "$PT" update 2>&1)
 check "update : guide idempotent" "guide de test deja a jour" "$out"
-# b24 : un site qui a son propre guide (fichier retouche, aucune version publiee) n'est pas touche
-echo "// retouche du site" >> "$TMP8/src/lib/guide/guide-verdict.ts"
-rm "$TMP8/src/components/guide/GuideDeTest.tsx"
+# Checker v2 : une copie retouchee du moteur est sauvegardee dans backup/code puis remplacee
+echo "// retouche du site" >> "$TMP8/src/lib/guide/moteur/guide-verdict.ts"
 out=$(CLAUDE_PROJECT_DIR="$TMP8" python3 "$PT" update 2>&1)
-check "update : un site qui a son propre guide est laisse tel quel" "a son propre guide" "$out"
-check "update : son fichier retouche est garde" "retouche du site" "$(tail -1 "$TMP8/src/lib/guide/guide-verdict.ts")"
-check "update : aucun fichier du moteur rajoute chez lui" "absent" \
-  "$([ -f "$TMP8/src/components/guide/GuideDeTest.tsx" ] && echo present || echo absent)"
+check "update : une copie retouchee du moteur est remplacee" "copie dans backup/code puis remplace" "$out"
+check "update : sa version est gardee dans backup/code" "retouche du site" "$(cat "$TMP8/backup/code/src/lib/guide/moteur/guide-verdict.ts" 2>/dev/null)"
+check_not "update : le moteur n a plus la retouche" "retouche du site" "$(cat "$TMP8/src/lib/guide/moteur/guide-verdict.ts")"
 rm -rf "$TMP8"
 
 # d151 : un projet NEUF qui est un site Next recoit le guide (moteur + fichiers du site)
@@ -491,7 +489,7 @@ printf '{"compilerOptions":{"paths":{"@/*": ["./src/*"]}}}' > "$TMP8b/tsconfig.j
 out=$(CLAUDE_PROJECT_DIR="$TMP8b" python3 "$PT" init 2>&1)
 check "init : un site Next neuf recoit le guide" "guide de test pose dans src/lib/guide" "$out"
 check "init : moteur pose sous l alias @/" "ok" \
-  "$(cmp -s "$TMP8b/src/lib/guide/types.ts" "$(dirname "$PT")/plantrack_guide/lib/guide/types.ts" && echo ok)"
+  "$(cmp -s "$TMP8b/src/lib/guide/moteur/types.ts" "$(dirname "$PT")/plantrack_guide/moteur/types.ts" && echo ok)"
 check "init : porte admin fermee par defaut" "async () => false" "$(cat "$TMP8b/src/lib/guide/guide-reglages-serveur.ts")"
 echo "// mes parcours" >> "$TMP8b/src/lib/guide/scenarios.ts"
 out=$(CLAUDE_PROJECT_DIR="$TMP8b" python3 "$PT" init 2>&1)
@@ -517,6 +515,149 @@ printf '{"compilerOptions":{"paths":{"@/*": ["./*"]}}}' > "$TMP8d/tsconfig.json"
 out=$(CLAUDE_PROJECT_DIR="$TMP8d" python3 "$PT" init 2>&1)
 check_not "init : un depot deja equipe ne recoit pas le guide par surprise" "guide de test" "$out$(ls "$TMP8d")"
 rm -rf "$TMP8d"
+
+# Checker v2 (d241) : dossier reserve moteur/, raccourcis, fichiers du site, commande checker.
+# Source factice (PLANTRACK_GUIDE_SRC) : le test ne depend pas du contenu reel du moteur.
+CK=$(mktemp -d); CKS="$CK/src-moteur"
+mkdir -p "$CKS/moteur" "$CKS/raccourcis/lib/guide" "$CKS/raccourcis/components/guide" "$CKS/site/guides"
+echo 'export const v = 1;' > "$CKS/moteur/types.ts"
+echo 'export const e = 1;' > "$CKS/moteur/guide-etat.ts"
+echo '"use server"; export const a = 1;' > "$CKS/moteur/guide-actions.ts"
+echo 'export const L = () => null;' > "$CKS/moteur/GuideDeTestLazy.tsx"
+echo 'export * from "./moteur/types";' > "$CKS/raccourcis/lib/guide/types.ts"
+echo 'export * from "./moteur/guide-etat";' > "$CKS/raccourcis/lib/guide/guide-etat.ts"
+echo 'export * from "@/lib/guide/moteur/GuideDeTestLazy";' > "$CKS/raccourcis/components/guide/GuideDeTestLazy.tsx"
+echo '// gabarit index' > "$CKS/site/guides/index.ts"
+ckpt() { (cd "$CKD" && PLANTRACK_GUIDE_SRC="$CKS" CLAUDE_PROJECT_DIR="$CKD" python3 "$PT" "$@" 2>&1); }
+CKD="$CK/site1"; mkdir -p "$CKD/app" "$CKD/lib/guide/guides"; git -C "$CKD" init -q
+printf '{"dependencies":{"next":"15.0.0"}}' > "$CKD/package.json"
+printf '{"compilerOptions":{"paths":{"@/*": ["./*"]}}}' > "$CKD/tsconfig.json"
+printf 'import "./globals.css";\n\nexport default function L({ children }) {\n  return (\n    <html>\n      <body>\n        {children}\n      </body>\n    </html>\n  );\n}\n' > "$CKD/app/layout.tsx"
+# un site avec l'ancien guide a plat : types.ts, guide-actions.ts retouche, scenarios.ts a lui
+echo 'ancien types' > "$CKD/lib/guide/types.ts"
+echo 'export const a = "retouche du site";' > "$CKD/lib/guide/guide-actions.ts"
+echo 'mes scenarios' > "$CKD/lib/guide/scenarios.ts"
+echo 'mes reglages serveur' > "$CKD/lib/guide/guide-reglages-serveur.ts"
+echo '{"titre":"T","page":"/p","points":[{"id":"un","titre":"a","faire":"f","attendu":"a","cible":"#present"}]}' > "$CKD/lib/guide/guides/essai.json"
+echo 'export const x = 1;' > "$CKD/lib/guide/moteur-perso.ts"
+mkdir -p "$CKD/lib/guide/moteur"; echo 'copie modifiee a la main' > "$CKD/lib/guide/moteur/types.ts"
+out=$(ckpt init)
+check "checker : synchro, fichiers du moteur mis a jour" "fichier(s) du moteur mis a jour" "$out"
+check "checker : copie modifiee sauvegardee" "copie dans backup/code puis remplace" "$out"
+check "checker : la copie modifiee est dans backup/code" "copie modifiee a la main" "$(cat "$CKD/backup/code/lib/guide/moteur/types.ts" 2>/dev/null)"
+check "checker : le moteur est remplace par la source" "export const v = 1;" "$(cat "$CKD/lib/guide/moteur/types.ts")"
+check "checker : raccourci pose a l ancien chemin" 'export * from "./moteur/types";' "$(cat "$CKD/lib/guide/types.ts")"
+check "checker : raccourci du composant pose" 'moteur/GuideDeTestLazy' "$(cat "$CKD/components/guide/GuideDeTestLazy.tsx")"
+check_exit "checker : ancien guide-actions.ts supprime" "absent" "$([ -e "$CKD/lib/guide/guide-actions.ts" ] && echo present || echo absent)"
+check "checker : l ancien guide-actions.ts inconnu est sauvegarde" "retouche du site" "$(cat "$CKD/backup/code/lib/guide/guide-actions.ts" 2>/dev/null)"
+check "checker : scenarios.ts du site intact" "mes scenarios" "$(cat "$CKD/lib/guide/scenarios.ts")"
+check "checker : reglages du site intacts" "mes reglages serveur" "$(cat "$CKD/lib/guide/guide-reglages-serveur.ts")"
+check "checker : index.ts genere (import du guide)" 'import g0 from "./essai.json";' "$(cat "$CKD/lib/guide/guides/index.ts")"
+check "checker : index.ts exporte GUIDES_JSON" '"essai": g0' "$(cat "$CKD/lib/guide/guides/index.ts")"
+check_not "checker : index.ts sans grand tiret" $'\xe2\x80\x94' "$(cat "$CKD/lib/guide/guides/index.ts")"
+check "checker : la ligne Checker est dans AGENTS.md du site" "plantrack checker verifier" "$(cat "$CKD/AGENTS.md")"
+out=$(ckpt update)
+check "checker : synchro idempotente" "guide de test deja a jour" "$out"
+check_exit "checker : rien a sauvegarder deuxieme fois (pas de doublon)" "1" "$(find "$CKD/backup/code" -type f -path "*moteur*" | wc -l)"
+rm -rf "$CKD/backup"; echo "// bidouille" >> "$CKD/lib/guide/moteur/types.ts"; rm "$CKD/lib/guide/types.ts"
+ckpt update >/dev/null
+check "checker : raccourci absent est repose" 'export * from "./moteur/types";' "$(cat "$CKD/lib/guide/types.ts")"
+# un raccourci retouche n est pas sauvegarde (il est remplace sans bruit)
+echo 'export * from "./autre";' > "$CKD/lib/guide/guide-etat.ts"
+out=$(ckpt update); check_not "checker : un raccourci remplace n est pas sauvegarde" "backup/code" "$out"
+# lien symbolique sortant : jamais d'ecriture
+rm "$CKD/lib/guide/guide-etat.ts"; echo cible > "$CK/dehors.ts"; ln -s "$CK/dehors.ts" "$CKD/lib/guide/guide-etat.ts"
+out=$(ckpt update)
+check "checker : lien hors du depot ignore" "lien hors du depot" "$out"
+check "checker : cible du lien intacte" "cible" "$(cat "$CK/dehors.ts")"
+rm "$CKD/lib/guide/guide-etat.ts"
+# backup/code piege : lien vers l'exterieur, la sauvegarde est refusee et la copie inconnue n'est pas remplacee
+mkdir -p "$CK/exterieur"; rm -rf "$CKD/backup"; ln -s "$CK/exterieur" "$CKD/backup"
+echo 'copie inconnue' > "$CKD/lib/guide/moteur/types.ts"
+out=$(ckpt update)
+check "checker : backup/code en lien hors du depot refuse" "refusee" "$out"
+check_exit "checker : rien ecrit a l exterieur" 0 "$(find "$CK/exterieur" -type f | wc -l)"
+check "checker : copie inconnue non remplacee faute de sauvegarde" "copie inconnue" "$(cat "$CKD/lib/guide/moteur/types.ts")"
+rm "$CKD/backup"
+ckpt update >/dev/null
+# .planning/guides-etat.json en lien hors du depot : checker corrige refuse
+# ancien guide (sans reglages serveur) laisse tel quel
+CKA="$CK/ancien"; mkdir -p "$CKA/lib/guide"; git -C "$CKA" init -q; echo vieux > "$CKA/lib/guide/types.ts"
+out=$(cd "$CKA" && PLANTRACK_GUIDE_SRC="$CKS" CLAUDE_PROJECT_DIR="$CKA" python3 "$PT" init 2>&1)
+check "checker : ancien guide laisse tel quel" "ancien guide" "$out"
+check "checker : ancien guide intact" "vieux" "$(cat "$CKA/lib/guide/types.ts")"
+# checker verifier
+printf '<button id="present">x</button>\n' > "$CKD/app/page.tsx"
+out=$(ckpt checker verifier); rc=$?
+check "checker verifier : guide valide" "ok essai" "$out"; check_exit "checker verifier : code 0" 0 "$rc"
+echo '{"titre":"T","page":"/p","points":[{"id":"a","faire":"f","attendu":"x","cible":"#absent-ici"},{"id":"a","titre":"b"}]}' > "$CKD/lib/guide/guides/mauvais.json"
+out=$(ckpt checker verifier mauvais); rc=$?
+check "checker verifier : id en double signale" "en double" "$out"
+check "checker verifier : champ manquant signale" "champ « attendu » manquant" "$out"
+check "checker verifier : #id absent signale" "#absent-ici introuvable" "$out"
+check_exit "checker verifier : code non nul sur erreur" 1 "$rc"
+echo '{"titre":"T","page":"/p","points":[{"id":"a","faire":"f","attendu":"x","cible":"#absent-ici"}]}' > "$CKD/lib/guide/guides/mauvais.json"
+out=$(ckpt checker verifier mauvais); rc=$?
+check "checker verifier : #id absent = avertissement" "avertissement mauvais" "$out"; check_exit "checker verifier : avertissement seul = code 0" 0 "$rc"
+echo '{pas du json' > "$CKD/lib/guide/guides/casse.json"
+out=$(ckpt checker verifier casse); rc=$?
+check "checker verifier : JSON illisible" "JSON illisible" "$out"; check_exit "checker verifier : JSON illisible = code 1" 1 "$rc"
+out=$(ckpt checker verifier nexistepas); rc=$?
+check "checker verifier : guide absent" "introuvable" "$out"; check_exit "checker verifier : guide absent = code 1" 1 "$rc"
+rm "$CKD/lib/guide/guides/casse.json" "$CKD/lib/guide/guides/mauvais.json"
+# checker corrige / etat
+mkdir -p "$CKD/.planning"
+cat > "$CKD/.planning/guides-etat.json" <<'JSON'
+{"essai": {"date": "1", "verdicts": {"un": {"v": "bloque", "a": "2026-11-12", "note": "casse"}, "deux": {"v": "ok", "a": "2026-11-12"}}}}
+JSON
+out=$(ckpt checker etat)
+check "checker etat : point bloque liste" "bloques : un" "$out"
+out=$(ckpt checker corrige essai un)
+check "checker corrige : message clair" "remis a jouer (il etait : bloque)" "$out"
+check_not "checker corrige : verdict retire" '"un"' "$(cat "$CKD/.planning/guides-etat.json")"
+check "checker corrige : les autres points restent acquis" '"deux"' "$(cat "$CKD/.planning/guides-etat.json")"
+check_exit "checker corrige : pas de fichier temporaire oublie" 0 "$(ls "$CKD/.planning" | grep -c tmp)"
+out=$(ckpt checker corrige essai un); rc=$?
+check_exit "checker corrige : point sans verdict = code 1" 1 "$rc"
+out=$(ckpt checker corrige inconnu x); check "checker corrige : guide sans verdict" "aucun verdict" "$out"
+# guides-etat.json en lien hors du depot : refuse, la cible reste intacte
+echo '{"essai": {"date": "1", "verdicts": {"deux": {"v": "ko", "a": "x"}}}}' > "$CK/etat-ext.json"
+rm "$CKD/.planning/guides-etat.json"; ln -s "$CK/etat-ext.json" "$CKD/.planning/guides-etat.json"
+out=$(ckpt checker corrige essai deux); rc=$?
+check_exit "checker corrige : etat en lien hors du depot refuse" 1 "$rc"
+check "checker corrige : cible du lien intacte" '"deux"' "$(cat "$CK/etat-ext.json")"
+rm "$CKD/.planning/guides-etat.json"
+# checker installer sur un faux site Next, idempotent
+CKN="$CK/neuf"; mkdir -p "$CKN/src/app"; git -C "$CKN" init -q
+printf '{"dependencies":{"next":"15.0.0"}}' > "$CKN/package.json"
+printf '{"compilerOptions":{"paths":{"@/*": ["./src/*"]}}}' > "$CKN/tsconfig.json"
+printf 'import type { Metadata } from "next";\n\nexport default function R({ children }) {\n  return (\n    <html>\n      <body>{children}</body>\n    </html>\n  );\n}\n' > "$CKN/src/app/layout.tsx"
+printf 'import type { Metadata } from "next";\n\nexport default function R({ children }) {\n  return (\n    <html>\n      <body>\n        {children}\n      </body>\n    </html>\n  );\n}\n' > "$CKN/src/app/layout.tsx"
+out=$(cd "$CKN" && PLANTRACK_GUIDE_SRC="$CKS" CLAUDE_PROJECT_DIR="$CKN" python3 "$PT" checker 2>&1)
+check "checker installer : moteur pose" "moteur a jour dans src/lib/guide" "$out"
+check "checker installer : layout monte" "guide monte" "$out"
+check "checker installer : import ajoute" 'import { GuideDeTestLazy } from "@/components/guide/GuideDeTestLazy";' "$(cat "$CKN/src/app/layout.tsx")"
+check "checker installer : composant avant </body>" "<GuideDeTestLazy />
+      </body>" "$(cat "$CKN/src/app/layout.tsx")"
+check "checker installer : reste a faire (estAdmin)" "estAdmin" "$out"
+check "checker installer : aide courte affichee" "un fichier par guide" "$(echo "$out" | sed 's/un guide de test = un fichier/un fichier par guide/')"
+check "checker installer : fichiers du site crees" "ok" "$([ -f "$CKN/src/lib/guide/scenarios.ts" ] && [ -f "$CKN/src/lib/guide/guides/index.ts" ] && echo ok)"
+check "checker installer : scenarios.ts importe ./types" 'from "./types"' "$(cat "$CKN/src/lib/guide/scenarios.ts")"
+out=$(cd "$CKN" && PLANTRACK_GUIDE_SRC="$CKS" CLAUDE_PROJECT_DIR="$CKN" python3 "$PT" checker installer 2>&1)
+check "checker installer : idempotent (deja monte)" "deja monte" "$out"
+check_exit "checker installer : un seul composant dans le layout" 1 "$(grep -c '<GuideDeTestLazy />' "$CKN/src/app/layout.tsx")"
+check_exit "checker installer : un seul import dans le layout" 1 "$(grep -c '^import { GuideDeTestLazy }' "$CKN/src/app/layout.tsx")"
+# pas de layout : dit ou le mettre ; pas de site Next : refuse
+CKM="$CK/sanslayout"; mkdir -p "$CKM"; git -C "$CKM" init -q
+printf '{"dependencies":{"next":"15.0.0"}}' > "$CKM/package.json"
+printf '{"compilerOptions":{"paths":{"@/*": ["./*"]}}}' > "$CKM/tsconfig.json"
+out=$(cd "$CKM" && PLANTRACK_GUIDE_SRC="$CKS" CLAUDE_PROJECT_DIR="$CKM" python3 "$PT" checker installer 2>&1)
+check "checker installer : sans layout, dit ou le mettre" "layout racine introuvable" "$out"
+CKP="$CK/pasnext"; mkdir -p "$CKP"; git -C "$CKP" init -q
+out=$(cd "$CKP" && PLANTRACK_GUIDE_SRC="$CKS" CLAUDE_PROJECT_DIR="$CKP" python3 "$PT" checker installer 2>&1); rc=$?
+check_exit "checker installer : refuse hors site Next" 1 "$rc"
+out=$(ckpt checker aide); check "checker aide : format" '"points"' "$out"
+rm -rf "$CK"
 
 # 24. garde-fou surcouches — un outil (GSD...) regenere CLAUDE.md sans la reference
 TMP9=$(mktemp -d)
