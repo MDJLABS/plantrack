@@ -2569,3 +2569,39 @@
 {"ts": "2026-11-12T21:40:44+00:00", "kind": "bug_status", "id": "b49", "status": "to_verify"}
 {"ts": "2026-11-12T21:40:44+00:00", "kind": "commit", "sha": "1cf03ea", "ctype": "chore", "thread": "t23"}
 {"ts": "2026-11-12T21:43:32+00:00", "kind": "decision", "id": "d240", "text": "Mariella (tel, 12/11 soir, carte Suite) : apres v1.9.47 (coordinateur autonome, b49) et mesure de sa consommation (22 Mo, 0,6 % d'un processeur), choix 'Le laisser tourner (Recommande)' - verdict b49 au bilan de dimanche ; tri des 8 corrections toujours en attente.", "par": "agent"}
+{"ts": "2026-11-12T21:43:33+00:00", "kind": "commit", "sha": "1b1ab17", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-12T21:48:28+00:00", "kind": "commit", "sha": "296bf99", "ctype": "fix", "thread": "t23"}
+{"ts": "2026-11-12T21:52:27+00:00", "kind": "bug", "id": "b50", "text": "update : le moteur du guide 3fed332 n'est pas dans GUIDE_PUBLIES, Projob (copie intacte de 3fed332) est pris pour un guide maison et n'est pas mis a jour (recopie a la main le 12/11)", "thread": "t23", "severity": "normal", "par": "agent"}
+{"ts": "2026-11-12T22:22:03+00:00", "kind": "bug", "id": "b51", "text": "Securite (revue auto du 12/11) : pt.py orch, le service a reveiller vient d'un fichier non root (orch_service_du_registre puis systemctl start en root) : risque de demarrer n'importe quelle unite. Piste : liste blanche root par projet ou prefixe fixe", "thread": "t23", "severity": "normal", "par": "agent"}
+{"ts": "2026-11-12T22:42:31+00:00", "kind": "decision", "id": "d241", "text": "Mariella (tel, 12/11 22h, carte Checker) : 'Dossier reserve (Recommande)' + 'Une commande + un fichier (Recommande)'. Checker v2 : (1) moteur pose dans un dossier reserve du site (lib/guide/moteur/), REMPLACE d'office par PlanTrack a chaque update/ronde, plus de detection 'guide maison' par empreintes (b50) ; reglages et guides du site hors de ce dossier, jamais ecrases ; (2) bouton 'Bloquant, envoyer a la session' a chaque etape : avis immediat a la session, le guide continue, le point reste 'a traiter' ; la session le marque corrige, Mariella ne rejoue que ce point pour finir le guide (plus de remise a zero) ; (3) 'plantrack checker' branche le site d'un coup + un fichier simple par guide, verifie les cibles avant envoi.", "par": "agent"}
+{"ts": "2026-11-12T22:42:31+00:00", "kind": "attempt", "id": "a74", "bug": "b50", "hypothesis": "Cause : empreintes GUIDE_PUBLIES non regenerees apres 3fed332. Remede retenu (d241) : le moteur passe dans un dossier reserve remplace d'office, la garde par empreintes disparait pour ce dossier.", "session": "ec2b56c8-765e-4029-aac5-fe74e2e4f9dc", "actor": "claude-code"}
+{"ts": "2026-11-12T22:44:51+00:00", "kind": "file_touched", "text": "docs/checker-v2.md", "thread": "t23"}
+{"ts": "2026-11-12T22:45:00+00:00", "kind": "commit", "sha": "7f17168", "ctype": "docs", "thread": "t23"}
+{"ts": "2026-11-12T22:45:01+00:00", "kind": "file_touched", "text": "docs/checker-v2.md", "thread": "t23"}
+{"ts": "2026-11-12T22:47:22+00:00", "kind": "file_touched", "text": "../../../tmp/o.txt", "thread": "t23"}
+{"ts": "2026-11-12T22:47:26+00:00", "kind": "commit", "sha": "35e7fdc", "ctype": "refactor", "thread": "t23"}
+{"ts": "2026-11-12T22:48:11+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/ec2b56c8-765e-4029-aac5-fe74e2e4f9dc/scratchpad/avant.log", "thread": "t23"}
+{"ts": "2026-11-12T22:49:23+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/ec2b56c8-765e-4029-aac5-fe74e2e4f9dc/scratchpad/nouveau.py", "thread": "t23"}
+{"ts": "2026-11-12T22:50:31+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/ec2b56c8-765e-4029-aac5-fe74e2e4f9dc/scratchpad/checker.py", "thread": "t23"}
+{"ts": "2026-11-12T22:50:52+00:00", "kind": "commit", "sha": "a94c22b", "ctype": "feat", "thread": "t23"}
+{"ts": "2026-11-12T22:57:03+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/ec2b56c8-765e-4029-aac5-fe74e2e4f9dc/scratchpad/bloc.sh", "thread": "t23"}
+{"ts": "2026-11-12T22:58:10+00:00", "kind": "file_touched", "text": "../../../tmp/o.txt", "thread": "t23"}
+{"ts": "2026-11-12T22:58:14+00:00", "kind": "commit", "sha": "5ed9be1", "ctype": "feat", "thread": "t23"}
+{"ts": "2026-11-12T23:03:04+00:00", "kind": "commit", "sha": "5eb53c0", "ctype": "fix", "thread": "t23"}
+{"ts": "2026-11-12T23:08:05+00:00", "kind": "file_touched", "text": "../../../tmp/o.txt", "thread": "t23"}
+{"ts": "2026-11-12T23:08:08+00:00", "kind": "commit", "sha": "91b3846", "ctype": "fix", "thread": "t23"}
+{"ts": "2026-11-12T23:25:28+00:00", "kind": "commit", "sha": "e272f9b", "ctype": "refactor", "thread": "t23"}
+{"ts": "2026-11-12T23:25:28+00:00", "kind": "file_touched", "text": "../../../tmp/o.txt", "thread": "t23"}
+{"ts": "2026-11-12T23:25:28+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/moteur/guide-actions.ts", "thread": "t23"}
+{"ts": "2026-11-12T23:26:19+00:00", "kind": "file_touched", "text": "../../../tmp/o.txt", "thread": "t23"}
+{"ts": "2026-11-12T23:26:30+00:00", "kind": "commit", "sha": "5a6ffaf", "ctype": "fix", "thread": "t23"}
+{"ts": "2026-11-12T23:26:30+00:00", "kind": "file_touched", "text": "../../../tmp/o.txt", "thread": "t23"}
+{"ts": "2026-11-12T23:28:39+00:00", "kind": "file_touched", "text": "../../../tmp/sc.txt", "thread": "t23"}
+{"ts": "2026-11-12T23:38:09+00:00", "kind": "file_touched", "text": "../../../tmp/sc.txt", "thread": "t23"}
+{"ts": "2026-11-12T23:40:14+00:00", "kind": "commit", "sha": "0772eaf", "ctype": "feat", "thread": "t23"}
+{"ts": "2026-11-12T23:40:47+00:00", "kind": "commit", "sha": "23692a3", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-12T23:42:55+00:00", "kind": "commit", "sha": "e161eaf", "ctype": "commit", "thread": "t23"}
+{"ts": "2026-11-12T23:42:58+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t23"}
+{"ts": "2026-11-12T23:43:13+00:00", "kind": "attempt", "id": "a75", "bug": "b50", "hypothesis": "Livre v1.9.48 (GitHub seul, pas de cle PyPI) : moteur dans lib/guide/moteur/ remplace d'office avec sauvegarde des copies inconnues, empreintes regenerees ; essai sur copie de ProJob : synchro propre, tsc sans erreur.", "session": "ec2b56c8-765e-4029-aac5-fe74e2e4f9dc", "actor": "claude-code"}
+{"ts": "2026-11-12T23:43:13+00:00", "kind": "bug_status", "id": "b50", "status": "to_verify"}
+{"ts": "2026-11-12T23:43:13+00:00", "kind": "decision", "id": "d242", "text": "Checker v2 livre v1.9.48 (13/11, GitHub seul, d127) : d241 complet (dossier moteur/, raccourcis, Bloquant + marque corriges, plantrack checker installer/aide/verifier/corrige/etat, guides JSON). Essai sur copie ProJob vert (tsc 0 erreur). Les sites le recoivent a leur prochaine ouverture de session (ronde/update).", "par": "agent"}

@@ -14,12 +14,15 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [210 commits]
-  fichiers recemment ecrits : sortie/carte-suite-1111.log, ../../../tmp/claude-0/-home-mariella-plantrack/ecf9a9a5-4736-4a4f-be83-a65441738a2a/scratchpad/carte.json, sortie/carte-suite-1111b.log, ../../../tmp/claude-0/-home-mariella-plantrack/1a31736e-5532-4b6a-8650-290b2970d038/scratchpad/cmds.py, ../../../tmp/claude-0/-home-mariella-plantrack/1a31736e-5532-4b6a-8650-290b2970d038/scratchpad/bloc.py, pyproject.toml
+FIL ACTIF — t23 : guides de test automatiques (d100) [223 commits]
+  fichiers recemment ecrits : ../../../tmp/claude-0/-home-mariella-plantrack/ec2b56c8-765e-4029-aac5-fe74e2e4f9dc/scratchpad/checker.py, ../../../tmp/claude-0/-home-mariella-plantrack/ec2b56c8-765e-4029-aac5-fe74e2e4f9dc/scratchpad/bloc.sh, .claude/hooks/plantrack_guide/moteur/guide-actions.ts, ../../../tmp/o.txt, ../../../tmp/sc.txt, pyproject.toml
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
   t5 : travaux sur main — reprise : retour au travail courant apres la faille
+
+BUGS NON CORRIGES (personne ne s'en est occupe) :
+  b51 (open) [t23] Securite (revue auto du 12/11) : pt.py orch, le service a reveiller vient d'un fichier non root (orch_service_du_registre puis systemctl st… (agent)
 
 BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b37 (to_verify) [t23] kvm-lourd (01/11) : une commande de lecture (diff/grep/ls dans prolearn) classee next-build et mise en file 8/8 — recurrence b35/b36 (agent) [1 tentatives, derniere: Cause trouvee (reproduite) : dans 'diff <(cat A) B', la par…]
@@ -31,6 +34,7 @@ BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b45 (to_verify) [t23] Moteur guide : consignerPoint lit puis reecrit guides-etat.json hors de la file de consignation ; deux verdicts rapproches (deux onglets, p… (agent) [2 tentatives, derniere: Livre : consignerPoint passe par la file enFile (meme file …]
   b46 (to_verify) [t23] Guide (moteur commun + mdjlabs) : en dev (StrictMode) avec mouvement reduit, un point a plusieurs gestes s'arretait apres le 1er geste sans… (agent) [1 tentatives, derniere: Ref prochain (index du 1er geste non joue) + fini a la plac…]
   b49 (to_verify) [t23] Surcharge 12/11 22h01-22h13 (earlyoom tue chrome + java 1,4 Go) : la respiration (battre, pt.py) reveille prolearn-supabase (22h01) puis pr… (agent) [1 tentatives, derniere: Livre v1.9.47 (bd9c2a7 + 21baa4f, GitHub seul, pas de cle P…]
+  b50 (to_verify) [t23] update : le moteur du guide 3fed332 n'est pas dans GUIDE_PUBLIES, Projob (copie intacte de 3fed332) est pris pour un guide maison et n'est … (agent) [2 tentatives, derniere: Livre v1.9.48 (GitHub seul, pas de cle PyPI) : moteur dans …]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
@@ -273,6 +277,8 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d238 : Mariella (tel, 12/11, carte Tri des 8) : 'fais d'abord une analyse de la charge serveur, libere de la charge, analyse pourquoi le coordinat… (agent)
   d239 : Mariella (tel, 12/11 22h30, carte Coordinateur) : 'Les 3 etages (Recommande)' - 1) portier : tout reveil de base (battre/souffle) demande l… (agent)
   d240 : Mariella (tel, 12/11 soir, carte Suite) : apres v1.9.47 (coordinateur autonome, b49) et mesure de sa consommation (22 Mo, 0,6 % d'un proces… (agent)
+  d241 : Mariella (tel, 12/11 22h, carte Checker) : 'Dossier reserve (Recommande)' + 'Une commande + un fichier (Recommande)'. Checker v2 : (1) mote… (agent)
+  d242 : Checker v2 livre v1.9.48 (13/11, GitHub seul, d127) : d241 complet (dossier moteur/, raccourcis, Bloquant + marque corriges, plantrack chec… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
