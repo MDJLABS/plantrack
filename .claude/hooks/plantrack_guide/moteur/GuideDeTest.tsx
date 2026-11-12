@@ -400,8 +400,8 @@ function Visite({ scenario, verdictsServeur, onReplier, onFermer, onTerminer, on
     premiereLectureRef.current = false;
     const p = premiere
       ? reconcilierAvecServeur(local, verdictsServeur, etapesIds)
-      : serveurPrime(local, verdictsServeur)
-        ? progressionDepuisServeur(scenario.id, verdictsServeur!, etapesIds)
+      : serveurPrime(local, verdictsServeur, etapesIds)
+        ? progressionDepuisServeur(scenario.id, verdictsServeur!, etapesIds, (local.joues ?? []).filter((id) => etapesIds.includes(id)))
         : local;
     // eslint-disable-next-line react-hooks/set-state-in-effect -- reprise lue dans localStorage/serveur après montage, cf. bandeau de tête
     setProg(p);

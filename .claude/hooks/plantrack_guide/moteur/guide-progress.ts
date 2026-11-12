@@ -296,9 +296,15 @@ export function effacerGuideActif(storage: Storage | null): void {
  * serveur prime sur le localStorage si elle contient plus de verdicts »), jamais la date ni
  * l'ordre d'écriture : un simple décompte, le même esprit que `faitsPour` (`guide-etat.ts`).
  */
-export function serveurPrime(local: GuideProgress, verdictsServeur: Record<string, unknown> | undefined): boolean {
+export function serveurPrime(
+  local: GuideProgress, verdictsServeur: Record<string, unknown> | undefined, etapesIds?: readonly string[],
+): boolean {
   if (!verdictsServeur) return false;
-  return Object.keys(verdictsServeur).length > Object.keys(local.verdicts).length;
+  // `etapesIds` fourni : on ne compte que les points qui existent encore dans le scénario, des
+  // deux côtés (des ids d'étapes retirées gonflaient le local et le faisaient gagner à tort).
+  const compte = (o: Record<string, unknown>) =>
+    etapesIds ? etapesIds.filter((id) => Object.prototype.hasOwnProperty.call(o, id)).length : Object.keys(o).length;
+  return compte(verdictsServeur) > compte(local.verdicts);
 }
 
 /**
@@ -313,6 +319,7 @@ export function progressionDepuisServeur(
   scenarioId: string,
   verdictsServeur: Record<string, VerdictStocke>,
   etapesIds: readonly string[],
+  joues: readonly string[] = [],
 ): GuideProgress {
   const verdicts: Record<string, StepVerdict> = {};
   const motifs: Record<string, string> = {};
@@ -323,7 +330,7 @@ export function progressionDepuisServeur(
     if (v.note) motifs[id] = v.note;
   }
   const index = premierSansReponseOuIndex(etapesIds, verdicts, 0);
-  return { scenarioId, index, verdicts, motifs, joues: [] };
+  return { scenarioId, index, verdicts, motifs, joues: [...joues] };
 }
 
 /**
@@ -340,7 +347,12 @@ export function reconcilierAvecServeur(
   etapesIds: readonly string[],
 ): GuideProgress {
   if (!verdictsServeur) return local;
-  if (serveurPrime(local, verdictsServeur)) return progressionDepuisServeur(local.scenarioId, verdictsServeur, etapesIds);
+  if (serveurPrime(local, verdictsServeur, etapesIds)) {
+    // Les gestes déjà joués sur ce poste le restent (sinon un geste « aller » rejoué = boucle
+    // de redirection) ; seuls les ids encore au scénario sont gardés.
+    const joues = (local.joues ?? []).filter((id) => etapesIds.includes(id));
+    return progressionDepuisServeur(local.scenarioId, verdictsServeur, etapesIds, joues);
+  }
 
   const retires = etapesIds.filter(
     (id) => Object.prototype.hasOwnProperty.call(local.verdicts, id)

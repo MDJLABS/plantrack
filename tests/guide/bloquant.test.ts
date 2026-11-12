@@ -13,7 +13,7 @@ import { join } from "node:path";
 import { calculerStatut, bloquesPour, dejaConsigne } from "../../.claude/hooks/plantrack_guide/moteur/guide-etat";
 import { verdictScenario } from "../../.claude/hooks/plantrack_guide/moteur/guide-verdict";
 import {
-  chargerProgression, reconcilierAvecServeur, vide,
+  chargerProgression, progressionDepuisServeur, reconcilierAvecServeur, serveurPrime, vide,
 } from "../../.claude/hooks/plantrack_guide/moteur/guide-progress";
 import { texteAvis } from "../../.claude/hooks/plantrack_guide/moteur/guide-avertir";
 import { SCENARIOS } from "./fixtures/scenarios";
@@ -81,6 +81,23 @@ await step("reconcilierAvecServeur : sans retrait, la progression locale est gar
   const serveur = { p1: { v: "ok", a }, p2: { v: "ok", a } } as never;
   assert.equal(reconcilierAvecServeur(local, serveur, ids), local);
   assert.equal(reconcilierAvecServeur(local, undefined, ids), local);
+});
+
+await step("serveurPrime : ne compte que les ids du scénario (étapes retirées ignorées)", () => {
+  const local = { ...vide(principal.id), verdicts: { p1: "ok", vieux1: "ko", vieux2: "ko" } as never };
+  const serveur = { p1: { v: "ok", a }, p2: { v: "ok", a } };
+  assert.equal(serveurPrime(local, serveur), false, "sans etapesIds : ancien décompte brut");
+  assert.equal(serveurPrime(local, serveur, ids), true, "avec etapesIds : 2 contre 1, le serveur prime");
+  const p = reconcilierAvecServeur(local, serveur as never, ids);
+  assert.deepEqual(Object.keys(p.verdicts).sort(), ["p1", "p2"], "la vieille remarque locale ne revient pas");
+});
+
+await step("reconcilierAvecServeur : quand le serveur prime, les gestes déjà joués sont gardés (filtrés)", () => {
+  const local = { ...vide(principal.id), verdicts: { p1: "ok" } as never, joues: ["p1", "vieux"] };
+  const serveur = { p1: { v: "ok", a }, p2: { v: "ok", a } } as never;
+  const p = reconcilierAvecServeur(local, serveur, ids);
+  assert.deepEqual(p.joues, ["p1"]);
+  assert.deepEqual(progressionDepuisServeur(principal.id, serveur, ids).joues, []);
 });
 
 await step("chargerProgression : un point bloqué est rouvert (reprise sur le 1er sans réponse)", () => {
