@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [223 commits]
+FIL ACTIF — t23 : guides de test automatiques (d100) [224 commits]
   fichiers recemment ecrits : ../../../tmp/claude-0/-home-mariella-plantrack/ec2b56c8-765e-4029-aac5-fe74e2e4f9dc/scratchpad/checker.py, ../../../tmp/claude-0/-home-mariella-plantrack/ec2b56c8-765e-4029-aac5-fe74e2e4f9dc/scratchpad/bloc.sh, .claude/hooks/plantrack_guide/moteur/guide-actions.ts, ../../../tmp/o.txt, ../../../tmp/sc.txt, pyproject.toml
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -279,6 +279,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d240 : Mariella (tel, 12/11 soir, carte Suite) : apres v1.9.47 (coordinateur autonome, b49) et mesure de sa consommation (22 Mo, 0,6 % d'un proces… (agent)
   d241 : Mariella (tel, 12/11 22h, carte Checker) : 'Dossier reserve (Recommande)' + 'Une commande + un fichier (Recommande)'. Checker v2 : (1) mote… (agent)
   d242 : Checker v2 livre v1.9.48 (13/11, GitHub seul, d127) : d241 complet (dossier moteur/, raccourcis, Bloquant + marque corriges, plantrack chec… (agent)
+  d243 : Mariella (tel, 13/11, carte Checker v2) : 'A la prochaine ouverture (Recommande)' : chaque site recoit v1.9.48 a l'ouverture de sa session,… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
