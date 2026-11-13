@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [238 commits]
+FIL ACTIF — t23 : guides de test automatiques (d100) [239 commits]
   fichiers recemment ecrits : ../projob/apps/web/lib/guide/scenarios.ts, ../projob/sortie/qdj8/build.log, ../../../tmp/claude-0/-home-mariella-plantrack/25d4343f-2121-42cd-b55b-60c7ec39240d/scratchpad/carte.json, sortie/carte-qdj8-1113.log, ../../../tmp/claude-0/-home-mariella-plantrack/2eae4e95-6593-49d4-ab4a-1b2638dd2157/scratchpad/carte.json, sortie/carte-tri3-1114.log
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -26,6 +26,7 @@ BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b39 (to_verify) [t23] Essai guide Soirees (02/11 11h, tel Mariella) : la page /soirees de la version de test s69-soirees affiche 'canal MiamBoost non configure (… (agent) [1 tentatives, derniere: Version de test branchee sur la preprod MiamBoost locale : …]
   b40 (to_verify) [t23] Essai guide Soirees (02/11 11h23, tel Mariella) : 'probleme sur les captcha cloudflare, il y en a 3 dans la page, beaucoup trop ; un seul s… (agent) [1 tentatives, derniere: s69-soirees 3c92781 : TurnstileWidget monte seulement a l'e…]
   b49 (to_verify) [t23] Surcharge 12/11 22h01-22h13 (earlyoom tue chrome + java 1,4 Go) : la respiration (battre, pt.py) reveille prolearn-supabase (22h01) puis pr… (agent) [1 tentatives, derniere: Livre v1.9.47 (bd9c2a7 + 21baa4f, GitHub seul, pas de cle P…]
+  b53 (to_verify) [t23] Essai guide Soirees (14/11, tel Mariella) : /soirees -> 'liste des soirees indisponible : timeout' ; base locale MiamBoost (supabase_db_mia… (agent) [1 tentatives, derniere: miamboost-supabase.service demarre sans l'ecran d'admin (su…]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
@@ -297,6 +298,7 @@ Pieges connus :
   pg31 : tests/scenario.sh 'bilan --all : rien a dire' echoue sur le serveur reel quand …
   pg33 : Orchestre (b51, v1.9.49) : un service ajoute au souffle.conf d'un projet n'est …
   pg34 : Le serveur a 4 vCPU (nproc), pas 2 : l'alerte de saturation (seuil 3.00 'sur 2 …
+  pg35 : MiamBoost : 'supabase start' redescend TOUTE la pile si supabase_studio_miamboo…
 
 Questions en attente (reponds via !answer qN ...) :
   q15 : Guide Soirées pret (s69-soirees 1db1d2a) : Mariella fait-elle l'essai sur https…
