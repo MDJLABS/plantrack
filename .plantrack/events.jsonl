@@ -2644,3 +2644,14 @@
 {"ts": "2026-11-13T01:33:43+00:00", "kind": "file_touched", "text": "sortie/carte-verdict-1113.log", "thread": "t23"}
 {"ts": "2026-11-13T01:34:06+00:00", "kind": "file_touched", "text": "sortie/carte-verdict-1113.log", "thread": "t23"}
 {"ts": "2026-11-13T03:34:16+00:00", "kind": "question", "id": "q30", "text": "Carte Verdict du Checker (13/11) : le guide ProJob (https://projob-test.mdjlabs.com/app/suivi) est-il alle au bout ? Si oui -> valider b44 b45 b46 b50"}
+{"ts": "2026-11-13T03:34:16+00:00", "kind": "commit", "sha": "eff856e", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-13T21:01:10+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t23"}
+{"ts": "2026-11-13T21:01:17+00:00", "kind": "commit", "sha": "9221800", "ctype": "fix", "thread": "t23"}
+{"ts": "2026-11-13T21:01:26+00:00", "kind": "decision", "id": "d247", "text": "Mariella (tel, 13/11 22h, 'pourquoi tu ne declenches pas la file d'attente, corrige ca') : cause = le feu de l'orchestre ne jugeait que la memoire ; a charge 9 (CPU PSI 43 %) il restait vert, donc kvm-lourd ne retenait rien. v1.9.50 (GitHub seul, d127) : orange si pression cpu 1 min > 35 % ou charge 5 min > 1,2 par vCPU, rouge si > 60 % ou > 2 par vCPU (ORCH_*_CPU/CHARGE). Service relance, passe orange aussitot.", "par": "agent"}
+{"ts": "2026-11-13T21:01:27+00:00", "kind": "piege", "id": "pg34", "text": "Le serveur a 4 vCPU (nproc), pas 2 : l'alerte de saturation (seuil 3.00 'sur 2 vCPU') et d'anciens calculs supposent 2 processeurs."}
+{"ts": "2026-11-13T21:03:38+00:00", "kind": "file_touched", "text": "../projob/sortie/b-clics/chaine.sh", "thread": "t23"}
+{"ts": "2026-11-13T21:03:38+00:00", "kind": "file_touched", "text": "../projob/sortie/b-clics/build.log", "thread": "t23"}
+{"ts": "2026-11-13T21:06:27+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/79791efb-c06d-4f1c-9ca2-eb3a719e3f45/scratchpad/carte.json", "thread": "t23"}
+{"ts": "2026-11-13T21:06:27+00:00", "kind": "file_touched", "text": "sortie/carte-suivi-1113.log", "thread": "t23"}
+{"ts": "2026-11-13T21:06:39+00:00", "kind": "file_touched", "text": "sortie/carte-suivi-1113.log", "thread": "t23"}
+{"ts": "2026-11-13T21:06:43+00:00", "kind": "question", "id": "q31", "text": "Carte Suivi (13/11 22h) : Mariella refait-elle l'essai du Checker sur projob-test /app/suivi apres la correction des clics (projob b42, 1be7e80) ?"}
