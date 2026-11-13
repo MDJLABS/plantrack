@@ -2663,3 +2663,9 @@
 {"ts": "2026-11-13T21:17:46+00:00", "kind": "bug", "id": "b52", "text": "ProJob guide lot9 point 8 (Non et Plus tard) : apres Ajouter au profil la carte reste sur Ajoute, zone introuvable et deja sur /app donc aucun bouton (tel Mariella 13/11)", "thread": "t23", "severity": "normal", "par": "agent"}
 {"ts": "2026-11-13T21:17:54+00:00", "kind": "attempt", "id": "a77", "bug": "b52", "hypothesis": "Point 8 recoit un geste aller /app (rechargement) : la question suivante preparee en base s'affiche avec Non/Plus tard (projob 8105c43)", "session": "25d4343f-2121-42cd-b55b-60c7ec39240d", "actor": "claude-code"}
 {"ts": "2026-11-13T21:18:08+00:00", "kind": "bug_status", "id": "b52", "status": "to_verify"}
+{"ts": "2026-11-13T21:19:18+00:00", "kind": "commit", "sha": "364dcfc", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-13T21:19:34+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/25d4343f-2121-42cd-b55b-60c7ec39240d/scratchpad/carte.json", "thread": "t23"}
+{"ts": "2026-11-13T21:19:34+00:00", "kind": "file_touched", "text": "sortie/carte-qdj8-1113.log", "thread": "t23"}
+{"ts": "2026-11-13T23:06:56+00:00", "kind": "bug_status", "id": "b52", "status": "validated", "canal": "telephone 13/11 23h06 : « c'est bon » (apres « c'est bon pour le test 7, et pour le 9 a l'etape 8 ca bloque »)"}
+{"ts": "2026-11-13T23:06:56+00:00", "kind": "bug_status", "id": "b44", "status": "validated", "canal": "telephone 13/11 23h06 : « c'est bon » (apres « c'est bon pour le test 7, et pour le 9 a l'etape 8 ca bloque »)"}
+{"ts": "2026-11-13T23:07:03+00:00", "kind": "answer", "id": "q30", "text": "Oui : guide ProJob alle au bout (test 7 ok, point 8 du test 9 corrige puis ok) ; b44 et b52 valides, b45 b46 b50 a trier", "canal": "telephone 13/11 23h06 : « c'est bon »"}
