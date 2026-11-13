@@ -2655,3 +2655,11 @@
 {"ts": "2026-11-13T21:06:27+00:00", "kind": "file_touched", "text": "sortie/carte-suivi-1113.log", "thread": "t23"}
 {"ts": "2026-11-13T21:06:39+00:00", "kind": "file_touched", "text": "sortie/carte-suivi-1113.log", "thread": "t23"}
 {"ts": "2026-11-13T21:06:43+00:00", "kind": "question", "id": "q31", "text": "Carte Suivi (13/11 22h) : Mariella refait-elle l'essai du Checker sur projob-test /app/suivi apres la correction des clics (projob b42, 1be7e80) ?"}
+{"ts": "2026-11-13T21:06:44+00:00", "kind": "commit", "sha": "95e58a5", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-13T21:15:27+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/25d4343f-2121-42cd-b55b-60c7ec39240d/scratchpad/p8.ts", "thread": "t23"}
+{"ts": "2026-11-13T21:17:07+00:00", "kind": "file_touched", "text": "../projob/apps/web/lib/guide/scenarios.ts", "thread": "t23"}
+{"ts": "2026-11-13T21:17:31+00:00", "kind": "file_touched", "text": "../projob/sortie/qdj8/build.log", "thread": "t23"}
+{"ts": "2026-11-13T21:17:46+00:00", "kind": "answer", "id": "q31", "text": "Oui, essai refait : lot7 ok, lot9 bloque au point 8", "canal": "telephone 13/11 21h06 : « c'est bon pour le test 7, et pour le 9 à l'étape 8 ça bloque je n'ai pas le bouton qui me dirige au bon endroit »"}
+{"ts": "2026-11-13T21:17:46+00:00", "kind": "bug", "id": "b52", "text": "ProJob guide lot9 point 8 (Non et Plus tard) : apres Ajouter au profil la carte reste sur Ajoute, zone introuvable et deja sur /app donc aucun bouton (tel Mariella 13/11)", "thread": "t23", "severity": "normal", "par": "agent"}
+{"ts": "2026-11-13T21:17:54+00:00", "kind": "attempt", "id": "a77", "bug": "b52", "hypothesis": "Point 8 recoit un geste aller /app (rechargement) : la question suivante preparee en base s'affiche avec Non/Plus tard (projob 8105c43)", "session": "25d4343f-2121-42cd-b55b-60c7ec39240d", "actor": "claude-code"}
+{"ts": "2026-11-13T21:18:08+00:00", "kind": "bug_status", "id": "b52", "status": "to_verify"}
