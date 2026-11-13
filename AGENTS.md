@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [237 commits]
-  fichiers recemment ecrits : sortie/carte-suivi-1113.log, ../../../tmp/claude-0/-home-mariella-plantrack/25d4343f-2121-42cd-b55b-60c7ec39240d/scratchpad/p8.ts, ../projob/apps/web/lib/guide/scenarios.ts, ../projob/sortie/qdj8/build.log, ../../../tmp/claude-0/-home-mariella-plantrack/25d4343f-2121-42cd-b55b-60c7ec39240d/scratchpad/carte.json, sortie/carte-qdj8-1113.log
+FIL ACTIF — t23 : guides de test automatiques (d100) [238 commits]
+  fichiers recemment ecrits : ../projob/apps/web/lib/guide/scenarios.ts, ../projob/sortie/qdj8/build.log, ../../../tmp/claude-0/-home-mariella-plantrack/25d4343f-2121-42cd-b55b-60c7ec39240d/scratchpad/carte.json, sortie/carte-qdj8-1113.log, ../../../tmp/claude-0/-home-mariella-plantrack/2eae4e95-6593-49d4-ab4a-1b2638dd2157/scratchpad/carte.json, sortie/carte-tri3-1114.log
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -25,10 +25,7 @@ BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b38 (to_verify) [t23] Essai versions de test (01/11 soir, tel Mariella) : 's69 soirees mene vers le site s69 dev il me semble, et les 2 autres liens ne fonctionn… (agent) [1 tentatives, derniere: MiamBoost : miamboost-dev.mdjlabs.com classe en domaine de …]
   b39 (to_verify) [t23] Essai guide Soirees (02/11 11h, tel Mariella) : la page /soirees de la version de test s69-soirees affiche 'canal MiamBoost non configure (… (agent) [1 tentatives, derniere: Version de test branchee sur la preprod MiamBoost locale : …]
   b40 (to_verify) [t23] Essai guide Soirees (02/11 11h23, tel Mariella) : 'probleme sur les captcha cloudflare, il y en a 3 dans la page, beaucoup trop ; un seul s… (agent) [1 tentatives, derniere: s69-soirees 3c92781 : TurnstileWidget monte seulement a l'e…]
-  b45 (to_verify) [t23] Moteur guide : consignerPoint lit puis reecrit guides-etat.json hors de la file de consignation ; deux verdicts rapproches (deux onglets, p… (agent) [2 tentatives, derniere: Livre : consignerPoint passe par la file enFile (meme file …]
-  b46 (to_verify) [t23] Guide (moteur commun + mdjlabs) : en dev (StrictMode) avec mouvement reduit, un point a plusieurs gestes s'arretait apres le 1er geste sans… (agent) [1 tentatives, derniere: Ref prochain (index du 1er geste non joue) + fini a la plac…]
   b49 (to_verify) [t23] Surcharge 12/11 22h01-22h13 (earlyoom tue chrome + java 1,4 Go) : la respiration (battre, pt.py) reveille prolearn-supabase (22h01) puis pr… (agent) [1 tentatives, derniere: Livre v1.9.47 (bd9c2a7 + 21baa4f, GitHub seul, pas de cle P…]
-  b50 (to_verify) [t23] update : le moteur du guide 3fed332 n'est pas dans GUIDE_PUBLIES, Projob (copie intacte de 3fed332) est pris pour un guide maison et n'est … (agent) [2 tentatives, derniere: Livre v1.9.48 (GitHub seul, pas de cle PyPI) : moteur dans …]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
