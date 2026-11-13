@@ -1879,6 +1879,11 @@ check_exit "feu : coup dur (full 10 s > 25) = rouge tout de suite" "rouge" "$(ni
 check_exit "feu : gene moderee sur 1 min = orange" "orange" "$(niv '{"dispo":40,"psi_memory_some_60":12}')"
 check_exit "feu : 13 % de RAM disponible sans pression = vert" "vert" "$(niv '{"dispo":13}')"
 check_exit "feu : filet sous 5 % de RAM = rouge" "rouge" "$(niv '{"dispo":4}')"
+check_exit "feu : processeur sature sur 1 min = rouge" "rouge" "$(niv '{"dispo":40,"psi_cpu_some_60":65}')"
+check_exit "feu : processeur gene sur 1 min = orange" "orange" "$(niv '{"dispo":40,"psi_cpu_some_60":40}')"
+check_exit "feu : charge 5 min 3 par vCPU = rouge" "rouge" "$(niv '{"dispo":40,"charge5":3}')"
+check_exit "feu : charge 5 min 1,5 par vCPU = orange" "orange" "$(niv '{"dispo":40,"charge5":1.5}')"
+check_exit "feu : processeur calme = vert" "vert" "$(niv '{"dispo":40,"psi_cpu_some_60":10,"charge5":0.5}')"
 # le feu ne redescend qu'apres le calme ; une pause est plafonnee
 memoire 500000; O orchestre --tour; memoire 8000000
 PLANTRACK_ORCHESTRE="$OD" PLANTRACK_PROC="$OP" SOUFFLE_SYSTEMCTL="$TO/inerte" ORCH_DOCKER="$TO/inerte" ORCH_CALME=3600 ORCH_PAS=0 ORCH_ALERTE=true python3 "$PT" orchestre --tour

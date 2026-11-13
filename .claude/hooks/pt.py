@@ -1273,6 +1273,12 @@ ORCH_ORANGE_DISPO = float(os.environ.get("ORCH_ORANGE_DISPO") or 10)
 ORCH_ROUGE_PSI = float(os.environ.get("ORCH_ROUGE_PSI") or 5)         # PSI memoire full avg60
 ORCH_ROUGE_PSI_PIC = float(os.environ.get("ORCH_ROUGE_PSI_PIC") or 25)  # full avg10 : coup dur
 ORCH_ORANGE_PSI = float(os.environ.get("ORCH_ORANGE_PSI") or 10)      # PSI memoire some avg60
+# Processeur (13/11, Mariella : « n'attends pas d'etre bloque ») : jusqu'ici le feu ne voyait que
+# la memoire ; a 9 de charge sur 2 vCPU il restait vert et la file kvm-lourd ne retenait rien.
+ORCH_ORANGE_CPU = float(os.environ.get("ORCH_ORANGE_CPU") or 35)      # PSI cpu some avg60
+ORCH_ROUGE_CPU = float(os.environ.get("ORCH_ROUGE_CPU") or 60)
+ORCH_ORANGE_CHARGE = float(os.environ.get("ORCH_ORANGE_CHARGE") or 1.2)  # charge 5 min par vCPU
+ORCH_ROUGE_CHARGE = float(os.environ.get("ORCH_ROUGE_CHARGE") or 2.0)
 ORCH_ALERTE_DELAI = 600  # rouge depuis 10 min malgre les pauses : une bulle
 ORCH_ALERTE = os.environ.get("ORCH_ALERTE") or "node /home/mariella/bcc/hook/repondre.ts --ton probleme"
 ORCH_JAMAIS = {"systemd", "sshd", "cloudflared", "dockerd", "containerd", "earlyoom"}
@@ -1431,14 +1437,23 @@ def orch_mesure():
                     m[f"psi_{res}_{k}_60"] = float(v.get("avg60", 0))
         except (OSError, ValueError):
             pass
+    try:
+        with open(os.path.join(ORCH_PROC, "loadavg"), encoding="utf-8") as f:
+            m["charge5"] = round(float(f.read().split()[1]) / (os.cpu_count() or 1), 2)
+    except (OSError, ValueError, IndexError):
+        pass
     return m
 
 
 def orch_niveau(m):
     if (m["dispo"] < ORCH_ROUGE_DISPO or m.get("psi_memory_full_60", 0) > ORCH_ROUGE_PSI
-            or m.get("psi_memory_full", 0) > ORCH_ROUGE_PSI_PIC):
+            or m.get("psi_memory_full", 0) > ORCH_ROUGE_PSI_PIC
+            or m.get("psi_cpu_some_60", 0) > ORCH_ROUGE_CPU
+            or m.get("charge5", 0) > ORCH_ROUGE_CHARGE):
         return "rouge"
-    if m["dispo"] < orch_orange() or m.get("psi_memory_some_60", 0) > ORCH_ORANGE_PSI:
+    if (m["dispo"] < orch_orange() or m.get("psi_memory_some_60", 0) > ORCH_ORANGE_PSI
+            or m.get("psi_cpu_some_60", 0) > ORCH_ORANGE_CPU
+            or m.get("charge5", 0) > ORCH_ORANGE_CHARGE):
         return "orange"
     return "vert"
 
@@ -2234,7 +2249,9 @@ def orch_tour(etat, maintenant):
            else "vert")
     if feu != etat.get("feu"):
         orch_journal(f"feu {feu} (memoire disponible {m['dispo']} %, swap {m['swap']} %, "
-                     f"pression sur 1 min {m.get('psi_memory_some_60', 0)} %)")
+                     f"pression sur 1 min {m.get('psi_memory_some_60', 0)} %, "
+                     f"processeur sur 1 min {m.get('psi_cpu_some_60', 0)} %, "
+                     f"charge 5 min par vCPU {m.get('charge5', 0)})")
         etat["feu_depuis"] = maintenant
         etat.pop("alerte_feu", None)
     etat["feu"], etat["mesure"] = feu, m
@@ -2322,7 +2339,8 @@ def orch_resume(e):
     ss = e.get("sessions", {})
     pauses = e.get("pauses", {})
     lignes = [f"feu {e.get('feu')} — memoire disponible {m.get('dispo')} %, swap {m.get('swap')} %, "
-              f"pression memoire sur 1 min {m.get('psi_memory_some_60', 0)} %",
+              f"pression memoire sur 1 min {m.get('psi_memory_some_60', 0)} %, "
+              f"processeur sur 1 min {m.get('psi_cpu_some_60', 0)} %, charge 5 min par vCPU {m.get('charge5', 0)}",
               f"sessions : {len(ss)} ("
               + ", ".join(f"{r} {sum(1 for f in ss.values() if f['rang'] == r)}" for r in RANGS)
               + f"), en pause : {len(pauses)}"]
