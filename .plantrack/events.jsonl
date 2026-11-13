@@ -2607,3 +2607,12 @@
 {"ts": "2026-11-12T23:43:13+00:00", "kind": "decision", "id": "d242", "text": "Checker v2 livre v1.9.48 (13/11, GitHub seul, d127) : d241 complet (dossier moteur/, raccourcis, Bloquant + marque corriges, plantrack checker installer/aide/verifier/corrige/etat, guides JSON). Essai sur copie ProJob vert (tsc 0 erreur). Les sites le recoivent a leur prochaine ouverture de session (ronde/update).", "par": "agent"}
 {"ts": "2026-11-12T23:43:14+00:00", "kind": "commit", "sha": "9439929", "ctype": "chore", "thread": "t23"}
 {"ts": "2026-11-12T23:54:45+00:00", "kind": "decision", "id": "d243", "text": "Mariella (tel, 13/11, carte Checker v2) : 'A la prochaine ouverture (Recommande)' : chaque site recoit v1.9.48 a l'ouverture de sa session, essai du bouton Bloquant sur le prochain guide envoye ; veille silencieuse (d23) jusque-la.", "par": "agent"}
+{"ts": "2026-11-12T23:54:45+00:00", "kind": "commit", "sha": "2a6f248", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-12T23:55:40+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-12T23:55:40+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-12T23:55:53+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-13T00:00:31+00:00", "kind": "file_touched", "text": "sortie/scenario-reveils.log", "thread": "t23"}
+{"ts": "2026-11-13T00:00:50+00:00", "kind": "commit", "sha": "d260baf", "ctype": "fix", "thread": "t23"}
+{"ts": "2026-11-13T00:00:52+00:00", "kind": "file_touched", "text": "../../../etc/plantrack/reveils-autorises", "thread": "t23"}
+{"ts": "2026-11-13T00:01:17+00:00", "kind": "attempt", "id": "a76", "bug": "b51", "hypothesis": "Liste blanche de root /etc/plantrack/reveils-autorises (root, non modifiable par un autre compte, sinon ignoree) : l'orchestre ne demarre que les services listes ; liste posee avec miamboost/prolearn/prorent-supabase, orchestre relance ; 3 tests ajoutes, suite verte hors echec connu pg31.", "session": "ec2b56c8-765e-4029-aac5-fe74e2e4f9dc", "actor": "claude-code"}
+{"ts": "2026-11-13T00:01:17+00:00", "kind": "bug_status", "id": "b51", "status": "to_verify"}
