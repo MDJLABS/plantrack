@@ -2637,3 +2637,6 @@
 {"ts": "2026-11-13T01:28:42+00:00", "kind": "commit", "sha": "a021839", "ctype": "chore", "thread": "t23"}
 {"ts": "2026-11-13T01:28:52+00:00", "kind": "file_touched", "text": "sortie/carte-suite2-1113.log", "thread": "t23"}
 {"ts": "2026-11-13T01:32:25+00:00", "kind": "decision", "id": "d245", "text": "Mariella (tel, 13/11, carte Suite apres tri des 11) : 'Je fais l essai du Checker (Recommande)' - essai du Checker v2 sur un site pour b44 b45 b46 b50 ; veille silencieuse jusqu'a son verdict (d23).", "par": "agent"}
+{"ts": "2026-11-13T01:32:26+00:00", "kind": "commit", "sha": "d48c538", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-13T01:32:53+00:00", "kind": "file_touched", "text": "sortie/carte-pendant-1113.log", "thread": "t23"}
+{"ts": "2026-11-13T01:33:25+00:00", "kind": "decision", "id": "d246", "text": "Mariella (tel, 13/11, carte Pendant ton essai) : 'Attendre mon verdict (Recommande)' - aucun chantier, veille silencieuse jusqu'a son verdict du Checker v2 (d23, d245).", "par": "agent"}
