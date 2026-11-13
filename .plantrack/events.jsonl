@@ -2634,3 +2634,6 @@
 {"ts": "2026-11-13T01:28:29+00:00", "kind": "bug_status", "id": "b41", "status": "validated", "canal": "telephone, carte Tri des 11 (13/11) : Valider les 3 du serveur (Recommande) ; puis carte Validation : Je te redonne le feu vert (Recommande)"}
 {"ts": "2026-11-13T01:28:30+00:00", "kind": "bug_status", "id": "b51", "status": "validated", "canal": "telephone, carte Tri des 11 (13/11) : Valider les 3 du serveur (Recommande) ; puis carte Validation : Je te redonne le feu vert (Recommande)"}
 {"ts": "2026-11-13T01:28:41+00:00", "kind": "answer", "id": "q29", "text": "Valider les 3 du serveur (b37 b41 b51 valides, d244)", "canal": "telephone, carte Tri des 11 (13/11) : Valider les 3 du serveur (Recommande)"}
+{"ts": "2026-11-13T01:28:42+00:00", "kind": "commit", "sha": "a021839", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-13T01:28:52+00:00", "kind": "file_touched", "text": "sortie/carte-suite2-1113.log", "thread": "t23"}
+{"ts": "2026-11-13T01:32:25+00:00", "kind": "decision", "id": "d245", "text": "Mariella (tel, 13/11, carte Suite apres tri des 11) : 'Je fais l essai du Checker (Recommande)' - essai du Checker v2 sur un site pour b44 b45 b46 b50 ; veille silencieuse jusqu'a son verdict (d23).", "par": "agent"}
