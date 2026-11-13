@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [227 commits]
-  fichiers recemment ecrits : ../../../tmp/o.txt, ../../../tmp/sc.txt, .claude/hooks/pt.py, sortie/scenario-reveils.log, ../../../etc/plantrack/reveils-autorises, pyproject.toml
+FIL ACTIF — t23 : guides de test automatiques (d100) [228 commits]
+  fichiers recemment ecrits : .claude/hooks/pt.py, sortie/scenario-reveils.log, ../../../etc/plantrack/reveils-autorises, pyproject.toml, ../../../tmp/claude-0/-home-mariella-plantrack/ec2b56c8-765e-4029-aac5-fe74e2e4f9dc/scratchpad/suite.json, sortie/carte-suite-1113.log
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -303,5 +303,6 @@ Pieges connus :
 Questions en attente (reponds via !answer qN ...) :
   q15 : Guide Soirées pret (s69-soirees 1db1d2a) : Mariella fait-elle l'essai sur https…
   q23 : Carte 10/11 : guide ProRent pret, rallumer sa base de test (eteinte d155) pour …
+  q28 : Carte Suite du 13/11 (apres Checker v2 v1.9.48 et b51 v1.9.49) restee sans repo…
 ```
 <!-- plantrack:state-end -->

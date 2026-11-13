@@ -2619,3 +2619,7 @@
 {"ts": "2026-11-13T00:01:18+00:00", "kind": "commit", "sha": "acb7399", "ctype": "commit", "thread": "t23"}
 {"ts": "2026-11-13T00:01:20+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t23"}
 {"ts": "2026-11-13T00:01:26+00:00", "kind": "piege", "id": "pg33", "text": "Orchestre (b51, v1.9.49) : un service ajoute au souffle.conf d'un projet n'est reveille par l'orchestre que s'il figure aussi dans /etc/plantrack/reveils-autorises (fichier de root, 644). Nouveau projet qui respire : ajouter sa ligne en root, sinon 'demande refusee ... absent de' dans le journal de l'orchestre."}
+{"ts": "2026-11-13T00:01:26+00:00", "kind": "commit", "sha": "7c86710", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-13T00:01:48+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/ec2b56c8-765e-4029-aac5-fe74e2e4f9dc/scratchpad/suite.json", "thread": "t23"}
+{"ts": "2026-11-13T00:01:48+00:00", "kind": "file_touched", "text": "sortie/carte-suite-1113.log", "thread": "t23"}
+{"ts": "2026-11-13T00:32:14+00:00", "kind": "question", "id": "q28", "text": "Carte Suite du 13/11 (apres Checker v2 v1.9.48 et b51 v1.9.49) restee sans reponse : trier les 11 corrections en attente (Recommande), brainstorming de la suite, ou rester en veille ?"}
