@@ -14,25 +14,22 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [229 commits]
-  fichiers recemment ecrits : ../../../etc/plantrack/reveils-autorises, pyproject.toml, ../../../tmp/claude-0/-home-mariella-plantrack/ec2b56c8-765e-4029-aac5-fe74e2e4f9dc/scratchpad/suite.json, sortie/carte-suite-1113.log, ../../../tmp/claude-0/-home-mariella-plantrack/e09d6add-e3a0-4ce0-9be6-f530eff5e68f/scratchpad/tri.json, sortie/carte-tri-1113.log
+FIL ACTIF — t23 : guides de test automatiques (d100) [230 commits]
+  fichiers recemment ecrits : pyproject.toml, ../../../tmp/claude-0/-home-mariella-plantrack/ec2b56c8-765e-4029-aac5-fe74e2e4f9dc/scratchpad/suite.json, sortie/carte-suite-1113.log, ../../../tmp/claude-0/-home-mariella-plantrack/e09d6add-e3a0-4ce0-9be6-f530eff5e68f/scratchpad/tri.json, sortie/carte-tri-1113.log, sortie/carte-validation-1113.log
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
   t5 : travaux sur main — reprise : retour au travail courant apres la faille
 
 BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
-  b37 (to_verify) [t23] kvm-lourd (01/11) : une commande de lecture (diff/grep/ls dans prolearn) classee next-build et mise en file 8/8 — recurrence b35/b36 (agent) [1 tentatives, derniere: Cause trouvee (reproduite) : dans 'diff <(cat A) B', la par…]
   b38 (to_verify) [t23] Essai versions de test (01/11 soir, tel Mariella) : 's69 soirees mene vers le site s69 dev il me semble, et les 2 autres liens ne fonctionn… (agent) [1 tentatives, derniere: MiamBoost : miamboost-dev.mdjlabs.com classe en domaine de …]
   b39 (to_verify) [t23] Essai guide Soirees (02/11 11h, tel Mariella) : la page /soirees de la version de test s69-soirees affiche 'canal MiamBoost non configure (… (agent) [1 tentatives, derniere: Version de test branchee sur la preprod MiamBoost locale : …]
   b40 (to_verify) [t23] Essai guide Soirees (02/11 11h23, tel Mariella) : 'probleme sur les captcha cloudflare, il y en a 3 dans la page, beaucoup trop ; un seul s… (agent) [1 tentatives, derniere: s69-soirees 3c92781 : TurnstileWidget monte seulement a l'e…]
-  b41 (to_verify) [t23] Orchestre (d159) : les sessions lancees sous bccsession (telephone) ne peuvent pas s'inscrire — /var/lib/plantrack-orchestre/sessions en ro… (agent) [1 tentatives, derniere: Dossier sessions en 1777 (bit collant) pose par l'orchestre…]
   b44 (to_verify) [t23] Guide termine (tel Mariella 08/11, session projob) : derniere etape pas confirmee a l'ecran, guide reste dans la liste des restants, fin en… (agent) [2 tentatives, derniere: Livre : moteur (cda33df + 8ea12a4 sans grands tirets) coche…]
   b45 (to_verify) [t23] Moteur guide : consignerPoint lit puis reecrit guides-etat.json hors de la file de consignation ; deux verdicts rapproches (deux onglets, p… (agent) [2 tentatives, derniere: Livre : consignerPoint passe par la file enFile (meme file …]
   b46 (to_verify) [t23] Guide (moteur commun + mdjlabs) : en dev (StrictMode) avec mouvement reduit, un point a plusieurs gestes s'arretait apres le 1er geste sans… (agent) [1 tentatives, derniere: Ref prochain (index du 1er geste non joue) + fini a la plac…]
   b49 (to_verify) [t23] Surcharge 12/11 22h01-22h13 (earlyoom tue chrome + java 1,4 Go) : la respiration (battre, pt.py) reveille prolearn-supabase (22h01) puis pr… (agent) [1 tentatives, derniere: Livre v1.9.47 (bd9c2a7 + 21baa4f, GitHub seul, pas de cle P…]
   b50 (to_verify) [t23] update : le moteur du guide 3fed332 n'est pas dans GUIDE_PUBLIES, Projob (copie intacte de 3fed332) est pris pour un guide maison et n'est … (agent) [2 tentatives, derniere: Livre v1.9.48 (GitHub seul, pas de cle PyPI) : moteur dans …]
-  b51 (to_verify) [t23] Securite (revue auto du 12/11) : pt.py orch, le service a reveiller vient d'un fichier non root (orch_service_du_registre puis systemctl st… (agent) [1 tentatives, derniere: Liste blanche de root /etc/plantrack/reveils-autorises (roo…]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
@@ -305,6 +302,5 @@ Questions en attente (reponds via !answer qN ...) :
   q15 : Guide Soirées pret (s69-soirees 1db1d2a) : Mariella fait-elle l'essai sur https…
   q23 : Carte 10/11 : guide ProRent pret, rallumer sa base de test (eteinte d155) pour …
   q28 : Carte Suite du 13/11 (apres Checker v2 v1.9.48 et b51 v1.9.49) restee sans repo…
-  q29 : Carte Tri des 11 (13/11) : quelles corrections valider ? (reco : les 3 du serve…
 ```
 <!-- plantrack:state-end -->

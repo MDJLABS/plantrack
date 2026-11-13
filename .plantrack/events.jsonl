@@ -2628,3 +2628,9 @@
 {"ts": "2026-11-13T01:25:11+00:00", "kind": "file_touched", "text": "sortie/carte-tri-1113.log", "thread": "t23"}
 {"ts": "2026-11-13T01:25:16+00:00", "kind": "question", "id": "q29", "text": "Carte Tri des 11 (13/11) : quelles corrections valider ? (reco : les 3 du serveur b37 b41 b51 ; b49 en surveillance ; guide b44-b50 et Soirees b38-b40 a ses essais)"}
 {"ts": "2026-11-13T01:26:40+00:00", "kind": "decision", "id": "d244", "text": "Mariella (tel, 13/11, carte Tri des 11) : 'Valider les 3 du serveur (Recommande)' - b37 b41 b51 a valider ; b49 en surveillance une semaine ; guide b44 b45 b46 b50 a son essai du Checker v2 ; Soirees b38 b39 b40 a son essai. Saisie verify bloquee par le controle automatique de la session, a refaire avec son accord.", "par": "agent"}
+{"ts": "2026-11-13T01:26:44+00:00", "kind": "commit", "sha": "06ffda3", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-13T01:26:54+00:00", "kind": "file_touched", "text": "sortie/carte-validation-1113.log", "thread": "t23"}
+{"ts": "2026-11-13T01:28:29+00:00", "kind": "bug_status", "id": "b37", "status": "validated", "canal": "telephone, carte Tri des 11 (13/11) : Valider les 3 du serveur (Recommande) ; puis carte Validation : Je te redonne le feu vert (Recommande)"}
+{"ts": "2026-11-13T01:28:29+00:00", "kind": "bug_status", "id": "b41", "status": "validated", "canal": "telephone, carte Tri des 11 (13/11) : Valider les 3 du serveur (Recommande) ; puis carte Validation : Je te redonne le feu vert (Recommande)"}
+{"ts": "2026-11-13T01:28:30+00:00", "kind": "bug_status", "id": "b51", "status": "validated", "canal": "telephone, carte Tri des 11 (13/11) : Valider les 3 du serveur (Recommande) ; puis carte Validation : Je te redonne le feu vert (Recommande)"}
+{"ts": "2026-11-13T01:28:41+00:00", "kind": "answer", "id": "q29", "text": "Valider les 3 du serveur (b37 b41 b51 valides, d244)", "canal": "telephone, carte Tri des 11 (13/11) : Valider les 3 du serveur (Recommande)"}
