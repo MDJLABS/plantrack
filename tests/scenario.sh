@@ -1936,7 +1936,8 @@ exit 0
 FAUX
 chmod +x "$TO/sc2" "$TO/dk2"; : > "$TO/sc2.log"; : > "$TO/sc2.actifs"; : > "$TO/dk2.log"; : > "$TO/dk2.noms"
 echo "$TO/pj" > "$TO/reg2"
-O2() { env -u ORCH_ORANGE_DISPO PLANTRACK_ORCHESTRE="$OD2" PLANTRACK_PROC="$OP" PLANTRACK_CGROUP="$CG2" \
+printf 'x.service\nz.service\n' > "$TO/autorises"; chmod 644 "$TO/autorises"
+O2() { env -u ORCH_ORANGE_DISPO PLANTRACK_REVEILS_AUTORISES="$TO/autorises" PLANTRACK_ORCHESTRE="$OD2" PLANTRACK_PROC="$OP" PLANTRACK_CGROUP="$CG2" \
   PLANTRACK_REGISTRY="$TO/reg2" ORCH_CALME=0 ORCH_PAS=0 ORCH_ALERTE=true SOUFFLE_SYSTEMCTL="$TO/sc2" \
   ORCH_DOCKER="$TO/dk2" python3 "$PT" "$@"; }
 PJ="$TO/pj"; mkdir -p "$PJ/.plantrack"; echo "x.service" > "$PJ/.plantrack/souffle.conf"
@@ -1985,6 +1986,17 @@ check_not "demande hostile : nom invalide ignore" "bad" "$out"
 check_not "demande hostile : nom de fichier different ignore" "y.service" "$out"
 check_not "demande de plus de 2 h oubliee" "vieux" "$out"
 check_exit "demandes hostiles ou perimees supprimees" "0" "$(ls "$OD2/demandes" | wc -l)"
+# 5a. revue securite 12/11 : service du souffle.conf mais absent de la liste de root, refuse
+: > "$TO/sc2.log"; now=$(date +%s); printf 'z.service\n' > "$TO/autorises"
+printf '{"service":"x.service","projet":"pj","racine":"%s","ts":%s,"rang":"agent"}' "$PJ" "$now" > "$OD2/demandes/x.service.json"
+O2 orchestre --tour; sleep 0.5
+check_not "liste de root : service non liste jamais demarre" "x.service" "$(cat "$TO/sc2.log")"
+check "liste de root : refus journalise" "absent de" "$(jnl)"
+printf 'x.service\n' > "$TO/autorises"; chmod 666 "$TO/autorises"
+printf '{"service":"x.service","projet":"pj","racine":"%s","ts":%s,"rang":"agent"}' "$PJ" "$now" > "$OD2/demandes/x.service.json"
+O2 orchestre --tour; sleep 0.5
+check_not "liste de root modifiable par tous : ignoree" "x.service" "$(cat "$TO/sc2.log")"
+printf 'x.service\nz.service\n' > "$TO/autorises"; chmod 644 "$TO/autorises"; rm -f "$OD2/demandes/"*
 # 5b. demandes de session non fiables : service hors souffle.conf, lien symbolique
 : > "$TO/sc2.log"; now=$(date +%s)
 printf '{"service":"z.service","projet":"pj","racine":"%s","ts":%s,"rang":"agent"}' "$PJ" "$now" > "$OD2/demandes/z.service.json"

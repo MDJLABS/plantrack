@@ -27,6 +27,7 @@ import shlex
 import shutil
 import signal
 import subprocess
+import stat
 import sys
 import tempfile
 import time
@@ -1925,6 +1926,23 @@ def orch_service_du_registre(service, uid=None, racine=None):
     return False
 
 
+ORCH_AUTORISES = os.environ.get("PLANTRACK_REVEILS_AUTORISES") or "/etc/plantrack/reveils-autorises"
+
+
+def orch_reveil_autorise(service):
+    """Revue securite du 12/11 : souffle.conf appartient au proprietaire du projet, pas a root.
+    L'orchestre (root) ne demarre donc qu'une unite listee dans un fichier de root
+    (un nom par ligne), non modifiable par un autre compte. Pas de fichier = aucun reveil."""
+    try:
+        st = os.lstat(ORCH_AUTORISES)
+        if not stat.S_ISREG(st.st_mode) or st.st_uid not in (0, os.geteuid()) or st.st_mode & 0o022:
+            return False
+        with open(ORCH_AUTORISES, encoding="utf-8") as f:
+            return service in {l.split("#", 1)[0].strip() for l in f}
+    except OSError:
+        return False
+
+
 def orch_ramasser_reveils(etat):
     """Traces deposees par le portier pour un reveil accorde : l'orchestre en mesurera le cout.
     Une trace est non fiable : meme controles qu'une demande, valeurs bornees."""
@@ -1978,6 +1996,9 @@ def orch_demandes(etat, maintenant, m, feu):
             if ok and not orch_service_du_registre(d["service"], uid, d.get("racine")):
                 ok = False
                 orch_journal(f"demande refusee {nom[:80]} : pas un reveil autorise de ce projet")
+            elif ok and not orch_reveil_autorise(d["service"]):
+                ok = False
+                orch_journal(f"demande refusee {nom[:80]} : absent de {ORCH_AUTORISES} (liste de root)")
         except (KeyError, TypeError, ValueError, OverflowError):
             ok = False
         if not ok:
