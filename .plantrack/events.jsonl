@@ -2616,3 +2616,6 @@
 {"ts": "2026-11-13T00:00:52+00:00", "kind": "file_touched", "text": "../../../etc/plantrack/reveils-autorises", "thread": "t23"}
 {"ts": "2026-11-13T00:01:17+00:00", "kind": "attempt", "id": "a76", "bug": "b51", "hypothesis": "Liste blanche de root /etc/plantrack/reveils-autorises (root, non modifiable par un autre compte, sinon ignoree) : l'orchestre ne demarre que les services listes ; liste posee avec miamboost/prolearn/prorent-supabase, orchestre relance ; 3 tests ajoutes, suite verte hors echec connu pg31.", "session": "ec2b56c8-765e-4029-aac5-fe74e2e4f9dc", "actor": "claude-code"}
 {"ts": "2026-11-13T00:01:17+00:00", "kind": "bug_status", "id": "b51", "status": "to_verify"}
+{"ts": "2026-11-13T00:01:18+00:00", "kind": "commit", "sha": "acb7399", "ctype": "commit", "thread": "t23"}
+{"ts": "2026-11-13T00:01:20+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t23"}
+{"ts": "2026-11-13T00:01:26+00:00", "kind": "piege", "id": "pg33", "text": "Orchestre (b51, v1.9.49) : un service ajoute au souffle.conf d'un projet n'est reveille par l'orchestre que s'il figure aussi dans /etc/plantrack/reveils-autorises (fichier de root, 644). Nouveau projet qui respire : ajouter sa ligne en root, sinon 'demande refusee ... absent de' dans le journal de l'orchestre."}

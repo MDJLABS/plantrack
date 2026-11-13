@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [226 commits]
-  fichiers recemment ecrits : ../../../tmp/o.txt, ../../../tmp/sc.txt, pyproject.toml, .claude/hooks/pt.py, sortie/scenario-reveils.log, ../../../etc/plantrack/reveils-autorises
+FIL ACTIF — t23 : guides de test automatiques (d100) [227 commits]
+  fichiers recemment ecrits : ../../../tmp/o.txt, ../../../tmp/sc.txt, .claude/hooks/pt.py, sortie/scenario-reveils.log, ../../../etc/plantrack/reveils-autorises, pyproject.toml
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -298,6 +298,7 @@ Pieges connus :
   pg29 : tests/scenario.sh lance sous le compte bccsession : 6 echecs ronde/b20/bilan --…
   pg30 : Compte bccsession (sessions du telephone) : la boucle locale est filtree — seul…
   pg31 : tests/scenario.sh 'bilan --all : rien a dire' echoue sur le serveur reel quand …
+  pg33 : Orchestre (b51, v1.9.49) : un service ajoute au souffle.conf d'un projet n'est …
 
 Questions en attente (reponds via !answer qN ...) :
   q15 : Guide Soirées pret (s69-soirees 1db1d2a) : Mariella fait-elle l'essai sur https…
