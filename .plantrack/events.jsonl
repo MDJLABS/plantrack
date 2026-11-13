@@ -2623,3 +2623,8 @@
 {"ts": "2026-11-13T00:01:48+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/ec2b56c8-765e-4029-aac5-fe74e2e4f9dc/scratchpad/suite.json", "thread": "t23"}
 {"ts": "2026-11-13T00:01:48+00:00", "kind": "file_touched", "text": "sortie/carte-suite-1113.log", "thread": "t23"}
 {"ts": "2026-11-13T00:32:14+00:00", "kind": "question", "id": "q28", "text": "Carte Suite du 13/11 (apres Checker v2 v1.9.48 et b51 v1.9.49) restee sans reponse : trier les 11 corrections en attente (Recommande), brainstorming de la suite, ou rester en veille ?"}
+{"ts": "2026-11-13T00:32:14+00:00", "kind": "commit", "sha": "bbb8afb", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-13T01:25:11+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/e09d6add-e3a0-4ce0-9be6-f530eff5e68f/scratchpad/tri.json", "thread": "t23"}
+{"ts": "2026-11-13T01:25:11+00:00", "kind": "file_touched", "text": "sortie/carte-tri-1113.log", "thread": "t23"}
+{"ts": "2026-11-13T01:25:16+00:00", "kind": "question", "id": "q29", "text": "Carte Tri des 11 (13/11) : quelles corrections valider ? (reco : les 3 du serveur b37 b41 b51 ; b49 en surveillance ; guide b44-b50 et Soirees b38-b40 a ses essais)"}
+{"ts": "2026-11-13T01:26:40+00:00", "kind": "decision", "id": "d244", "text": "Mariella (tel, 13/11, carte Tri des 11) : 'Valider les 3 du serveur (Recommande)' - b37 b41 b51 a valider ; b49 en surveillance une semaine ; guide b44 b45 b46 b50 a son essai du Checker v2 ; Soirees b38 b39 b40 a son essai. Saisie verify bloquee par le controle automatique de la session, a refaire avec son accord.", "par": "agent"}

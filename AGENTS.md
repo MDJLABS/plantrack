@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [228 commits]
-  fichiers recemment ecrits : .claude/hooks/pt.py, sortie/scenario-reveils.log, ../../../etc/plantrack/reveils-autorises, pyproject.toml, ../../../tmp/claude-0/-home-mariella-plantrack/ec2b56c8-765e-4029-aac5-fe74e2e4f9dc/scratchpad/suite.json, sortie/carte-suite-1113.log
+FIL ACTIF — t23 : guides de test automatiques (d100) [229 commits]
+  fichiers recemment ecrits : ../../../etc/plantrack/reveils-autorises, pyproject.toml, ../../../tmp/claude-0/-home-mariella-plantrack/ec2b56c8-765e-4029-aac5-fe74e2e4f9dc/scratchpad/suite.json, sortie/carte-suite-1113.log, ../../../tmp/claude-0/-home-mariella-plantrack/e09d6add-e3a0-4ce0-9be6-f530eff5e68f/scratchpad/tri.json, sortie/carte-tri-1113.log
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -278,6 +278,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d241 : Mariella (tel, 12/11 22h, carte Checker) : 'Dossier reserve (Recommande)' + 'Une commande + un fichier (Recommande)'. Checker v2 : (1) mote… (agent)
   d242 : Checker v2 livre v1.9.48 (13/11, GitHub seul, d127) : d241 complet (dossier moteur/, raccourcis, Bloquant + marque corriges, plantrack chec… (agent)
   d243 : Mariella (tel, 13/11, carte Checker v2) : 'A la prochaine ouverture (Recommande)' : chaque site recoit v1.9.48 a l'ouverture de sa session,… (agent)
+  d244 : Mariella (tel, 13/11, carte Tri des 11) : 'Valider les 3 du serveur (Recommande)' - b37 b41 b51 a valider ; b49 en surveillance une semaine… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
@@ -304,5 +305,6 @@ Questions en attente (reponds via !answer qN ...) :
   q15 : Guide Soirées pret (s69-soirees 1db1d2a) : Mariella fait-elle l'essai sur https…
   q23 : Carte 10/11 : guide ProRent pret, rallumer sa base de test (eteinte d155) pour …
   q28 : Carte Suite du 13/11 (apres Checker v2 v1.9.48 et b51 v1.9.49) restee sans repo…
+  q29 : Carte Tri des 11 (13/11) : quelles corrections valider ? (reco : les 3 du serve…
 ```
 <!-- plantrack:state-end -->
