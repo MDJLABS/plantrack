@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [232 commits]
-  fichiers recemment ecrits : sortie/carte-suite-1113.log, ../../../tmp/claude-0/-home-mariella-plantrack/e09d6add-e3a0-4ce0-9be6-f530eff5e68f/scratchpad/tri.json, sortie/carte-tri-1113.log, sortie/carte-validation-1113.log, sortie/carte-suite2-1113.log, sortie/carte-pendant-1113.log
+FIL ACTIF — t23 : guides de test automatiques (d100) [233 commits]
+  fichiers recemment ecrits : ../../../tmp/claude-0/-home-mariella-plantrack/e09d6add-e3a0-4ce0-9be6-f530eff5e68f/scratchpad/tri.json, sortie/carte-tri-1113.log, sortie/carte-validation-1113.log, sortie/carte-suite2-1113.log, sortie/carte-pendant-1113.log, sortie/carte-verdict-1113.log
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -304,5 +304,6 @@ Questions en attente (reponds via !answer qN ...) :
   q15 : Guide Soirées pret (s69-soirees 1db1d2a) : Mariella fait-elle l'essai sur https…
   q23 : Carte 10/11 : guide ProRent pret, rallumer sa base de test (eteinte d155) pour …
   q28 : Carte Suite du 13/11 (apres Checker v2 v1.9.48 et b51 v1.9.49) restee sans repo…
+  q30 : Carte Verdict du Checker (13/11) : le guide ProJob (https://projob-test.mdjlabs…
 ```
 <!-- plantrack:state-end -->
