@@ -97,7 +97,7 @@ import { consignerGuide, consignerPoint, guideInterrompu, renvoyerGuide } from "
 import { reglagesGuide } from "../guide-reglages";
 import { surLaPage } from "./guide-visite";
 import { GuideCurseur } from "./GuideCurseur";
-import { gestesEtape, type ResultatGeste } from "./guide-geste";
+import { gestesEtape, oublierSurvol, type ResultatGeste } from "./guide-geste";
 import type { VerdictStocke } from "./guide-etat";
 import type { GuideScenario, GuideProgress } from "./types";
 import { useDecalageMenuBas } from "./guide-menu-bas";
@@ -615,6 +615,8 @@ function Visite({ scenario, verdictsServeur, corriges, onReplier, onFermer, onTe
   // de `prog` (un motif saisi, un autre verdict…) n'a aucune raison de redéclencher quoi que
   // ce soit — seul un changement d'ÉTAPE doit décider de montrer ou non le curseur.
   useEffect(() => {
+    // Un survol forcé par le point précédent ne doit pas déborder sur celui-ci.
+    oublierSurvol(document);
     setGesteRaison(null);
     setGesteOk(false);
     setMenuOuvert(false);

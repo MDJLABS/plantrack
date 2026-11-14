@@ -32,7 +32,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { resolveTarget } from "./guide-geometry";
-import { jouerGeste, selecteursGeste, type ResultatGeste } from "./guide-geste";
+import { gesteSansCible, jouerGesteAttendu, selecteursGeste, type ResultatGeste } from "./guide-geste";
 import type { GuideGeste } from "./types";
 
 /** Durée du glissé : assez lent pour être SUIVI du regard, assez rapide pour ne pas traîner. */
@@ -71,7 +71,7 @@ export function GuideCurseur({
   const [pos, setPos] = useState<Point>(depart);
   const [clic, setClic] = useState(false);
   const [sansTransition, setSansTransition] = useState(false);
-  const [visible, setVisible] = useState(gestes[0]?.type !== "aller");
+  const [visible, setVisible] = useState(gestes[0]?.type !== "aller" && gestes[0]?.type !== "retour");
   // Garde contre un double effet (StrictMode en dev) : un geste ne part jamais deux fois.
   // `prochain` retient le premier geste pas encore joué : un remontage reprend la suite LÀ,
   // sans rejouer ni abandonner les gestes restants (b28) ; `fini` ferme la porte au résultat.
@@ -97,10 +97,10 @@ export function GuideCurseur({
 
     const rendre = (res: ResultatGeste) => { fini.current = true; onJoue(res); };
 
-    const jouer = (geste: GuideGeste, i: number): ResultatGeste => {
+    const jouer = (geste: GuideGeste, i: number): Promise<ResultatGeste> => {
       if (!avantFait.current) { avantFait.current = true; onAvantAction(); }
       prochain.current = i + 1;
-      return jouerGeste(geste, document, ciblesRepli, undefined, ancetresReplies);
+      return jouerGesteAttendu(geste, document, ciblesRepli, undefined, ancetresReplies);
     };
 
     const suivant = (i: number) => {
@@ -108,30 +108,42 @@ export function GuideCurseur({
       if (i >= gestes.length) { rendre({ ok: true }); return; }
       const geste = gestes[i];
 
-      if (geste.type === "aller") {
+      if (geste.type === "aller" || geste.type === "retour") {
         setVisible(false);
-        rendre(jouer(geste, i)); // dernier geste de la suite, cf. `gestesEtape`
+        void jouer(geste, i).then(rendre); // dernier geste de la suite, cf. `gestesEtape`
         return;
       }
 
       // La cible est cherchée MAINTENANT, après que la page a réagi au geste précédent.
-      const el = resolveTarget(selecteursGeste(geste, ciblesRepli), document, undefined, ancetresReplies);
-      if (!el) {
+      // Échap ou clic dans le vide sans cible propre : pas d'élément à viser, le curseur va
+      // au fond de la page (bord gauche, mi-hauteur), là où un clic ne touche rien.
+      const sansCible = gesteSansCible(geste);
+      const el = sansCible ? null : resolveTarget(selecteursGeste(geste, ciblesRepli), document, undefined, ancetresReplies);
+      if (!el && !sansCible) {
         // Invariant 2 du guide : ne jamais prétendre avoir atteint une cible absente.
         rendre({ ok: false, raison: "cible introuvable" });
         return;
       }
-      const r = el.getBoundingClientRect();
-      const centre: Point = { x: r.x + r.width / 2, y: r.y + r.height / 2 };
+      const r = el?.getBoundingClientRect();
+      const centre: Point = r
+        ? { x: r.x + r.width / 2, y: r.y + r.height / 2 }
+        : { x: 24, y: Math.round(window.innerHeight / 2) };
+      // Glisser : le curseur part de la source puis suit le déposé jusqu'à `vers`.
+      const dest = geste.type === "glisser" && geste.vers
+        ? resolveTarget([geste.vers], document, undefined, ancetresReplies)?.getBoundingClientRect()
+        : undefined;
       setVisible(true);
       setClic(false);
 
       const conclure = () => {
         if (annule) return;
-        const res = jouer(geste, i);
-        if (!res.ok) { rendre(res); return; }
-        if (i + 1 >= gestes.length) { rendre(res); return; }
-        attendre(PAUSE_ENTRE_GESTES_MS, () => suivant(i + 1));
+        if (dest) { setSansTransition(false); setPos({ x: dest.x + dest.width / 2, y: dest.y + dest.height / 2 }); }
+        void jouer(geste, i).then((res) => {
+          if (annule) return;
+          if (!res.ok) { rendre(res); return; }
+          if (i + 1 >= gestes.length) { rendre(res); return; }
+          attendre(PAUSE_ENTRE_GESTES_MS, () => suivant(i + 1));
+        });
       };
 
       if (motionReduite) {
@@ -157,7 +169,7 @@ export function GuideCurseur({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- un seul passage par montage, cf. `prochain`
   }, []);
 
-  if (!visible) return null; // geste "aller" : rien à encadrer
+  if (!visible) return null; // geste "aller" / "retour" : rien à encadrer
 
   return (
     <div

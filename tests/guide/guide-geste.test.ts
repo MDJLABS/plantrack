@@ -17,7 +17,9 @@
 
 import assert from "node:assert/strict";
 import {
-  appliquerClic, appliquerSaisie, gestesEtape, jouerGeste, selecteursGeste,
+  appliquerClic, appliquerClicDehors, appliquerGlisser, appliquerSaisie, appliquerSurvol,
+  appliquerTouche, gesteSansCible, gestesEtape, jouerGeste, jouerGesteAttendu, reecrireSurvol,
+  selecteursGeste,
 } from "../../.claude/hooks/plantrack_guide/moteur/guide-geste";
 import type { GuideGeste } from "../../.claude/hooks/plantrack_guide/moteur/types";
 
@@ -183,4 +185,97 @@ step("gestesEtape : un aller coupe la suite juste apres lui", () => {
   assert.deepEqual(gestesEtape({ geste: clic, gestes: [aller, clic] }), [clic, aller]);
 });
 
-console.log(`\n${passed} assertions vertes`);
+// --- Gestes du 14/11 (q26) : touche, survol, glisser, clic-dehors, retour ----------------
+
+/** Double minimal qui note les événements reçus (Node 24 a `Event`, pas `MouseEvent`). */
+function enregistreur() {
+  const recus: { type: string; key?: string }[] = [];
+  return {
+    recus,
+    dispatchEvent(e: Event) { recus.push({ type: e.type, key: (e as unknown as { key?: string }).key }); return true; },
+    getBoundingClientRect: () => ({ x: 10, y: 20, width: 100, height: 40 }) as DOMRect,
+  };
+}
+
+step("selecteursGeste : touche et clic-dehors ne se rabattent jamais sur la zone surlignee", () => {
+  assert.deepEqual(selecteursGeste({ type: "touche" }, ["#menu"]), []);
+  assert.deepEqual(selecteursGeste({ type: "clic-dehors" }, ["#menu"]), []);
+  assert.deepEqual(selecteursGeste({ type: "clic-dehors", cible: "#fond" }, ["#menu"]), ["#fond"]);
+  assert.deepEqual(selecteursGeste({ type: "survol" }, ["#ligne"]), ["#ligne"]);
+});
+step("gesteSansCible : navigation, et Echap / clic-dehors sans cible propre", () => {
+  assert.equal(gesteSansCible({ type: "retour" }), true);
+  assert.equal(gesteSansCible({ type: "touche" }), true);
+  assert.equal(gesteSansCible({ type: "touche", cible: "#champ" }), false);
+  assert.equal(gesteSansCible({ type: "survol" }), false);
+});
+step("gestesEtape : un retour coupe la suite comme un aller", () => {
+  const retour: GuideGeste = { type: "retour" };
+  const clic: GuideGeste = { type: "clic", cible: "#x" };
+  assert.deepEqual(gestesEtape({ gestes: [clic, retour, clic] }), [clic, retour]);
+});
+step("appliquerTouche : keydown puis keyup, Escape par defaut", () => {
+  const el = enregistreur();
+  assert.deepEqual(appliquerTouche(el), { ok: true });
+  assert.deepEqual(el.recus.map((r) => r.type), ["keydown", "keyup"]);
+});
+step("appliquerTouche : element absent -> echec declare", () => {
+  assert.equal(appliquerTouche(null).ok, false);
+});
+step("appliquerClicDehors : la suite complete d'un vrai clic", () => {
+  const el = enregistreur();
+  assert.deepEqual(appliquerClicDehors(el), { ok: true });
+  assert.deepEqual(el.recus.map((r) => r.type), ["pointerdown", "mousedown", "pointerup", "mouseup", "click"]);
+});
+step("appliquerSurvol : evenements d'entree et de mouvement, sans document", () => {
+  const el = enregistreur();
+  assert.deepEqual(appliquerSurvol(el), { ok: true });
+  assert.ok(el.recus.some((r) => r.type === "mouseover"));
+  assert.ok(el.recus.some((r) => r.type === "mouseenter"));
+});
+step("reecrireSurvol : :hover devient la classe forcee, (hover: hover) devient all", () => {
+  assert.equal(reecrireSurvol(".a { color: red; }"), null);
+  assert.equal(reecrireSurvol(".a:hover { color: red; }"), ".a.guide-force-survol { color: red; }");
+  assert.equal(
+    reecrireSurvol(".g { &:is(:where(.group):hover *) { @media (hover: hover) { opacity: 1; } } }"),
+    ".g { &:is(:where(.group).guide-force-survol *) { @media all { opacity: 1; } } }",
+  );
+});
+step("jouerGeste : touche sans cible -> element qui a le focus", () => {
+  const actif = enregistreur();
+  const doc = { activeElement: actif, body: {} } as unknown as Document;
+  const r = jouerGeste({ type: "touche", touche: "Enter" }, doc, ["#zone"], () => null);
+  assert.deepEqual(r, { ok: true });
+  assert.equal(actif.recus[0].type, "keydown"); // `key` n'existe qu'en navigateur (KeyboardEvent)
+});
+step("jouerGeste : clic-dehors sans cible -> fond de page (body)", () => {
+  const body = enregistreur();
+  const doc = { body } as unknown as Document;
+  assert.deepEqual(jouerGeste({ type: "clic-dehors" }, doc, ["#menu"], () => null), { ok: true });
+  assert.equal(body.recus.at(-1)?.type, "click");
+});
+
+async function asynchrones() {
+  const source = enregistreur();
+  const dest = enregistreur();
+  const docRecus = enregistreur();
+  const r = await appliquerGlisser(source, dest, docRecus as unknown as Document, 0);
+  assert.deepEqual(r, { ok: true });
+  assert.equal(source.recus[0].type, "pointerdown");
+  assert.ok(docRecus.recus.filter((e) => e.type === "pointermove").length >= 10);
+  assert.equal(docRecus.recus.at(-1)?.type, "mouseup");
+  passed++; console.log("ok - appliquerGlisser : dnd-kit, pointerdown puis mouvements puis lacher sur le document");
+
+  const sansVers = await jouerGesteAttendu({ type: "glisser", cible: "#a" }, {} as Document, [], () => source as unknown as Element);
+  assert.equal(sansVers.ok, false);
+  passed++; console.log("ok - jouerGesteAttendu : glisser sans vers -> echec declare");
+
+  const clic = await jouerGesteAttendu({ type: "clic", cible: "#a" }, {} as Document, [], () => ({ click() {} }) as unknown as Element);
+  assert.deepEqual(clic, { ok: true });
+  passed++; console.log("ok - jouerGesteAttendu : les gestes immediats passent par jouerGeste");
+}
+
+asynchrones().then(
+  () => console.log(`\n${passed} assertions vertes`),
+  (e) => { console.error("FAIL - asynchrones\n", e); process.exitCode = 1; },
+);

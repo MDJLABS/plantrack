@@ -18,14 +18,28 @@
  */
 export type GuideGeste = {
   /** clic : `el.click()`. saisie : pose `valeur` dans un champ (setter natif + events React).
-   *  aller : navigue vers `url` — la visite reprend grâce à `sessionStorage` (guide-visite.ts). */
-  type: "clic" | "saisie" | "aller";
-  /** Sélecteur CSS de l'élément à actionner — absent ⇒ repli sur les `cibles` de l'étape. */
+   *  aller : navigue vers `url` — la visite reprend grâce à `sessionStorage` (guide-visite.ts).
+   *  Gestes ajoutés le 14/11 (q26, choix Mariella « Apprendre les gestes ») :
+   *  touche : appuie sur `touche` (Escape par défaut) dans l'élément visé, ou celui qui a le
+   *    focus quand le geste n'a pas de `cible` ; l'événement remonte jusqu'au document.
+   *  survol : pose la souris sur l'élément (événements souris + état :hover forcé, pour que
+   *    les boutons qui n'apparaissent qu'au survol se montrent vraiment).
+   *  glisser : glisse l'élément visé jusqu'à `vers` (glisser-déposer natif ou dnd-kit).
+   *  clic-dehors : clique dans le vide (sur `cible` si donnée, sinon sur le fond de page) ;
+   *    c'est ce que guettent les menus qui se ferment au clic extérieur.
+   *  retour : bouton « Précédent » du navigateur ; comme "aller", toujours le DERNIER. */
+  type: "clic" | "saisie" | "aller" | "touche" | "survol" | "glisser" | "clic-dehors" | "retour";
+  /** Sélecteur CSS de l'élément à actionner — absent ⇒ repli sur les `cibles` de l'étape
+   *  (sauf "touche" et "clic-dehors", qui n'ont pas besoin de cible). */
   cible?: string;
-  /** Valeur à saisir (type "saisie" uniquement). */
+  /** Valeur à saisir (type "saisie" uniquement ; marche aussi sur une liste <select>). */
   valeur?: string;
   /** URL de destination (type "aller" uniquement). */
   url?: string;
+  /** Touche à presser (type "touche") : nom `KeyboardEvent.key`, "Escape" par défaut. */
+  touche?: string;
+  /** Sélecteur CSS de l'endroit où déposer (type "glisser" uniquement). */
+  vers?: string;
 };
 
 /** Un point à vérifier : où regarder, quoi faire, ce qui doit se passer. */
