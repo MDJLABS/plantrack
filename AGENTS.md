@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [240 commits]
-  fichiers recemment ecrits : ../../../tmp/claude-0/-home-mariella-plantrack/25d4343f-2121-42cd-b55b-60c7ec39240d/scratchpad/carte.json, sortie/carte-qdj8-1113.log, ../../../tmp/claude-0/-home-mariella-plantrack/2eae4e95-6593-49d4-ab4a-1b2638dd2157/scratchpad/carte.json, sortie/carte-tri3-1114.log, sortie/carte-soirees-1114.log, ../../../tmp/claude-0/-home-mariella-plantrack/2eae4e95-6593-49d4-ab4a-1b2638dd2157/scratchpad/soirees.json
+FIL ACTIF — t23 : guides de test automatiques (d100) [241 commits]
+  fichiers recemment ecrits : sortie/carte-qdj8-1113.log, ../../../tmp/claude-0/-home-mariella-plantrack/2eae4e95-6593-49d4-ab4a-1b2638dd2157/scratchpad/carte.json, sortie/carte-tri3-1114.log, sortie/carte-soirees-1114.log, ../../../tmp/claude-0/-home-mariella-plantrack/2eae4e95-6593-49d4-ab4a-1b2638dd2157/scratchpad/soirees.json, sortie/carte-guide-soirees-1114.log
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -305,5 +305,8 @@ Questions en attente (reponds via !answer qN ...) :
   q23 : Carte 10/11 : guide ProRent pret, rallumer sa base de test (eteinte d155) pour …
   q28 : Carte Suite du 13/11 (apres Checker v2 v1.9.48 et b51 v1.9.49) restee sans repo…
   q32 : Carte Soirees reparee (14/11) restee sans reponse : refaire l'essai sur https:/…
+
+Cartes laissees de cote (action a reprendre a la reponse : answer --carte <id>) :
+  q33 (carte guide-soirees) : Carte 14/11 : guide Soirees invisible car non connectee en admin sur s69-soiree…
 ```
 <!-- plantrack:state-end -->

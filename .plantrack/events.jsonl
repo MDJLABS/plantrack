@@ -2684,3 +2684,6 @@
 {"ts": "2026-11-13T23:34:44+00:00", "kind": "file_touched", "text": "sortie/carte-soirees-1114.log", "thread": "t23"}
 {"ts": "2026-11-14T00:04:19+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/2eae4e95-6593-49d4-ab4a-1b2638dd2157/scratchpad/soirees.json", "thread": "t23"}
 {"ts": "2026-11-14T00:34:26+00:00", "kind": "question", "id": "q32", "text": "Carte Soirees reparee (14/11) restee sans reponse : refaire l'essai sur https://s69-soirees-dev.mdjlabs.com/soirees pour verifier b38 b39 b40 b53 ?"}
+{"ts": "2026-11-14T00:34:27+00:00", "kind": "commit", "sha": "1f0e0aa", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-14T15:15:31+00:00", "kind": "file_touched", "text": "sortie/carte-guide-soirees-1114.log", "thread": "t23"}
+{"ts": "2026-11-14T15:15:37+00:00", "kind": "question", "id": "q33", "text": "Carte 14/11 : guide Soirees invisible car non connectee en admin sur s69-soirees-dev ; se connecter via /connexion (lien magique) puis lancer le guide Soirees", "carte": "guide-soirees"}
