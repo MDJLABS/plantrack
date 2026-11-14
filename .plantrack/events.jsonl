@@ -2701,3 +2701,7 @@
 {"ts": "2026-11-14T15:31:57+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/0b4d050f-54f8-469a-90dc-149f422ed340/scratchpad/suite.json", "thread": "t23"}
 {"ts": "2026-11-14T15:31:57+00:00", "kind": "file_touched", "text": "sortie/carte-suite-veille-1114.log", "thread": "t23"}
 {"ts": "2026-11-14T15:47:14+00:00", "kind": "decision", "id": "d249", "text": "Mariella (tel, 14/11 15h44, carte Veille) : 'Rester en veille (Recommande)' - Soirees chez la session S69 (d248), memoire du serveur tenable ; veille silencieuse (d23), aucune carte de suite, ecrire seulement sur panne.", "par": "agent"}
+{"ts": "2026-11-14T15:47:34+00:00", "kind": "commit", "sha": "d7ab0bc", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-14T15:56:39+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-warm-diffie.md", "thread": "t23"}
+{"ts": "2026-11-14T18:15:23+00:00", "kind": "commit", "sha": "fc759e3", "ctype": "feat", "thread": "t23"}
+{"ts": "2026-11-14T18:26:05+00:00", "kind": "decision", "id": "d250", "text": "Mariella (tel, 14/11, plan approuve apres relance auto) : rien a faire, veille silencieuse (d23, d249) ; Soirees chez la session S69 (d248)", "par": "agent"}
