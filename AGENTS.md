@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [242 commits]
-  fichiers recemment ecrits : ../../../tmp/claude-0/-home-mariella-plantrack/2eae4e95-6593-49d4-ab4a-1b2638dd2157/scratchpad/carte.json, sortie/carte-tri3-1114.log, sortie/carte-soirees-1114.log, ../../../tmp/claude-0/-home-mariella-plantrack/2eae4e95-6593-49d4-ab4a-1b2638dd2157/scratchpad/soirees.json, sortie/carte-guide-soirees-1114.log, ../../../tmp/claude-0/-home-mariella-plantrack/3df629d6-bc50-492f-acc9-df57a6f9731a/scratchpad/acces.json
+FIL ACTIF — t23 : guides de test automatiques (d100) [244 commits]
+  fichiers recemment ecrits : ../../../tmp/claude-0/-home-mariella-plantrack/2eae4e95-6593-49d4-ab4a-1b2638dd2157/scratchpad/soirees.json, sortie/carte-guide-soirees-1114.log, ../../../tmp/claude-0/-home-mariella-plantrack/3df629d6-bc50-492f-acc9-df57a6f9731a/scratchpad/acces.json, ../../../tmp/claude-0/-home-mariella-plantrack/ea6204d7-ade7-497f-beef-18bb105abd0f/scratchpad/suite.json, ../../../tmp/claude-0/-home-mariella-plantrack/0b4d050f-54f8-469a-90dc-149f422ed340/scratchpad/suite.json, sortie/carte-suite-veille-1114.log
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -277,6 +277,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d246 : Mariella (tel, 13/11, carte Pendant ton essai) : 'Attendre mon verdict (Recommande)' - aucun chantier, veille silencieuse jusqu'a son verdi… (agent)
   d247 : Mariella (tel, 13/11 22h, 'pourquoi tu ne declenches pas la file d'attente, corrige ca') : cause = le feu de l'orchestre ne jugeait que la … (agent)
   d248 : Mariella (tel, 14/11 15h20) : 'je comprends pas pourquoi c'est dans la session plantrack qu'on s'occupe de ca, redonne ca a la session s69 … (agent)
+  d249 : Mariella (tel, 14/11 15h44, carte Veille) : 'Rester en veille (Recommande)' - Soirees chez la session S69 (d248), memoire du serveur tenabl… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
