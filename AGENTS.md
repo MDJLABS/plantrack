@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [248 commits]
-  fichiers recemment ecrits : sortie/carte-suite-veille-1114.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-warm-diffie.md, sortie/carte-suite-1114b.json, sortie/carte-suite-1114b.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-eager-scone.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-magical-oasis.md
+FIL ACTIF — t23 : guides de test automatiques (d100) [249 commits]
+  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-warm-diffie.md, sortie/carte-suite-1114b.json, sortie/carte-suite-1114b.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-eager-scone.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-magical-oasis.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-deep-aurora.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -281,6 +281,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d250 : Mariella (tel, 14/11, plan approuve apres relance auto) : rien a faire, veille silencieuse (d23, d249) ; Soirees chez la session S69 (d248) (agent)
   d251 : Mariella (tel, 14/11 soir, plan approuve apres relance auto) : rien a faire, veille silencieuse (d23, d249, reponse 18h26 'ne repose pas ce… (agent)
   d252 : Mariella (tel, 14/11 soir, plan approuve apres nouvelle relance auto) : rien a faire, veille silencieuse (d23, d249, d251, reponse 18h26 'n… (agent)
+  d253 : Mariella (tel, 14/11 21h45, plan approuve apres relance auto alerte charge 5.43) : rien a faire, le coordinateur etait deja au rouge et ava… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
