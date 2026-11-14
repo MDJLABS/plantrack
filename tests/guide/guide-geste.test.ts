@@ -49,6 +49,12 @@ step("selecteursGeste : pas de cible sur le geste → seulement le repli", () =>
 step("selecteursGeste : ni cible ni repli → liste vide, jamais une exception", () => {
   assert.deepEqual(selecteursGeste({ type: "clic" }), []);
 });
+step("selecteursGeste : geste siPresent → sa cible seule, jamais de repli", () => {
+  assert.deepEqual(selecteursGeste({ type: "clic", cible: "#b", siPresent: true }, ["#zone-a"]), ["#b"]);
+});
+step("jouerGeste : geste siPresent dont la cible manque → sauté sans erreur", () => {
+  assert.deepEqual(jouerGeste({ type: "clic", cible: "#b", siPresent: true }, {} as Document, ["#zone-a"], () => null), { ok: true });
+});
 
 // --- 2. appliquerClic() --------------------------------------------------------------------
 

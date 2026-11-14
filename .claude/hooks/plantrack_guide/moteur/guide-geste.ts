@@ -56,6 +56,8 @@ export function selecteursGeste(geste: GuideGeste, ciblesRepli: readonly string[
   // Échap et clic dans le vide visent rarement la zone surlignée : se rabattre sur elle
   // ferait cliquer DEDANS le menu qu'on veut justement fermer. Leur cible est la leur ou rien.
   if (geste.type === "touche" || geste.type === "clic-dehors") return geste.cible ? [geste.cible] : [];
+  // Geste conditionnel : sa cible ou rien (cf. `siPresent` dans types.ts).
+  if (geste.siPresent) return geste.cible ? [geste.cible] : [];
   return geste.cible ? [geste.cible, ...ciblesRepli] : [...ciblesRepli];
 }
 
@@ -406,7 +408,7 @@ export function jouerGeste(
     const el = gesteSansCible(geste)
       ? cibleParDefaut(geste, doc)
       : resolve(selecteurs, doc, undefined, ancetresReplies as string[]);
-    if (!el) return { ok: false, raison: "cible introuvable" };
+    if (!el) return geste.siPresent ? { ok: true } : { ok: false, raison: "cible introuvable" };
 
     if (geste.type === "clic") return appliquerClic(el);
     if (geste.type === "saisie") return appliquerSaisie(el, geste.valeur ?? "");
@@ -438,7 +440,7 @@ export async function jouerGesteAttendu(
   try {
     if (!geste.vers) return { ok: false, raison: 'geste "glisser" sans destination (vers)' };
     const source = resolve(selecteursGeste(geste, ciblesRepli), doc, undefined, ancetresReplies as string[]);
-    if (!source) return { ok: false, raison: "cible introuvable" };
+    if (!source) return geste.siPresent ? { ok: true } : { ok: false, raison: "cible introuvable" };
     const dest = resolve([geste.vers], doc, undefined, ancetresReplies as string[]);
     if (!dest) return { ok: false, raison: "endroit où déposer introuvable" };
     return await appliquerGlisser(source, dest, doc);

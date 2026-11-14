@@ -40,6 +40,11 @@ export type GuideGeste = {
   touche?: string;
   /** Sélecteur CSS de l'endroit où déposer (type "glisser" uniquement). */
   vers?: string;
+  /** Geste joué SEULEMENT si sa propre `cible` paraît dans les secondes qui suivent ; sinon
+   *  il est sauté sans erreur et la suite continue. Jamais de repli sur les `cibles` de
+   *  l'étape : un geste conditionnel ne doit pas cliquer autre chose que ce qu'il vise.
+   *  Ex. « Continuer » d'un avertissement qui n'apparaît que si le texte a déjà été déposé. */
+  siPresent?: boolean;
 };
 
 /** Un point à vérifier : où regarder, quoi faire, ce qui doit se passer. */

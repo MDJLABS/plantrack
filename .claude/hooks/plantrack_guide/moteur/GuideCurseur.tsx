@@ -41,6 +41,10 @@ const DUREE_GLISSE_MS = 700;
 const DUREE_CLIC_MS = 160;
 /** Pause entre deux gestes : le temps que React rende l'effet du précédent. */
 const PAUSE_ENTRE_GESTES_MS = 450;
+/** Geste `siPresent` : combien de temps sa cible a pour paraître (une action serveur en
+ *  cours, par ex.) avant que le geste soit sauté, et à quel rythme on la cherche. */
+const ATTENTE_SI_PRESENT_MS = 6000;
+const PAS_SI_PRESENT_MS = 300;
 /** Au-dessus de `#guide-overlay` (Z = 2147483000 dans `GuideDeTest.tsx`). */
 const Z_CURSEUR = 2147483001;
 
@@ -103,7 +107,7 @@ export function GuideCurseur({
       return jouerGesteAttendu(geste, document, ciblesRepli, undefined, ancetresReplies);
     };
 
-    const suivant = (i: number) => {
+    const suivant = (i: number, attendu = 0) => {
       if (annule) return;
       if (i >= gestes.length) { rendre({ ok: true }); return; }
       const geste = gestes[i];
@@ -119,6 +123,13 @@ export function GuideCurseur({
       // au fond de la page (bord gauche, mi-hauteur), là où un clic ne touche rien.
       const sansCible = gesteSansCible(geste);
       const el = sansCible ? null : resolveTarget(selecteursGeste(geste, ciblesRepli), document, undefined, ancetresReplies);
+      if (!el && !sansCible && geste.siPresent) {
+        // Geste conditionnel : on laisse à sa cible le temps de paraître, puis on le saute.
+        if (attendu < ATTENTE_SI_PRESENT_MS) { attendre(PAS_SI_PRESENT_MS, () => suivant(i, attendu + PAS_SI_PRESENT_MS)); return; }
+        if (i + 1 >= gestes.length) { rendre({ ok: true }); return; }
+        suivant(i + 1);
+        return;
+      }
       if (!el && !sansCible) {
         // Invariant 2 du guide : ne jamais prétendre avoir atteint une cible absente.
         rendre({ ok: false, raison: "cible introuvable" });
