@@ -2992,7 +2992,7 @@ def write_hooks_file(path, obj, label, hint=""):
         with open(path, "w", encoding="utf-8") as f:
             json.dump(obj, f, ensure_ascii=False, indent=2)
             f.write("\n")
-        print(f"{label} ecrit ({len(obj["hooks"])} hooks).{hint}")
+        print(f"{label} ecrit ({len(obj['hooks'])} hooks).{hint}")
         return True
     with open(path, encoding="utf-8") as f:
         content = f.read()
