@@ -117,6 +117,14 @@ export function marquerJoue(p: GuideProgress, stepId: string): GuideProgress {
   return { ...p, joues: [...(p.joues ?? []), stepId] };
 }
 
+/** Rend des étapes « pas encore jouées » : leur geste repartira tout seul à la prochaine
+ *  entrée (15/11, demande s69 : un geste raté avant « M'emmener au bon endroit » doit
+ *  repartir à l'arrivée, et « Préparer ce point » rejoue le point précédent). */
+export function oublierJoue(p: GuideProgress, stepIds: readonly string[]): GuideProgress {
+  if (!p.joues?.some((j) => stepIds.includes(j))) return p;
+  return { ...p, joues: p.joues.filter((j) => !stepIds.includes(j)) };
+}
+
 export function sauverProgression(p: GuideProgress, storage: Storage | null): void {
   if (!storage) return;
   try {

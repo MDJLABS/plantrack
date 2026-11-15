@@ -75,3 +75,34 @@ function cheminDe(url: string): string {
 export function surLaPage(pathname: string, url: string): boolean {
   return cheminDe(pathname) === cheminDe(url);
 }
+
+/* ------------------------------------------------------------------------------------------
+ * Adresse réelle où la zone d'un point a été vue (15/11, demande s69). Les pages à jeton
+ * (/paiement?…, /confirmation/<id>, /carte-cadeau/<code>) n'ont pas d'url propre dans le
+ * scénario : sans mémoire, « M'emmener au bon endroit » retombait sur l'url du scénario et
+ * faisait recommencer tout le parcours. On retient, le temps de l'onglet, le chemin ET les
+ * paramètres de la page où la zone est apparue, pour y ramener.
+ * ------------------------------------------------------------------------------------------ */
+
+const PREFIXE_VUE = "guide-vue:";
+
+/** Retient l'adresse (chemin + paramètres) où la zone du point a été vue. Jamais ne lève. */
+export function retenirAdresseVue(storage: StorageVisite | null, scenarioId: string, stepId: string, adresse: string): void {
+  if (!storage) return;
+  try {
+    storage.setItem(`${PREFIXE_VUE}${scenarioId}:${stepId}`, adresse);
+  } catch {
+    /* stockage plein ou refusé : le bouton retombe sur l'url du scénario, comme avant */
+  }
+}
+
+/** Dernière adresse où la zone du point a été vue, ou `null`. Jamais ne lève. */
+export function adresseVue(storage: StorageVisite | null, scenarioId: string, stepId: string): string | null {
+  if (!storage) return null;
+  try {
+    const v = storage.getItem(`${PREFIXE_VUE}${scenarioId}:${stepId}`);
+    return v && v.startsWith("/") && !v.startsWith("//") ? v : null;
+  } catch {
+    return null;
+  }
+}

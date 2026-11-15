@@ -87,7 +87,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { BORD_CARTE, placerCarte, resolveTarget, type PlaceCarte, type Rect } from "./guide-geometry";
 import {
   accederLocalStorage, avancer, chargerProgression, marquerJoue, noterMotif, oublierProgression,
-  oublierToutesLesProgressions, reconcilierAvecServeur, reculer, sauverProgression,
+  oublierToutesLesProgressions, oublierJoue, reconcilierAvecServeur, reculer, sauverProgression,
   verdict, vide,
 } from "./guide-progress";
 import { indexDePoint, SCENARIOS } from "./guides-json";
@@ -95,7 +95,7 @@ import { verdictScenario } from "./guide-verdict";
 import { construireCompteRendu } from "./guide-compte-rendu";
 import { consignerGuide, consignerPoint, guideInterrompu, renvoyerGuide } from "./guide-actions";
 import { reglagesGuide } from "../guide-reglages";
-import { surLaPage } from "./guide-visite";
+import { accederSessionStorage, adresseVue, retenirAdresseVue, surLaPage } from "./guide-visite";
 import { GuideCurseur } from "./GuideCurseur";
 import { gestesEtape, oublierSurvol, type ResultatGeste } from "./guide-geste";
 import type { VerdictStocke } from "./guide-etat";
@@ -420,7 +420,9 @@ function Visite({ scenario, verdictsServeur, corriges, onReplier, onFermer, onTe
   // `null` si ni le point ni le scénario n'en portent.
   const pathname = usePathname();
   const router = useRouter();
-  const urlBrute = etape.url ?? scenario.url ?? null;
+  // Sans url propre, l'adresse réelle où la zone a déjà été vue (pages à jeton, 15/11) passe
+  // avant l'url du scénario : sinon le bouton faisait recommencer tout le parcours.
+  const urlBrute = etape.url ?? adresseVue(accederSessionStorage(), scenario.id, etape.id) ?? scenario.url ?? null;
   const urlPoint = urlBrute === null ? null : (reglagesGuide.resoudreUrl ?? ((u: string) => u))(urlBrute, pathname);
   // Un scénario porte souvent un `match` (toutes les pages où il est valable, ex. n'importe
   // quel élément du Studio) plus large que son `url` (UNE page de départ) : sur une page
@@ -437,9 +439,37 @@ function Visite({ scenario, verdictsServeur, corriges, onReplier, onFermer, onTe
   // Jamais un bouton qui renvoie sur la page où elle est déjà (même chemin ET mêmes
   // paramètres, `?vue=` de /dashboard compris) : un clic sans effet (b42, 07/11).
   const dejaLa = urlPoint !== null && surLaPage(pathname, urlPoint) && memesParametres(urlPoint);
+  // Arrivée attendue après un clic (15/11, demande s69) : le geste du point repart tout seul
+  // une fois la page atteinte, même s'il avait échoué avant (plus besoin de « Réessayer »).
+  const [attente, setAttente] = useState<string | null>(null);
+  const [arrivee, setArrivee] = useState(0);
+  const allerEtRejouer = (url: string) => {
+    maj(oublierJoue(prog, [etape.id]));
+    // Changement de page : l'effet du curseur repart seul sur `horsPage`. Même page (autres
+    // paramètres, ou zone absente) : rien ne change pour lui, on guette l'arrivée.
+    if (!horsPage) setAttente(url);
+    router.push(url);
+  };
   const onAllerAuBonEndroit = urlPoint !== null && (horsPage || (!trouvee && !dejaLa))
-    ? () => router.push(urlPoint)
+    ? () => allerEtRejouer(urlPoint)
     : null;
+  // Déjà au bon endroit mais la zone manque (ex. panier vide sur /panier) : un bouton ramène
+  // là où l'état se prépare, au lieu de rien (15/11). Point précédent rejoué, ou à défaut
+  // départ du scénario, ou à défaut le geste du point lui-même.
+  // Pas pendant le simple chargement de la page : la zone doit manquer depuis 1,5 s.
+  const [zoneManque, setZoneManque] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setZoneManque(!trouvee), trouvee ? 0 : 1500);
+    return () => clearTimeout(t);
+  }, [trouvee, etape.id]);
+  const precedent = prog.index > 0 ? scenario.etapes[prog.index - 1] : null;
+  const onPreparer = precedent
+    ? () => maj(reculer(oublierJoue(prog, [precedent.id, etape.id])))
+    : scenario.url
+      ? () => allerEtRejouer(scenario.url as string)
+      : aGestes
+        ? () => rejouerGeste()
+        : null;
 
   const bilan = verdictScenario(scenario.etapes, prog.verdicts);
 
@@ -578,6 +608,10 @@ function Visite({ scenario, verdictsServeur, corriges, onReplier, onFermer, onTe
         // `inline: 'nearest'` explicite : aucun défilement HORIZONTAL provoqué par le guide.
         el.scrollIntoView({ block: "center", inline: "nearest", behavior: "smooth" });
       }
+      // Adresse réelle où la zone est apparue (pages à jeton, 15/11) : cf. `adresseVue`.
+      if (el && !presente) {
+        retenirAdresseVue(accederSessionStorage(), scenario.id, etape.id, window.location.pathname + window.location.search);
+      }
       presente = !!el;
       const cle = r ? `${Math.round(r.x)},${Math.round(r.y)},${Math.round(r.w)},${Math.round(r.h)}` : "null";
       if (cle !== dernier) {
@@ -589,7 +623,23 @@ function Visite({ scenario, verdictsServeur, corriges, onReplier, onFermer, onTe
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [etape]);
+  }, [etape, scenario.id]);
+
+  // Guette l'arrivée sur la page demandée (même chemin : `usePathname` ne bouge pas), puis
+  // relance l'effet du curseur. Abandon au bout de 10 s : la page n'est jamais venue.
+  useEffect(() => {
+    if (!attente) return;
+    const debut = Date.now();
+    const t = setInterval(() => {
+      const la = surLaPage(window.location.pathname, attente) && memesParametres(attente);
+      if (la || Date.now() - debut > 10000) {
+        clearInterval(t);
+        setAttente(null);
+        if (la) setArrivee((a) => a + 1);
+      }
+    }, 150);
+    return () => clearInterval(t);
+  }, [attente]);
 
   // d172 : la carte s'écarte de la zone montrée. Mesurée (bulleRef), jamais supposée.
   // Si même la meilleure place la recouvre (zone trop grande), la page défile UNE fois par
@@ -637,7 +687,7 @@ function Visite({ scenario, verdictsServeur, corriges, onReplier, onFermer, onTe
       setCurseurVisible(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- un seul passage par ÉTAPE (et par arrivée sur sa page), cf. commentaire ci-dessus
-  }, [etape.id, horsPage, charge]);
+  }, [etape.id, horsPage, charge, arrivee]);
 
   // ⚠️ Invariant 4 : Échap ne ferme PAS la visite. Aucun `onKeyDown` ici, volontairement —
   // en ajouter un pour intercepter Échap casserait le test qu'elle sert justement à faire.
@@ -908,6 +958,25 @@ function Visite({ scenario, verdictsServeur, corriges, onReplier, onFermer, onTe
                 font: "600 14px/1 var(--font-sans, var(--sans, system-ui, sans-serif))", cursor: "pointer",
               }}
             >M&rsquo;emmener au bon endroit</button>
+          </div>
+        ) : !trouvee && zoneManque && !gesteOk && !ecranBilan && charge && !curseurVisible && onPreparer ? (
+          // Au bon endroit, mais la zone n'existe pas encore (15/11) : toujours un bouton.
+          <div id="guide-zone-a-preparer" style={{
+            display: "flex", flexDirection: "column", gap: 10, marginBottom: 8,
+            padding: 12, borderRadius: 10, background: C.orangeFond, border: `1px solid ${C.orangeBord}`,
+          }}>
+            <span style={{ color: C.orangeTexte, fontSize: 13, fontWeight: 600 }}>
+              La zone de ce point n&rsquo;est pas encore là : la page doit d&rsquo;abord être préparée.
+            </span>
+            <button
+              id="guide-preparer-point"
+              onClick={onPreparer}
+              style={{
+                height: 44, borderRadius: 10, border: "none",
+                background: C.cyan, color: C.cyanTexte,
+                font: "600 14px/1 var(--font-sans, var(--sans, system-ui, sans-serif))", cursor: "pointer",
+              }}
+            >{precedent ? "Préparer ce point (je rejoue le précédent)" : "Préparer ce point"}</button>
           </div>
         ) : !trouvee && !gesteOk && !ecranBilan && (
           // b47 : une zone retirée par le geste lui-même (fermer une boîte) n'est pas
