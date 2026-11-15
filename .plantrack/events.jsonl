@@ -2753,3 +2753,7 @@
 {"ts": "2026-11-15T20:46:53+00:00", "kind": "bug_status", "id": "b53", "status": "validated", "canal": "guide de test (carnet web, s69-soirees) 15/11 09:34 : guide soirees fini, 9/9 ok"}
 {"ts": "2026-11-15T20:46:53+00:00", "kind": "tri_plus_tard"}
 {"ts": "2026-11-15T20:46:53+00:00", "kind": "decision", "id": "d258", "text": "Mariella (tel, 15/11 20h06, plan approuve) : le guide Soirees n'apparaissait pas dans sa liste car deja fini le matin (9/9 ok, 09:34) ; b39 b40 b53 valides sur ce verdict ; b38 (liens miamboost-dev / s69-francoviet-dev) reste en attente, non reproposee 7 j", "par": "agent"}
+{"ts": "2026-11-15T20:46:56+00:00", "kind": "commit", "sha": "43287de", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-15T20:47:13+00:00", "kind": "file_touched", "text": "sortie/carte-suite-1115-soir.json", "thread": "t23"}
+{"ts": "2026-11-15T20:47:17+00:00", "kind": "file_touched", "text": "sortie/carte-suite-1115-soir.log", "thread": "t23"}
+{"ts": "2026-11-15T21:01:41+00:00", "kind": "decision", "id": "d259", "text": "Mariella (tel, 15/11 soir, carte Suite) : 'J'ouvre les 2 liens (Recommande)' - elle teste miamboost-dev et s69-francoviet-dev pour b38 ; veille silencieuse jusqu'a son verdict", "par": "agent"}
