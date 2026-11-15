@@ -2766,3 +2766,6 @@
 {"ts": "2026-11-15T21:52:23+00:00", "kind": "commit", "sha": "162c98b", "ctype": "chore", "thread": "t23"}
 {"ts": "2026-11-15T21:53:14+00:00", "kind": "bug_status", "id": "b38", "status": "validated", "canal": "telephone 15/11 soir, cartes liens test : miamboost-dev s'ouvre (erreur de code MiamBoost a part, signalee a son carnet) ; 'Francoviet s'affiche (Recommande)'"}
 {"ts": "2026-11-15T21:53:14+00:00", "kind": "answer", "id": "q35", "text": "Francoviet s'affiche", "canal": "telephone 15/11 soir, cartes liens test : miamboost-dev s'ouvre (erreur de code MiamBoost a part, signalee a son carnet) ; 'Francoviet s'affiche (Recommande)'"}
+{"ts": "2026-11-15T21:53:15+00:00", "kind": "commit", "sha": "2003d00", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-15T21:53:25+00:00", "kind": "file_touched", "text": "sortie/carte-suite-1115-fin.json", "thread": "t23"}
+{"ts": "2026-11-15T21:54:20+00:00", "kind": "decision", "id": "d260", "text": "Mariella (tel, 15/11 soir, carte Suite) : 'Attendre la fin de surveillance (Recommande)' - veille silencieuse (d23) jusqu'au verdict b49 le 19/11 ; plus aucune correction en attente hormis b49", "par": "agent"}

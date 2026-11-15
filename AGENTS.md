@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [259 commits]
-  fichiers recemment ecrits : sortie/carte-suite-1115-guides.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-proud-pnueli.md, sortie/carte-suite-1115-soir.json, sortie/carte-suite-1115-soir.log, sortie/carte-b38-verdict.json, sortie/carte-b38-francoviet.json
+FIL ACTIF — t23 : guides de test automatiques (d100) [260 commits]
+  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-proud-pnueli.md, sortie/carte-suite-1115-soir.json, sortie/carte-suite-1115-soir.log, sortie/carte-b38-verdict.json, sortie/carte-b38-francoviet.json, sortie/carte-suite-1115-fin.json
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -284,6 +284,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d257 : Mariella (tel, 15/11 soir, plan approuve) : a la carte tri des 3 corrections Soirees elle a demande 'c'est quoi les noms de guides ?' -> li… (agent)
   d258 : Mariella (tel, 15/11 20h06, plan approuve) : le guide Soirees n'apparaissait pas dans sa liste car deja fini le matin (9/9 ok, 09:34) ; b39… (agent)
   d259 : Mariella (tel, 15/11 soir, carte Suite) : 'J'ouvre les 2 liens (Recommande)' - elle teste miamboost-dev et s69-francoviet-dev pour b38 ; ve… (agent)
+  d260 : Mariella (tel, 15/11 soir, carte Suite) : 'Attendre la fin de surveillance (Recommande)' - veille silencieuse (d23) jusqu'au verdict b49 le… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
