@@ -1300,10 +1300,24 @@ ORCH_RELAIS_HUMAIN = re.compile(r"Mariella (t'a ecrit|a repondu)|\[appel \d+")
 
 
 def orch_ecrire(chemin, obj):
-    tmp = f"{chemin}.{os.getpid()}.tmp"
-    with open(tmp, "w", encoding="utf-8") as f:
-        json.dump(obj, f, ensure_ascii=False)
-    os.replace(tmp, chemin)
+    """Ecriture atomique. Dans des dossiers ouverts a tous (1777), le temporaire a un nom
+    imprevisible cree en O_EXCL (mkstemp) : jamais ecrit a travers un lien pose d'avance,
+    jamais bloque par un nom reserve par un autre compte (b28). os.replace remplace un
+    lien cible sans le suivre."""
+    import tempfile
+    fd, tmp = tempfile.mkstemp(dir=os.path.dirname(chemin) or ".",
+                               prefix=os.path.basename(chemin) + ".", suffix=".tmp")
+    try:
+        os.fchmod(fd, 0o644)
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            json.dump(obj, f, ensure_ascii=False)
+        os.replace(tmp, chemin)
+    except BaseException:
+        try:
+            os.remove(tmp)
+        except OSError:
+            pass
+        raise
 
 
 def orch_lire(chemin, defaut=None):
@@ -1378,7 +1392,9 @@ def orch_inscrire(data, prompt=None):
         if not os.access(dossier, os.W_OK):   # service pas encore relance en 1777 (b41)
             return None
         chemin = os.path.join(dossier, sid + ".json")
-        fiche = orch_lire(chemin, {}) or {}
+        fiche, uid = orch_lire_sur(chemin)   # sans suivre de lien (b28)
+        if not isinstance(fiche, dict) or uid != os.geteuid():
+            fiche = {}   # fiche d'un autre compte : on ne reprend rien de ce qu'elle dit
         pid = orch_pid_session() or fiche.get("pid")
         maintenant = time.time()
         terminal = orch_terminal(pid) if pid else False
@@ -1552,11 +1568,13 @@ def orch_estimation(projet):
     return int(1.2 * pics[len(pics) // 2]) if pics else 0
 
 
-def orch_meme_compte(chemin, pid):
+def orch_meme_compte(proprio, pid):
     """Le dossier des fiches est ouvert a tous (1777) : une fiche n'est crue que si son
-    proprietaire est root ou le compte du processus qu'elle designe."""
+    proprietaire (uid lu par fstat a l'ouverture, b28) est root ou le compte du processus
+    qu'elle designe."""
     try:
-        proprio = os.stat(chemin).st_uid
+        if proprio is None:
+            return False
         if proprio == 0:
             return True
         with open(f"/proc/{int(pid)}/status", encoding="utf-8") as f:
@@ -1578,7 +1596,11 @@ def orch_sessions(maintenant, enfants, rss, etat):
         if not nom.endswith(".json"):
             continue
         chemin = os.path.join(dossier, nom)
-        fiche = orch_lire(chemin)
+        fiche, proprio = orch_lire_sur(chemin)   # sans suivre de lien, uid sans course (b28)
+        if not isinstance(fiche, dict):
+            fiche = None
+        elif fiche.get("sid") != nom[:-5]:   # le sid fait foi par le NOM du fichier (b28)
+            continue
         pid = (fiche or {}).get("pid")
         st = orch_stat(pid) if pid else None
         if not fiche or not st or st[0] not in ("claude", "codex") or orch_zombie(pid) \
@@ -1594,7 +1616,7 @@ def orch_sessions(maintenant, enfants, rss, etat):
             except OSError:
                 pass
             continue
-        if not orch_meme_compte(chemin, pid):   # une fiche ne gele que son propre compte (b41)
+        if not orch_meme_compte(proprio, pid):   # une fiche ne gele que son propre compte (b41)
             continue
         poids = rss.get(pid, 0) + sum(rss.get(d, 0) for d in orch_descendants(pid, enfants))
         pic = max(poids, (connues.get(fiche["sid"]) or {}).get("pic", 0))
@@ -1885,7 +1907,7 @@ def orch_portier(racine, reveil):
         journalise = False
         for s in reveil:
             chemin = os.path.join(dossier, s + ".json")
-            deja = orch_lire(chemin)
+            deja, _ = orch_lire_sur(chemin)   # sans suivre de lien (b28)
             if isinstance(deja, dict) and maintenant - float(deja.get("ts", 0)) < ORCH_DEMANDE_AGE:
                 continue   # deja demande : on garde la plus ancienne
             try:

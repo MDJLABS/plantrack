@@ -1903,8 +1903,17 @@ out=$(echo '{"session_id":"zz","tool_name":"Read","tool_input":{}}' | PLANTRACK_
 check_exit "orchestre absent : hook code 0, muet" "0:" "$rc:$out"
 # b41 : dossier des fiches ouvert a tous les comptes, une fiche ne vise que son compte
 check_exit "orchestre : dossier des fiches en 1777" "1777" "$(stat -c %a "$OD/sessions")"
-out=$(python3 -c 'import importlib.util as u,sys,os; sp=u.spec_from_file_location("pt",sys.argv[1]); m=u.module_from_spec(sp); f=sys.argv[2]; sys.argv=["pt"]; sp.loader.exec_module(m); print(m.orch_meme_compte(f, os.getpid()), m.orch_meme_compte(f, 1) if os.getuid() else False)' "$PT" "$OD/sessions/sb.json")
-check_exit "orchestre : fiche crue pour son compte, ignoree pour un autre" "True False" "$out"
+out=$(python3 -c 'import importlib.util as u,sys,os; sp=u.spec_from_file_location("pt",sys.argv[1]); m=u.module_from_spec(sp); f=sys.argv[2]; sys.argv=["pt"]; sp.loader.exec_module(m); print(m.orch_meme_compte(os.stat(f).st_uid, os.getpid()), m.orch_meme_compte(os.stat(f).st_uid, 1) if os.getuid() else False, m.orch_meme_compte(None, os.getpid()))' "$PT" "$OD/sessions/sb.json")
+check_exit "orchestre : fiche crue pour son compte, ignoree pour un autre" "True False False" "$out"
+# b28 : sid du contenu = nom du fichier, aucun lien suivi, temporaire jamais ecrit a travers un lien
+printf '{"sid":"sc","pid":%s,"projet":"pirate","vu":%s,"debut":%s,"humain":%s}' "$pa" "$(date +%s)" "$(date +%s)" "$(date +%s)" > "$OD/sessions/usurpe.json"
+echo '{"sid":"lien","pid":1}' > "$TO/cible-lien.json"; ln -sf "$TO/cible-lien.json" "$OD/sessions/lien.json"
+out=$(PLANTRACK_ORCHESTRE="$OD" PLANTRACK_PROC="$OP" python3 -c 'import importlib.util as u,sys,time; sp=u.spec_from_file_location("pt",sys.argv[1]); m=u.module_from_spec(sp); sys.argv=["pt"]; sp.loader.exec_module(m); v=m.orch_sessions(time.time(), {}, {}, {"sessions": {}}); print(sorted(v), v.get("sc", {}).get("projet") == "pirate")' "$PT" 2>&1)
+check_exit "orchestre : fiche au sid usurpe et fiche en lien ignorees (b28)" "['sa', 'sb', 'sc'] False" "$out"
+rm -f "$OD/sessions/usurpe.json" "$OD/sessions/lien.json"
+echo temoin > "$TO/temoin"
+out=$(python3 -c 'import importlib.util as u,sys,os; a=sys.argv[:]; sp=u.spec_from_file_location("pt",a[1]); m=u.module_from_spec(sp); sys.argv=["pt"]; sp.loader.exec_module(m); c=a[2]; os.symlink(a[3], f"{c}.{os.getpid()}.tmp"); m.orch_ecrire(c, {"ok": 1}); print(open(a[3]).read().strip(), os.path.islink(c), m.orch_lire(c))' "$PT" "$TO/ecrit.json" "$TO/temoin" 2>&1)
+check_exit "orchestre : temporaire pose en lien, temoin intact (b28)" "temoin False {'ok': 1}" "$out"
 chmod 555 "$OD/sessions"
 out=$(echo '{"session_id":"sx","tool_name":"Read","tool_input":{}}' | PLANTRACK_ORCHESTRE="$OD" python3 "$PT" hook-pretool 2>&1); rc=$?
 [ "$(id -u)" = 0 ] && ecrit=0 || ecrit=$(ls "$OD/sessions" | grep -c '^sx')
