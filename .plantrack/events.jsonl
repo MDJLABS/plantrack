@@ -2757,3 +2757,6 @@
 {"ts": "2026-11-15T20:47:13+00:00", "kind": "file_touched", "text": "sortie/carte-suite-1115-soir.json", "thread": "t23"}
 {"ts": "2026-11-15T20:47:17+00:00", "kind": "file_touched", "text": "sortie/carte-suite-1115-soir.log", "thread": "t23"}
 {"ts": "2026-11-15T21:01:41+00:00", "kind": "decision", "id": "d259", "text": "Mariella (tel, 15/11 soir, carte Suite) : 'J'ouvre les 2 liens (Recommande)' - elle teste miamboost-dev et s69-francoviet-dev pour b38 ; veille silencieuse jusqu'a son verdict", "par": "agent"}
+{"ts": "2026-11-15T21:01:44+00:00", "kind": "commit", "sha": "f76ac44", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-15T21:01:58+00:00", "kind": "file_touched", "text": "sortie/carte-b38-verdict.json", "thread": "t23"}
+{"ts": "2026-11-15T21:22:05+00:00", "kind": "attempt", "id": "a79", "bug": "b38", "hypothesis": "Essai Mariella 15/11 soir : miamboost-dev joignable mais affiche une Build Error du code MiamBoost (conflit cartes-cadeaux, 9bf79c58), signale au carnet MiamBoost ; francoviet sans retour", "session": "983b8d27-a290-4bc6-a58e-c6b5d6872d0d", "actor": "claude-code"}
