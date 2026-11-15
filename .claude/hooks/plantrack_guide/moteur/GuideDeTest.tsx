@@ -669,6 +669,7 @@ function Visite({ scenario, verdictsServeur, corriges, onReplier, onFermer, onTe
     oublierSurvol(document);
     setGesteRaison(null);
     setGesteOk(false);
+    setZoneManque(false); // nouveau point : le délai de 1,5 s repart de zéro
     setMenuOuvert(false);
     setMotifActif(false);
     setMotifSaisie("");
