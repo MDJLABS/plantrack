@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [257 commits]
-  fichiers recemment ecrits : sortie/carte-suite-1115-guides.json, sortie/carte-suite-1115-guides.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-proud-pnueli.md, sortie/carte-suite-1115-soir.json, sortie/carte-suite-1115-soir.log, sortie/carte-b38-verdict.json
+FIL ACTIF — t23 : guides de test automatiques (d100) [258 commits]
+  fichiers recemment ecrits : sortie/carte-suite-1115-guides.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-proud-pnueli.md, sortie/carte-suite-1115-soir.json, sortie/carte-suite-1115-soir.log, sortie/carte-b38-verdict.json, sortie/carte-b38-francoviet.json
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -312,5 +312,6 @@ Pieges connus :
 Questions en attente (reponds via !answer qN ...) :
   q23 : Carte 10/11 : guide ProRent pret, rallumer sa base de test (eteinte d155) pour …
   q28 : Carte Suite du 13/11 (apres Checker v2 v1.9.48 et b51 v1.9.49) restee sans repo…
+  q35 : 15/11 soir : carte Francoviet - s69-francoviet-dev.mdjlabs.com s'affiche-t-il ?…
 ```
 <!-- plantrack:state-end -->
