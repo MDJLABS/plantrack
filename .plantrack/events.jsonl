@@ -2763,3 +2763,6 @@
 {"ts": "2026-11-15T21:22:09+00:00", "kind": "commit", "sha": "23add6f", "ctype": "chore", "thread": "t23"}
 {"ts": "2026-11-15T21:22:15+00:00", "kind": "file_touched", "text": "sortie/carte-b38-francoviet.json", "thread": "t23"}
 {"ts": "2026-11-15T21:52:22+00:00", "kind": "question", "id": "q35", "text": "15/11 soir : carte Francoviet - s69-francoviet-dev.mdjlabs.com s'affiche-t-il ? (dernier point de b38 ; miamboost-dev joignable, son erreur de code signalee au carnet MiamBoost)"}
+{"ts": "2026-11-15T21:52:23+00:00", "kind": "commit", "sha": "162c98b", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-15T21:53:14+00:00", "kind": "bug_status", "id": "b38", "status": "validated", "canal": "telephone 15/11 soir, cartes liens test : miamboost-dev s'ouvre (erreur de code MiamBoost a part, signalee a son carnet) ; 'Francoviet s'affiche (Recommande)'"}
+{"ts": "2026-11-15T21:53:14+00:00", "kind": "answer", "id": "q35", "text": "Francoviet s'affiche", "canal": "telephone 15/11 soir, cartes liens test : miamboost-dev s'ouvre (erreur de code MiamBoost a part, signalee a son carnet) ; 'Francoviet s'affiche (Recommande)'"}

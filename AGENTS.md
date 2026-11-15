@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [258 commits]
+FIL ACTIF — t23 : guides de test automatiques (d100) [259 commits]
   fichiers recemment ecrits : sortie/carte-suite-1115-guides.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-proud-pnueli.md, sortie/carte-suite-1115-soir.json, sortie/carte-suite-1115-soir.log, sortie/carte-b38-verdict.json, sortie/carte-b38-francoviet.json
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -22,7 +22,6 @@ FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t5 : travaux sur main — reprise : retour au travail courant apres la faille
 
 BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
-  b38 (to_verify) [t23] Essai versions de test (01/11 soir, tel Mariella) : 's69 soirees mene vers le site s69 dev il me semble, et les 2 autres liens ne fonctionn… (agent) [2 tentatives, derniere: Essai Mariella 15/11 soir : miamboost-dev joignable mais af…]
   b49 (to_verify) [t23] Surcharge 12/11 22h01-22h13 (earlyoom tue chrome + java 1,4 Go) : la respiration (battre, pt.py) reveille prolearn-supabase (22h01) puis pr… (agent) [1 tentatives, derniere: Livre v1.9.47 (bd9c2a7 + 21baa4f, GitHub seul, pas de cle P…]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
@@ -312,6 +311,5 @@ Pieges connus :
 Questions en attente (reponds via !answer qN ...) :
   q23 : Carte 10/11 : guide ProRent pret, rallumer sa base de test (eteinte d155) pour …
   q28 : Carte Suite du 13/11 (apres Checker v2 v1.9.48 et b51 v1.9.49) restee sans repo…
-  q35 : 15/11 soir : carte Francoviet - s69-francoviet-dev.mdjlabs.com s'affiche-t-il ?…
 ```
 <!-- plantrack:state-end -->
