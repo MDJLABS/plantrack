@@ -2720,3 +2720,21 @@
 {"ts": "2026-11-14T21:37:11+00:00", "kind": "file_touched", "text": "sortie/carte-suite-1114c.json", "thread": "t23"}
 {"ts": "2026-11-14T21:37:11+00:00", "kind": "file_touched", "text": "sortie/carte-suite-1114c.log", "thread": "t23"}
 {"ts": "2026-11-14T21:45:46+00:00", "kind": "decision", "id": "d254", "text": "Mariella (tel, 14/11 soir, carte Surcharge geree) : 'Rester en veille (Recommande)' + 'Ne repose pas ces questions' - veille silencieuse (d23, d249, d251)", "par": "agent"}
+{"ts": "2026-11-14T21:45:47+00:00", "kind": "commit", "sha": "5f76375", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-15T17:19:24+00:00", "kind": "file_touched", "text": "tests/guide/bon-endroit.test.ts", "thread": "t23"}
+{"ts": "2026-11-15T17:19:24+00:00", "kind": "file_touched", "text": "sortie/guide-err.log", "thread": "t23"}
+{"ts": "2026-11-15T17:49:23+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/moteur/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-11-15T17:49:37+00:00", "kind": "commit", "sha": "9b136ae", "ctype": "feat", "thread": "t23"}
+{"ts": "2026-11-15T17:50:00+00:00", "kind": "file_touched", "text": ".claude/hooks/plantrack_guide/moteur/GuideDeTest.tsx", "thread": "t23"}
+{"ts": "2026-11-15T17:50:11+00:00", "kind": "commit", "sha": "b351053", "ctype": "fix", "thread": "t23"}
+{"ts": "2026-11-15T17:50:28+00:00", "kind": "decision", "id": "d255", "text": "Moteur guide (demande session s69 15/11, relayant Mariella tel 'le bouton qui me dirige au bon endroit n'est pas tout le temps la, il faut qu'il le soit') : 9b136ae+b351053 - (1) deja sur la page mais zone absente depuis 1,5 s -> bouton 'Preparer ce point' (rejoue le point precedent, sinon depart du scenario, sinon le geste) ; (2) adresse reelle (chemin+parametres) ou la zone a ete vue retenue en sessionStorage (guide-vue:<scenario>:<point>) et utilisee si le point n'a pas d'url propre ; (3) clic sur M'emmener efface le point de prog.joues et le geste repart seul a l'arrivee (meme chemin : guet de l'adresse 10 s max). Tests tests/guide/bon-endroit.test.ts.", "par": "agent"}
+{"ts": "2026-11-15T18:22:00+00:00", "kind": "file_touched", "text": "sortie/tsc-moteur-1115.sh", "thread": "t23"}
+{"ts": "2026-11-15T18:22:00+00:00", "kind": "file_touched", "text": "sortie/tsc-moteur-1115.log", "thread": "t23"}
+{"ts": "2026-11-15T18:31:19+00:00", "kind": "file_touched", "text": "sortie/tsc-moteur-1115.log", "thread": "t23"}
+{"ts": "2026-11-15T19:01:41+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/4bd7c654-65cf-412f-845b-6fd185c4a947/scratchpad/tsc/tsconfig.json", "thread": "t23"}
+{"ts": "2026-11-15T19:01:47+00:00", "kind": "file_touched", "text": "sortie/tsc-moteur-1115.log", "thread": "t23"}
+{"ts": "2026-11-15T19:17:58+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-smooth-starlight.md", "thread": "t23"}
+{"ts": "2026-11-15T19:32:20+00:00", "kind": "precommit_block"}
+{"ts": "2026-11-15T19:40:52+00:00", "kind": "commit", "sha": "11be87f", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-15T19:40:57+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t23"}
+{"ts": "2026-11-15T19:41:12+00:00", "kind": "decision", "id": "d256", "text": "v1.9.51 publiee (15/11, GitHub seul, pas de cle PyPI d127) : bouton du guide toujours present (d255, 9b136ae+b351053) ; 9 tests du guide verts, /code-review low sans defaut ; les autres sites la recoivent par update a l'ouverture de leur session.", "par": "agent"}
