@@ -2738,3 +2738,18 @@
 {"ts": "2026-11-15T19:40:52+00:00", "kind": "commit", "sha": "11be87f", "ctype": "chore", "thread": "t23"}
 {"ts": "2026-11-15T19:40:57+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t23"}
 {"ts": "2026-11-15T19:41:12+00:00", "kind": "decision", "id": "d256", "text": "v1.9.51 publiee (15/11, GitHub seul, pas de cle PyPI d127) : bouton du guide toujours present (d255, 9b136ae+b351053) ; 9 tests du guide verts, /code-review low sans defaut ; les autres sites la recoivent par update a l'ouverture de leur session.", "par": "agent"}
+{"ts": "2026-11-15T19:41:27+00:00", "kind": "commit", "sha": "9fbc427", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-15T19:41:30+00:00", "kind": "file_touched", "text": "sortie/carte-tri-1115.json", "thread": "t23"}
+{"ts": "2026-11-15T19:41:30+00:00", "kind": "file_touched", "text": "sortie/carte-tri-1115.log", "thread": "t23"}
+{"ts": "2026-11-15T19:41:42+00:00", "kind": "file_touched", "text": "sortie/carte-tri-1115b.log", "thread": "t23"}
+{"ts": "2026-11-15T19:41:42+00:00", "kind": "file_touched", "text": "sortie/carte-tri-1115.json", "thread": "t23"}
+{"ts": "2026-11-15T19:54:30+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-sorted-diffie.md", "thread": "t23"}
+{"ts": "2026-11-15T19:54:52+00:00", "kind": "decision", "id": "d257", "text": "Mariella (tel, 15/11 soir, plan approuve) : a la carte tri des 3 corrections Soirees elle a demande 'c'est quoi les noms de guides ?' -> liste des 11 guides S69 Soirees donnee ; b38/b39/b40 se verifient avec le guide 'La page Soirees : reserver une place, pas a pas' (https://s69-soirees-dev.mdjlabs.com/soirees) ; pas de nouvelle carte de tri, verdicts attendus par le guide (veille silencieuse d23, d254)", "par": "agent"}
+{"ts": "2026-11-15T19:55:06+00:00", "kind": "file_touched", "text": "sortie/carte-suite-1115-guides.json", "thread": "t23"}
+{"ts": "2026-11-15T19:55:06+00:00", "kind": "file_touched", "text": "sortie/carte-suite-1115-guides.log", "thread": "t23"}
+{"ts": "2026-11-15T20:08:38+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-proud-pnueli.md", "thread": "t23"}
+{"ts": "2026-11-15T20:46:52+00:00", "kind": "bug_status", "id": "b39", "status": "validated", "canal": "guide de test (carnet web, s69-soirees) 15/11 09:34 : guide soirees fini, 9/9 ok"}
+{"ts": "2026-11-15T20:46:53+00:00", "kind": "bug_status", "id": "b40", "status": "validated", "canal": "guide de test (carnet web, s69-soirees) 15/11 09:34 : guide soirees fini, 9/9 ok"}
+{"ts": "2026-11-15T20:46:53+00:00", "kind": "bug_status", "id": "b53", "status": "validated", "canal": "guide de test (carnet web, s69-soirees) 15/11 09:34 : guide soirees fini, 9/9 ok"}
+{"ts": "2026-11-15T20:46:53+00:00", "kind": "tri_plus_tard"}
+{"ts": "2026-11-15T20:46:53+00:00", "kind": "decision", "id": "d258", "text": "Mariella (tel, 15/11 20h06, plan approuve) : le guide Soirees n'apparaissait pas dans sa liste car deja fini le matin (9/9 ok, 09:34) ; b39 b40 b53 valides sur ce verdict ; b38 (liens miamboost-dev / s69-francoviet-dev) reste en attente, non reproposee 7 j", "par": "agent"}

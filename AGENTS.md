@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [254 commits]
-  fichiers recemment ecrits : .claude/hooks/plantrack_guide/moteur/GuideDeTest.tsx, sortie/tsc-moteur-1115.sh, ../../../tmp/claude-0/-home-mariella-plantrack/4bd7c654-65cf-412f-845b-6fd185c4a947/scratchpad/tsc/tsconfig.json, sortie/tsc-moteur-1115.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-smooth-starlight.md, pyproject.toml
+FIL ACTIF — t23 : guides de test automatiques (d100) [255 commits]
+  fichiers recemment ecrits : sortie/carte-tri-1115b.log, sortie/carte-tri-1115.json, ../../../root/.claude/plans/contexte-reconstruit-par-le-sorted-diffie.md, sortie/carte-suite-1115-guides.json, sortie/carte-suite-1115-guides.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-proud-pnueli.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -23,10 +23,7 @@ FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
 
 BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b38 (to_verify) [t23] Essai versions de test (01/11 soir, tel Mariella) : 's69 soirees mene vers le site s69 dev il me semble, et les 2 autres liens ne fonctionn… (agent) [1 tentatives, derniere: MiamBoost : miamboost-dev.mdjlabs.com classe en domaine de …]
-  b39 (to_verify) [t23] Essai guide Soirees (02/11 11h, tel Mariella) : la page /soirees de la version de test s69-soirees affiche 'canal MiamBoost non configure (… (agent) [1 tentatives, derniere: Version de test branchee sur la preprod MiamBoost locale : …]
-  b40 (to_verify) [t23] Essai guide Soirees (02/11 11h23, tel Mariella) : 'probleme sur les captcha cloudflare, il y en a 3 dans la page, beaucoup trop ; un seul s… (agent) [1 tentatives, derniere: s69-soirees 3c92781 : TurnstileWidget monte seulement a l'e…]
   b49 (to_verify) [t23] Surcharge 12/11 22h01-22h13 (earlyoom tue chrome + java 1,4 Go) : la respiration (battre, pt.py) reveille prolearn-supabase (22h01) puis pr… (agent) [1 tentatives, derniere: Livre v1.9.47 (bd9c2a7 + 21baa4f, GitHub seul, pas de cle P…]
-  b53 (to_verify) [t23] Essai guide Soirees (14/11, tel Mariella) : /soirees -> 'liste des soirees indisponible : timeout' ; base locale MiamBoost (supabase_db_mia… (agent) [1 tentatives, derniere: miamboost-supabase.service demarre sans l'ecran d'admin (su…]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
@@ -285,6 +282,8 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d254 : Mariella (tel, 14/11 soir, carte Surcharge geree) : 'Rester en veille (Recommande)' + 'Ne repose pas ces questions' - veille silencieuse (d… (agent)
   d255 : Moteur guide (demande session s69 15/11, relayant Mariella tel 'le bouton qui me dirige au bon endroit n'est pas tout le temps la, il faut … (agent)
   d256 : v1.9.51 publiee (15/11, GitHub seul, pas de cle PyPI d127) : bouton du guide toujours present (d255, 9b136ae+b351053) ; 9 tests du guide ve… (agent)
+  d257 : Mariella (tel, 15/11 soir, plan approuve) : a la carte tri des 3 corrections Soirees elle a demande 'c'est quoi les noms de guides ?' -> li… (agent)
+  d258 : Mariella (tel, 15/11 20h06, plan approuve) : le guide Soirees n'apparaissait pas dans sa liste car deja fini le matin (9/9 ok, 09:34) ; b39… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
