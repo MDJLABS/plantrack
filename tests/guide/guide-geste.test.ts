@@ -17,7 +17,7 @@
 
 import assert from "node:assert/strict";
 import {
-  appliquerClic, appliquerClicDehors, appliquerGlisser, appliquerSaisie, appliquerSurvol,
+  appliquerClic, appliquerClicDehors, appliquerCompte, appliquerFichier, appliquerGlisser, appliquerSaisie, appliquerSurvol,
   appliquerTouche, gesteSansCible, gestesEtape, jouerGeste, jouerGesteAttendu, reecrireSurvol,
   selecteursGeste,
 } from "../../.claude/hooks/plantrack_guide/moteur/guide-geste";
@@ -279,6 +279,67 @@ async function asynchrones() {
   const clic = await jouerGesteAttendu({ type: "clic", cible: "#a" }, {} as Document, [], () => ({ click() {} }) as unknown as Element);
   assert.deepEqual(clic, { ok: true });
   passed++; console.log("ok - jouerGesteAttendu : les gestes immediats passent par jouerGeste");
+
+  // --- fichier ---------------------------------------------------------------------------
+  const g = globalThis as unknown as Record<string, unknown>;
+  const avantDT = g.DataTransfer;
+  g.DataTransfer = class { items = { add: (f: File) => { this.files = [f]; } }; files: unknown[] = []; };
+  const fich = { nom: "essai.csv", type: "text/csv", contenu: "a;b" };
+  const input = Object.assign(enregistreur(), { type: "file", files: null as unknown });
+  assert.deepEqual(appliquerFichier(input, fich), { ok: true });
+  const f0 = (input.files as File[])[0];
+  assert.equal(f0.name, "essai.csv");
+  assert.equal(f0.type, "text/csv");
+  assert.deepEqual(input.recus.map((e) => e.type), ["input", "change"]);
+  passed++; console.log("ok - appliquerFichier : input file, files posé puis input et change");
+
+  const zoneInput = Object.assign(enregistreur(), { querySelector: () => input });
+  input.recus.length = 0;
+  assert.deepEqual(appliquerFichier(zoneInput, { nom: "x.bin", base64: "aGk=" }), { ok: true });
+  assert.equal(await (input.files as File[])[0].text(), "hi");
+  assert.equal(zoneInput.recus.length, 0);
+  passed++; console.log("ok - appliquerFichier : zone qui contient un input, base64 décodé");
+
+  const zone = Object.assign(enregistreur(), { querySelector: () => null });
+  assert.deepEqual(appliquerFichier(zone, fich), { ok: true });
+  assert.deepEqual(zone.recus.map((e) => e.type), ["dragenter", "dragover", "drop"]);
+  passed++; console.log("ok - appliquerFichier : zone de dépôt sans input, dragenter dragover drop");
+
+  assert.equal(appliquerFichier(null, fich).ok, false);
+  assert.equal(appliquerFichier(zone, undefined).ok, false);
+  const rj = jouerGeste({ type: "fichier", cible: "#z" }, {} as Document, [], () => null);
+  assert.deepEqual(rj, { ok: false, raison: "cible introuvable" });
+  g.DataTransfer = undefined;
+  assert.equal(appliquerFichier(zone, fich).ok, false);
+  g.DataTransfer = avantDT;
+  passed++; console.log("ok - appliquerFichier : échecs propres (cible absente, sans nom, sans DataTransfer)");
+
+  // --- compte ----------------------------------------------------------------------------
+  let rechargee = 0;
+  const appels: string[] = [];
+  const ok = await appliquerCompte("jean", async (c) => { appels.push(c); }, () => { rechargee++; });
+  assert.deepEqual(ok, { ok: true });
+  assert.deepEqual(appels, ["jean"]);
+  assert.equal(rechargee, 1);
+  passed++; console.log("ok - appliquerCompte : adaptateur appelé puis page rechargée");
+
+  const sans = await appliquerCompte("jean", undefined, () => { rechargee++; });
+  assert.equal(sans.ok, false);
+  const refus = await appliquerCompte("jean", () => false, () => { rechargee++; });
+  assert.equal(refus.ok, false);
+  const leve = await appliquerCompte("jean", () => { throw new Error("x"); }, () => { rechargee++; });
+  assert.equal(leve.ok, false);
+  assert.equal((await appliquerCompte("", () => true, () => { rechargee++; })).ok, false);
+  assert.equal(rechargee, 1);
+  passed++; console.log("ok - appliquerCompte : sans adaptateur, refus, exception, compte vide -> échec sans rechargement");
+
+  const viaAttendu = await jouerGesteAttendu({ type: "compte", compte: "moi" }, {} as Document, [], undefined, [], (c) => { appels.push(c); }, () => { rechargee++; });
+  assert.deepEqual(viaAttendu, { ok: true });
+  assert.equal(appels.at(-1), "moi");
+  assert.equal((await jouerGesteAttendu({ type: "compte", compte: "moi" }, {} as Document)).ok, false);
+  assert.equal(gesteSansCible({ type: "compte", compte: "moi" }), true);
+  assert.equal(gestesEtape({ gestes: [{ type: "compte", compte: "a" }, { type: "clic", cible: "#x" }] }).length, 1);
+  passed++; console.log("ok - jouerGesteAttendu : compte via adaptateur, sans cible, coupe la suite");
 }
 
 asynchrones().then(

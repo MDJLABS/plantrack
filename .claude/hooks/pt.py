@@ -3516,6 +3516,14 @@ CHECKER_AIDE = """Checker : un guide de test = un fichier lib/guide/guides/<id>.
 Obligatoires : titre, page, points ; par point : faire et attendu. Facultatifs : id (sinon p1, p2...), cible (texte
 ou liste), url, version (defaut "1" : la changer remet le guide a zero), gestes (liste, "aller" en dernier) ou le
 raccourci clic / saisir + valeur / aller. Les cibles sont des #id presents dans le code du site.
+Deux gestes en plus (dans "gestes", ou en raccourci sur le point) :
+  { "fichier": "#zone", "nom": "essai.csv", "type": "text/csv", "contenu": "a;b" }   (ou "base64": "...")
+      depose un fichier d'essai sur un <input type=file> (la cible, ou celui qu'elle contient) ; sans input,
+      simule un depot (dragenter, dragover, drop) sur la zone. Obligatoires : le selecteur, "nom", et "contenu" ou "base64".
+      "type" = type MIME (defaut text/plain).
+  { "compte": "jean@exemple.fr" }     se met a la place d'un autre compte ("moi" = revenir au sien), puis recharge la page ;
+      toujours le DERNIER geste du point. Le site doit fournir changerCompte(compte) dans lib/guide/guide-reglages.ts
+      (reglagesGuide : fonction qui change de compte, rend false ou leve en cas d'echec) ; sans elle le geste echoue proprement.
 Commandes : plantrack checker verifier [id] | corrige <scenario> <point> | etat | installer | aide"""
 
 
@@ -3619,15 +3627,35 @@ def checker_selecteurs(point):
     bruts = []
     cible = point.get("cible")
     bruts += cible if isinstance(cible, list) else [cible]
-    bruts += [point.get("clic"), point.get("saisir")]
+    bruts += [point.get("clic"), point.get("saisir"), point.get("fichier")]
     for g in point.get("gestes") or []:
         if isinstance(g, dict):
-            bruts += [g.get("clic"), g.get("saisir")]
+            bruts += [g.get("clic"), g.get("saisir"), g.get("fichier")]
     out = []
     for b in bruts:
         if isinstance(b, str):
             out += re.findall(r"#([A-Za-z_][\w-]*)", b)
     return out
+
+
+def checker_valider_geste(pid, g, erreurs):
+    """Champs requis des gestes « fichier » et « compte » (forme courte ou {type: ...})."""
+    def plein(v):
+        return isinstance(v, str) and v.strip() != ""
+    est_fichier = g.get("type") == "fichier" or (g.get("type") is None and g.get("fichier") is not None)
+    if est_fichier:
+        f = g["fichier"] if isinstance(g.get("fichier"), dict) else g
+        if g.get("type") == "fichier" and not plein(g.get("cible")) and not plein(g.get("fichier")):
+            erreurs.append(f"point {pid} : geste « fichier » sans selecteur (cible)")
+        if not plein(f.get("nom")):
+            erreurs.append(f"point {pid} : geste « fichier » sans « nom »")
+        if not (isinstance(f.get("contenu"), str) or plein(f.get("base64"))):
+            erreurs.append(f"point {pid} : geste « fichier » sans « contenu » ni « base64 »")
+        if f.get("type") is not None and not plein(f.get("type")):
+            erreurs.append(f"point {pid} : « type » du fichier doit etre un type MIME")
+    elif g.get("type") == "compte" or (g.get("type") is None and "compte" in g):
+        if not plein(g.get("compte")):
+            erreurs.append(f"point {pid} : geste « compte » sans nom de compte (« moi » pour revenir au sien)")
 
 
 def checker_valider(gid, chemin, ids_code):
@@ -3663,6 +3691,12 @@ def checker_valider(gid, chemin, ids_code):
         gestes = p.get("gestes")
         if gestes is not None and (not isinstance(gestes, list) or any(not isinstance(x, dict) for x in gestes)):
             erreurs.append(f"point {pid} : « gestes » doit etre une liste d'objets")
+        gs = [x for x in (gestes if isinstance(gestes, list) else []) if isinstance(x, dict)]
+        for x in [p] + gs:
+            checker_valider_geste(pid, x, erreurs)
+        for i, x in enumerate(gs):
+            if (x.get("type") == "compte" or (x.get("type") is None and "compte" in x)) and i != len(gs) - 1:
+                erreurs.append(f"point {pid} : geste « compte » doit etre le dernier (la page se recharge)")
         for s in dict.fromkeys(checker_selecteurs(p)):
             if s not in ids_code:
                 avis.append(f"point {pid} : #{s} introuvable dans le code du site (id=\"{s}\")")

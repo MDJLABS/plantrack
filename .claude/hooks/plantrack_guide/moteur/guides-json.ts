@@ -20,6 +20,17 @@ type Objet = Record<string, unknown>;
 const estObjet = (x: unknown): x is Objet => !!x && typeof x === "object" && !Array.isArray(x);
 const texte = (x: unknown): string | null => (typeof x === "string" && x.trim() !== "" ? x : null);
 
+/** Fichier d'essai d'un geste "fichier" : `{nom, type?, contenu?, base64?}` (à plat ou sous `fichier`). */
+function fichierDe(g: Objet): NonNullable<GuideGeste["fichier"]> {
+  const src = estObjet(g.fichier) ? g.fichier : g;
+  return {
+    nom: typeof src.nom === "string" ? src.nom : "",
+    ...(texte(src.type) ? { type: src.type as string } : {}),
+    ...(typeof src.contenu === "string" ? { contenu: src.contenu } : {}),
+    ...(typeof src.base64 === "string" ? { base64: src.base64 } : {}),
+  };
+}
+
 /** Un geste en forme courte (`{clic}`, `{saisir, valeur}`, `{aller}`) ou longue
  *  (`{type, cible, valeur, url}`). `null` si rien d'exploitable. */
 function convertirGeste(g: unknown): GuideGeste | null {
@@ -30,10 +41,16 @@ function convertirGeste(g: unknown): GuideGeste | null {
   if (saisir) return { type: "saisie", cible: saisir, valeur: typeof g.valeur === "string" ? g.valeur : "" };
   const aller = texte(g.aller);
   if (aller) return { type: "aller", url: aller };
+  const fichierCible = texte(g.fichier);
+  if (fichierCible) return { type: "fichier", cible: fichierCible, fichier: fichierDe(g) };
+  const compte = texte(g.compte);
+  if (compte && g.type === undefined) return { type: "compte", compte };
   const type = g.type;
-  if (type === "clic" || type === "saisie" || type === "aller") {
+  if (type === "clic" || type === "saisie" || type === "aller" || type === "fichier" || type === "compte") {
     return {
       type,
+      ...(type === "fichier" ? { fichier: fichierDe(g) } : {}),
+      ...(type === "compte" && compte ? { compte } : {}),
       ...(texte(g.cible) ? { cible: g.cible as string } : {}),
       ...(typeof g.valeur === "string" ? { valeur: g.valeur } : {}),
       ...(texte(g.url) ? { url: g.url as string } : {}),

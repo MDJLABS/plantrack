@@ -42,7 +42,7 @@ export type ResultatGeste = { ok: boolean; raison?: string };
  */
 export function gestesEtape(etape: { geste?: GuideGeste; gestes?: GuideGeste[] }): GuideGeste[] {
   const tous = [...(etape.geste ? [etape.geste] : []), ...(etape.gestes ?? [])];
-  const aller = tous.findIndex((g) => g.type === "aller" || g.type === "retour");
+  const aller = tous.findIndex((g) => g.type === "aller" || g.type === "retour" || g.type === "compte");
   return aller >= 0 ? tous.slice(0, aller + 1) : tous;
 }
 
@@ -64,7 +64,7 @@ export function selecteursGeste(geste: GuideGeste, ciblesRepli: readonly string[
 /** Un geste qui n'a besoin d'aucun élément à viser : la navigation, et Échap ou le clic
  *  dans le vide quand ils n'ont pas de `cible` propre (focus courant / fond de page). */
 export function gesteSansCible(geste: GuideGeste): boolean {
-  if (geste.type === "aller" || geste.type === "retour") return true;
+  if (geste.type === "aller" || geste.type === "retour" || geste.type === "compte") return true;
   return (geste.type === "touche" || geste.type === "clic-dehors") && !geste.cible;
 }
 
@@ -358,6 +358,80 @@ export async function appliquerGlisser(
   }
 }
 
+/** Fichier d'essai décrit dans un geste "fichier" (cf. `GuideGeste.fichier`). */
+type FichierEssai = NonNullable<GuideGeste["fichier"]>;
+
+/**
+ * Fichier - dépose un fichier d'essai. Si `el` est un `<input type="file">` (ou en contient
+ * un) : `input.files` reçoit le fichier puis `input` et `change` partent en bulles. Sinon
+ * l'élément est une zone de dépôt : `dragenter`, `dragover`, `drop` avec le `DataTransfer`.
+ */
+export function appliquerFichier(el: unknown, f: FichierEssai | undefined): ResultatGeste {
+  if (!el || typeof el !== "object") return { ok: false, raison: "rien pour recevoir le fichier" };
+  if (!f || typeof f.nom !== "string" || !f.nom) return { ok: false, raison: 'geste "fichier" sans nom de fichier' };
+  try {
+    const g = globalThis as unknown as {
+      File?: new (parts: BlobPart[], nom: string, o?: FilePropertyBag) => File;
+      DataTransfer?: new () => DataTransfer;
+    };
+    if (typeof g.File !== "function" || typeof g.DataTransfer !== "function") {
+      return { ok: false, raison: "dépôt de fichier indisponible" };
+    }
+    let parts: BlobPart[];
+    if (typeof f.base64 === "string") {
+      const bin = atob(f.base64);
+      const octets = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) octets[i] = bin.charCodeAt(i);
+      parts = [octets];
+    } else {
+      parts = [f.contenu ?? ""];
+    }
+    const fichier = new g.File(parts, f.nom, { type: f.type || "text/plain" });
+    const dt = new g.DataTransfer();
+    dt.items.add(fichier);
+
+    const e = el as Cible & { type?: string; files?: unknown; querySelector?: (s: string) => unknown };
+    const input = (e.type === "file" ? e
+      : typeof e.querySelector === "function" ? e.querySelector('input[type="file"]')
+      : null) as (Cible & { files?: unknown }) | null;
+    if (input) {
+      input.files = dt.files;
+      if (typeof input.dispatchEvent !== "function") return { ok: false, raison: "champ fichier inutilisable" };
+      emettre(input, "input");
+      emettre(input, "change");
+      return { ok: true };
+    }
+    const { x: clientX, y: clientY } = centreDe(e);
+    for (const t of ["dragenter", "dragover", "drop"]) {
+      if (!emettre(e, t, { clientX, clientY, dataTransfer: dt })) return { ok: false, raison: "zone de dépôt inutilisable" };
+    }
+    return { ok: true };
+  } catch {
+    return { ok: false, raison: "le dépôt du fichier a échoué" };
+  }
+}
+
+/**
+ * Compte - appelle l'adaptateur du site (`ReglagesGuideClient.changerCompte`) puis recharge
+ * la page (`recharger`, injectable). L'appelant a déjà marqué l'étape jouée (cf. "aller").
+ * Ne lève jamais ; sans adaptateur, ou si l'adaptateur échoue, rien n'est rechargé.
+ */
+export async function appliquerCompte(
+  compte: string | undefined,
+  changerCompte?: (compte: string) => Promise<boolean | void> | boolean | void,
+  recharger: () => void = () => { if (typeof location !== "undefined") location.reload(); },
+): Promise<ResultatGeste> {
+  if (!compte || typeof compte !== "string") return { ok: false, raison: 'geste "compte" sans compte' };
+  if (typeof changerCompte !== "function") return { ok: false, raison: "changement de compte non prévu par ce site" };
+  try {
+    if ((await changerCompte(compte)) === false) return { ok: false, raison: "le changement de compte a échoué" };
+  } catch {
+    return { ok: false, raison: "le changement de compte a échoué" };
+  }
+  try { recharger(); } catch { return { ok: false, raison: "rechargement impossible" }; }
+  return { ok: true };
+}
+
 /** L'élément qui reçoit Échap / le clic dans le vide quand le geste n'a pas de `cible`. */
 function cibleParDefaut(geste: GuideGeste, doc: Document): Element | null {
   if (geste.type === "touche") {
@@ -415,7 +489,9 @@ export function jouerGeste(
     if (geste.type === "touche") return appliquerTouche(el, geste.touche ?? "Escape");
     if (geste.type === "survol") return appliquerSurvol(el, doc);
     if (geste.type === "clic-dehors") return appliquerClicDehors(el);
+    if (geste.type === "fichier") return appliquerFichier(el, geste.fichier);
     if (geste.type === "glisser") return { ok: false, raison: "glisser se joue avec jouerGesteAttendu" };
+    if (geste.type === "compte") return { ok: false, raison: "compte se joue avec jouerGesteAttendu" };
 
     // Exhaustivité : `GuideGeste["type"]` n'a que ces valeurs ; un futur ajout de
     // type qui oublierait de l'implémenter ici échoue PROPREMENT plutôt que silencieux.
@@ -435,7 +511,10 @@ export async function jouerGesteAttendu(
   ciblesRepli: readonly string[] = [],
   resolve: typeof resolveTarget = resolveTarget,
   ancetresReplies: readonly string[] = [],
+  changerCompte?: (compte: string) => Promise<boolean | void> | boolean | void,
+  recharger?: () => void,
 ): Promise<ResultatGeste> {
+  if (geste.type === "compte") return appliquerCompte(geste.compte, changerCompte, recharger);
   if (geste.type !== "glisser") return jouerGeste(geste, doc, ciblesRepli, resolve, ancetresReplies);
   try {
     if (!geste.vers) return { ok: false, raison: 'geste "glisser" sans destination (vers)' };

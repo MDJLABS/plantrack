@@ -32,6 +32,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { resolveTarget } from "./guide-geometry";
+import { reglagesGuide } from "../guide-reglages";
 import { gesteSansCible, jouerGesteAttendu, selecteursGeste, type ResultatGeste } from "./guide-geste";
 import type { GuideGeste } from "./types";
 
@@ -75,7 +76,7 @@ export function GuideCurseur({
   const [pos, setPos] = useState<Point>(depart);
   const [clic, setClic] = useState(false);
   const [sansTransition, setSansTransition] = useState(false);
-  const [visible, setVisible] = useState(gestes[0]?.type !== "aller" && gestes[0]?.type !== "retour");
+  const [visible, setVisible] = useState(gestes[0]?.type !== "aller" && gestes[0]?.type !== "retour" && gestes[0]?.type !== "compte");
   // Garde contre un double effet (StrictMode en dev) : un geste ne part jamais deux fois.
   // `prochain` retient le premier geste pas encore joué : un remontage reprend la suite LÀ,
   // sans rejouer ni abandonner les gestes restants (b28) ; `fini` ferme la porte au résultat.
@@ -104,7 +105,7 @@ export function GuideCurseur({
     const jouer = (geste: GuideGeste, i: number): Promise<ResultatGeste> => {
       if (!avantFait.current) { avantFait.current = true; onAvantAction(); }
       prochain.current = i + 1;
-      return jouerGesteAttendu(geste, document, ciblesRepli, undefined, ancetresReplies);
+      return jouerGesteAttendu(geste, document, ciblesRepli, undefined, ancetresReplies, reglagesGuide.changerCompte);
     };
 
     const suivant = (i: number, attendu = 0) => {
@@ -112,7 +113,7 @@ export function GuideCurseur({
       if (i >= gestes.length) { rendre({ ok: true }); return; }
       const geste = gestes[i];
 
-      if (geste.type === "aller" || geste.type === "retour") {
+      if (geste.type === "aller" || geste.type === "retour" || geste.type === "compte") {
         setVisible(false);
         void jouer(geste, i).then(rendre); // dernier geste de la suite, cf. `gestesEtape`
         return;

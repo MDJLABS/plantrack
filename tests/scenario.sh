@@ -605,6 +605,17 @@ check "checker verifier : JSON illisible" "JSON illisible" "$out"; check_exit "c
 out=$(ckpt checker verifier nexistepas); rc=$?
 check "checker verifier : guide absent" "introuvable" "$out"; check_exit "checker verifier : guide absent = code 1" 1 "$rc"
 rm "$CKD/lib/guide/guides/casse.json" "$CKD/lib/guide/guides/mauvais.json"
+echo '{"titre":"T","page":"/p","points":[{"id":"a","faire":"f","attendu":"x","gestes":[{"fichier":"#present","nom":"a.csv","contenu":"1"},{"type":"fichier","cible":"#present","fichier":{"nom":"b","base64":"aGk="}},{"compte":"moi"}]}]}' > "$CKD/lib/guide/guides/geste.json"
+out=$(ckpt checker verifier geste); rc=$?
+check "checker verifier : gestes fichier et compte valides" "ok geste" "$out"; check_exit "checker verifier : fichier/compte valides = code 0" 0 "$rc"
+echo '{"titre":"T","page":"/p","points":[{"id":"a","faire":"f","attendu":"x","gestes":[{"fichier":"#present","contenu":"1"},{"fichier":"#present","nom":"a"},{"compte":""},{"type":"compte"},{"compte":"x"},{"clic":"#present"}]}]}' > "$CKD/lib/guide/guides/geste.json"
+out=$(ckpt checker verifier geste); rc=$?
+check "checker verifier : fichier sans nom signale" "geste « fichier » sans « nom »" "$out"
+check "checker verifier : fichier sans contenu signale" "sans « contenu » ni « base64 »" "$out"
+check "checker verifier : compte vide signale" "geste « compte » sans nom de compte" "$out"
+check "checker verifier : compte pas en dernier signale" "doit etre le dernier" "$out"
+check_exit "checker verifier : gestes invalides = code 1" 1 "$rc"
+rm "$CKD/lib/guide/guides/geste.json"
 # checker corrige / etat
 mkdir -p "$CKD/.planning"
 cat > "$CKD/.planning/guides-etat.json" <<'JSON'
@@ -659,6 +670,8 @@ CKP="$CK/pasnext"; mkdir -p "$CKP"; git -C "$CKP" init -q
 out=$(cd "$CKP" && PLANTRACK_GUIDE_SRC="$CKS" CLAUDE_PROJECT_DIR="$CKP" python3 "$PT" checker installer 2>&1); rc=$?
 check_exit "checker installer : refuse hors site Next" 1 "$rc"
 out=$(ckpt checker aide); check "checker aide : format" '"points"' "$out"
+check "checker aide : geste fichier documente" '"fichier": "#zone"' "$out"
+check "checker aide : geste compte documente" 'changerCompte' "$out"
 rm -rf "$CK"
 
 # 24. garde-fou surcouches — un outil (GSD...) regenere CLAUDE.md sans la reference

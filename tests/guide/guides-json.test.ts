@@ -118,3 +118,24 @@ step("indexDePoint", () => {
 });
 
 console.log(`\n${passed} assertions vertes`);
+
+step("gestes fichier et compte : formes courte et longue", () => {
+  const sc = convertirGuide("g", {
+    titre: "T", page: "/p",
+    points: [
+      { id: "a", titre: "a", faire: "f", attendu: "x", gestes: [
+        { fichier: "#zone", nom: "a.csv", type: "text/csv", contenu: "1;2" },
+        { type: "fichier", cible: "#z2", fichier: { nom: "b.bin", base64: "aGk=" } },
+        { compte: "jean" },
+      ] },
+      { id: "b", titre: "b", faire: "f", attendu: "x", gestes: [{ type: "compte", compte: "moi" }] },
+    ],
+  });
+  assert.ok(sc);
+  assert.deepEqual(sc.etapes[0].gestes, [
+    { type: "fichier", cible: "#zone", fichier: { nom: "a.csv", type: "text/csv", contenu: "1;2" } },
+    { type: "fichier", cible: "#z2", fichier: { nom: "b.bin", base64: "aGk=" } },
+    { type: "compte", compte: "jean" },
+  ]);
+  assert.deepEqual(sc.etapes[1].gestes, [{ type: "compte", compte: "moi" }]);
+});

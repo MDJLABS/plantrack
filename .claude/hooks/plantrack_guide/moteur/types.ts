@@ -27,8 +27,13 @@ export type GuideGeste = {
    *  glisser : glisse l'élément visé jusqu'à `vers` (glisser-déposer natif ou dnd-kit).
    *  clic-dehors : clique dans le vide (sur `cible` si donnée, sinon sur le fond de page) ;
    *    c'est ce que guettent les menus qui se ferment au clic extérieur.
-   *  retour : bouton « Précédent » du navigateur ; comme "aller", toujours le DERNIER. */
-  type: "clic" | "saisie" | "aller" | "touche" | "survol" | "glisser" | "clic-dehors" | "retour";
+   *  retour : bouton « Précédent » du navigateur ; comme "aller", toujours le DERNIER.
+   *  fichier : dépose le fichier d'essai `fichier` sur un <input type="file"> (la `cible`, ou
+   *    celui qu'elle contient) ; sans input, simule un dépôt (dragenter/dragover/drop) sur la zone.
+   *  compte : se met à la place de l'autre compte `compte` ("moi" = revenir au sien) via
+   *    l'adaptateur `changerCompte` des réglages du site, puis recharge la page ; comme
+   *    "aller", toujours le DERNIER (la page se décharge). */
+  type: "clic" | "saisie" | "aller" | "touche" | "survol" | "glisser" | "clic-dehors" | "retour" | "fichier" | "compte";
   /** Sélecteur CSS de l'élément à actionner — absent ⇒ repli sur les `cibles` de l'étape
    *  (sauf "touche" et "clic-dehors", qui n'ont pas besoin de cible). */
   cible?: string;
@@ -38,6 +43,10 @@ export type GuideGeste = {
   url?: string;
   /** Touche à presser (type "touche") : nom `KeyboardEvent.key`, "Escape" par défaut. */
   touche?: string;
+  /** Fichier d'essai à déposer (type "fichier" uniquement) : `contenu` (texte) OU `base64`. */
+  fichier?: { nom: string; type?: string; contenu?: string; base64?: string };
+  /** Compte à endosser (type "compte" uniquement) ; "moi" = revenir à son propre compte. */
+  compte?: string;
   /** Sélecteur CSS de l'endroit où déposer (type "glisser" uniquement). */
   vers?: string;
   /** Geste joué SEULEMENT si sa propre `cible` paraît dans les secondes qui suivent ; sinon
@@ -166,6 +175,11 @@ export type ReglagesGuideClient = {
   /** Sélecteurs d'ancêtres repliés à ignorer lors de la recherche d'une cible visible (ex.
    *  ProLearn : `.tn-childwrap.collapsed`) — voir `guide-geometry.ts`. Absent ⇒ aucun. */
   ancetresReplies?: string[];
+  /** Adaptateur du geste "compte" : le site se met à la place du compte `compte` ("moi" =
+   *  retour à son propre compte), par exemple en appelant sa propre route d'usurpation.
+   *  Rend `false` (ou lève) en cas d'échec ; toute autre valeur = succès. Le moteur recharge
+   *  ensuite la page. Absent ⇒ le geste "compte" échoue proprement (rien ne casse). */
+  changerCompte?: (compte: string) => Promise<boolean | void> | boolean | void;
 };
 
 /**
