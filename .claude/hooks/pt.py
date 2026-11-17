@@ -1083,7 +1083,7 @@ CLI humaine : plantrack status | bugs | inbox | verify <id> | reject <id> -m ...
               plantrack ronde   met le coeur du projet a niveau (lancee seule a l'ouverture, toutes les 4 h au plus)
               plantrack bilan [--all] [--jours N]   ce qui a avance, ce qui attend ton avis
               plantrack releve [--rapport]   releve de sante de la flotte (bulle sur panne neuve) | rapport final
-              plantrack orchestre [--boucle|--tour|--tout-reprendre]   charge du serveur : feu, sessions, pauses
+              plantrack orchestre [--boucle|--tour|--tout-reprendre|--essai-alertes]   charge du serveur : feu, sessions, pauses
               plantrack attentes [plus-tard]   ce qui attend ton avis depuis plus de 7 jours (tri groupe)"""
 
 
@@ -1279,7 +1279,13 @@ ORCH_ORANGE_CPU = float(os.environ.get("ORCH_ORANGE_CPU") or 35)      # PSI cpu 
 ORCH_ROUGE_CPU = float(os.environ.get("ORCH_ROUGE_CPU") or 60)
 ORCH_ORANGE_CHARGE = float(os.environ.get("ORCH_ORANGE_CHARGE") or 1.2)  # charge 5 min par vCPU
 ORCH_ROUGE_CHARGE = float(os.environ.get("ORCH_ROUGE_CHARGE") or 2.0)
-ORCH_ALERTE_DELAI = 600  # rouge depuis 10 min malgre les pauses : une bulle
+# d266 (etape 1 de la piste A) : l'orchestre est la seule voix d'alerte. Ses reglages viennent
+# du fichier de capacite unique (/etc/plantrack/capacite.conf, EnvironmentFile du service).
+ORCH_ALERTE_DELAI = int(os.environ.get("ORCH_ALERTE_DELAI") or 1800)  # rouge 30 min malgre tout
+ORCH_VCPU = int(os.environ.get("VCPU") or 0) or os.cpu_count() or 1   # 4 sur ce serveur (pg34)
+ORCH_DISQUE_PCT = float(os.environ.get("DISQUE_ALERTE_PCT") or 90)
+ORCH_SOCLE = (os.environ.get("SERVICES_SOCLE") or "").split()   # toujours allumes
+ORCH_ALERTE_REPOS = 6 * 3600   # une meme panne ne se redit pas avant 6 h
 ORCH_ALERTE = os.environ.get("ORCH_ALERTE") or "node /home/mariella/bcc/hook/repondre.ts --ton probleme"
 ORCH_JAMAIS = {"systemd", "sshd", "cloudflared", "dockerd", "containerd", "earlyoom"}
 # Portier des reveils, menage d'urgence, apprentissage (d237, panne du 12/11 22h : deux piles
@@ -1455,7 +1461,7 @@ def orch_mesure():
             pass
     try:
         with open(os.path.join(ORCH_PROC, "loadavg"), encoding="utf-8") as f:
-            m["charge5"] = round(float(f.read().split()[1]) / (os.cpu_count() or 1), 2)
+            m["charge5"] = round(float(f.read().split()[1]) / ORCH_VCPU, 2)
     except (OSError, ValueError, IndexError):
         pass
     return m
@@ -1632,6 +1638,59 @@ def orch_alerter(texte):
                          start_new_session=True)
     except OSError as e:
         trace("orchestre : alerte", e)
+
+
+ORCH_SOCLE_DELAI = 300   # un service du socle arrete depuis 5 min : ses redemarrages ont echoue
+
+
+def orch_alerte_motif(etat, motif, maintenant, texte):
+    """Une alerte par motif, jamais redite avant ORCH_ALERTE_REPOS (d266)."""
+    vues = etat.setdefault("alertes", {})
+    if maintenant - vues.get(motif, 0) > ORCH_ALERTE_REPOS:
+        vues[motif] = maintenant
+        orch_journal(f"alerte {motif}")
+        orch_alerter(texte)
+
+
+def orch_pannes(etat, maintenant):
+    """Les vraies pannes (d266, cas 1 et 4 ; le rouge prolonge est dans orch_tour,
+    l'orchestre muet est surveille par plantrack-gardien) : disque presque plein,
+    service du socle tombe qui ne repart pas."""
+    try:
+        st = os.statvfs("/")
+        plein = round(100 * (1 - st.f_bavail / st.f_blocks), 1)
+    except (OSError, ZeroDivisionError):
+        plein = 0
+    if plein >= ORCH_DISQUE_PCT:
+        orch_alerte_motif(etat, "disque", maintenant,
+                          f"Le disque du serveur est plein à {plein} % : il faut faire de la "
+                          f"place avant qu'il ne bloque tout.")
+    ko = etat.setdefault("socle_ko", {})
+    for unite in ORCH_SOCLE:
+        try:
+            r = subprocess.run(["systemctl", "show", "-p", "ActiveState", "--value", unite],
+                               capture_output=True, text=True, timeout=5)
+            actif = r.stdout.strip() in ("active", "activating", "reloading")
+        except (OSError, subprocess.SubprocessError):
+            continue
+        if actif:
+            ko.pop(unite, None)
+            continue
+        depuis = ko.setdefault(unite, maintenant)
+        if maintenant - depuis > ORCH_SOCLE_DELAI:
+            orch_alerte_motif(etat, f"socle:{unite}", maintenant,
+                              f"Le service {unite} est arrêté depuis plus de "
+                              f"{ORCH_SOCLE_DELAI // 60} minutes et ne redémarre pas tout seul.")
+
+
+def orch_essai_alertes():
+    """plantrack orchestre --essai-alertes : une bulle d'essai par cas de panne (d266)."""
+    for texte in ("le disque est presque plein",
+                  "un service toujours allumé est tombé et ne repart pas",
+                  f"le serveur sature depuis plus de {ORCH_ALERTE_DELAI // 60} minutes malgré tout",
+                  "le chef d'orchestre ne répond plus (message du gardien)"):
+        orch_alerter(f"Essai, rien n'est en panne : voici le message que tu recevrais si {texte}.")
+        time.sleep(2)
 
 
 def orch_reprendre(etat, sid, motif):
@@ -2339,10 +2398,14 @@ def orch_tour(etat, maintenant):
                 systemctl(["start", "--no-block", "menage-serveur.service"], detache=True)
             except OSError as e:
                 trace("orchestre : menage", e)
+    try:
+        orch_pannes(etat, maintenant)
+    except Exception as e:   # fail-open
+        trace("orchestre : pannes", e)
     if feu == "rouge" and maintenant - etat.get("feu_depuis", maintenant) > ORCH_ALERTE_DELAI \
-            and not etat.get("alerte_feu") and maintenant - etat.get("alerte", 0) > 6 * 3600:
+            and not etat.get("alerte_feu") and maintenant - etat.get("alerte", 0) > ORCH_ALERTE_REPOS:
         etat["alerte"] = etat["alerte_feu"] = maintenant
-        orch_alerter(f"Le serveur sature depuis plus de 10 minutes malgré les pauses : "
+        orch_alerter(f"Le serveur sature depuis plus de {ORCH_ALERTE_DELAI // 60} minutes malgré tout : "
                      f"{m['dispo']} % de mémoire libre, {len(pauses)} session(s) en pause. "
                      f"Ce qui consomme le plus : "
                      + ", ".join(f"{f['projet']} ({f['poids'] // 2**20} Mo)" for f in
@@ -2454,6 +2517,9 @@ def cmd_orchestre(args):
             if "--tour" in args:
                 return
             time.sleep(ORCH_TOUR)
+    if "--essai-alertes" in args:
+        orch_essai_alertes()
+        return
     if "--tout-reprendre" in args:   # arret du service : personne ne reste gele
         etat = orch_lire(chemin, {}) or {}
         for sid in list(etat.get("pauses", {})):

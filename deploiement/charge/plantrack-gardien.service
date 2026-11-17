@@ -1,0 +1,6 @@
+[Unit]
+Description=Gardien du chef d'orchestre PlanTrack (d266)
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/plantrack-gardien.sh

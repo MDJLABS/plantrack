@@ -2104,5 +2104,33 @@ check "bilan : surcharges, cause la plus frequente et reglage" "1 surcharge(s) c
 # orange a 12 % : 11 % de memoire libre est maintenant orange
 check_exit "niveau : le seuil appris s'applique" "orange" "$(env -u ORCH_ORANGE_DISPO PLANTRACK_ORCHESTRE="$OD2" python3 -c 'import importlib.util as u,sys,json; sp=u.spec_from_file_location("pt",sys.argv[1]); m=u.module_from_spec(sp); sys.argv=["pt"]; sp.loader.exec_module(m); print(m.orch_niveau({"dispo":11}))' "$PT")"
 
+# Etape 1 de la piste A (d266) : le guichet kvm-lourd obeit au feu, l'orchestre seule voix
+KV="$(dirname "$PT")/../../deploiement/charge/kvm-lourd"; TK="$TMP/guichet"; mkdir -p "$TK"
+feu_k() { printf '{"feu":"%s","ts":%s}' "$1" "$(date +%s)" > "$TK/etat.json"; }
+retenu() { PLANTRACK_CAPACITE="$TK/cap.conf" python3 -c '
+import importlib.machinery as m, importlib.util as u, dataclasses, sys
+l=m.SourceFileLoader("kvm", sys.argv[1]); sp=u.spec_from_loader("kvm", l); k=u.module_from_spec(sp); sys.modules["kvm"]=k; l.exec_module(k)
+kw={f.name: None for f in dataclasses.fields(k.Entree)}; kw.update(qui=sys.argv[3], estimation=int(sys.argv[4])*2**20)
+print(k.retenu_par_orchestre(k.Entree(**kw), sys.argv[2]))' "$KV" "$TK/etat.json" "$1" "$2"; }
+: > "$TK/cap.conf"
+feu_k rouge
+check "guichet : au rouge la tache agent attend" "True" "$(retenu agent 300)"
+check "guichet : au rouge l'humain passe" "False" "$(retenu humain 3000)"
+feu_k orange
+check "guichet : a l'orange la petite tache agent part" "False" "$(retenu agent 300)"
+check "guichet : a l'orange la grosse tache agent attend" "True" "$(retenu agent 3000)"
+feu_k vert
+check "guichet : au vert tout part" "False" "$(retenu fond 3000)"
+echo GUICHET_AGENT=0 > "$TK/cap.conf"; feu_k rouge
+check "guichet : interrupteur a 0 = ancien comportement" "False" "$(retenu agent 300)"
+printf '{"feu":"rouge","ts":%s}' "$(( $(date +%s) - 300 ))" > "$TK/etat.json"; : > "$TK/cap.conf"
+check "guichet : feu perime = fail-open" "False" "$(retenu agent 300)"
+OD3="$TMP/orch3"; mkdir -p "$OD3"
+printf '#!/bin/sh\necho "$@" >> %s/bulles\n' "$OD3" > "$OD3/alerte"; chmod +x "$OD3/alerte"
+P3() { PLANTRACK_ORCHESTRE="$OD3" ORCH_ALERTE="$OD3/alerte" DISQUE_ALERTE_PCT=0 python3 -c 'import importlib.util as u,sys,time; sp=u.spec_from_file_location("pt",sys.argv[1]); m=u.module_from_spec(sp); sys.argv=["pt"]; sp.loader.exec_module(m); e={}; m.orch_pannes(e,time.time()); m.orch_pannes(e,time.time()); time.sleep(0.5)' "$PT"; }
+P3
+check "pannes : disque plein = une bulle" "disque du serveur est plein" "$(cat "$OD3/bulles" 2>/dev/null)"
+check_exit "pannes : la meme panne ne se redit pas" 1 "$(grep -c disque "$OD3/bulles" 2>/dev/null)"
+
 echo
 [ "$fail" = 0 ] && echo "TOUS LES TESTS PASSENT" || { echo "DES TESTS ECHOUENT"; exit 1; }

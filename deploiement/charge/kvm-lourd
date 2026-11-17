@@ -1,0 +1,822 @@
+#!/usr/bin/env python3
+"""kvm-lourd : file d'attente et plafonnement des taches lourdes du KVM.
+
+Une tache lourde (build, lint, tests, docker build) attend que la RAM la
+couvre, puis tourne plafonnee dans lourd.slice ; son pic reel affine
+l'estimation suivante. Stdlib uniquement, sans demon.
+Spec : docs/superpowers/specs/2026-10-11-kvm-lourd-design.md
+"""
+from __future__ import annotations
+
+import argparse
+import fcntl
+import json
+import os
+import re
+import shlex
+import shutil
+import signal
+import statistics
+import subprocess
+import sys
+import time
+from collections.abc import Mapping
+from dataclasses import asdict, dataclass
+from pathlib import Path
+
+# --- Tailles -----------------------------------------------------------------
+
+_UNITES = {"": 1, "K": 1024, "M": 1024**2, "G": 1024**3}
+
+
+def octets(texte: str) -> int:
+    """'3G', '1.5G', '1,5G', '512M', '2048' -> octets."""
+    m = re.fullmatch(r"\s*(\d+(?:[.,]\d+)?)\s*([KMG]?)i?[oB]?\s*", texte, re.I)
+    if not m:
+        raise ValueError(f"taille illisible : {texte!r}")
+    return int(float(m.group(1).replace(",", ".")) * _UNITES[m.group(2).upper()])
+
+
+def lisible(n: int) -> str:
+    return f"{n / 1024**3:.1f} Go".replace(".", ",")
+
+
+# --- Types lourds et classification ------------------------------------------
+
+@dataclass(frozen=True)
+class TypeLourd:
+    nom: str
+    depart: int
+    inclusion: re.Pattern
+    exclusion: re.Pattern | None
+
+
+# Commande non classee passee a la main (kvm-lourd run -- ...).
+AUTRE = TypeLourd("autre", 1024**3, re.compile(r"(?!)"), None)
+
+# Un segment dont la commande est l'une d'elles ne fait que lire, gerer des
+# fichiers, des paquets ou des processus : jamais lourd, meme s'il cite un outil
+# lourd (`git commit -m "fix eslint"`, `pkill -f gradle`).
+JAMAIS_LOURD = {"grep", "rg", "cat", "ls", "find", "echo", "head", "tail", "less",
+                "sed", "awk", "wc", "which", "type", "file", "stat", "git", "kill",
+                "pkill", "pgrep", "ps", "rm", "mv", "cp", "mkdir", "touch", "chmod",
+                "chown", "pip", "pip3", "uv", "apt", "apt-get"}
+# `npm install eslint` installe, ne lance rien.
+_GESTIONNAIRES = {"npm", "pnpm", "yarn", "bun"}
+_INSTALLATION = {"install", "i", "add", "ci", "uninstall", "remove", "rm", "update",
+                 "up", "upgrade"}
+# Prefixes qui ne changent pas la commande reellement lancee.
+_PREFIXES = {"sudo", "env", "nice", "time", "command", "nohup", "setsid"}
+_AFFECTATION = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=")
+
+_SEPARATEURS = re.compile(r"&&|\|\||;|\||\n")
+_PONCTUATION = "();<>|&\n"
+
+
+def charger_types(chemin: Path) -> list[TypeLourd]:
+    types = []
+    for n, ligne in enumerate(chemin.read_text(encoding="utf-8").splitlines(), 1):
+        ligne = ligne.strip()
+        if not ligne or ligne.startswith("#"):
+            continue
+        champs = ligne.split()
+        if len(champs) not in (3, 4):
+            raise ValueError(f"{chemin}:{n} : 3 ou 4 champs attendus, {len(champs)} trouves")
+        try:
+            inclusion = re.compile(champs[2])
+            exclusion = re.compile(champs[3]) if len(champs) == 4 else None
+        except re.error as err:
+            raise ValueError(f"{chemin}:{n} : regex invalide ({err})") from err
+        types.append(TypeLourd(champs[0], octets(champs[1]), inclusion, exclusion))
+    return types
+
+
+def segments(commande: str) -> list[list[str]]:
+    """Mots de chaque commande simple, lus comme le shell : un `&&` ou un
+    `gradlew build` cite entre guillemets dans un texte ne cree pas de commande."""
+    lex = shlex.shlex(commande, posix=True, punctuation_chars=_PONCTUATION)
+    lex.whitespace, lex.whitespace_split = " \t\r", True
+    try:
+        mots = list(lex)
+    except ValueError:  # guillemet non ferme : lecture brute
+        return [s.split() for s in _SEPARATEURS.split(commande) if s.strip()]
+    segs = [[]]
+    for m in mots:
+        if m and set(m) <= set("();|&\n"):
+            segs.append([])
+        else:
+            segs[-1].append(m)
+    return [s for s in segs if s]
+
+
+_HEREDOC = re.compile(r"<<-?\s*(['\"]?)(\w+)\1[^\n]*\n.*?\n[ \t]*\2[ \t]*(?=\n|$)", re.S)
+
+
+# `cat > x.sh <<EOF` / `tee x.sh <<EOF` : la cible ecrite par un heredoc
+_CIBLE_HEREDOC = re.compile(r"(?:^|[\s;&|(])(?:cat|tee(?:\s+-a)?)\s*>?>?\s*([^\s;&|<>]+)\s*$")
+
+
+def _ecrits(commande: str) -> dict[str, str]:
+    """Scripts ecrits par un heredoc de la commande, {cible: corps}. 24/10 : un
+    build ecrit dans /tmp/x.sh puis lance dans la MEME commande passait hors file,
+    le fichier n'existant pas encore quand le garde-fou le lisait."""
+    ecrits = {}
+    for m in _HEREDOC.finditer(commande):
+        avant = commande[commande.rfind("\n", 0, m.start()) + 1:m.start()]
+        c = _CIBLE_HEREDOC.search(avant)
+        if c and "\n" in m.group(0):
+            ecrits[c.group(1)] = m.group(0).split("\n", 1)[1].rsplit("\n", 1)[0]
+    return ecrits
+
+
+def _script(mots: list[str], dossier: str, ecrits: dict[str, str] | None = None) -> str | None:
+    """Contenu du script local que lance le segment (`./x.sh`, `sortie/x.sh`,
+    `bash x.sh`), ou None. 16/10 : un build gradle range dans un script passait
+    hors file, le garde-fou ne voyant que le nom du fichier."""
+    direct = False
+    if mots[0].rsplit("/", 1)[-1] in ("bash", "sh") and len(mots) > 1 and not mots[1].startswith("-"):
+        chemin = mots[1]
+    elif "/" in mots[0]:
+        chemin, direct = mots[0], True
+    else:
+        return None
+    for cle in (chemin, os.path.normpath(os.path.join(dossier, chemin))):
+        if ecrits and cle in ecrits:
+            return ecrits[cle]
+    # b37 (01/11) : dans `diff <(cat a) b.tsx`, la parenthese coupe la commande et b.tsx
+    # passait pour un script lance (un commentaire « next build » le mettait en file).
+    # Lance sans bash/sh, un fichier non executable ne peut pas tourner : ce n'est pas un script.
+    if direct and not os.access(os.path.join(dossier, chemin), os.X_OK):
+        return None
+    try:
+        with open(os.path.join(dossier, chemin), encoding="utf-8", errors="replace") as f:
+            contenu = f.read(65536)
+    except OSError:
+        return None
+    return None if contenu.startswith("\x7fELF") else contenu  # un binaire n'est pas un script
+
+
+def classe(commande: str, types: list[TypeLourd], dossier: str | None = None,
+           profondeur: int = 0) -> TypeLourd | None:
+    """Type lourd de la commande, ou None si elle est legere."""
+    trouves = []
+    dossier = dossier or os.getcwd()
+    ecrits = _ecrits(commande) if profondeur == 0 else {}
+    ecrits = {**ecrits, **{os.path.normpath(os.path.join(dossier, k)): v
+                           for k, v in ecrits.items() if not os.path.isabs(k)}}
+    # le corps d'un heredoc est le contenu d'un fichier, pas une commande
+    commande = _HEREDOC.sub(lambda m: m.group(0).split("\n", 1)[0], commande)
+    for mots in segments(commande):
+        while mots and (_AFFECTATION.match(mots[0]) or mots[0] in _PREFIXES):
+            mots.pop(0)
+        if not mots:
+            continue
+        if mots[0] == "cd" and len(mots) > 1:
+            dossier = os.path.join(dossier, os.path.expanduser(mots[1]))
+            continue
+        contenu = _script(mots, dossier, ecrits) if profondeur == 0 else None
+        if contenu is not None:     # puis le segment lui-meme (`./gradlew build`)
+            t = classe(contenu, types, dossier, 1)
+            trouves += [t] if t else []
+        premier = mots[0].rsplit("/", 1)[-1]
+        if premier == "kvm-lourd":
+            return None     # deja enveloppee : jamais deux fois
+        if premier in JAMAIS_LOURD:
+            continue
+        if premier in _GESTIONNAIRES and len(mots) > 1 and mots[1] in _INSTALLATION:
+            continue
+        if premier in ("bash", "sh") and "-c" in mots[:-1]:
+            t = classe(mots[mots.index("-c") + 1], types, dossier, profondeur)
+            trouves += [t] if t else []
+            continue
+        # un argument cite qui contient des espaces est du texte, pas une commande
+        seg = " ".join(m for m in mots if not any(c.isspace() for c in m))
+        for t in types:
+            if t.inclusion.search(seg) and not (t.exclusion and t.exclusion.search(seg)):
+                trouves.append(t)
+                break
+    return max(trouves, key=lambda t: t.depart, default=None)
+
+
+# --- Historique et estimation ------------------------------------------------
+
+def avertir(message: str) -> None:
+    print(f"kvm-lourd : {message}", file=sys.stderr, flush=True)
+
+
+def lire_historique(chemin: Path) -> list[dict]:
+    try:
+        brut = chemin.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return []
+    lignes = []
+    for texte in brut.splitlines():
+        try:
+            valeur = json.loads(texte)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(valeur, dict):
+            lignes.append(valeur)
+    return lignes
+
+
+def pics_connus(type_nom: str, projet: str, historique: list[dict]) -> list[int]:
+    return [h["pic"] for h in historique
+            if h.get("type") == type_nom and h.get("projet") == projet
+            and isinstance(h.get("pic"), int) and h["pic"] > 0][-10:]
+
+
+def estimer(type_: TypeLourd, projet: str, historique: list[dict]) -> int:
+    """1,2 x la mediane des 10 derniers pics, jamais sous le depart.
+
+    La mediane, pas le max (pg17) : un seul run hors norme ne bloque plus la file
+    pour toutes les commandes du meme type. Le depart reste le plancher.
+    """
+    pics = pics_connus(type_.nom, projet, historique)
+    if len(pics) < 3:
+        return type_.depart
+    return max(int(1.2 * statistics.median(pics)), type_.depart)
+
+
+def atypique(pic: int, type_nom: str, projet: str, historique: list[dict]) -> bool:
+    """Pic a plus de 1,5 x la mediane habituelle : a signaler pour en comprendre la cause."""
+    pics = pics_connus(type_nom, projet, historique)
+    return len(pics) >= 3 and pic > 1.5 * statistics.median(pics)
+
+
+def enregistrer(chemin: Path, ligne: dict) -> None:
+    try:
+        with open(chemin, "a", encoding="utf-8") as f:
+            f.write(json.dumps(ligne, ensure_ascii=False) + "\n")
+    except OSError as err:
+        avertir(f"historique non ecrit ({err})")
+
+
+# --- File sur disque ---------------------------------------------------------
+
+PRIORITE = {"humain": 0, "agent": 1, "fond": 2}
+
+
+@dataclass
+class Entree:
+    id: str
+    pid: int          # le processus kvm-lourd qui attend puis execute
+    debut_pid: int    # date de demarrage de ce processus : protege des PID reattribues
+    qui: str
+    type: str
+    projet: str
+    estimation: int
+    inscrit_le: float
+    etat: str = "attente"   # attente | en_cours
+    commande: str = ""
+
+
+def debut_processus(pid: int) -> int | None:
+    """Champ 22 de /proc/<pid>/stat (starttime), ou None si le processus n'existe pas."""
+    try:
+        brut = Path(f"/proc/{pid}/stat").read_text()
+    except OSError:
+        return None
+    return int(brut.rsplit(")", 1)[1].split()[19])
+
+
+def vivante(e: Entree) -> bool:
+    return debut_processus(e.pid) == e.debut_pid
+
+
+class File:
+    """Dossier d'entrees JSON ; `with file:` tient le verrou exclusif."""
+
+    def __init__(self, racine: Path):
+        self.racine = racine
+        self.dossier = racine / "file"
+        self.dossier.mkdir(parents=True, exist_ok=True)
+        self._verrou = None
+
+    def __enter__(self) -> "File":
+        self._verrou = open(self.racine / "verrou", "a")
+        fcntl.flock(self._verrou, fcntl.LOCK_EX)
+        return self
+
+    def __exit__(self, *exc) -> None:
+        fcntl.flock(self._verrou, fcntl.LOCK_UN)
+        self._verrou.close()
+
+    def ecrire(self, e: Entree) -> None:
+        tmp = self.dossier / f".{e.id}.tmp"
+        tmp.write_text(json.dumps(asdict(e)))
+        tmp.replace(self.dossier / f"{e.id}.json")
+
+    def retirer(self, id_: str) -> None:
+        (self.dossier / f"{id_}.json").unlink(missing_ok=True)
+
+    def lister(self) -> list[Entree]:
+        entrees = []
+        for chemin in self.dossier.glob("*.json"):
+            try:
+                entrees.append(Entree(**json.loads(chemin.read_text())))
+            except (OSError, ValueError, TypeError):
+                chemin.unlink(missing_ok=True)
+        return entrees
+
+    def purger(self) -> list[Entree]:
+        vivantes = []
+        for e in self.lister():
+            if vivante(e):
+                vivantes.append(e)
+            else:
+                self.retirer(e.id)
+        return vivantes
+
+
+# --- Admission ---------------------------------------------------------------
+
+def ordre(e: Entree) -> tuple:
+    return (PRIORITE[e.qui], e.inscrit_le, e.id)
+
+
+def lire_capacite(chemin: str | None = None) -> dict[str, str]:
+    """Fichier de capacite unique du serveur (d266) : lignes CLE=valeur, # = commentaire.
+    Absent ou illisible = dictionnaire vide (chacun garde ses valeurs par defaut)."""
+    chemin = chemin or os.environ.get("PLANTRACK_CAPACITE", "/etc/plantrack/capacite.conf")
+    vals: dict[str, str] = {}
+    try:
+        with open(chemin, encoding="utf-8") as f:
+            for ligne in f:
+                ligne = ligne.split("#", 1)[0].strip()
+                if "=" in ligne:
+                    cle, val = ligne.split("=", 1)
+                    vals[cle.strip()] = val.strip().strip('"')
+    except OSError:
+        pass
+    return vals
+
+
+def retenu_par_orchestre(moi: Entree, etat: str | None = None) -> bool:
+    """Feu du chef d'orchestre PlanTrack (d159, d247, d266).
+    Rouge : tout attend sauf l'humain. Orange : le fond et les grosses taches
+    (estimation au-dela de PETITE_TACHE_MO) attendent. Interrupteur GUICHET_AGENT=0
+    dans le fichier de capacite = ancien comportement (seul le fond attend).
+    Fail-open : etat absent, illisible ou vieux de plus de 60 s = rien ne change."""
+    etat = etat or os.environ.get("PLANTRACK_ORCHESTRE", "/var/lib/plantrack-orchestre") + "/etat.json"
+    try:
+        with open(etat, encoding="utf-8") as f:
+            e = json.load(f)
+        if time.time() - float(e.get("ts", 0)) > 60:
+            return False
+        feu = e.get("feu")
+        if feu not in ("orange", "rouge"):
+            return False
+        cap = lire_capacite()
+        if cap.get("GUICHET_AGENT", "1") == "0":
+            return moi.qui == "fond"
+        if moi.qui == "humain":
+            return False
+        if feu == "rouge" or moi.qui == "fond":
+            return True
+        petite = int(float(cap.get("PETITE_TACHE_MO", "1024"))) * 1024 * 1024
+        return moi.estimation > petite
+    except (OSError, ValueError, TypeError, AttributeError):
+        return False
+
+
+def peut_partir(moi: Entree, entrees: list[Entree], dispo: int,
+                budget_total: int, croissance: int) -> bool:
+    """moi peut-elle demarrer maintenant ?
+
+    dispo      : MemAvailable - reserve
+    croissance : ce que les taches en cours vont encore allouer
+    """
+    en_cours = [e for e in entrees if e.etat == "en_cours" and e.id != moi.id]
+    attente = sorted((e for e in entrees if e.etat == "attente" and e.id != moi.id), key=ordre)
+    devant = [e for e in attente if ordre(e) < ordre(moi)]
+    if moi.estimation > budget_total:
+        # ne rentrera jamais dans le budget : passe seule, a son tour, et
+        # seulement quand la RAM couvre toute la slice
+        return not en_cours and not devant and dispo - croissance >= budget_total
+    marge = min(dispo - croissance, budget_total - sum(e.estimation for e in en_cours))
+    if moi.estimation > marge:
+        return False
+    for e in devant:
+        if PRIORITE[e.qui] < PRIORITE[moi.qui]:
+            return False    # plus prioritaire : jamais doublee
+        if e.estimation > budget_total:
+            return False    # geante en tete : on ne la double pas, sinon elle attend toujours
+        if e.estimation <= marge:
+            return False    # meme priorite, plus ancienne, et elle rentre : a elle
+    return True
+
+
+# --- Configuration et mesures systeme ----------------------------------------
+
+@dataclass
+class Config:
+    etat: Path
+    types: Path
+    meminfo: Path
+    stat: Path
+    cgroup: Path
+    slice: str
+    reserve: int
+    libre: float    # % de RAM et de processeur toujours laisses aux taches en cours
+    budget: int
+    poll: float
+    affichage: float
+    systemd: bool
+    # Taches lourdes en meme temps (choix de Mariella, tel 30/10 : "Verifs lourdes
+    # en file") : 1 = une par une. Le 30/10 a 16h20, quatre tournaient ensemble.
+    parallele: int = 1
+
+    @classmethod
+    def depuis_env(cls, env: Mapping = os.environ) -> "Config":
+        return cls(
+            etat=Path(env.get("KVM_LOURD_ETAT", "/var/lib/kvm-lourd")),
+            types=Path(env.get("KVM_LOURD_TYPES", "/etc/kvm-lourd/types.conf")),
+            meminfo=Path(env.get("KVM_LOURD_MEMINFO", "/proc/meminfo")),
+            stat=Path(env.get("KVM_LOURD_STAT", "/proc/stat")),
+            cgroup=Path(env.get("KVM_LOURD_CGROUP", "/sys/fs/cgroup/lourd.slice")),
+            slice=env.get("KVM_LOURD_SLICE", "lourd.slice"),
+            reserve=octets(env.get("KVM_LOURD_RESERVE", "1.5G")),
+            libre=float(env.get("KVM_LOURD_LIBRE", "5")),
+            budget=octets(env.get("KVM_LOURD_BUDGET", "6G")),
+            poll=float(env.get("KVM_LOURD_POLL", "2")),
+            affichage=float(env.get("KVM_LOURD_AFFICHAGE", "30")),
+            systemd=(env.get("KVM_LOURD_SANS_SYSTEMD") != "1"
+                     and shutil.which("systemd-run") is not None),
+            parallele=max(1, int(env.get("KVM_LOURD_PARALLELE", "1"))),
+        )
+
+
+def memoire_dispo(meminfo: Path) -> int:
+    for ligne in meminfo.read_text().splitlines():
+        if ligne.startswith("MemAvailable:"):
+            return int(ligne.split()[1]) * 1024
+    raise RuntimeError(f"MemAvailable absent de {meminfo}")
+
+
+def memoire_totale(meminfo: Path) -> int:
+    for ligne in meminfo.read_text().splitlines():
+        if ligne.startswith("MemTotal:"):
+            return int(ligne.split()[1]) * 1024
+    return 0
+
+
+def reserve_effective(cfg: Config) -> int:
+    """RAM jamais donnee a une tache lourde : la reserve, et au moins cfg.libre %
+    de la RAM totale (28/10, Mariella : toujours 5 % libres pour les taches en cours)."""
+    return max(cfg.reserve, int(memoire_totale(cfg.meminfo) * cfg.libre / 100))
+
+
+def cpu_compteurs(stat: Path) -> tuple[int, int] | None:
+    """(ticks inactifs, ticks totaux) de la ligne 'cpu' de /proc/stat, ou None."""
+    try:
+        for ligne in stat.read_text().splitlines():
+            if ligne.startswith("cpu "):
+                v = [int(x) for x in ligne.split()[1:9]]
+                return v[3] + v[4], sum(v)    # idle + iowait
+    except (OSError, ValueError):
+        pass
+    return None
+
+
+def cpu_libre(avant: tuple[int, int] | None, apres: tuple[int, int] | None) -> float | None:
+    """% de processeur libre entre deux mesures ; None si on ne sait pas."""
+    if avant is None or apres is None or apres[1] <= avant[1]:
+        return None
+    return 100 * (apres[0] - avant[0]) / (apres[1] - avant[1])
+
+
+def lire_cgroup(racine: Path, id_: str, fichier: str) -> int:
+    try:
+        return int((racine / f"lourd-{id_}.scope" / fichier).read_text().strip())
+    except (OSError, ValueError):
+        return 0
+
+
+# Daemons qu'un build laisse derriere lui : ils ne retiennent pas la place.
+_DAEMONS = re.compile(r"GradleDaemon|KotlinCompileDaemon|kotlin-daemon|GradleWorkerMain")
+DETACHE_MAX = 6 * 3600
+
+# b27 (30/10, plan valide par Mariella) : un eslint de bcc a tenu la place ~30 h. Avec les
+# verifs une par une (d118), une seule tache bloquee fait attendre toutes les autres :
+# au-dela de sa duree maximale, la tache est arretee et Mariella recoit une bulle.
+DUREE_MAX = {"lint": "30m", "tests": "30m", "build": "1h", "next-build": "1h",
+             "docker-build": "1h", "gradle": "2h", "navigateur": "15m",
+             "video": "1h", "voix": "35m"}
+DUREE_MAX_AUTRE = "2h"
+
+
+def duree_max(type_nom: str, env: Mapping = os.environ) -> float:
+    """Duree maximale d'un type, en secondes. Surcharge : KVM_LOURD_DUREE_MAX='lint=45m,...'."""
+    table = dict(DUREE_MAX)
+    for morceau in env.get("KVM_LOURD_DUREE_MAX", "").split(","):
+        if "=" in morceau:
+            nom, _, valeur = morceau.partition("=")
+            table[nom.strip()] = valeur.strip()
+    try:
+        return duree(table.get(type_nom, DUREE_MAX_AUTRE))
+    except ValueError:
+        return duree(DUREE_MAX_AUTRE)
+
+
+def bulle(message: str) -> None:
+    """Prevenir Mariella sur son telephone (fil bcc). Jamais bloquant, jamais fatal."""
+    if os.environ.get("KVM_LOURD_BULLE") == "0":
+        return
+    try:
+        subprocess.Popen(["node", "/home/mariella/bcc/hook/repondre.ts", "--ton", "probleme", message],
+                         cwd="/home/mariella/bcc", stdin=subprocess.DEVNULL,
+                         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+    except OSError:
+        pass
+
+
+def _detaches(racine: Path, id_: str) -> bool:
+    """Le scope contient-il encore un processus de travail (pas un daemon) ?"""
+    try:
+        pids = (racine / f"lourd-{id_}.scope" / "cgroup.procs").read_text().split()
+    except OSError:
+        return False
+    for pid in pids:
+        try:
+            ligne = Path(f"/proc/{pid}/cmdline").read_bytes().replace(b"\0", b" ").decode(errors="replace")
+        except OSError:
+            continue
+        if ligne.strip() and not _DAEMONS.search(ligne):
+            return True
+    return False
+
+
+def duree(texte: str) -> float:
+    """'2h', '30m', '90s', '90' -> secondes."""
+    m = re.fullmatch(r"\s*(\d+(?:\.\d+)?)\s*([smh]?)\s*", texte)
+    if not m:
+        raise ValueError(f"duree illisible : {texte!r}")
+    return float(m.group(1)) * {"": 1, "s": 1, "m": 60, "h": 3600}[m.group(2)]
+
+
+def projet_par_defaut() -> str:
+    """Nom du depot git courant, sinon du dossier courant."""
+    try:
+        top = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True,
+                             text=True, timeout=2).stdout.strip()
+    except (OSError, subprocess.TimeoutExpired):
+        top = ""
+    return Path(top or os.getcwd()).name
+
+
+def journaliser(cfg: Config, message: str) -> None:
+    try:
+        with open(cfg.etat / "journal.log", "a", encoding="utf-8") as f:
+            f.write(f"{time.strftime('%Y-%m-%d %H:%M:%S')} {message}\n")
+    except OSError:
+        pass
+
+
+# --- Attente et execution ----------------------------------------------------
+
+def run(cfg: Config, qui: str, type_nom: str | None, projet: str,
+        attente_max: float, commande: list[str]) -> int:
+    try:
+        types = charger_types(cfg.types)
+    except (OSError, ValueError) as err:
+        avertir(f"types illisibles ({err}) : tache traitee comme 'autre'")
+        journaliser(cfg, f"types illisibles : {err}")
+        types = []
+    if type_nom:
+        t = next((x for x in types if x.nom == type_nom),
+                 TypeLourd(type_nom, AUTRE.depart, AUTRE.inclusion, None))
+    else:
+        t = classe(shlex.join(commande), types) or AUTRE
+    estimation = estimer(t, projet, lire_historique(cfg.etat / "historique.jsonl"))
+    moi = Entree(id=f"{time.time_ns()}-{os.getpid()}", pid=os.getpid(),
+                 debut_pid=debut_processus(os.getpid()) or 0, qui=qui, type=t.nom,
+                 projet=projet, estimation=estimation, inscrit_le=time.time(),
+                 commande=shlex.join(commande)[:300])
+    recus: list[int] = []
+    anciens = {s: signal.signal(s, lambda n, _: recus.append(n))
+               for s in (signal.SIGINT, signal.SIGTERM)}
+    file: File | None = None
+    try:
+        try:
+            file = File(cfg.etat)
+            with file:
+                file.ecrire(moi)
+            code = attendre(cfg, file, moi, attente_max, recus)
+            if code is not None:
+                return code
+        except Exception as err:   # noqa: BLE001 - fail-open : la file ne bloque jamais la commande
+            avertir(f"file indisponible ({err!r}) : la commande passe sans attendre")
+            journaliser(cfg, f"file indisponible : {err!r}")
+        return executer(cfg, moi, commande, recus)
+    finally:
+        if file is not None:
+            try:
+                with file:
+                    file.retirer(moi.id)
+            except Exception:   # noqa: BLE001
+                pass
+        for s, h in anciens.items():
+            signal.signal(s, h)
+
+
+def attendre(cfg: Config, file: File, moi: Entree, attente_max: float,
+             recus: list[int]) -> int | None:
+    """None quand moi est admise ; sinon le code de sortie (abandon, signal)."""
+    debut = time.monotonic()
+    prochain_affichage = debut
+    cpu_avant = cpu_compteurs(cfg.stat)
+    time.sleep(min(cfg.poll, 1.0))    # il faut un intervalle pour mesurer le processeur
+    while True:
+        if recus:
+            return 128 + recus[0]
+        cpu_apres = cpu_compteurs(cfg.stat)
+        libre_cpu, cpu_avant = cpu_libre(cpu_avant, cpu_apres), cpu_apres
+        # processeur : on ne demarre pas tant que moins de cfg.libre % est libre
+        cpu_ok = libre_cpu is None or libre_cpu >= cfg.libre
+        with file:
+            entrees = file.purger()
+            dispo = memoire_dispo(cfg.meminfo) - reserve_effective(cfg)
+            croissance = sum(max(0, e.estimation - lire_cgroup(cfg.cgroup, e.id, "memory.current"))
+                             for e in entrees if e.etat == "en_cours" and e.id != moi.id)
+            place = sum(e.etat == "en_cours" and e.id != moi.id for e in entrees) < cfg.parallele
+            if cpu_ok and place and not retenu_par_orchestre(moi) and peut_partir(moi, entrees, dispo, cfg.budget, croissance):
+                if moi.estimation > cfg.budget:
+                    avertir(f"estimee a {lisible(moi.estimation)}, plus que le budget "
+                            f"({lisible(cfg.budget)}) : elle passe seule")
+                moi.etat = "en_cours"
+                file.ecrire(moi)
+                return None
+        maintenant = time.monotonic()
+        if maintenant - debut >= attente_max:
+            avertir(f"abandon apres {int(maintenant - debut)} s d'attente "
+                    f"(il fallait {lisible(moi.estimation)}) : relance plus tard")
+            journaliser(cfg, f"abandon {moi.projet}/{moi.type} apres {int(maintenant - debut)} s")
+            return 75
+        if maintenant >= prochain_affichage:
+            attente = sorted((e for e in entrees if e.etat == "attente"), key=ordre)
+            rang = next((i for i, e in enumerate(attente, 1) if e.id == moi.id), len(attente))
+            avertir(f"en file : position {rang}/{len(attente)} ({moi.qui}), il faut "
+                    f"{lisible(moi.estimation)}, {lisible(max(0, dispo - croissance))} dispo"
+                    + ("" if libre_cpu is None else f", CPU libre {libre_cpu:.0f} %"
+                       f" (il faut {cfg.libre:.0f} %)")
+                    + (", retenue par le feu de l'orchestre" if retenu_par_orchestre(moi) else ""))
+            prochain_affichage = maintenant + cfg.affichage
+        time.sleep(cfg.poll)
+
+
+def executer(cfg: Config, moi: Entree, commande: list[str], recus: list[int]) -> int:
+    scope = f"lourd-{moi.id}"
+    if cfg.systemd:
+        argv = ["systemd-run", "--scope", "--quiet", "--collect", f"--slice={cfg.slice}",
+                f"--unit={scope}", "-p", f"MemoryHigh={int(moi.estimation * 1.3)}",
+                "-p", f"MemoryMax={int(moi.estimation * 1.8)}", "--", *commande]
+    else:
+        if os.environ.get("KVM_LOURD_SANS_SYSTEMD") != "1":
+            avertir("systemd-run indisponible : execution directe, sans plafond")
+        argv = list(commande)
+    debut = time.monotonic()
+    limite = debut + duree_max(moi.type)
+    depasse = False
+    pic = 0
+    try:
+        enfant = subprocess.Popen(argv)
+    except OSError as err:
+        avertir(f"lancement impossible : {err}")
+        return 127
+    transmis = len(recus)   # un signal recu pendant l'attente a deja fait sortir
+    while True:
+        while transmis < len(recus):
+            try:
+                os.kill(enfant.pid, recus[transmis])
+            except ProcessLookupError:
+                pass
+            transmis += 1
+        try:
+            code = enfant.wait(timeout=1)
+            break
+        except subprocess.TimeoutExpired:
+            pic = max(pic, lire_cgroup(cfg.cgroup, moi.id, "memory.peak"))
+        if not depasse and time.monotonic() >= limite:
+            depasse = True
+            if cfg.systemd:
+                subprocess.run(["systemctl", "stop", f"{scope}.scope"], capture_output=True)
+            enfant.terminate()
+            try:
+                enfant.wait(timeout=10)
+            except subprocess.TimeoutExpired:
+                enfant.kill()
+    pic = max(pic, lire_cgroup(cfg.cgroup, moi.id, "memory.peak"))
+    if cfg.systemd:
+        # 24/10 : un build lance en tache detachee (`setsid nohup ... &`) survit au
+        # bash enveloppe : sa place reste prise jusqu'a sa vraie fin (daemons exclus)
+        fin_max = min(time.monotonic() + DETACHE_MAX, limite)
+        while _detaches(cfg.cgroup, moi.id) and time.monotonic() < fin_max:
+            time.sleep(1)
+            pic = max(pic, lire_cgroup(cfg.cgroup, moi.id, "memory.peak"))
+        if _detaches(cfg.cgroup, moi.id) and time.monotonic() >= limite:
+            depasse = True
+        # restes du scope (ex. daemon gradle) : hors comptabilite, on les arrete
+        subprocess.run(["systemctl", "stop", f"{scope}.scope"], capture_output=True)
+    code = 128 - code if code < 0 else code
+    if depasse:
+        ecoule = time.monotonic() - debut
+        temps = f"{round(ecoule / 60)} min" if ecoule >= 60 else f"{round(ecoule)} s"
+        code = 124
+        avertir(f"duree maximale depassee : {moi.type} dans {moi.projet} arretee apres {temps}")
+        journaliser(cfg, f"depasse {moi.projet}/{moi.type} arretee apres {temps} : {moi.commande[:120]}")
+        bulle(f"Une vérification de {moi.projet} ({moi.type}) restait bloquée : je l'ai arrêtée "
+              f"au bout de {temps} pour libérer la file. Commande : {moi.commande[:120]}")
+    if atypique(pic, moi.type, moi.projet, lire_historique(cfg.etat / "historique.jsonl")):
+        avertir(f"pic hors norme : {lisible(pic)} pour {moi.type} dans {moi.projet}, plus de "
+                f"1,5 x l'habituel — commande : {moi.commande[:120]}")
+    enregistrer(cfg.etat / "historique.jsonl", {
+        "date": time.strftime("%Y-%m-%d %H:%M:%S"), "projet": moi.projet, "type": moi.type,
+        "qui": moi.qui, "pic": pic, "duree": round(time.monotonic() - debut, 1), "code": code})
+    return code
+
+
+# --- CLI ---------------------------------------------------------------------
+
+def _classe(cfg: Config, commande: str) -> int:
+    """Fail-open : la moindre erreur = rien affiche, code 0."""
+    try:
+        types = charger_types(cfg.types)
+        t = classe(commande, types)
+        if t:
+            est = estimer(t, projet_par_defaut(), lire_historique(cfg.etat / "historique.jsonl"))
+            print(f"{t.nom}\t{est}")
+    except Exception as err:   # noqa: BLE001 - ne jamais bloquer un agent
+        journaliser(cfg, f"classe en erreur : {err!r}")
+    return 0
+
+
+def _status(cfg: Config) -> int:
+    file = File(cfg.etat)
+    with file:
+        entrees = file.purger()
+    print(f"RAM dispo {lisible(memoire_dispo(cfg.meminfo))} (reserve {lisible(reserve_effective(cfg))}), "
+          f"{cfg.libre:.0f} % de RAM et de processeur toujours laisses libres, "
+          f"budget lourd.slice {lisible(cfg.budget)}")
+    if not entrees:
+        print("file vide")
+    for e in sorted(entrees, key=lambda e: (e.etat != "en_cours", ordre(e))):
+        print(f"{e.etat:8} {e.qui:6} {e.projet:14} {e.type:12} "
+              f"{lisible(e.estimation):>8}  {e.commande[:60]}")
+    return 0
+
+
+def _estime(cfg: Config) -> int:
+    types = {t.nom: t for t in charger_types(cfg.types)}
+    historique = lire_historique(cfg.etat / "historique.jsonl")
+    print("valeurs de depart :")
+    for t in types.values():
+        print(f"  {t.nom:12} {lisible(t.depart):>8}")
+    couples = sorted({(h["projet"], h["type"]) for h in historique
+                      if isinstance(h.get("projet"), str) and isinstance(h.get("type"), str)})
+    if couples:
+        print("apprises (projet, type) :")
+    for projet, nom in couples:
+        t = types.get(nom, TypeLourd(nom, AUTRE.depart, AUTRE.inclusion, None))
+        n = sum(1 for h in historique if h.get("projet") == projet and h.get("type") == nom
+                and isinstance(h.get("pic"), int) and h["pic"] > 0)
+        print(f"  {projet:14} {nom:12} {lisible(estimer(t, projet, historique)):>8}  "
+              f"({n} mesures)")
+    return 0
+
+
+def main(argv: list[str] | None = None) -> int:
+    p = argparse.ArgumentParser(prog="kvm-lourd",
+                                description="File d'attente des taches lourdes du KVM.")
+    sous = p.add_subparsers(dest="cmd", required=True)
+    r = sous.add_parser("run", help="passer une commande par la file")
+    r.add_argument("--qui", choices=list(PRIORITE))
+    r.add_argument("--type")
+    r.add_argument("--projet")
+    r.add_argument("--attente-max", default="2h")
+    r.add_argument("commande", nargs=argparse.REMAINDER)
+    c = sous.add_parser("classe", help="type lourd d'une commande (rien si legere)")
+    c.add_argument("commande")
+    sous.add_parser("status", help="voir la file")
+    sous.add_parser("estime", help="voir les estimations")
+    a = p.parse_args(argv)
+    cfg = Config.depuis_env()
+    if a.cmd == "classe":
+        return _classe(cfg, a.commande)
+    if a.cmd == "status":
+        return _status(cfg)
+    if a.cmd == "estime":
+        return _estime(cfg)
+    commande = a.commande[1:] if a.commande[:1] == ["--"] else a.commande
+    if not commande:
+        p.error("commande manquante : kvm-lourd run [options] -- <commande>")
+    try:
+        attente_max = duree(a.attente_max)
+    except ValueError as err:
+        p.error(str(err))
+    qui = a.qui or ("humain" if sys.stdin.isatty() else "agent")
+    return run(cfg, qui, a.type, a.projet or projet_par_defaut(), attente_max, commande)
+
+
+if __name__ == "__main__":
+    sys.exit(main())

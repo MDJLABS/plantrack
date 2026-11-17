@@ -1,0 +1,17 @@
+[Unit]
+Description=ProRent — pile Supabase (docker compose) (souffle PlanTrack : reveille par une session, endormi apres 30 min)
+After=network-online.target docker.service
+Wants=network-online.target
+Requires=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/home/mariella/prorent-docs
+# d266 : studio et meta ne demarrent plus (ExecStop les arrete quand meme)
+ExecStart=/usr/bin/docker compose -p prorent-dev --env-file .env.dev -f docker-compose.yml start auth db functions imgproxy kong realtime rest storage supabase-mail supavisor
+ExecStop=/usr/bin/docker compose -p prorent-dev --env-file .env.dev -f docker-compose.yml stop auth db functions imgproxy kong meta realtime rest storage studio supabase-mail supavisor
+TimeoutStartSec=300
+
+[Install]
+WantedBy=multi-user.target

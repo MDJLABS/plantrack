@@ -1,0 +1,5 @@
+# Coupe-circuit anti-gel du KVM — 2026-10-11 (backup dans /root/backups/anti-gel-*)
+# Tue UN processus (pas un service entier) quand la RAM dispo < 5 % et le swap libre < 10 %.
+# Vise d abord les builds/navigateurs, n y touche jamais aux briques vitales.
+# d266 : memoire seule (-s 100), le secours etant toujours plein il ne servait pas de seuil
+EARLYOOM_ARGS="-m 5 -s 100 -r 3600 -n --prefer ^(java|chrome|chromium|chrome_crashpad|eslint|esbuild|tsc|gradle)$ --avoid ^(sshd|mosh-server|systemd|systemd-journal|dockerd|containerd|containerd-shim|postgres|init|earlyoom)$"

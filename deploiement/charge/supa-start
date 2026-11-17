@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+# supa-start — demarre une stack Supabase CLI en la bindant sur 127.0.0.1.
+#
+# POURQUOI CE WRAPPER EXISTE
+#   Le bind sur 127.0.0.1 n'est PAS une option de config.toml : c'est un FLAG
+#   (--network-id) a repasser a CHAQUE demarrage. Un `supabase start` nu
+#   republie la base, Kong, Studio, Mailpit et Analytics sur 0.0.0.0,
+#   c'est-a-dire sur Internet, sans aucun signal. Le CLI n'offre aucun moyen
+#   de rendre ce bind persistant :
+#     - config.toml n'a aucune cle de bind ni de mot de passe ;
+#     - `supabase start` n'a aucun flag de mot de passe ;
+#     - le mot de passe Postgres est en dur dans l'env des conteneurs.
+#   Ref. officielle : https://supabase.com/docs/guides/local-development
+#     "You should never expose your local development stack publicly."
+#
+# LE PIEGE QU'IL FERME
+#   `supabase start --network-id <reseau-inexistant>` ne protege RIEN : le
+#   reseau serait cree SANS l'option host_binding_ipv4, donc de retour sur
+#   0.0.0.0 — un flag present et une protection absente. Ce script cree le
+#   reseau avec la bonne option, et REFUSE de demarrer si le bind n'est pas
+#   le bon, plutot que de demarrer en donnant l'illusion d'etre protege.
+#
+# CE QU'IL NE FAIT PAS
+#   Il n'empeche personne de taper `supabase start` a la main. La seule
+#   protection qui ne depend d'aucun geste humain est le pare-feu
+#   DOCKER-USER (/usr/local/sbin/docker-user-lockdown.sh), qui est conserve
+#   pour cette raison exacte : defense en profondeur.
+#
+# USAGE : supa-start <chemin-du-projet>
+#   ex. supa-start /home/mariella/miamboost
+set -euo pipefail
+
+DIR="${1:-}"
+if [ -z "$DIR" ]; then echo "usage: supa-start <chemin-du-projet>" >&2; exit 2; fi
+CFG="$DIR/supabase/config.toml"
+if [ ! -f "$CFG" ]; then echo "ABANDON: $CFG introuvable (mauvais repertoire projet ?)" >&2; exit 2; fi
+
+PROJ=$(grep -E '^project_id' "$CFG" | head -1 | sed -E 's/.*"(.*)".*/\1/')
+if [ -z "$PROJ" ]; then echo "ABANDON: project_id illisible dans $CFG" >&2; exit 2; fi
+NET="local-network-$PROJ"
+
+# Un reseau par stack : un reseau partage ferait se voir les stacks entre elles.
+if ! docker network inspect "$NET" >/dev/null 2>&1; then
+  echo "[supa-start] creation du reseau $NET (bind 127.0.0.1)"
+  docker network create -o 'com.docker.network.bridge.host_binding_ipv4=127.0.0.1' "$NET" >/dev/null
+fi
+
+# Garde-fou : un reseau pre-existant mal cree = fausse protection. On refuse.
+BIND=$(docker network inspect "$NET" --format '{{index .Options "com.docker.network.bridge.host_binding_ipv4"}}' 2>/dev/null || true)
+if [ "$BIND" != "127.0.0.1" ]; then
+  echo "ABANDON: le reseau $NET est binde sur [${BIND:-<vide>}], pas 127.0.0.1." >&2
+  echo "         Demarrer maintenant exposerait la stack sur Internet." >&2
+  echo "         Corriger: docker network rm $NET  (stack arretee), puis relancer supa-start." >&2
+  exit 1
+fi
+
+echo "[supa-start] projet=$PROJ reseau=$NET bind=127.0.0.1"
+# d266 : les ecrans d'admin (studio, meta, analytics) ne demarrent plus avec la pile ;
+# SUPA_ECRANS=1 supa-start <projet> les lance quand on en a besoin.
+EXCLURE=(-x studio,postgres-meta,logflare,vector)
+[ "${SUPA_ECRANS:-0}" = 1 ] && EXCLURE=()
+exec supabase start --workdir "$DIR" --network-id "$NET" "${EXCLURE[@]}"

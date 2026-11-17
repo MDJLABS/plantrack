@@ -1,0 +1,17 @@
+[Unit]
+Description=OpenStyle — instance Supabase locale (CLI) (souffle PlanTrack : reveille par une session, endormi apres 30 min)
+After=network-online.target docker.service
+Wants=network-online.target
+Requires=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/home/mariella/openstyle/app
+# d266 : sans ecrans d'admin (studio, meta, analytics)
+ExecStart=/usr/local/bin/supabase start -x studio,postgres-meta,logflare,vector
+ExecStop=/usr/local/bin/supabase stop
+TimeoutStartSec=300
+
+[Install]
+WantedBy=multi-user.target
