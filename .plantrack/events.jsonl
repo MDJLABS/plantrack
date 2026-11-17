@@ -2769,3 +2769,71 @@
 {"ts": "2026-11-15T21:53:15+00:00", "kind": "commit", "sha": "2003d00", "ctype": "chore", "thread": "t23"}
 {"ts": "2026-11-15T21:53:25+00:00", "kind": "file_touched", "text": "sortie/carte-suite-1115-fin.json", "thread": "t23"}
 {"ts": "2026-11-15T21:54:20+00:00", "kind": "decision", "id": "d260", "text": "Mariella (tel, 15/11 soir, carte Suite) : 'Attendre la fin de surveillance (Recommande)' - veille silencieuse (d23) jusqu'au verdict b49 le 19/11 ; plus aucune correction en attente hormis b49", "par": "agent"}
+{"ts": "2026-11-15T21:54:21+00:00", "kind": "commit", "sha": "6484ae5", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-15T21:58:16+00:00", "kind": "commit", "sha": "4893baf", "ctype": "fix", "thread": "t23"}
+{"ts": "2026-11-15T21:59:09+00:00", "kind": "commit", "sha": "d9a136f", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-15T21:59:27+00:00", "kind": "commit", "sha": "16640e2", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-15T22:00:22+00:00", "kind": "commit", "sha": "63aa456", "ctype": "fix", "thread": "t23"}
+{"ts": "2026-11-15T22:00:23+00:00", "kind": "commit", "sha": "c9beec6", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-15T22:00:27+00:00", "kind": "commit", "sha": "440df86", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-15T22:50:29+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-frolicking-tide.md", "thread": "t23"}
+{"ts": "2026-11-16T01:05:39+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-composed-cocoa.md", "thread": "t23"}
+{"ts": "2026-11-16T01:10:15+00:00", "kind": "decision", "id": "d261", "text": "Mariella (tel, 16/11 01h05, plan approuve 'On y va') : rien a faire, veille silencieuse jusqu'au verdict b49 le 19/11 (d23, d260)", "par": "agent"}
+{"ts": "2026-11-16T01:47:28+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-soft-koala.md", "thread": "t23"}
+{"ts": "2026-11-16T17:25:39+00:00", "kind": "decision", "id": "d262", "text": "Mariella (tel, 16/11, plan approuve apres relance auto) : rien a faire, veille silencieuse jusqu'au verdict b49 le 19/11 (d23, d260, d261) ; seul rouge du doctor = eba6bd5, deja connu (d208)", "par": "agent"}
+{"ts": "2026-11-16T21:26:12+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-dreamy-seal.md", "thread": "t23"}
+{"ts": "2026-11-16T21:33:26+00:00", "kind": "decision", "id": "d263", "text": "Mariella (tel, 16/11 soir, plan approuve apres alerte memoire 20h25) : rien a faire, java parti seul, orchestre au rouge depuis 21h22 retient les taches lourdes ; veille silencieuse jusqu'au verdict b49 le 19/11 (d23, d260)", "par": "agent"}
+{"ts": "2026-11-16T21:33:38+00:00", "kind": "file_touched", "text": "sortie/carte-suite-1116-soir.json", "thread": "t23"}
+{"ts": "2026-11-16T21:34:52+00:00", "kind": "decision", "id": "d264", "text": "Mariella (tel, 16/11 soir, carte Suite) : 'Rester en veille (Recommande)' + 'Ne repose pas ces questions' - veille silencieuse jusqu'au verdict b49 le 19/11 (d23, d260, d263)", "par": "agent"}
+{"ts": "2026-11-16T23:04:21+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-wild-newell.md", "thread": "t23"}
+{"ts": "2026-11-16T23:08:52+00:00", "kind": "decision", "id": "d265", "text": "Mariella (tel, 16/11 23h00, plan approuve 17/11) : donner l'historique de la charge serveur et le suivi des ameliorations a un agent Fable 5.2 pour qu'il propose une gestion des ressources/coordination/charge entierement automatique ; Fable lit et propose seulement, Mariella choisit ensuite.", "par": "agent"}
+{"ts": "2026-11-16T23:16:42+00:00", "kind": "file_touched", "text": "sortie/dossier-charge-fable/RAPPORT-FABLE.md", "thread": "t23"}
+{"ts": "2026-11-16T23:17:04+00:00", "kind": "commit", "sha": "a8ac7e7", "ctype": "docs", "thread": "t23"}
+{"ts": "2026-11-16T23:17:23+00:00", "kind": "file_touched", "text": "sortie/carte-fable-charge-1117.json", "thread": "t23"}
+{"ts": "2026-11-16T23:19:41+00:00", "kind": "question", "id": "q36", "text": "Carte 17/11 'Automatiser la charge' : pistes du rapport Fable (A par etapes recommandee, B, C, veille) - attente du choix de Mariella"}
+{"ts": "2026-11-17T00:23:01+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-enumerated-reef.md", "thread": "t23"}
+{"ts": "2026-11-17T05:05:19+00:00", "kind": "decision", "id": "d266", "text": "Mariella (tel, 17/11, carte Automatiser la charge 'Piste A, par etapes (Recommande)', plan approuve) : etape 1 de la piste A du rapport Fable = fichier de capacite unique (4 vCPU) ; une seule voix d'alerte (orchestre, 4 cas de panne + gardien), alertes d67 (memoire 80 %) et d79 (charge 5 min) retirees ; kvm-lourd retient les taches agent au rouge et les grosses a l'orange ; ecrans d'admin des bases non demarres ; earlyoom sur la memoire seule.", "par": "agent"}
+{"ts": "2026-11-17T05:05:56+00:00", "kind": "file_touched", "text": "../../../usr/local/bin/kvm-lourd", "thread": "t23"}
+{"ts": "2026-11-17T05:06:05+00:00", "kind": "file_touched", "text": "../../../usr/local/bin/kvm-lourd", "thread": "t23"}
+{"ts": "2026-11-17T05:06:49+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-17T05:06:50+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-17T05:06:53+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-17T05:06:56+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/0247324b-315d-4c30-bd6f-4defe887d2e0/scratchpad/patch.py", "thread": "t23"}
+{"ts": "2026-11-17T05:07:08+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-17T05:07:10+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-17T05:07:16+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-17T05:07:40+00:00", "kind": "file_touched", "text": "../../../usr/local/bin/menage-serveur.sh", "thread": "t23"}
+{"ts": "2026-11-17T05:07:57+00:00", "kind": "file_touched", "text": "deploiement/charge/capacite.conf", "thread": "t23"}
+{"ts": "2026-11-17T05:07:57+00:00", "kind": "file_touched", "text": "deploiement/charge/plantrack-gardien.sh", "thread": "t23"}
+{"ts": "2026-11-17T05:07:57+00:00", "kind": "file_touched", "text": "deploiement/charge/plantrack-gardien.service", "thread": "t23"}
+{"ts": "2026-11-17T05:07:57+00:00", "kind": "file_touched", "text": "deploiement/charge/plantrack-gardien.timer", "thread": "t23"}
+{"ts": "2026-11-17T05:07:57+00:00", "kind": "file_touched", "text": "deploiement/charge/orchestre.d/capacite.conf", "thread": "t23"}
+{"ts": "2026-11-17T05:08:05+00:00", "kind": "file_touched", "text": "deploiement/charge/capacite.conf", "thread": "t23"}
+{"ts": "2026-11-17T05:08:07+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/0247324b-315d-4c30-bd6f-4defe887d2e0/scratchpad/p2.py", "thread": "t23"}
+{"ts": "2026-11-17T05:08:56+00:00", "kind": "file_touched", "text": "deploiement/charge/installer.sh", "thread": "t23"}
+{"ts": "2026-11-17T05:08:56+00:00", "kind": "file_touched", "text": "../../../etc/default/earlyoom", "thread": "t23"}
+{"ts": "2026-11-17T05:08:56+00:00", "kind": "file_touched", "text": "../../../etc/default/earlyoom", "thread": "t23"}
+{"ts": "2026-11-17T05:09:55+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t23"}
+{"ts": "2026-11-17T05:09:59+00:00", "kind": "file_touched", "text": "sortie/d266-tests.log", "thread": "t23"}
+{"ts": "2026-11-17T05:13:11+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/0247324b-315d-4c30-bd6f-4defe887d2e0/scratchpad/bloc.sh", "thread": "t23"}
+{"ts": "2026-11-17T05:13:11+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t23"}
+{"ts": "2026-11-17T05:13:28+00:00", "kind": "commit", "sha": "2426c6b", "ctype": "feat", "thread": "t23"}
+{"ts": "2026-11-17T05:13:31+00:00", "kind": "commit", "sha": "3712ecb", "ctype": "feat", "thread": "t23"}
+{"ts": "2026-11-17T05:13:31+00:00", "kind": "decision", "id": "d267", "text": "Etape 1 piste A installee (17/11) : vps-charge-alerte.timer coupe, plantrack-gardien.timer actif, orchestre relance avec /etc/plantrack/capacite.conf, earlyoom -s 100, ecrans d'admin exclus (supa-start, openstyle, prorent : effet au prochain demarrage de chaque pile). Retour arriere : interrupteurs a 0 ou backup/code/2026-11-17-charge. 4 bulles d'essai envoyees ; premiere vraie alerte : disque a 96 %.", "par": "agent"}
+{"ts": "2026-11-17T05:19:12+00:00", "kind": "commit", "sha": "283fa4e", "ctype": "feat", "thread": "t23"}
+{"ts": "2026-11-17T05:19:22+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t23"}
+{"ts": "2026-11-17T05:19:26+00:00", "kind": "commit", "sha": "a0b213e", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-17T05:19:28+00:00", "kind": "commit", "sha": "6c9da7f", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-17T05:19:58+00:00", "kind": "file_touched", "text": "sortie/carte-charge-etape1-1117.json", "thread": "t23"}
+{"ts": "2026-11-17T05:19:58+00:00", "kind": "file_touched", "text": "sortie/carte-charge-etape1-1117.log", "thread": "t23"}
+{"ts": "2026-11-17T05:20:04+00:00", "kind": "question", "id": "q37", "text": "Carte 17/11 'Charge : etape 1 faite' : libérer le disque (96 %, reco), étape 2 dans 48 h, ou veille ?"}
+{"ts": "2026-11-17T05:47:30+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-async-pine.md", "thread": "t23"}
+{"ts": "2026-11-17T19:21:30+00:00", "kind": "decision", "id": "d268", "text": "Mariella (tel, 17/11, plan approuve apres relance auto) : rien a faire, attente de sa reponse a la carte 'Charge : etape 1 faite' (q37 : liberer le disque 96 % reco, ou etape 2) ; pas de carte en double", "par": "agent"}
+{"ts": "2026-11-17T19:32:31+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-cryptic-nebula.md", "thread": "t23"}
+{"ts": "2026-11-17T19:33:33+00:00", "kind": "piege", "id": "pg36", "text": "demander.ts refuse un objet JSON seul (log 'il faut au moins une question') : toujours passer un tableau [{...}], et relire le log apres l'envoi avant de dire qu'on attend la reponse"}
+{"ts": "2026-11-17T19:33:34+00:00", "kind": "file_touched", "text": "sortie/carte-charge-etape1-1117b.log", "thread": "t23"}
+{"ts": "2026-11-17T19:39:21+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/b7dca3c0-3e29-4795-8047-ee1bc4bb2c29/scratchpad/du.txt", "thread": "t23"}
+{"ts": "2026-11-17T20:04:49+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-dreamy-balloon.md", "thread": "t23"}
+{"ts": "2026-11-17T20:38:28+00:00", "kind": "file_touched", "text": "../../../usr/local/bin/menage-serveur.sh", "thread": "t23"}
+{"ts": "2026-11-17T20:38:50+00:00", "kind": "decision", "id": "d269", "text": "Disque libere (choix Mariella tel 17/11 'Liberer le disque (Recommande)', plan approuve) : 97 % -> 93 % puis suite (pip, npm, pnpm prune, /tmp > 7 j, snaps desactives, journaux). Non touches : volumes docker orphelins (prolearn_db_data...), messages vocaux bcc, gradle, huggingface, images docker (toutes actives). Prevention : menage-serveur.sh (hors depot, backup backup/code/usr-local-bin/menage-serveur.sh.avant-disque) relance ce nettoyage detache et en priorite basse chaque semaine, ou si disque > 90 % (au plus toutes les 6 h), temoin /var/lib/menage-serveur/disque-nettoye.", "par": "agent"}
+{"ts": "2026-11-17T20:38:54+00:00", "kind": "answer", "id": "q37", "text": "Libérer le disque (Recommandé) - fait, d269", "canal": "telephone : Étape 1 de la charge en place. On fait quoi maintenant ? → Libérer le disque (Recommandé)"}

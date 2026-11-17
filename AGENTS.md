@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [260 commits]
-  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-proud-pnueli.md, sortie/carte-suite-1115-soir.json, sortie/carte-suite-1115-soir.log, sortie/carte-b38-verdict.json, sortie/carte-b38-francoviet.json, sortie/carte-suite-1115-fin.json
+FIL ACTIF — t23 : guides de test automatiques (d100) [273 commits]
+  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-async-pine.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-cryptic-nebula.md, sortie/carte-charge-etape1-1117b.log, ../../../tmp/claude-0/-home-mariella-plantrack/b7dca3c0-3e29-4795-8047-ee1bc4bb2c29/scratchpad/du.txt, ../../../root/.claude/plans/contexte-reconstruit-par-le-dreamy-balloon.md, ../../../usr/local/bin/menage-serveur.sh
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -285,6 +285,15 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d258 : Mariella (tel, 15/11 20h06, plan approuve) : le guide Soirees n'apparaissait pas dans sa liste car deja fini le matin (9/9 ok, 09:34) ; b39… (agent)
   d259 : Mariella (tel, 15/11 soir, carte Suite) : 'J'ouvre les 2 liens (Recommande)' - elle teste miamboost-dev et s69-francoviet-dev pour b38 ; ve… (agent)
   d260 : Mariella (tel, 15/11 soir, carte Suite) : 'Attendre la fin de surveillance (Recommande)' - veille silencieuse (d23) jusqu'au verdict b49 le… (agent)
+  d261 : Mariella (tel, 16/11 01h05, plan approuve 'On y va') : rien a faire, veille silencieuse jusqu'au verdict b49 le 19/11 (d23, d260) (agent)
+  d262 : Mariella (tel, 16/11, plan approuve apres relance auto) : rien a faire, veille silencieuse jusqu'au verdict b49 le 19/11 (d23, d260, d261) … (agent)
+  d263 : Mariella (tel, 16/11 soir, plan approuve apres alerte memoire 20h25) : rien a faire, java parti seul, orchestre au rouge depuis 21h22 retie… (agent)
+  d264 : Mariella (tel, 16/11 soir, carte Suite) : 'Rester en veille (Recommande)' + 'Ne repose pas ces questions' - veille silencieuse jusqu'au ver… (agent)
+  d265 : Mariella (tel, 16/11 23h00, plan approuve 17/11) : donner l'historique de la charge serveur et le suivi des ameliorations a un agent Fable … (agent)
+  d266 : Mariella (tel, 17/11, carte Automatiser la charge 'Piste A, par etapes (Recommande)', plan approuve) : etape 1 de la piste A du rapport Fab… (agent)
+  d267 : Etape 1 piste A installee (17/11) : vps-charge-alerte.timer coupe, plantrack-gardien.timer actif, orchestre relance avec /etc/plantrack/cap… (agent)
+  d268 : Mariella (tel, 17/11, plan approuve apres relance auto) : rien a faire, attente de sa reponse a la carte 'Charge : etape 1 faite' (q37 : li… (agent)
+  d269 : Disque libere (choix Mariella tel 17/11 'Liberer le disque (Recommande)', plan approuve) : 97 % -> 93 % puis suite (pip, npm, pnpm prune, /… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
@@ -308,9 +317,11 @@ Pieges connus :
   pg33 : Orchestre (b51, v1.9.49) : un service ajoute au souffle.conf d'un projet n'est …
   pg34 : Le serveur a 4 vCPU (nproc), pas 2 : l'alerte de saturation (seuil 3.00 'sur 2 …
   pg35 : MiamBoost : 'supabase start' redescend TOUTE la pile si supabase_studio_miamboo…
+  pg36 : demander.ts refuse un objet JSON seul (log 'il faut au moins une question') : t…
 
 Questions en attente (reponds via !answer qN ...) :
   q23 : Carte 10/11 : guide ProRent pret, rallumer sa base de test (eteinte d155) pour …
   q28 : Carte Suite du 13/11 (apres Checker v2 v1.9.48 et b51 v1.9.49) restee sans repo…
+  q36 : Carte 17/11 'Automatiser la charge' : pistes du rapport Fable (A par etapes rec…
 ```
 <!-- plantrack:state-end -->
