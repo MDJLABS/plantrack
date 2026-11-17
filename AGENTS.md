@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [273 commits]
-  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-async-pine.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-cryptic-nebula.md, sortie/carte-charge-etape1-1117b.log, ../../../tmp/claude-0/-home-mariella-plantrack/b7dca3c0-3e29-4795-8047-ee1bc4bb2c29/scratchpad/du.txt, ../../../root/.claude/plans/contexte-reconstruit-par-le-dreamy-balloon.md, ../../../usr/local/bin/menage-serveur.sh
+FIL ACTIF — t23 : guides de test automatiques (d100) [274 commits]
+  fichiers recemment ecrits : sortie/carte-charge-etape1-1117b.log, ../../../tmp/claude-0/-home-mariella-plantrack/b7dca3c0-3e29-4795-8047-ee1bc4bb2c29/scratchpad/du.txt, ../../../root/.claude/plans/contexte-reconstruit-par-le-dreamy-balloon.md, ../../../usr/local/bin/menage-serveur.sh, sortie/carte-disque-1117.json, sortie/carte-disque-1117.log
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -294,6 +294,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d267 : Etape 1 piste A installee (17/11) : vps-charge-alerte.timer coupe, plantrack-gardien.timer actif, orchestre relance avec /etc/plantrack/cap… (agent)
   d268 : Mariella (tel, 17/11, plan approuve apres relance auto) : rien a faire, attente de sa reponse a la carte 'Charge : etape 1 faite' (q37 : li… (agent)
   d269 : Disque libere (choix Mariella tel 17/11 'Liberer le disque (Recommande)', plan approuve) : 97 % -> 93 % puis suite (pip, npm, pnpm prune, /… (agent)
+  d270 : Mariella (tel, 17/11 soir, carte Disque : place liberee) : 'Laisser le menage faire (Recommande)' + 'Ne repose pas ces questions' - veille … (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…

@@ -2837,3 +2837,9 @@
 {"ts": "2026-11-17T20:38:28+00:00", "kind": "file_touched", "text": "../../../usr/local/bin/menage-serveur.sh", "thread": "t23"}
 {"ts": "2026-11-17T20:38:50+00:00", "kind": "decision", "id": "d269", "text": "Disque libere (choix Mariella tel 17/11 'Liberer le disque (Recommande)', plan approuve) : 97 % -> 93 % puis suite (pip, npm, pnpm prune, /tmp > 7 j, snaps desactives, journaux). Non touches : volumes docker orphelins (prolearn_db_data...), messages vocaux bcc, gradle, huggingface, images docker (toutes actives). Prevention : menage-serveur.sh (hors depot, backup backup/code/usr-local-bin/menage-serveur.sh.avant-disque) relance ce nettoyage detache et en priorite basse chaque semaine, ou si disque > 90 % (au plus toutes les 6 h), temoin /var/lib/menage-serveur/disque-nettoye.", "par": "agent"}
 {"ts": "2026-11-17T20:38:54+00:00", "kind": "answer", "id": "q37", "text": "Libérer le disque (Recommandé) - fait, d269", "canal": "telephone : Étape 1 de la charge en place. On fait quoi maintenant ? → Libérer le disque (Recommandé)"}
+{"ts": "2026-11-17T20:39:10+00:00", "kind": "precommit_block"}
+{"ts": "2026-11-17T20:39:16+00:00", "kind": "commit", "sha": "5e28fc4", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-17T20:42:46+00:00", "kind": "file_touched", "text": "sortie/carte-disque-1117.json", "thread": "t23"}
+{"ts": "2026-11-17T20:42:46+00:00", "kind": "file_touched", "text": "sortie/carte-disque-1117.log", "thread": "t23"}
+{"ts": "2026-11-17T20:43:22+00:00", "kind": "file_touched", "text": "sortie/carte-disque-1117.log", "thread": "t23"}
+{"ts": "2026-11-17T20:47:15+00:00", "kind": "decision", "id": "d270", "text": "Mariella (tel, 17/11 soir, carte Disque : place liberee) : 'Laisser le menage faire (Recommande)' + 'Ne repose pas ces questions' - veille silencieuse (d23) ; le nettoyage hebdo du disque (d269) tourne seul, volumes docker orphelins laisses en place.", "par": "agent"}
