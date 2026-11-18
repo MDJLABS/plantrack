@@ -2843,3 +2843,6 @@
 {"ts": "2026-11-17T20:42:46+00:00", "kind": "file_touched", "text": "sortie/carte-disque-1117.log", "thread": "t23"}
 {"ts": "2026-11-17T20:43:22+00:00", "kind": "file_touched", "text": "sortie/carte-disque-1117.log", "thread": "t23"}
 {"ts": "2026-11-17T20:47:15+00:00", "kind": "decision", "id": "d270", "text": "Mariella (tel, 17/11 soir, carte Disque : place liberee) : 'Laisser le menage faire (Recommande)' + 'Ne repose pas ces questions' - veille silencieuse (d23) ; le nettoyage hebdo du disque (d269) tourne seul, volumes docker orphelins laisses en place.", "par": "agent"}
+{"ts": "2026-11-17T20:47:15+00:00", "kind": "commit", "sha": "a9926d0", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-18T06:41:09+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-synthetic-fiddle.md", "thread": "t23"}
+{"ts": "2026-11-18T12:19:15+00:00", "kind": "decision", "id": "d271", "text": "Mariella (tel, 18/11, plan approuve apres relance auto) : rien a faire, veille silencieuse (d23, d270) ; verdict b49 le 19/11", "par": "agent"}
