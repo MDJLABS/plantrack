@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [275 commits]
-  fichiers recemment ecrits : ../../../tmp/claude-0/-home-mariella-plantrack/b7dca3c0-3e29-4795-8047-ee1bc4bb2c29/scratchpad/du.txt, ../../../root/.claude/plans/contexte-reconstruit-par-le-dreamy-balloon.md, ../../../usr/local/bin/menage-serveur.sh, sortie/carte-disque-1117.json, sortie/carte-disque-1117.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-synthetic-fiddle.md
+FIL ACTIF — t23 : guides de test automatiques (d100) [276 commits]
+  fichiers recemment ecrits : sortie/carte-disque-1117.json, sortie/carte-disque-1117.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-synthetic-fiddle.md, sortie/carte-veille-1118.json, sortie/carte-veille-1118.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-indexed-salamander.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -296,6 +296,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d269 : Disque libere (choix Mariella tel 17/11 'Liberer le disque (Recommande)', plan approuve) : 97 % -> 93 % puis suite (pip, npm, pnpm prune, /… (agent)
   d270 : Mariella (tel, 17/11 soir, carte Disque : place liberee) : 'Laisser le menage faire (Recommande)' + 'Ne repose pas ces questions' - veille … (agent)
   d271 : Mariella (tel, 18/11, plan approuve apres relance auto) : rien a faire, veille silencieuse (d23, d270) ; verdict b49 le 19/11 (agent)
+  d272 : Mariella (tel, 18/11 12h22, carte Veille) : 'Rester en veille (Recommande)' + 'Ne repose pas ces questions' - veille silencieuse jusqu'au v… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…

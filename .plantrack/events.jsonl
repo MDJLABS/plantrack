@@ -2846,3 +2846,8 @@
 {"ts": "2026-11-17T20:47:15+00:00", "kind": "commit", "sha": "a9926d0", "ctype": "chore", "thread": "t23"}
 {"ts": "2026-11-18T06:41:09+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-synthetic-fiddle.md", "thread": "t23"}
 {"ts": "2026-11-18T12:19:15+00:00", "kind": "decision", "id": "d271", "text": "Mariella (tel, 18/11, plan approuve apres relance auto) : rien a faire, veille silencieuse (d23, d270) ; verdict b49 le 19/11", "par": "agent"}
+{"ts": "2026-11-18T12:19:16+00:00", "kind": "commit", "sha": "4d6a36d", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-18T12:19:27+00:00", "kind": "file_touched", "text": "sortie/carte-veille-1118.json", "thread": "t23"}
+{"ts": "2026-11-18T12:19:27+00:00", "kind": "file_touched", "text": "sortie/carte-veille-1118.log", "thread": "t23"}
+{"ts": "2026-11-18T12:22:43+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-indexed-salamander.md", "thread": "t23"}
+{"ts": "2026-11-18T12:23:11+00:00", "kind": "decision", "id": "d272", "text": "Mariella (tel, 18/11 12h22, carte Veille) : 'Rester en veille (Recommande)' + 'Ne repose pas ces questions' - veille silencieuse jusqu'au verdict b49 le 19/11 (d23, d270, d271)", "par": "agent"}
