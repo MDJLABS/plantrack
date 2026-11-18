@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [278 commits]
-  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-twinkling-bumblebee.md, sortie/carte-veille-1118b.json, sortie/carte-veille-1118b.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-wobbly-castle.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-toasty-hanrahan.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-stateless-penguin.md
+FIL ACTIF — t23 : guides de test automatiques (d100) [279 commits]
+  fichiers recemment ecrits : sortie/carte-veille-1118b.json, sortie/carte-veille-1118b.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-wobbly-castle.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-toasty-hanrahan.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-stateless-penguin.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-twinkling-rabin.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -299,6 +299,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d272 : Mariella (tel, 18/11 12h22, carte Veille) : 'Rester en veille (Recommande)' + 'Ne repose pas ces questions' - veille silencieuse jusqu'au v… (agent)
   d273 : Mariella (tel, 18/11 apres-midi, plan approuve apres relance auto) : rien a faire, veille silencieuse jusqu'au verdict b49 le 19/11 (d23, d… (agent)
   d274 : Mariella (tel, 18/11 apres-midi, plan approuve apres nouvelle relance auto) : rien a faire, veille silencieuse jusqu'au verdict b49 le 19/1… (agent)
+  d275 : Mariella (tel, 18/11, plan approuve apres relance auto) : rien a faire, veille silencieuse jusqu'au verdict b49 le 19/11 (d23, d272) (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
