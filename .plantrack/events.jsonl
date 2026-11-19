@@ -2892,3 +2892,6 @@
 {"ts": "2026-11-19T20:23:37+00:00", "kind": "file_touched", "text": "sortie/carte-veille-1119d.log", "thread": "t23"}
 {"ts": "2026-11-19T20:24:37+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-modular-moth.md", "thread": "t23"}
 {"ts": "2026-11-19T20:25:28+00:00", "kind": "decision", "id": "d282", "text": "Mariella (tel, 19/11 20h23, carte Veille) : 'Rester en veille (Recommande)' + 'Ne repose pas ces questions' - veille silencieuse jusqu'au verdict b49 le 22/11 (d23, d279)", "par": "agent"}
+{"ts": "2026-11-19T20:25:29+00:00", "kind": "commit", "sha": "d8b7d7a", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-19T21:43:18+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-sorted-thimble.md", "thread": "t23"}
+{"ts": "2026-11-19T22:40:57+00:00", "kind": "decision", "id": "d283", "text": "Mariella (tel, 19/11 soir, plan approuve apres relance auto) : rien a faire, veille silencieuse jusqu'au verdict b49 le 22/11 (d23, d282)", "par": "agent"}
