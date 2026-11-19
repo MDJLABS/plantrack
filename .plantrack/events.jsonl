@@ -2874,3 +2874,6 @@
 {"ts": "2026-11-18T22:40:31+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-wondrous-patterson.md", "thread": "t23"}
 {"ts": "2026-11-19T06:11:52+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-iridescent-lightning.md", "thread": "t23"}
 {"ts": "2026-11-19T06:16:28+00:00", "kind": "decision", "id": "d278", "text": "Mariella (tel, 19/11 06h11, plan approuve 'On y va') : veille silencieuse jusqu'au verdict b49 le 19/11 (d23, d277) ; carte de verdict b49 envoyee ce jour", "par": "agent"}
+{"ts": "2026-11-19T06:16:29+00:00", "kind": "commit", "sha": "c679bc2", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-19T06:16:41+00:00", "kind": "file_touched", "text": "sortie/carte-verdict-b49-1119.json", "thread": "t23"}
+{"ts": "2026-11-19T06:32:53+00:00", "kind": "question", "id": "q38", "text": "Carte 19/11 'Verdict surcharge' (b49) : surveiller 3 jours de plus (reco), regle, ou pas regle ?"}

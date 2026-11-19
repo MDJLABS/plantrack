@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [282 commits]
-  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-stateless-penguin.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-twinkling-rabin.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-lucky-muffin.md, sortie/carte-veille-1118c.json, ../../../root/.claude/plans/contexte-reconstruit-par-le-wondrous-patterson.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-iridescent-lightning.md
+FIL ACTIF — t23 : guides de test automatiques (d100) [283 commits]
+  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-twinkling-rabin.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-lucky-muffin.md, sortie/carte-veille-1118c.json, ../../../root/.claude/plans/contexte-reconstruit-par-le-wondrous-patterson.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-iridescent-lightning.md, sortie/carte-verdict-b49-1119.json
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -332,5 +332,6 @@ Questions en attente (reponds via !answer qN ...) :
   q23 : Carte 10/11 : guide ProRent pret, rallumer sa base de test (eteinte d155) pour …
   q28 : Carte Suite du 13/11 (apres Checker v2 v1.9.48 et b51 v1.9.49) restee sans repo…
   q36 : Carte 17/11 'Automatiser la charge' : pistes du rapport Fable (A par etapes rec…
+  q38 : Carte 19/11 'Verdict surcharge' (b49) : surveiller 3 jours de plus (reco), regl…
 ```
 <!-- plantrack:state-end -->
