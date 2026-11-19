@@ -14,7 +14,7 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [283 commits]
+FIL ACTIF — t23 : guides de test automatiques (d100) [284 commits]
   fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-twinkling-rabin.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-lucky-muffin.md, sortie/carte-veille-1118c.json, ../../../root/.claude/plans/contexte-reconstruit-par-le-wondrous-patterson.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-iridescent-lightning.md, sortie/carte-verdict-b49-1119.json
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
@@ -303,6 +303,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d276 : Mariella (tel, 18/11, plan approuve apres relance auto) : rien a faire, veille silencieuse jusqu'au verdict b49 le 19/11 (d23, d272) (agent)
   d277 : Mariella (tel, 18/11, carte Veille) : 'Rester en veille (Recommande)' + 'Ne repose pas ces questions' - veille silencieuse jusqu'au verdict… (agent)
   d278 : Mariella (tel, 19/11 06h11, plan approuve 'On y va') : veille silencieuse jusqu'au verdict b49 le 19/11 (d23, d277) ; carte de verdict b49 … (agent)
+  d279 : Mariella (tel, 19/11, carte Verdict surcharge) : 'Surveiller encore 3 jours (Recommande)' + 'Ne repose pas ces questions' - b49 reste en to… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
@@ -332,6 +333,5 @@ Questions en attente (reponds via !answer qN ...) :
   q23 : Carte 10/11 : guide ProRent pret, rallumer sa base de test (eteinte d155) pour …
   q28 : Carte Suite du 13/11 (apres Checker v2 v1.9.48 et b51 v1.9.49) restee sans repo…
   q36 : Carte 17/11 'Automatiser la charge' : pistes du rapport Fable (A par etapes rec…
-  q38 : Carte 19/11 'Verdict surcharge' (b49) : surveiller 3 jours de plus (reco), regl…
 ```
 <!-- plantrack:state-end -->

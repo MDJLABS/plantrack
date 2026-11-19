@@ -2877,3 +2877,6 @@
 {"ts": "2026-11-19T06:16:29+00:00", "kind": "commit", "sha": "c679bc2", "ctype": "chore", "thread": "t23"}
 {"ts": "2026-11-19T06:16:41+00:00", "kind": "file_touched", "text": "sortie/carte-verdict-b49-1119.json", "thread": "t23"}
 {"ts": "2026-11-19T06:32:53+00:00", "kind": "question", "id": "q38", "text": "Carte 19/11 'Verdict surcharge' (b49) : surveiller 3 jours de plus (reco), regle, ou pas regle ?"}
+{"ts": "2026-11-19T06:32:53+00:00", "kind": "commit", "sha": "7243b4f", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-19T06:33:04+00:00", "kind": "answer", "id": "q38", "text": "Surveiller encore 3 jours (Recommande)", "canal": "tel : Surveiller encore 3 jours (Recommandé)"}
+{"ts": "2026-11-19T06:33:04+00:00", "kind": "decision", "id": "d279", "text": "Mariella (tel, 19/11, carte Verdict surcharge) : 'Surveiller encore 3 jours (Recommande)' + 'Ne repose pas ces questions' - b49 reste en to_verify, surveillance prolongee jusqu'au 22/11, veille silencieuse d'ici la (d23)", "par": "agent"}
