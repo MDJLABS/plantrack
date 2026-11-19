@@ -2884,3 +2884,6 @@
 {"ts": "2026-11-19T06:47:51+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-purring-lerdorf.md", "thread": "t23"}
 {"ts": "2026-11-19T19:13:17+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-sparkling-rainbow.md", "thread": "t23"}
 {"ts": "2026-11-19T19:14:28+00:00", "kind": "decision", "id": "d280", "text": "Mariella (tel, 19/11 19h12, plan approuve 'On y va') : veille silencieuse jusqu'au verdict b49 le 22/11 (d23, d279)", "par": "agent"}
+{"ts": "2026-11-19T19:14:29+00:00", "kind": "commit", "sha": "50c7747", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-19T19:29:12+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-declarative-hammock.md", "thread": "t23"}
+{"ts": "2026-11-19T20:23:26+00:00", "kind": "decision", "id": "d281", "text": "Mariella (tel, 19/11 soir, plan approuve apres relance auto) : rien a faire, veille silencieuse jusqu'au verdict b49 le 22/11 (d23, d279, d280)", "par": "agent"}
