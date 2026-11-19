@@ -2880,3 +2880,7 @@
 {"ts": "2026-11-19T06:32:53+00:00", "kind": "commit", "sha": "7243b4f", "ctype": "chore", "thread": "t23"}
 {"ts": "2026-11-19T06:33:04+00:00", "kind": "answer", "id": "q38", "text": "Surveiller encore 3 jours (Recommande)", "canal": "tel : Surveiller encore 3 jours (Recommandé)"}
 {"ts": "2026-11-19T06:33:04+00:00", "kind": "decision", "id": "d279", "text": "Mariella (tel, 19/11, carte Verdict surcharge) : 'Surveiller encore 3 jours (Recommande)' + 'Ne repose pas ces questions' - b49 reste en to_verify, surveillance prolongee jusqu'au 22/11, veille silencieuse d'ici la (d23)", "par": "agent"}
+{"ts": "2026-11-19T06:33:05+00:00", "kind": "commit", "sha": "fdaf5d3", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-19T06:47:51+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-purring-lerdorf.md", "thread": "t23"}
+{"ts": "2026-11-19T19:13:17+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-sparkling-rainbow.md", "thread": "t23"}
+{"ts": "2026-11-19T19:14:28+00:00", "kind": "decision", "id": "d280", "text": "Mariella (tel, 19/11 19h12, plan approuve 'On y va') : veille silencieuse jusqu'au verdict b49 le 22/11 (d23, d279)", "par": "agent"}
