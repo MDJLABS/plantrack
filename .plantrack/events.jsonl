@@ -2870,3 +2870,7 @@
 {"ts": "2026-11-18T22:30:21+00:00", "kind": "commit", "sha": "d39ca96", "ctype": "chore", "thread": "t23"}
 {"ts": "2026-11-18T22:30:32+00:00", "kind": "file_touched", "text": "sortie/carte-veille-1118c.json", "thread": "t23"}
 {"ts": "2026-11-18T22:34:30+00:00", "kind": "decision", "id": "d277", "text": "Mariella (tel, 18/11, carte Veille) : 'Rester en veille (Recommande)' + 'Ne repose pas ces questions' - veille silencieuse jusqu'au verdict b49 le 19/11 (d23, d272)", "par": "agent"}
+{"ts": "2026-11-18T22:34:31+00:00", "kind": "commit", "sha": "17d56d8", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-18T22:40:31+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-wondrous-patterson.md", "thread": "t23"}
+{"ts": "2026-11-19T06:11:52+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-iridescent-lightning.md", "thread": "t23"}
+{"ts": "2026-11-19T06:16:28+00:00", "kind": "decision", "id": "d278", "text": "Mariella (tel, 19/11 06h11, plan approuve 'On y va') : veille silencieuse jusqu'au verdict b49 le 19/11 (d23, d277) ; carte de verdict b49 envoyee ce jour", "par": "agent"}

@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [281 commits]
-  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-wobbly-castle.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-toasty-hanrahan.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-stateless-penguin.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-twinkling-rabin.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-lucky-muffin.md, sortie/carte-veille-1118c.json
+FIL ACTIF — t23 : guides de test automatiques (d100) [282 commits]
+  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-stateless-penguin.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-twinkling-rabin.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-lucky-muffin.md, sortie/carte-veille-1118c.json, ../../../root/.claude/plans/contexte-reconstruit-par-le-wondrous-patterson.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-iridescent-lightning.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -302,6 +302,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d275 : Mariella (tel, 18/11, plan approuve apres relance auto) : rien a faire, veille silencieuse jusqu'au verdict b49 le 19/11 (d23, d272) (agent)
   d276 : Mariella (tel, 18/11, plan approuve apres relance auto) : rien a faire, veille silencieuse jusqu'au verdict b49 le 19/11 (d23, d272) (agent)
   d277 : Mariella (tel, 18/11, carte Veille) : 'Rester en veille (Recommande)' + 'Ne repose pas ces questions' - veille silencieuse jusqu'au verdict… (agent)
+  d278 : Mariella (tel, 19/11 06h11, plan approuve 'On y va') : veille silencieuse jusqu'au verdict b49 le 19/11 (d23, d277) ; carte de verdict b49 … (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
