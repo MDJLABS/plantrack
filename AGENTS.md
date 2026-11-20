@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [288 commits]
-  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-sparkling-rainbow.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-declarative-hammock.md, sortie/carte-veille-1119d.json, sortie/carte-veille-1119d.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-modular-moth.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-sorted-thimble.md
+FIL ACTIF — t23 : guides de test automatiques (d100) [290 commits]
+  fichiers recemment ecrits : sortie/carte-reperes-1120.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-cosmic-barto.md, .bcc/reperes.json, sortie/carte-veille-1120.json, sortie/carte-veille-1120.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-woolly-clover.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -308,6 +308,8 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d281 : Mariella (tel, 19/11 soir, plan approuve apres relance auto) : rien a faire, veille silencieuse jusqu'au verdict b49 le 22/11 (d23, d279, d… (agent)
   d282 : Mariella (tel, 19/11 20h23, carte Veille) : 'Rester en veille (Recommande)' + 'Ne repose pas ces questions' - veille silencieuse jusqu'au v… (agent)
   d283 : Mariella (tel, 19/11 soir, plan approuve apres relance auto) : rien a faire, veille silencieuse jusqu'au verdict b49 le 22/11 (d23, d282) (agent)
+  d284 : Mariella (tel, 20/11 21h28, carte Liens de PlanTrack) : 'Enregistrer tel quel (Recommande)' - .bcc/reperes.json ecrit (prod PyPI, pas de pr… (agent)
+  d285 : Mariella (tel, 20/11 21h51, carte Veille) : 'Rester en veille (Recommande)' + 'Ne repose pas ces questions' - veille silencieuse jusqu'au v… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
