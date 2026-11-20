@@ -1,0 +1,10 @@
+{
+  "prod": { "url": "https://pypi.org/project/plantrack/", "titre": "PlanTrack sur PyPI" },
+  "preprod": { "annonce": "pas de préprod (outil en ligne de commande)" },
+  "version": "1.9.54",
+  "outils": [
+    { "titre": "Code sur GitHub", "url": "https://github.com/MDJLABS/plantrack" },
+    { "titre": "PyPI", "url": "https://pypi.org/project/plantrack/" },
+    { "titre": "Page de présentation (Cloudflare Pages)", "url": "https://plantrack-schemas.pages.dev" }
+  ]
+}
