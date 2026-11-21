@@ -2964,3 +2964,10 @@
 {"ts": "2026-11-21T15:14:54+00:00", "kind": "decision", "id": "d290", "text": "v1.9.56 publiee (21/11, GitHub + PyPI verifie, choix Mariella tel 'Regler les 2 defauts') : b55 corrige (une copie de travail lue une fois, sous le nom du depot principal) ; bilan.sh lance 'bilan --all --rattraper' : chaque dimanche, la ronde passe dans tout depot dont le coeur differe de la derniere version, ligne 'Remis a jour tout seuls' dans le bilan. 731 tests verts, /code-review low sans defaut.", "par": "agent"}
 {"ts": "2026-11-21T15:14:55+00:00", "kind": "commit", "sha": "c1cf284", "ctype": "chore", "thread": "t23"}
 {"ts": "2026-11-21T15:15:17+00:00", "kind": "bug_status", "id": "b55", "status": "to_verify"}
+{"ts": "2026-11-21T15:15:17+00:00", "kind": "commit", "sha": "84bf944", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-21T15:25:29+00:00", "kind": "file_touched", "text": "sortie/carte-b55-1121.json", "thread": "t23"}
+{"ts": "2026-11-21T15:25:29+00:00", "kind": "file_touched", "text": "sortie/carte-b55-1121.log", "thread": "t23"}
+{"ts": "2026-11-21T15:26:53+00:00", "kind": "question", "id": "q40", "text": "Carte 21/11 apres v1.9.56 (2 defauts regles) : rester en veille jusqu'au verdict b49 (reco) ou prevenir la session ProRent", "carte": "b55-1121"}
+{"ts": "2026-11-21T16:16:15+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-eager-unicorn.md", "thread": "t23"}
+{"ts": "2026-11-21T16:21:01+00:00", "kind": "answer", "id": "q40", "text": "téléphone 21/11 15h15 : Rester en veille (Recommandé) + Ne repose pas ces questions", "canal": "téléphone 21/11 15h15 : Rester en veille (Recommandé) + Ne repose pas ces questions"}
+{"ts": "2026-11-21T16:21:01+00:00", "kind": "decision", "id": "d291", "text": "Mariella (tel, 21/11, plan approuve apres relance auto) : rien a faire, veille silencieuse jusqu'au verdict b49 le 22/11 (d23, d290)", "par": "agent"}

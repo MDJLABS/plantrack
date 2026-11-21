@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [300 commits]
-  fichiers recemment ecrits : sortie/carte-check-1121.log, bilan.sh, .claude/hooks/pt.py, sortie/b55-tests-avant.log, tests/scenario.sh, sortie/b55-tests.log
+FIL ACTIF — t23 : guides de test automatiques (d100) [301 commits]
+  fichiers recemment ecrits : sortie/b55-tests-avant.log, tests/scenario.sh, sortie/b55-tests.log, sortie/carte-b55-1121.json, sortie/carte-b55-1121.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-eager-unicorn.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -317,6 +317,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d288 : Check complet du 21/11 (demande Mariella tel 'sous fable 5.2, check complet', plan approuve) : 10 depots en retard mis a niveau en 1.9.54 (… (agent)
   d289 : Mariella (tel, 21/11 14h45, carte Check complet) : 'Regler les 2 defauts (Recommande)' + 'Ne repose pas ces questions' - (1) b55 : bilan/do… (agent)
   d290 : v1.9.56 publiee (21/11, GitHub + PyPI verifie, choix Mariella tel 'Regler les 2 defauts') : b55 corrige (une copie de travail lue une fois,… (agent)
+  d291 : Mariella (tel, 21/11, plan approuve apres relance auto) : rien a faire, veille silencieuse jusqu'au verdict b49 le 22/11 (d23, d290) (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
