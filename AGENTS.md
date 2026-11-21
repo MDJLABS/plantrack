@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [302 commits]
-  fichiers recemment ecrits : sortie/carte-b55-1121.json, sortie/carte-b55-1121.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-eager-unicorn.md, sortie/carte-veille-1121.json, sortie/carte-veille-1121.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-piped-globe.md
+FIL ACTIF — t23 : guides de test automatiques (d100) [303 commits]
+  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-eager-unicorn.md, sortie/carte-veille-1121.json, sortie/carte-veille-1121.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-piped-globe.md, sortie/carte-b49-verdict-1122.json, sortie/carte-b49-verdict-1122.log
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -347,5 +347,8 @@ Questions en attente (reponds via !answer qN ...) :
   q23 : Carte 10/11 : guide ProRent pret, rallumer sa base de test (eteinte d155) pour …
   q28 : Carte Suite du 13/11 (apres Checker v2 v1.9.48 et b51 v1.9.49) restee sans repo…
   q36 : Carte 17/11 'Automatiser la charge' : pistes du rapport Fable (A par etapes rec…
+
+Cartes laissees de cote (action a reprendre a la reponse : answer --carte <id>) :
+  q41 (carte b49-1122) : Carte 22/11 'Verdict surcharge' (b49) : valider, refuser ou surveiller encore ?…
 ```
 <!-- plantrack:state-end -->
