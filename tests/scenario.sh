@@ -1439,6 +1439,23 @@ echo "$D" > "$R/reg"
 out=$(PLANTRACK_REGISTRY="$R/reg" python3 "$PT" bilan --all)
 check "bilan --all : une ligne par depot" "• depot : 1 commit, 1 décision" "$out"
 check_not "bilan : depot sain sans alerte" "en panne" "$out"
+# b55 : une copie de travail inscrite au registre ne sort pas une seconde fois (depot a part)
+D5="$R/d55"; git init -q "$D5" && CLAUDE_PROJECT_DIR="$D5" python3 "$PT" init >/dev/null 2>&1
+git -C "$D5" add -A && git -C "$D5" commit -qm init
+CLAUDE_PROJECT_DIR="$D5" python3 "$PT" decide "une decision" >/dev/null 2>&1
+git -C "$D5" worktree add -q "$R/copie55" 2>/dev/null
+printf '%s\n%s\n' "$R/copie55" "$D5" > "$R/reg55"
+B55() { PATH="$R/bin:$PATH" PLANTRACK_REGISTRY="$R/reg55" PLANTRACK_ORCHESTRE="$R/sans-orchestre" python3 "$PT" "$@" 2>/dev/null; }
+check "bilan --all : une copie de travail ne sort pas en double (b55)" "1" "$(B55 bilan --all | grep -c '^•')"
+check "bilan --all : sous le nom du depot principal (b55)" "d55 : 1 décision" "$(B55 bilan --all)"
+check "doctor --all : une copie de travail comptee une fois (b55)" "1 depot(s)" "$(B55 doctor --all)"
+# bilan --rattraper : un depot en retard jamais rouvert fait sa ronde le dimanche
+git -C "$D5" worktree remove --force "$R/copie55"; echo "$D5" > "$R/reg55"
+echo "# vieux coeur" >> "$D5/.claude/hooks/pt.py"; git -C "$D5" commit -qam "vieux coeur"
+out=$(B55 bilan --all --rattraper)
+check "bilan --rattraper : coeur en retard remis a niveau" "OK" "$(cmp -s "$D5/.claude/hooks/pt.py" "$PT" && echo OK)"
+check "bilan --rattraper : dit qui a ete remis a jour" "Remis à jour tout seuls (pas ouverts depuis longtemps) : d55" "$out"
+check_not "bilan --rattraper : depot a jour pas relance" "Remis à jour" "$(B55 bilan --all --rattraper)"
 touch -d '10 days ago' "$D/.plantrack/ronde.log" "$D/.plantrack/events.jsonl"
 check "bilan : depot oublie signale" "pas ouvert depuis 10 jours" "$(B bilan)"
 echo '{"ts": "2026-01-01T00:00:00+00:00", "kind": "question", "id": "q99", "text": "vieille question"}' >> "$D/.plantrack/events.jsonl"

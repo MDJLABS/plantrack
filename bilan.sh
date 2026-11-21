@@ -3,7 +3,8 @@
 # fil PlanTrack, par un minuteur systeme, sans agent. Rien a dire -> rien n'est envoye.
 set -euo pipefail
 ICI=$(cd "$(dirname "$0")" && pwd)
-BILAN=${BILAN_CMD:-"$ICI/plantrack bilan --all"}
+# --rattraper : un depot jamais rouvert fait sa ronde ici, sinon son coeur ne bouge plus
+BILAN=${BILAN_CMD:-"$ICI/plantrack bilan --all --rattraper"}
 ENVOI=${BILAN_ENVOI:-bulle}   # BILAN_ENVOI=echo pour essayer sans envoyer
 
 # repondre.ts designe le fil par le dossier courant (pas de session sous systemd) : PlanTrack

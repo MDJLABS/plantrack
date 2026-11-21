@@ -1081,7 +1081,7 @@ CLI humaine : plantrack status | bugs | inbox | verify <id> | reject <id> -m ...
               uvx plantrack@latest update   mise a jour d'une installation existante
               plantrack doctor [--all]   verifie l'installation et l'usage reel | plantrack stats   usage sur 14 jours
               plantrack ronde   met le coeur du projet a niveau (lancee seule a l'ouverture, toutes les 4 h au plus)
-              plantrack bilan [--all] [--jours N]   ce qui a avance, ce qui attend ton avis
+              plantrack bilan [--all [--rattraper]] [--jours N]   ce qui a avance, ce qui attend ton avis (--rattraper : ronde des depots en retard)
               plantrack releve [--rapport]   releve de sante de la flotte (bulle sur panne neuve) | rapport final
               plantrack orchestre [--boucle|--tour|--tout-reprendre|--essai-alertes]   charge du serveur : feu, sessions, pauses
               plantrack attentes [plus-tard]   ce qui attend ton avis depuis plus de 7 jours (tri groupe)"""
@@ -4177,6 +4177,43 @@ def registered_roots():
         return [r for r in dict.fromkeys(l.strip() for l in f) if r]
 
 
+def un_par_carnet(roots):
+    """b55 : une copie `git worktree` partage le carnet du depot principal (b14) : la lire
+    a part sortait le meme depot deux fois, avec les memes nombres. Un depot par carnet,
+    sous le nom du depot principal quand il est lui-meme inscrit."""
+    vus = {}
+    for r in roots:
+        main = os.path.realpath(journal_root(r))
+        if main not in vus or os.path.realpath(r) == main:
+            vus[main] = r
+    return [r for r in roots if r in vus.values()]
+
+
+def rattraper_flotte():
+    """Un depot jamais rouvert ne fait jamais sa ronde (d51 : elle part a l'ouverture) et
+    son coeur prend des semaines de retard (prorent-docs, 21/11). Le bilan du dimanche, qui
+    passe partout, lance la ronde de chaque depot dont le coeur differe de celui-ci.
+    Chaque copie de travail a son propre pt.py : on les passe toutes. Rend les noms remis a niveau."""
+    moi = open(os.path.abspath(__file__), "rb").read()
+    coeur = lambda r: open(os.path.join(r, ".claude", "hooks", "pt.py"), "rb").read()
+    faits = []
+    for r in registered_roots():
+        try:
+            if jetable(r) or coeur(r) == moi:
+                continue
+        except OSError:
+            continue
+        env = dict(os.environ, PLANTRACK_ROOT=r, CLAUDE_PROJECT_DIR=r)
+        try:
+            subprocess.run([sys.executable, os.path.abspath(__file__), "ronde"], cwd=r, env=env,
+                           capture_output=True, text=True, timeout=400)
+            if coeur(r) == moi:
+                faits.append(os.path.basename(r))
+        except (OSError, subprocess.TimeoutExpired) as e:
+            trace(f"rattraper_flotte {r}", e)
+    return faits
+
+
 def jetable(root):
     """Un depot sous /tmp est un bac a sable (essais, tests en reel) : l'inscrire au
     registre reel noie la ronde sous du bruit et masque les vraies pannes (pg11).
@@ -4224,7 +4261,7 @@ def cmd_doctor_all():
     roots = registered_roots()
     if not roots:
         sys.exit("[PlanTrack] aucun depot enregistre — lance `plantrack init` dans chacun.")
-    etat, gone = flotte(roots)
+    etat, gone = flotte(un_par_carnet(roots))
     bad = sum(ko != [] for ko in etat.values())
     for r, ko in etat.items():
         if ko is None:
@@ -4237,7 +4274,7 @@ def cmd_doctor_all():
         with open(REGISTRY, "w", encoding="utf-8") as f:
             f.write("".join(x + "\n" for x in roots if x not in gone))
         print(f"\n{len(gone)} depot(s) efface(s) retire(s) du registre.")
-    print(f"\n{len(roots) - len(gone)} depot(s), {bad} en defaut.")
+    print(f"\n{len(etat)} depot(s), {bad} en defaut.")
     sys.exit(1 if bad else 0)
 
 
@@ -4299,7 +4336,7 @@ def cmd_bilan(args, st):
         print(bilan_ligne(st, jours))
         return
     lignes = []
-    for r in registered_roots():
+    for r in un_par_carnet(registered_roots()):
         if not os.path.isfile(os.path.join(r, ".plantrack", "events.jsonl")) or jetable(r):
             continue
         env = dict(os.environ, PLANTRACK_ROOT=r, CLAUDE_PROJECT_DIR=r)
@@ -4311,6 +4348,9 @@ def cmd_bilan(args, st):
         lignes.append(s)
     if s := orch_bilan(jours):
         lignes.append(s)
+    # apres les lignes : le bilan dit encore « pas ouvert depuis N jours » avant le rattrapage
+    if "--rattraper" in args and (faits := rattraper_flotte()):
+        lignes.append("Remis à jour tout seuls (pas ouverts depuis longtemps) : " + ", ".join(faits))
     if lignes:
         print(f"Bilan PlanTrack des {jours} derniers jours :\n" + "\n".join(lignes))
 
