@@ -2918,3 +2918,47 @@
 {"ts": "2026-11-20T23:21:34+00:00", "kind": "commit", "sha": "4b13e74", "ctype": "chore", "thread": "t23"}
 {"ts": "2026-11-21T00:09:56+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-vast-whistle.md", "thread": "t23"}
 {"ts": "2026-11-21T00:10:17+00:00", "kind": "decision", "id": "d287", "text": "Mariella (tel, 21/11, plan approuve apres relance auto) : rien a faire, veille silencieuse jusqu'au verdict b49 le 22/11 (d23, d285)", "par": "agent"}
+{"ts": "2026-11-21T00:10:17+00:00", "kind": "commit", "sha": "345de49", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-21T00:10:26+00:00", "kind": "file_touched", "text": "sortie/carte-veille-1121.json", "thread": "t23"}
+{"ts": "2026-11-21T12:40:04+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-parsed-wirth.md", "thread": "t23"}
+{"ts": "2026-11-21T13:31:46+00:00", "kind": "file_touched", "text": "../../../tmp/claude-0/-home-mariella-plantrack/8159ad69-6c86-4819-8941-d5069e628d7d/scratchpad/flotte.txt", "thread": "t23"}
+{"ts": "2026-11-21T13:32:32+00:00", "kind": "file_touched", "text": "sortie/page-plantrack/plantrack.html", "thread": "t23"}
+{"ts": "2026-11-21T13:32:39+00:00", "kind": "file_touched", "text": "sortie/page-plantrack/plantrack.html", "thread": "t23"}
+{"ts": "2026-11-21T13:32:55+00:00", "kind": "file_touched", "text": "sortie/check-1121-tests.log", "thread": "t23"}
+{"ts": "2026-11-21T13:36:36+00:00", "kind": "bug", "id": "b54", "text": "Bilan du dimanche : la ligne 'le garde-fou a du tuer N programme(s)' compte une ligne de trop a chaque (re)demarrage d'earlyoom : sa banniere 'sending SIGTERM when mem <= 5 %' contient 'sending sig' et passe pour un programme tue (constate le 21/11 : 387 annonces, 386 reels)", "thread": "t23", "severity": "low", "par": "agent"}
+{"ts": "2026-11-21T13:36:37+00:00", "kind": "bug", "id": "b55", "text": "bilan --all et doctor --all : une copie de travail git (worktree) inscrite au registre partage le carnet du depot principal et sort donc en double avec les memes nombres (bcc + /root/.bcc/espaces/.../bcc ; s69-francoviet + s69-soirees), constate le 21/11", "thread": "t23", "severity": "low", "par": "agent"}
+{"ts": "2026-11-21T13:36:50+00:00", "kind": "attempt", "id": "a80", "bug": "b54", "hypothesis": "orch_bilan ne compte que les lignes earlyoom 'sending sig... to process' (un programme vraiment vise), plus la banniere de demarrage 'sending SIGTERM when mem <='", "session": "8159ad69-6c86-4819-8941-d5069e628d7d", "actor": "claude-code"}
+{"ts": "2026-11-21T13:36:59+00:00", "kind": "file_touched", "text": "sortie/check-1121-tests2.log", "thread": "t23"}
+{"ts": "2026-11-21T13:48:23+00:00", "kind": "commit", "sha": "dddc521", "ctype": "fix", "thread": "t23"}
+{"ts": "2026-11-21T13:48:24+00:00", "kind": "bug_status", "id": "b54", "status": "to_verify"}
+{"ts": "2026-11-21T13:48:42+00:00", "kind": "piege_clos", "id": "pg31", "text": "test corrige en dddc521 : le bilan vide ne lit plus le journal du vrai chef d'orchestre (PLANTRACK_ORCHESTRE)"}
+{"ts": "2026-11-21T13:50:17+00:00", "kind": "commit", "sha": "43d7594", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-21T13:50:20+00:00", "kind": "commit", "sha": "7de1f5f", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-21T13:50:20+00:00", "kind": "file_touched", "text": "pyproject.toml", "thread": "t23"}
+{"ts": "2026-11-21T13:52:05+00:00", "kind": "decision", "id": "d288", "text": "Check complet du 21/11 (demande Mariella tel 'sous fable 5.2, check complet', plan approuve) : 10 depots en retard mis a niveau en 1.9.54 (openstyle, s69-soirees, Discord-MDTV, prorent-docs, Coaching, Ailevel, vpgo, Myview, cvslim, essai-opencode) ; 725 tests verts ; b54 (banniere earlyoom comptee au bilan) corrige, v1.9.55 publiee GitHub seul (pas de cle PyPI) ; b55 (doublons des copies de travail) ouvert ; prorent-supabase en echec (conteneurs disparus, q23). Page explicative https://claude.ai/artifact/Kwc5mDpDKHRy5qn3EYJ31K", "par": "agent"}
+{"ts": "2026-11-21T13:52:31+00:00", "kind": "file_touched", "text": "sortie/carte-check-1121.json", "thread": "t23"}
+{"ts": "2026-11-21T13:52:31+00:00", "kind": "file_touched", "text": "sortie/carte-check-1121.log", "thread": "t23"}
+{"ts": "2026-11-21T13:52:49+00:00", "kind": "file_touched", "text": "sortie/carte-check-1121.log", "thread": "t23"}
+{"ts": "2026-11-21T13:52:49+00:00", "kind": "file_touched", "text": "sortie/carte-check-1121.log", "thread": "t23"}
+{"ts": "2026-11-21T14:45:49+00:00", "kind": "decision", "id": "d289", "text": "Mariella (tel, 21/11 14h45, carte Check complet) : 'Regler les 2 defauts (Recommande)' + 'Ne repose pas ces questions' - (1) b55 : bilan/doctor --all ne comptent plus une copie de travail git en double ; (2) le bilan du dimanche met a jour les depots en retard jamais ouverts (rattrapage).", "par": "agent"}
+{"ts": "2026-11-21T14:47:10+00:00", "kind": "attempt", "id": "a81", "bug": "b55", "hypothesis": "Dedoublonner la flotte par carnet (journal_root) dans bilan --all et doctor --all : une copie de travail est lue une seule fois, sous le nom du depot principal", "session": "1da8b472-fd16-414a-932e-7ed75bd58993", "actor": "claude-code"}
+{"ts": "2026-11-21T14:47:27+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-21T14:47:27+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-21T14:47:27+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-21T14:47:28+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-21T14:47:28+00:00", "kind": "file_touched", "text": "bilan.sh", "thread": "t23"}
+{"ts": "2026-11-21T14:47:37+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-21T14:47:37+00:00", "kind": "file_touched", "text": ".claude/hooks/pt.py", "thread": "t23"}
+{"ts": "2026-11-21T14:47:49+00:00", "kind": "file_touched", "text": "sortie/b55-tests.log", "thread": "t23"}
+{"ts": "2026-11-21T14:50:22+00:00", "kind": "file_touched", "text": "sortie/b55-tests.log", "thread": "t23"}
+{"ts": "2026-11-21T14:52:41+00:00", "kind": "file_touched", "text": "sortie/b55-tests-avant.log", "thread": "t23"}
+{"ts": "2026-11-21T14:55:17+00:00", "kind": "file_touched", "text": "sortie/b55-tests.log", "thread": "t23"}
+{"ts": "2026-11-21T15:05:50+00:00", "kind": "file_touched", "text": "sortie/b55-tests.log", "thread": "t23"}
+{"ts": "2026-11-21T15:06:38+00:00", "kind": "file_touched", "text": "sortie/b55-tests.log", "thread": "t23"}
+{"ts": "2026-11-21T15:09:34+00:00", "kind": "file_touched", "text": "tests/scenario.sh", "thread": "t23"}
+{"ts": "2026-11-21T15:09:43+00:00", "kind": "file_touched", "text": "sortie/b55-tests.log", "thread": "t23"}
+{"ts": "2026-11-21T15:12:30+00:00", "kind": "commit", "sha": "f97e12d", "ctype": "fix", "thread": "t23"}
+{"ts": "2026-11-21T15:12:56+00:00", "kind": "commit", "sha": "8645f6f", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-21T15:12:58+00:00", "kind": "commit", "sha": "a4857fa", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-21T15:14:54+00:00", "kind": "attempt", "id": "a82", "bug": "b55", "hypothesis": "Livre v1.9.56 (f97e12d, GitHub + PyPI verifie) : un_par_carnet() dedoublonne bilan/doctor --all par carnet ; 6 tests, 731 verts", "session": "1da8b472-fd16-414a-932e-7ed75bd58993", "actor": "claude-code"}
+{"ts": "2026-11-21T15:14:54+00:00", "kind": "decision", "id": "d290", "text": "v1.9.56 publiee (21/11, GitHub + PyPI verifie, choix Mariella tel 'Regler les 2 defauts') : b55 corrige (une copie de travail lue une fois, sous le nom du depot principal) ; bilan.sh lance 'bilan --all --rattraper' : chaque dimanche, la ronde passe dans tout depot dont le coeur differe de la derniere version, ligne 'Remis a jour tout seuls' dans le bilan. 731 tests verts, /code-review low sans defaut.", "par": "agent"}

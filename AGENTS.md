@@ -14,15 +14,19 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [292 commits]
-  fichiers recemment ecrits : sortie/carte-veille-1120.json, sortie/carte-veille-1120.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-woolly-clover.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-synthetic-tarjan.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-eager-moonbeam.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-vast-whistle.md
+FIL ACTIF — t23 : guides de test automatiques (d100) [299 commits]
+  fichiers recemment ecrits : sortie/carte-check-1121.log, bilan.sh, .claude/hooks/pt.py, sortie/b55-tests-avant.log, tests/scenario.sh, sortie/b55-tests.log
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
   t5 : travaux sur main — reprise : retour au travail courant apres la faille
 
+BUGS NON CORRIGES (personne ne s'en est occupe) :
+  b55 (open) [t23] bilan --all et doctor --all : une copie de travail git (worktree) inscrite au registre partage le carnet du depot principal et sort donc en… (agent) [2 tentatives, derniere: Livre v1.9.56 (f97e12d, GitHub + PyPI verifie) : un_par_car…]
+
 BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b49 (to_verify) [t23] Surcharge 12/11 22h01-22h13 (earlyoom tue chrome + java 1,4 Go) : la respiration (battre, pt.py) reveille prolearn-supabase (22h01) puis pr… (agent) [1 tentatives, derniere: Livre v1.9.47 (bd9c2a7 + 21baa4f, GitHub seul, pas de cle P…]
+  b54 (to_verify) [t23] Bilan du dimanche : la ligne 'le garde-fou a du tuer N programme(s)' compte une ligne de trop a chaque (re)demarrage d'earlyoom : sa bannie… (agent) [1 tentatives, derniere: orch_bilan ne compte que les lignes earlyoom 'sending sig..…]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
@@ -312,6 +316,9 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d285 : Mariella (tel, 20/11 21h51, carte Veille) : 'Rester en veille (Recommande)' + 'Ne repose pas ces questions' - veille silencieuse jusqu'au v… (agent)
   d286 : Mariella (tel, 20/11 23h03, plan approuve 'On y va') : rien a faire, veille silencieuse jusqu'au verdict b49 le 22/11 (d23, d285) (agent)
   d287 : Mariella (tel, 21/11, plan approuve apres relance auto) : rien a faire, veille silencieuse jusqu'au verdict b49 le 22/11 (d23, d285) (agent)
+  d288 : Check complet du 21/11 (demande Mariella tel 'sous fable 5.2, check complet', plan approuve) : 10 depots en retard mis a niveau en 1.9.54 (… (agent)
+  d289 : Mariella (tel, 21/11 14h45, carte Check complet) : 'Regler les 2 defauts (Recommande)' + 'Ne repose pas ces questions' - (1) b55 : bilan/do… (agent)
+  d290 : v1.9.56 publiee (21/11, GitHub + PyPI verifie, choix Mariella tel 'Regler les 2 defauts') : b55 corrige (une copie de travail lue une fois,… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
@@ -331,7 +338,6 @@ Pieges connus :
   pg28 : Orchestre : le hook-pretool reinscrit la session sur le premier ancetre claude/…
   pg29 : tests/scenario.sh lance sous le compte bccsession : 6 echecs ronde/b20/bilan --…
   pg30 : Compte bccsession (sessions du telephone) : la boucle locale est filtree — seul…
-  pg31 : tests/scenario.sh 'bilan --all : rien a dire' echoue sur le serveur reel quand …
   pg33 : Orchestre (b51, v1.9.49) : un service ajoute au souffle.conf d'un projet n'est …
   pg34 : Le serveur a 4 vCPU (nproc), pas 2 : l'alerte de saturation (seuil 3.00 'sur 2 …
   pg35 : MiamBoost : 'supabase start' redescend TOUTE la pile si supabase_studio_miamboo…
