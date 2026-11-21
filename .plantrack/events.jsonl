@@ -2971,3 +2971,8 @@
 {"ts": "2026-11-21T16:16:15+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-eager-unicorn.md", "thread": "t23"}
 {"ts": "2026-11-21T16:21:01+00:00", "kind": "answer", "id": "q40", "text": "téléphone 21/11 15h15 : Rester en veille (Recommandé) + Ne repose pas ces questions", "canal": "téléphone 21/11 15h15 : Rester en veille (Recommandé) + Ne repose pas ces questions"}
 {"ts": "2026-11-21T16:21:01+00:00", "kind": "decision", "id": "d291", "text": "Mariella (tel, 21/11, plan approuve apres relance auto) : rien a faire, veille silencieuse jusqu'au verdict b49 le 22/11 (d23, d290)", "par": "agent"}
+{"ts": "2026-11-21T16:21:02+00:00", "kind": "commit", "sha": "e667c49", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-21T16:21:20+00:00", "kind": "file_touched", "text": "sortie/carte-veille-1121.json", "thread": "t23"}
+{"ts": "2026-11-21T16:21:20+00:00", "kind": "file_touched", "text": "sortie/carte-veille-1121.log", "thread": "t23"}
+{"ts": "2026-11-21T18:07:57+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-piped-globe.md", "thread": "t23"}
+{"ts": "2026-11-21T23:27:51+00:00", "kind": "decision", "id": "d292", "text": "Mariella (tel, 21/11 18h07, carte Veille) : 'Rester en veille (Recommande)' + 'Ne repose pas ces questions' - veille silencieuse jusqu'au verdict b49 le 22/11 (d23, d290)", "par": "agent"}
