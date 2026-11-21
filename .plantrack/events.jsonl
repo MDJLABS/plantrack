@@ -2962,3 +2962,5 @@
 {"ts": "2026-11-21T15:12:58+00:00", "kind": "commit", "sha": "a4857fa", "ctype": "chore", "thread": "t23"}
 {"ts": "2026-11-21T15:14:54+00:00", "kind": "attempt", "id": "a82", "bug": "b55", "hypothesis": "Livre v1.9.56 (f97e12d, GitHub + PyPI verifie) : un_par_carnet() dedoublonne bilan/doctor --all par carnet ; 6 tests, 731 verts", "session": "1da8b472-fd16-414a-932e-7ed75bd58993", "actor": "claude-code"}
 {"ts": "2026-11-21T15:14:54+00:00", "kind": "decision", "id": "d290", "text": "v1.9.56 publiee (21/11, GitHub + PyPI verifie, choix Mariella tel 'Regler les 2 defauts') : b55 corrige (une copie de travail lue une fois, sous le nom du depot principal) ; bilan.sh lance 'bilan --all --rattraper' : chaque dimanche, la ronde passe dans tout depot dont le coeur differe de la derniere version, ligne 'Remis a jour tout seuls' dans le bilan. 731 tests verts, /code-review low sans defaut.", "par": "agent"}
+{"ts": "2026-11-21T15:14:55+00:00", "kind": "commit", "sha": "c1cf284", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-21T15:15:17+00:00", "kind": "bug_status", "id": "b55", "status": "to_verify"}

@@ -14,19 +14,17 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [299 commits]
+FIL ACTIF — t23 : guides de test automatiques (d100) [300 commits]
   fichiers recemment ecrits : sortie/carte-check-1121.log, bilan.sh, .claude/hooks/pt.py, sortie/b55-tests-avant.log, tests/scenario.sh, sortie/b55-tests.log
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
   t5 : travaux sur main — reprise : retour au travail courant apres la faille
 
-BUGS NON CORRIGES (personne ne s'en est occupe) :
-  b55 (open) [t23] bilan --all et doctor --all : une copie de travail git (worktree) inscrite au registre partage le carnet du depot principal et sort donc en… (agent) [2 tentatives, derniere: Livre v1.9.56 (f97e12d, GitHub + PyPI verifie) : un_par_car…]
-
 BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
   b49 (to_verify) [t23] Surcharge 12/11 22h01-22h13 (earlyoom tue chrome + java 1,4 Go) : la respiration (battre, pt.py) reveille prolearn-supabase (22h01) puis pr… (agent) [1 tentatives, derniere: Livre v1.9.47 (bd9c2a7 + 21baa4f, GitHub seul, pas de cle P…]
   b54 (to_verify) [t23] Bilan du dimanche : la ligne 'le garde-fou a du tuer N programme(s)' compte une ligne de trop a chaque (re)demarrage d'earlyoom : sa bannie… (agent) [1 tentatives, derniere: orch_bilan ne compte que les lignes earlyoom 'sending sig..…]
+  b55 (to_verify) [t23] bilan --all et doctor --all : une copie de travail git (worktree) inscrite au registre partage le carnet du depot principal et sort donc en… (agent) [2 tentatives, derniere: Livre v1.9.56 (f97e12d, GitHub + PyPI verifie) : un_par_car…]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
