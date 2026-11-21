@@ -2455,7 +2455,9 @@ def orch_bilan(jours):
     try:
         p = subprocess.run(["journalctl", "-u", "earlyoom", "--since", f"-{jours}d", "--no-pager", "-q"],
                            capture_output=True, text=True, timeout=30)
-        tues = sum(1 for l in p.stdout.splitlines() if "sending sig" in l.lower())
+        # b54 : la banniere de demarrage ("sending SIGTERM when mem <= ...") n'est pas un programme tue
+        tues = sum(1 for l in p.stdout.splitlines()
+                   if "sending sig" in l.lower() and " to process " in l.lower())
     except (OSError, subprocess.SubprocessError):
         tues = None
     texte = (f"• Charge du serveur : {pauses} mise(s) en pause par le chef d'orchestre"

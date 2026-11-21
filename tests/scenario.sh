@@ -1423,7 +1423,13 @@ sleep 1
 # Bilan de la semaine (d37) : des nombres seulement, un depot calme se tait
 B() { CLAUDE_PROJECT_DIR="$D" python3 "$PT" "$@" 2>/dev/null; }
 : > "$R/vide"
-check "bilan --all : rien a dire, rien d'ecrit" "VIDE" "$(PLANTRACK_REGISTRY="$R/vide" python3 "$PT" bilan --all | grep -q . || echo VIDE)"
+# pg31 : sans PLANTRACK_ORCHESTRE, le test lisait le journal du vrai chef d'orchestre du serveur
+check "bilan --all : rien a dire, rien d'ecrit" "VIDE" "$(PLANTRACK_REGISTRY="$R/vide" PLANTRACK_ORCHESTRE="$R/sans-orchestre" python3 "$PT" bilan --all | grep -q . || echo VIDE)"
+# b54 : la banniere de demarrage d'earlyoom n'est pas un programme tue
+mkdir -p "$R/orch54" "$R/bin54"; : > "$R/orch54/journal.log"
+printf '%s\n' '#!/bin/sh' 'echo "nov 17 earlyoom[1]: sending SIGTERM when mem <=  5.00% and swap <= 100.00%,"' 'echo "nov 17 earlyoom[1]: sending SIGTERM to process 42 uid 0 \"chrome\": badness 900, VmRSS 300 MiB"' > "$R/bin54/journalctl"; chmod +x "$R/bin54/journalctl"
+check "bilan --all : la banniere d'earlyoom n'est pas comptee (b54)" "a du tuer 1 programme(s)" \
+  "$(PATH="$R/bin54:$PATH" PLANTRACK_REGISTRY="$R/vide" PLANTRACK_ORCHESTRE="$R/orch54" python3 "$PT" bilan --all)"
 B decide "une decision" >/dev/null; B question "texte secret de la question" >/dev/null
 out=$(B bilan)
 check "bilan : ce qui a avance" "1 décision" "$out"
