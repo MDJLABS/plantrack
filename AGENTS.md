@@ -14,15 +14,14 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [303 commits]
-  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-eager-unicorn.md, sortie/carte-veille-1121.json, sortie/carte-veille-1121.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-piped-globe.md, sortie/carte-b49-verdict-1122.json, sortie/carte-b49-verdict-1122.log
+FIL ACTIF — t23 : guides de test automatiques (d100) [304 commits]
+  fichiers recemment ecrits : sortie/carte-veille-1121.json, sortie/carte-veille-1121.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-piped-globe.md, sortie/carte-b49-verdict-1122.json, sortie/carte-b49-verdict-1122.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-sharded-naur.md
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
   t5 : travaux sur main — reprise : retour au travail courant apres la faille
 
 BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
-  b49 (to_verify) [t23] Surcharge 12/11 22h01-22h13 (earlyoom tue chrome + java 1,4 Go) : la respiration (battre, pt.py) reveille prolearn-supabase (22h01) puis pr… (agent) [1 tentatives, derniere: Livre v1.9.47 (bd9c2a7 + 21baa4f, GitHub seul, pas de cle P…]
   b54 (to_verify) [t23] Bilan du dimanche : la ligne 'le garde-fou a du tuer N programme(s)' compte une ligne de trop a chaque (re)demarrage d'earlyoom : sa bannie… (agent) [1 tentatives, derniere: orch_bilan ne compte que les lignes earlyoom 'sending sig..…]
   b55 (to_verify) [t23] bilan --all et doctor --all : une copie de travail git (worktree) inscrite au registre partage le carnet du depot principal et sort donc en… (agent) [2 tentatives, derniere: Livre v1.9.56 (f97e12d, GitHub + PyPI verifie) : un_par_car…]
 
@@ -319,6 +318,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d290 : v1.9.56 publiee (21/11, GitHub + PyPI verifie, choix Mariella tel 'Regler les 2 defauts') : b55 corrige (une copie de travail lue une fois,… (agent)
   d291 : Mariella (tel, 21/11, plan approuve apres relance auto) : rien a faire, veille silencieuse jusqu'au verdict b49 le 22/11 (d23, d290) (agent)
   d292 : Mariella (tel, 21/11 18h07, carte Veille) : 'Rester en veille (Recommande)' + 'Ne repose pas ces questions' - veille silencieuse jusqu'au v… (agent)
+  d293 : Mariella (tel, 21/11 23h28, carte Verdict surcharge) : 'Valider (Recommande)' + 'Ne repose pas ces questions' - b49 valide, veille silencie… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
@@ -347,8 +347,5 @@ Questions en attente (reponds via !answer qN ...) :
   q23 : Carte 10/11 : guide ProRent pret, rallumer sa base de test (eteinte d155) pour …
   q28 : Carte Suite du 13/11 (apres Checker v2 v1.9.48 et b51 v1.9.49) restee sans repo…
   q36 : Carte 17/11 'Automatiser la charge' : pistes du rapport Fable (A par etapes rec…
-
-Cartes laissees de cote (action a reprendre a la reponse : answer --carte <id>) :
-  q41 (carte b49-1122) : Carte 22/11 'Verdict surcharge' (b49) : valider, refuser ou surveiller encore ?…
 ```
 <!-- plantrack:state-end -->
