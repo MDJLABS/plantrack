@@ -3004,3 +3004,21 @@
 {"ts": "2026-11-23T22:32:07+00:00", "kind": "decision", "id": "d295", "text": "Mariella (tel 23/11, carte Le prochain chantier : 'Navigateurs au guichet (Recommande)') - lot 3 du rapport Fable avant le lot 2 : 118 des 140 arrets earlyoom de la semaine sont des chrome ; les navigateurs des sessions passent par un guichet (jetons de l'orchestre, fermeture des inactifs), objectif moins de 5 chrome tues par jour", "par": "agent"}
 {"ts": "2026-11-23T22:34:02+00:00", "kind": "file_touched", "text": "sortie/carte-plan-navigateurs-1123.json", "thread": "t23"}
 {"ts": "2026-11-23T22:35:06+00:00", "kind": "decision", "id": "d296", "text": "Mariella (tel 23/11, carte Plan des navigateurs, ecrit par elle : 'Passe sous fable 5.2 et lance un rainstorming bmad sur le sujet avant qu'on prenne une decision') - plan navigateurs (d295) suspendu, brainstorming BMAD confie a un agent Fable 5.2 avant toute decision", "par": "agent"}
+{"ts": "2026-11-23T22:35:07+00:00", "kind": "commit", "sha": "cd93966", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-23T22:38:20+00:00", "kind": "file_touched", "text": "sortie/carte-brainstorm-navigateurs-1123.json", "thread": "t23"}
+{"ts": "2026-11-23T23:23:33+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-gleaming-iverson.md", "thread": "t23"}
+{"ts": "2026-11-23T23:25:16+00:00", "kind": "decision", "id": "d297", "text": "Mariella (tel 23/11 22h38, carte Brainstorming navigateurs mene par Fable 5.2) : 'Scripts au guichet (Recommande)' - kvm-lourd lit aussi les scripts node/tsx/bun lances ; s'ils ouvrent un navigateur (chromium.launch, playwright, puppeteer) -> type navigateur en file ; scope navigateur en OOMPolicy=stop (un seul arret, message clair). Plan approuve 24/11.", "par": "agent"}
+{"ts": "2026-11-23T23:26:32+00:00", "kind": "file_touched", "text": "deploiement/charge/kvm-lourd", "thread": "t23"}
+{"ts": "2026-11-23T23:26:36+00:00", "kind": "file_touched", "text": "deploiement/charge/kvm-lourd", "thread": "t23"}
+{"ts": "2026-11-23T23:26:38+00:00", "kind": "file_touched", "text": "deploiement/charge/kvm-lourd", "thread": "t23"}
+{"ts": "2026-11-23T23:26:43+00:00", "kind": "file_touched", "text": "deploiement/charge/kvm-lourd", "thread": "t23"}
+{"ts": "2026-11-23T23:26:46+00:00", "kind": "file_touched", "text": "deploiement/charge/kvm-lourd", "thread": "t23"}
+{"ts": "2026-11-23T23:26:48+00:00", "kind": "file_touched", "text": "deploiement/charge/kvm-lourd", "thread": "t23"}
+{"ts": "2026-11-23T23:26:56+00:00", "kind": "file_touched", "text": "deploiement/charge/kvm-lourd", "thread": "t23"}
+{"ts": "2026-11-23T23:27:02+00:00", "kind": "file_touched", "text": "deploiement/charge/kvm-lourd", "thread": "t23"}
+{"ts": "2026-11-23T23:27:04+00:00", "kind": "file_touched", "text": "deploiement/charge/kvm-lourd", "thread": "t23"}
+{"ts": "2026-11-23T23:27:06+00:00", "kind": "file_touched", "text": "deploiement/charge/kvm-lourd", "thread": "t23"}
+{"ts": "2026-11-23T23:28:43+00:00", "kind": "commit", "sha": "c48ead5", "ctype": "feat", "thread": "t23"}
+{"ts": "2026-11-23T23:31:35+00:00", "kind": "decision", "id": "d298", "text": "d297 livre (24/11) : kvm-lourd c48ead5 installe dans /usr/local/bin - node/tsx/bun/deno/npx tsx <fichier JS> et node -e lus ; contenu chromium.launch/playwright/puppeteer/verifier-postures -> type navigateur (hook-pretool l'enveloppe en file, verifie en reel) ; scope navigateur OOMPolicy=stop + arret en entier sous 7 % de RAM dispo (KVM_LOURD_PLANCHER_NAVIGATEUR), code 137, journal manque-memoire. 13 cas de classement OK + rejeu manque memoire OK. Pas de version PyPI : deploiement/ n'est pas dans le paquet.", "par": "agent"}
+{"ts": "2026-11-23T23:37:12+00:00", "kind": "file_touched", "text": "sortie/push-d297.log", "thread": "t23"}
+{"ts": "2026-11-23T23:37:12+00:00", "kind": "file_touched", "text": "sortie/push-d297.log", "thread": "t23"}
