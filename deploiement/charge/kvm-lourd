@@ -54,6 +54,17 @@ class TypeLourd:
 # Commande non classee passee a la main (kvm-lourd run -- ...).
 AUTRE = TypeLourd("autre", 1024**3, re.compile(r"(?!)"), None)
 
+# d297 (24/11) : un script qui ouvre un navigateur (le 17/11, verif-statique.cjs de
+# mdjlabs : 102 chrome tues en 2 min) passait hors file, son nom ne disant rien.
+# On le reconnait a son contenu ; il prend alors le type `navigateur` de types.conf.
+NAVIGATEUR_JS = re.compile(
+    r"\b(chromium|firefox|webkit)\s*\.\s*launch(Persistent\w*)?\s*\("
+    r"|\bpuppeteer\b|\bfrom\s+['\"](@playwright/test|playwright(-core)?)['\"]"
+    r"|\brequire\(\s*['\"](@playwright/test|playwright(-core)?)['\"]\s*\)"
+    r"|\bverifier-postures\b")
+_LANCEURS_JS = {"node", "tsx", "bun", "deno", "ts-node"}
+_EXT_JS = re.compile(r"\.(c|m)?(j|t)sx?$")
+
 # Un segment dont la commande est l'une d'elles ne fait que lire, gerer des
 # fichiers, des paquets ou des processus : jamais lourd, meme s'il cite un outil
 # lourd (`git commit -m "fix eslint"`, `pkill -f gradle`).
@@ -134,7 +145,19 @@ def _script(mots: list[str], dossier: str, ecrits: dict[str, str] | None = None)
     `bash x.sh`), ou None. 16/10 : un build gradle range dans un script passait
     hors file, le garde-fou ne voyant que le nom du fichier."""
     direct = False
-    if mots[0].rsplit("/", 1)[-1] in ("bash", "sh") and len(mots) > 1 and not mots[1].startswith("-"):
+    lanceur = mots[0].rsplit("/", 1)[-1]
+    if lanceur == "npx" and len(mots) > 1 and mots[1] in _LANCEURS_JS:
+        mots, lanceur = mots[1:], mots[1]
+    if lanceur in _LANCEURS_JS:
+        # `node -e "<code>"` : le code est dans la commande
+        for i, m in enumerate(mots[1:-1], 1):
+            if m in ("-e", "--eval", "-p", "--print"):
+                return mots[i + 1]
+        # `node [options] x.cjs`, `bun run x.ts`, `deno run -A x.ts` : le premier fichier JS
+        chemin = next((m for m in mots[1:] if not m.startswith("-") and _EXT_JS.search(m)), None)
+        if chemin is None:
+            return None
+    elif lanceur in ("bash", "sh") and len(mots) > 1 and not mots[1].startswith("-"):
         chemin = mots[1]
     elif "/" in mots[0]:
         chemin, direct = mots[0], True
@@ -178,6 +201,8 @@ def classe(commande: str, types: list[TypeLourd], dossier: str | None = None,
         if contenu is not None:     # puis le segment lui-meme (`./gradlew build`)
             t = classe(contenu, types, dossier, 1)
             trouves += [t] if t else []
+            if NAVIGATEUR_JS.search(contenu):
+                trouves += [t for t in types if t.nom == "navigateur"][:1]
         premier = mots[0].rsplit("/", 1)[-1]
         if premier == "kvm-lourd":
             return None     # deja enveloppee : jamais deux fois
@@ -670,7 +695,9 @@ def executer(cfg: Config, moi: Entree, commande: list[str], recus: list[int]) ->
     if cfg.systemd:
         argv = ["systemd-run", "--scope", "--quiet", "--collect", f"--slice={cfg.slice}",
                 f"--unit={scope}", "-p", f"MemoryHigh={int(moi.estimation * 1.3)}",
-                "-p", f"MemoryMax={int(moi.estimation * 1.8)}", "--", *commande]
+                "-p", f"MemoryMax={int(moi.estimation * 1.8)}",
+                *(["-p", "OOMPolicy=stop"] if moi.type == "navigateur" else []),
+                "--", *commande]
     else:
         if os.environ.get("KVM_LOURD_SANS_SYSTEMD") != "1":
             avertir("systemd-run indisponible : execution directe, sans plafond")
@@ -678,6 +705,11 @@ def executer(cfg: Config, moi: Entree, commande: list[str], recus: list[int]) ->
     debut = time.monotonic()
     limite = debut + duree_max(moi.type)
     depasse = False
+    manque = False
+    # d297 : un navigateur est arrete EN ENTIER avant que le garde-fou memoire
+    # (earlyoom, 5 %) ne tue ses pages une par une : un seul arret, un message clair
+    plancher = (int(memoire_totale(cfg.meminfo) * float(os.environ.get(
+        "KVM_LOURD_PLANCHER_NAVIGATEUR", "7")) / 100) if moi.type == "navigateur" else 0)
     pic = 0
     try:
         enfant = subprocess.Popen(argv)
@@ -697,28 +729,40 @@ def executer(cfg: Config, moi: Entree, commande: list[str], recus: list[int]) ->
             break
         except subprocess.TimeoutExpired:
             pic = max(pic, lire_cgroup(cfg.cgroup, moi.id, "memory.peak"))
-        if not depasse and time.monotonic() >= limite:
+        if not (depasse or manque) and plancher and memoire_dispo(cfg.meminfo) < plancher:
+            manque = True
+        elif not (depasse or manque) and time.monotonic() >= limite:
             depasse = True
-            if cfg.systemd:
-                subprocess.run(["systemctl", "stop", f"{scope}.scope"], capture_output=True)
-            enfant.terminate()
-            try:
-                enfant.wait(timeout=10)
-            except subprocess.TimeoutExpired:
-                enfant.kill()
+        else:
+            continue    # rien de neuf (ou deja arretee : on attend sa fin)
+        if cfg.systemd:
+            subprocess.run(["systemctl", "stop", f"{scope}.scope"], capture_output=True)
+        enfant.terminate()
+        try:
+            enfant.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            enfant.kill()
     pic = max(pic, lire_cgroup(cfg.cgroup, moi.id, "memory.peak"))
     if cfg.systemd:
         # 24/10 : un build lance en tache detachee (`setsid nohup ... &`) survit au
         # bash enveloppe : sa place reste prise jusqu'a sa vraie fin (daemons exclus)
         fin_max = min(time.monotonic() + DETACHE_MAX, limite)
-        while _detaches(cfg.cgroup, moi.id) and time.monotonic() < fin_max:
+        while not manque and _detaches(cfg.cgroup, moi.id) and time.monotonic() < fin_max:
             time.sleep(1)
             pic = max(pic, lire_cgroup(cfg.cgroup, moi.id, "memory.peak"))
-        if _detaches(cfg.cgroup, moi.id) and time.monotonic() >= limite:
+            if plancher and memoire_dispo(cfg.meminfo) < plancher:
+                manque = True
+        if not manque and _detaches(cfg.cgroup, moi.id) and time.monotonic() >= limite:
             depasse = True
         # restes du scope (ex. daemon gradle) : hors comptabilite, on les arrete
         subprocess.run(["systemctl", "stop", f"{scope}.scope"], capture_output=True)
     code = 128 - code if code < 0 else code
+    if manque:
+        code = 137
+        avertir(f"memoire du serveur presque pleine : le navigateur de {moi.projet} est arrete "
+                f"en entier (une seule fois) pour eviter des dizaines d'arrets du garde-fou. "
+                f"Relance plus tard : la file le fera partir quand la memoire suffira.")
+        journaliser(cfg, f"manque-memoire {moi.projet}/{moi.type} arretee : {moi.commande[:120]}")
     if depasse:
         ecoule = time.monotonic() - debut
         temps = f"{round(ecoule / 60)} min" if ecoule >= 60 else f"{round(ecoule)} s"
