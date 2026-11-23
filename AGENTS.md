@@ -14,16 +14,12 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [304 commits]
-  fichiers recemment ecrits : sortie/carte-veille-1121.json, sortie/carte-veille-1121.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-piped-globe.md, sortie/carte-b49-verdict-1122.json, sortie/carte-b49-verdict-1122.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-sharded-naur.md
+FIL ACTIF — t23 : guides de test automatiques (d100) [305 commits]
+  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-sharded-naur.md, sortie/carte-suite-1122.json, sortie/carte-suite-1122.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-fizzy-salamander.md, sortie/carte-b54-b55-1123.json, sortie/carte-b54-b55-1123.log
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
   t5 : travaux sur main — reprise : retour au travail courant apres la faille
-
-BUGS EN ATTENTE DE TON VERDICT (corriges, ne pas les refaire) :
-  b54 (to_verify) [t23] Bilan du dimanche : la ligne 'le garde-fou a du tuer N programme(s)' compte une ligne de trop a chaque (re)demarrage d'earlyoom : sa bannie… (agent) [1 tentatives, derniere: orch_bilan ne compte que les lignes earlyoom 'sending sig..…]
-  b55 (to_verify) [t23] bilan --all et doctor --all : une copie de travail git (worktree) inscrite au registre partage le carnet du depot principal et sort donc en… (agent) [2 tentatives, derniere: Livre v1.9.56 (f97e12d, GitHub + PyPI verifie) : un_par_car…]
 
 DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d1 : Purge des transcripts : hook-precompact ne garde que les 5 derniers (MAX_ARCHIVES). Constate le 05/09 sur bcc — 1,7 Go pour 15 archives, ch… (agent)
@@ -319,6 +315,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d291 : Mariella (tel, 21/11, plan approuve apres relance auto) : rien a faire, veille silencieuse jusqu'au verdict b49 le 22/11 (d23, d290) (agent)
   d292 : Mariella (tel, 21/11 18h07, carte Veille) : 'Rester en veille (Recommande)' + 'Ne repose pas ces questions' - veille silencieuse jusqu'au v… (agent)
   d293 : Mariella (tel, 21/11 23h28, carte Verdict surcharge) : 'Valider (Recommande)' + 'Ne repose pas ces questions' - b49 valide, veille silencie… (agent)
+  d294 : Mariella (tel 23/11, carte Trier b54 et b55 : Valider les deux (Recommandé)) - b54 et b55 valides ; veille silencieuse (d23), ne pas repose… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…
