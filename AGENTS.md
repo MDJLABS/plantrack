@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [305 commits]
-  fichiers recemment ecrits : ../../../root/.claude/plans/contexte-reconstruit-par-le-sharded-naur.md, sortie/carte-suite-1122.json, sortie/carte-suite-1122.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-fizzy-salamander.md, sortie/carte-b54-b55-1123.json, sortie/carte-b54-b55-1123.log
+FIL ACTIF — t23 : guides de test automatiques (d100) [306 commits]
+  fichiers recemment ecrits : sortie/carte-suite-1122.json, sortie/carte-suite-1122.log, ../../../root/.claude/plans/contexte-reconstruit-par-le-fizzy-salamander.md, sortie/carte-b54-b55-1123.json, sortie/carte-b54-b55-1123.log, sortie/carte-suite-1123.json
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -341,8 +341,6 @@ Pieges connus :
   pg36 : demander.ts refuse un objet JSON seul (log 'il faut au moins une question') : t…
 
 Questions en attente (reponds via !answer qN ...) :
-  q23 : Carte 10/11 : guide ProRent pret, rallumer sa base de test (eteinte d155) pour …
-  q28 : Carte Suite du 13/11 (apres Checker v2 v1.9.48 et b51 v1.9.49) restee sans repo…
   q36 : Carte 17/11 'Automatiser la charge' : pistes du rapport Fable (A par etapes rec…
 ```
 <!-- plantrack:state-end -->

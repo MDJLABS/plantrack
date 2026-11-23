@@ -2994,3 +2994,7 @@
 {"ts": "2026-11-23T22:02:21+00:00", "kind": "bug_status", "id": "b54", "status": "validated", "canal": "tel 23/11, carte Trier b54 et b55 : Valider les deux (Recommandé)"}
 {"ts": "2026-11-23T22:02:21+00:00", "kind": "bug_status", "id": "b55", "status": "validated", "canal": "tel 23/11, carte Trier b54 et b55 : Valider les deux (Recommandé)"}
 {"ts": "2026-11-23T22:02:21+00:00", "kind": "decision", "id": "d294", "text": "Mariella (tel 23/11, carte Trier b54 et b55 : Valider les deux (Recommandé)) - b54 et b55 valides ; veille silencieuse (d23), ne pas reposer ces questions", "par": "agent"}
+{"ts": "2026-11-23T22:02:22+00:00", "kind": "commit", "sha": "11a2a8b", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-23T22:02:48+00:00", "kind": "file_touched", "text": "sortie/carte-suite-1123.json", "thread": "t23"}
+{"ts": "2026-11-23T22:13:29+00:00", "kind": "answer", "id": "q23", "text": "Plus tard : ProRent reste eteint tant que Mariella ne veut pas tester son guide", "canal": "tel 23/11, carte Ranger 2 vieilles questions : Ranger les deux (Recommandé)"}
+{"ts": "2026-11-23T22:13:29+00:00", "kind": "answer", "id": "q28", "text": "Deja traite : tri des 11 fait en d244", "canal": "tel 23/11, carte Ranger 2 vieilles questions : Ranger les deux (Recommandé)"}
