@@ -3022,3 +3022,14 @@
 {"ts": "2026-11-23T23:31:35+00:00", "kind": "decision", "id": "d298", "text": "d297 livre (24/11) : kvm-lourd c48ead5 installe dans /usr/local/bin - node/tsx/bun/deno/npx tsx <fichier JS> et node -e lus ; contenu chromium.launch/playwright/puppeteer/verifier-postures -> type navigateur (hook-pretool l'enveloppe en file, verifie en reel) ; scope navigateur OOMPolicy=stop + arret en entier sous 7 % de RAM dispo (KVM_LOURD_PLANCHER_NAVIGATEUR), code 137, journal manque-memoire. 13 cas de classement OK + rejeu manque memoire OK. Pas de version PyPI : deploiement/ n'est pas dans le paquet.", "par": "agent"}
 {"ts": "2026-11-23T23:37:12+00:00", "kind": "file_touched", "text": "sortie/push-d297.log", "thread": "t23"}
 {"ts": "2026-11-23T23:37:12+00:00", "kind": "file_touched", "text": "sortie/push-d297.log", "thread": "t23"}
+{"ts": "2026-11-23T23:37:17+00:00", "kind": "commit", "sha": "9c7438f", "ctype": "chore", "thread": "t23"}
+{"ts": "2026-11-23T23:37:20+00:00", "kind": "file_touched", "text": "sortie/push-d297b.log", "thread": "t23"}
+{"ts": "2026-11-23T23:37:35+00:00", "kind": "file_touched", "text": "sortie/carte-suite-navigateurs-1124.json", "thread": "t23"}
+{"ts": "2026-11-23T23:37:35+00:00", "kind": "file_touched", "text": "sortie/carte-suite-navigateurs-1124.log", "thread": "t23"}
+{"ts": "2026-11-23T23:37:43+00:00", "kind": "file_touched", "text": "sortie/carte-suite-navigateurs-1124.log", "thread": "t23"}
+{"ts": "2026-11-23T23:37:43+00:00", "kind": "file_touched", "text": "sortie/carte-suite-navigateurs-1124.json", "thread": "t23"}
+{"ts": "2026-11-24T06:30:50+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-lazy-iverson.md", "thread": "t23"}
+{"ts": "2026-11-24T07:47:46+00:00", "kind": "file_touched", "text": "../../../root/.claude/plans/contexte-reconstruit-par-le-fluffy-nebula.md", "thread": "t23"}
+{"ts": "2026-11-24T22:30:16+00:00", "kind": "file_touched", "text": "sortie/install-playwright-mcp.log", "thread": "t23"}
+{"ts": "2026-11-24T22:30:28+00:00", "kind": "file_touched", "text": "deploiement/charge/installer.sh", "thread": "t23"}
+{"ts": "2026-11-24T22:30:34+00:00", "kind": "decision", "id": "d299", "text": "Mariella (tel, 24/11, plan approuve 'Retirer l'enveloppe') : outil navigateur @playwright/mcp@0.0.83 installe dans /opt/playwright-mcp (installer.sh complete) ; bcc doit lancer node /opt/playwright-mcp/node_modules/@playwright/mcp/cli.js au lieu de npx (server/tour.ts OUTILS_FIGES.playwright, sans --isolated, profil guichet d152 inchange) - changement transmis a la session bcc. Mesure avant : 5 enveloppes npm exec = 554 Mo (~110 Mo chacune).", "par": "agent"}

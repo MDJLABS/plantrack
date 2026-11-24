@@ -14,8 +14,8 @@
 <!-- genere par plantrack a chaque commit — ne pas editer a la main -->
 ```
 
-FIL ACTIF — t23 : guides de test automatiques (d100) [309 commits]
-  fichiers recemment ecrits : sortie/carte-brainstorm-1123.json, sortie/carte-plan-navigateurs-1123.json, sortie/carte-brainstorm-navigateurs-1123.json, ../../../root/.claude/plans/contexte-reconstruit-par-le-gleaming-iverson.md, deploiement/charge/kvm-lourd, sortie/push-d297.log
+FIL ACTIF — t23 : guides de test automatiques (d100) [310 commits]
+  fichiers recemment ecrits : sortie/carte-suite-navigateurs-1124.log, sortie/carte-suite-navigateurs-1124.json, ../../../root/.claude/plans/contexte-reconstruit-par-le-lazy-iverson.md, ../../../root/.claude/plans/contexte-reconstruit-par-le-fluffy-nebula.md, sortie/install-playwright-mcp.log, deploiement/charge/installer.sh
 
 FILS EN PAUSE (ne pas y toucher sans reprise explicite) :
   t2 : verdict humain en session (!verify / !reject) — reprise : tri des bugs livre et propage (plantrack/bcc/miamboost) ; reste a faire valider b8 par Mariella
@@ -320,6 +320,7 @@ DECISIONS ACTEES (ne jamais revenir dessus ni reimplementer) :
   d296 : Mariella (tel 23/11, carte Plan des navigateurs, ecrit par elle : 'Passe sous fable 5.2 et lance un rainstorming bmad sur le sujet avant qu… (agent)
   d297 : Mariella (tel 23/11 22h38, carte Brainstorming navigateurs mene par Fable 5.2) : 'Scripts au guichet (Recommande)' - kvm-lourd lit aussi le… (agent)
   d298 : d297 livre (24/11) : kvm-lourd c48ead5 installe dans /usr/local/bin - node/tsx/bun/deno/npx tsx <fichier JS> et node -e lus ; contenu chrom… (agent)
+  d299 : Mariella (tel, 24/11, plan approuve 'Retirer l'enveloppe') : outil navigateur @playwright/mcp@0.0.83 installe dans /opt/playwright-mcp (ins… (agent)
 
 Pieges connus :
   pg9 : Une porte humaine sans aucune question posee ne s'ouvre PAS : 'phase next' exig…

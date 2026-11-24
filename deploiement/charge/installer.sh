@@ -12,6 +12,10 @@ install -m 644 "$ICI/plantrack-gardien.service" "$ICI/plantrack-gardien.timer" /
 install -m 755 "$ICI/kvm-lourd" /usr/local/bin/kvm-lourd
 install -m 755 "$ICI/menage-serveur.sh" /usr/local/bin/menage-serveur.sh
 install -m 755 "$ICI/supa-start" /usr/local/bin/supa-start
+# outil navigateur installe une fois (d299) : les sessions bcc lancent cli.js
+# directement, sans l'enveloppe "npm exec" qui restait en memoire (~110 Mo chacune).
+# Meme version que OUTILS_FIGES.playwright de bcc (server/tour.ts).
+npm install --prefix /opt/playwright-mcp @playwright/mcp@0.0.83
 systemctl daemon-reload
 # une seule voix : l'ancienne alerte de charge se tait, le gardien prend le relais
 systemctl disable --now vps-charge-alerte.timer 2>/dev/null || true
